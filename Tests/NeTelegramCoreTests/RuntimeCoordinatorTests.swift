@@ -1208,6 +1208,31 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(TDLibNotificationRouter.route(account: account, groupID: 1, groupChatID: 5, notification: unknownTopic) == nil)
 }
 
+@Test func conversationHistoryRequestsPreserveEveryTypedTopic() {
+    let account = AccountUUID()
+    let targets: [(ConversationTopicKey, String, String, Int64)] = [
+        (.main, "getChatHistory", "chat_id", 41),
+        (.thread(messageThreadID: 17), "getMessageThreadHistory", "message_id", 17),
+        (.forum(topicID: 12), "getForumTopicHistory", "forum_topic_id", 12),
+        (.directMessages(topicID: 23), "getDirectMessagesChatTopicHistory", "topic_id", 23),
+        (.savedMessages(topicID: 29), "getSavedMessagesTopicHistory", "saved_messages_topic_id", 29),
+    ]
+
+    for (topic, expectedType, topicField, topicID) in targets {
+        let request = ConversationHistoryRequest.make(
+            for: ConversationKey(account: account, chatID: 41, topic: topic),
+            fromMessageID: 99,
+            limit: 37
+        )
+        #expect(request["@type"] as? String == expectedType)
+        let hasChatID = (request["chat_id"] as? NSNumber)?.int64Value == 41
+        #expect(hasChatID == (topic != .savedMessages(topicID: 29)))
+        #expect((request[topicField] as? NSNumber)?.int64Value == topicID)
+        #expect((request["from_message_id"] as? NSNumber)?.int64Value == 99)
+        #expect((request["limit"] as? NSNumber)?.int32Value == 37)
+    }
+}
+
 @Test func textSendPermissionRejectsChannelsUnknownSendersTopicsAndPaidOptions() {
     let ordinaryGroup = ChatSendPermission(canSendBasicMessages: true, isChannel: false, defaultSenderTelegramUserID: 123)
     #expect(ordinaryGroup.permitsTextSend(as: 123, topic: .main, paidStars: 0))

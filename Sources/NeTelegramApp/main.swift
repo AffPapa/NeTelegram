@@ -146,6 +146,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var forumTopicsByAccount: [AccountUUID: [Int64: [ForumTopicDescriptor]]] = [:]
     private var forumChatsByAccount: [AccountUUID: Set<Int64>] = [:]
     private var selectedForumTopicIDsByAccount: [AccountUUID: [Int64: Int32]] = [:]
+    private var selectedConversationTopicsByAccount: [AccountUUID: [Int64: ConversationTopicKey]] = [:]
     private var topicPickerIDs: [Int32] = []
     private var historyRequestCounter: UInt64 = 0
     private var notificationIDsByAccount: [AccountUUID: Set<String>] = [:]
@@ -2071,16 +2072,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             defer { completionHandler() }
             guard let self, let identifier, let value = self.notificationTargets[identifier] else { return }
             if self.lockState { self.showWindow(); return }
-            switch value.conversation.topic {
-            case .main, .forum: break
-            default:
-                self.setStatus("Уведомление сохранено для этой темы, но такой тип темы пока не поддержан интерфейсом.")
-                self.showWindow()
-                return
-            }
             guard let accountRuntime = self.runtimesByAccount[value.account], accountRuntime.telegramUserID != nil else { return }
             self.runtime = accountRuntime
             self.refreshAccountPicker(select: value.account)
+            switch value.conversation.topic {
+            case .main, .forum:
+                self.selectedConversationTopicsByAccount[value.account]?.removeValue(forKey: value.conversation.chatID)
+            default:
+                self.selectedConversationTopicsByAccount[value.account, default: [:]][value.conversation.chatID] = value.conversation.topic
+            }
             if case .forum(let topicID) = value.conversation.topic {
                 self.forumChatsByAccount[value.account, default: []].insert(value.conversation.chatID)
                 self.selectedForumTopicIDsByAccount[value.account, default: [:]][value.conversation.chatID] = topicID
@@ -2336,6 +2336,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func currentConversationKey(for account: AccountUUID, chatID: Int64) -> ConversationKey {
+        if let topic = selectedConversationTopicsByAccount[account]?[chatID] {
+            return ConversationKey(account: account, chatID: chatID, topic: topic)
+        }
         if forumChatsByAccount[account, default: []].contains(chatID),
            let topicID = selectedForumTopicIDsByAccount[account]?[chatID] {
             return ConversationKey(account: account, chatID: chatID, topic: .forum(topicID: topicID))
@@ -2397,6 +2400,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               topicPickerIDs.indices.contains(topicPicker.indexOfSelectedItem) else { return }
         let topicID = topicPickerIDs[topicPicker.indexOfSelectedItem]
         selectedForumTopicIDsByAccount[runtime.account, default: [:]][chatID] = topicID
+        selectedConversationTopicsByAccount[runtime.account]?.removeValue(forKey: chatID)
         let conversation = currentConversationKey(for: runtime.account, chatID: chatID)
         clearStack(messageList)
         renderMessages(messagesByConversation[conversation] ?? [])
@@ -2435,14 +2439,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingHistoryByExtra[extra] = conversation
         messagesByConversation[conversation] = messagesByConversation[conversation] ?? []
         do {
-            switch conversation.topic {
-            case .forum(let topicID):
-                try runtime.send(["@type": "getForumTopicHistory", "chat_id": chatID, "forum_topic_id": topicID, "from_message_id": anchorMessageID, "offset": 0, "limit": 50, "@extra": extra])
-            case .main:
-                try runtime.send(["@type": "getChatHistory", "chat_id": chatID, "from_message_id": anchorMessageID, "offset": 0, "limit": 50, "only_local": false, "@extra": extra])
-            default:
-                setStatus("Этот тип темы пока не поддержан.")
-            }
+            var request = ConversationHistoryRequest.make(for: conversation, fromMessageID: anchorMessageID)
+            request["@extra"] = extra
+            try runtime.send(request)
         } catch {
             pendingHistoryByExtra.removeValue(forKey: extra)
             setStatus("Не удалось загрузить историю выбранной темы.")
