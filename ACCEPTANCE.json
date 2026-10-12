@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "The pinned native workflow 38315606030 built, strict-verified, launched, screenshot-captured, and quit one unauthenticated arm64 Dev.app for exact source 50e408d. This proves a single clean development app lifecycle only; no real authorized TDLib account or 20-client shutdown was exercised."
+      "evidence": "Source lifecycle now keeps quit pending through account close and shared TDLib receive/update drain; added TerminationBarrier tests for pre-drain rejection, exactly-once finish, and retry after rejected close. All 68 Swift tests pass on 2026-10-13. Native close/quit smoke with real authorized Telegram accounts remains not run."
     },
     {
       "id": "APP16",

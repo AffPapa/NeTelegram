@@ -5,6 +5,42 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func terminationBarrierWaitsForAccountCloseAndReceiverDrain() {
+    var barrier = TerminationBarrier()
+    #expect(!barrier.isPending)
+    #expect(!barrier.isFinished)
+
+    let drainBeforeAccountClose = barrier.beginReceiverDrain()
+    #expect(!drainBeforeAccountClose)
+    barrier.begin()
+    #expect(barrier.isPending)
+
+    let beganDrain = barrier.beginReceiverDrain()
+    #expect(beganDrain)
+    #expect(barrier.isPending)
+    let finishedDrain = barrier.finishReceiverDrain()
+    #expect(finishedDrain)
+    #expect(barrier.isFinished)
+    let duplicateFinish = barrier.finishReceiverDrain()
+    #expect(!duplicateFinish)
+}
+
+@Test func terminationBarrierCancellationAllowsRetryAfterRejectedClose() {
+    var barrier = TerminationBarrier()
+    barrier.begin()
+    barrier.cancel()
+    #expect(!barrier.isPending)
+    let drainAfterCancel = barrier.beginReceiverDrain()
+    #expect(!drainAfterCancel)
+
+    barrier.begin()
+    let beganRetryDrain = barrier.beginReceiverDrain()
+    #expect(beganRetryDrain)
+    let finishedRetryDrain = barrier.finishReceiverDrain()
+    #expect(finishedRetryDrain)
+    #expect(barrier.isFinished)
+}
+
 private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
     private var stored: Value

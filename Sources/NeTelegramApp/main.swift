@@ -53,10 +53,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var pendingInitialAuthorizationAction: InitialAuthorizationAction?
     private var initialAccountCreationInProgress = false
     private var lockState = false
-    private var terminationBarrierFinished = false
+    private var terminationBarrier = TerminationBarrier()
     private var terminationReply: ((Bool) -> Void)?
     private var pendingClosures: Set<Int32> = []
-    private var closingForTermination = false
+    private var closingForTermination: Bool { terminationBarrier.isPending }
     private var shutdownProgressTask: Task<Void, Never>?
     private var resumeProfilesAfterAbortedTermination = false
     private var profileRestoreInProgress = false
@@ -190,7 +190,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if terminationBarrierFinished { return .terminateNow }
+        if terminationBarrier.isFinished { return .terminateNow }
         guard flushDirtyDraftsBeforeQuit() else { return .terminateCancel }
         guard !profileRestoreInProgress else {
             setStatus("Восстанавливаю профили. Повторите выход после завершения запуска.")
@@ -202,6 +202,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         if runtimesByClient.isEmpty {
             guard let gateway, !gateway.receiveWorkerHasExited else { return .terminateNow }
+            terminationBarrier.begin()
             terminationReply = { [weak self] allow in
                 NSApp.reply(toApplicationShouldTerminate: allow)
                 self?.terminationReply = nil
@@ -209,7 +210,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             stopReceiverAndReplyWhenExited(gateway)
             return .terminateLater
         }
-        closingForTermination = true
+        terminationBarrier.begin()
         pendingClosures = Set(runtimesByClient.keys)
         let rejected = runtimesByClient.compactMap { client, target in
             target.close() ? nil : client
@@ -218,7 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // Do not strand already-accepted close requests. Cancel this quit
             // attempt, wait for their Closed updates, then reopen only profiles
             // whose previous TDLib clients have fully closed.
-            closingForTermination = false
+            terminationBarrier.cancel()
             pendingClosures.subtract(rejected)
             resumeProfilesAfterAbortedTermination = !pendingClosures.isEmpty
             setStatus("TDLib не принял закрытие одного или нескольких аккаунтов. Приложение осталось открытым; повторный выход будет доступен после восстановления runtime.")
@@ -1286,6 +1287,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func stopReceiverAndReplyWhenExited(_ gateway: TDLibGateway) {
+        guard terminationBarrier.beginReceiverDrain() else { return }
         if let pipeline = updatePipeline {
             pipeline.requestInputStop()
         } else {
@@ -1305,9 +1307,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             await Task.detached {
                 pipeline?.finishInputAndDrain()
             }.value
-            guard self.closingForTermination else { return }
+            guard self.terminationBarrier.finishReceiverDrain() else { return }
             self.setStatus("Все runtime закрыты; подтверждаю выход macOS…")
-            self.terminationBarrierFinished = true
             self.shutdownProgressTask?.cancel()
             self.shutdownProgressTask = nil
             self.terminationReply?(true)
@@ -1791,11 +1792,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
                 refreshAccountPicker()
                 if closingForTermination && pendingClosures.isEmpty {
-                    closingForTermination = false
                     if let gateway { stopReceiverAndReplyWhenExited(gateway) }
                     else {
-                        terminationBarrierFinished = true
-                        terminationReply?(true)
+                        if terminationBarrier.beginReceiverDrain(), terminationBarrier.finishReceiverDrain() {
+                            terminationReply?(true)
+                        }
                     }
                 } else if !closingForTermination && resumeProfilesAfterAbortedTermination && pendingClosures.isEmpty {
                     scheduleProfileRecoveryAfterAbortedTermination()
