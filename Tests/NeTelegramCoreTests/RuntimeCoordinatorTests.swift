@@ -1116,6 +1116,57 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(pipeline.maxConcurrentDecodes == 2)
 }
 
+@Test func outgoingPhotoManifestSurvivesRestartAndReleasesOnlyOwnedFiles() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let state = root.appendingPathComponent("state", isDirectory: true)
+    let files = root.appendingPathComponent("files", isDirectory: true)
+    let outgoing = files.appendingPathComponent("Outgoing", isDirectory: true)
+    try FileManager.default.createDirectory(at: outgoing, withIntermediateDirectories: true)
+    let staged = outgoing.appendingPathComponent("pending.jpg")
+    try Data([0x01, 0x02, 0x03]).write(to: staged)
+
+    let firstProcess = OutgoingPhotoManifestStore(stateDirectory: state, accountFilesDirectory: files)
+    try firstProcess.register(staged)
+    let manifestURL = state.appendingPathComponent("outgoing-photos.json")
+    let mode = try FileManager.default.attributesOfItem(atPath: manifestURL.path)[.posixPermissions] as? NSNumber
+    #expect(mode?.intValue == 0o600)
+
+    // A fresh store represents a relaunch. Recovery tracks ownership without
+    // resending, so TDLib can finish an upload that it persisted in its DB.
+    let relaunched = OutgoingPhotoManifestStore(stateDirectory: state, accountFilesDirectory: files)
+    #expect(try relaunched.load() == [staged.standardizedFileURL])
+    try relaunched.remove(staged)
+    #expect(try relaunched.load().isEmpty)
+    #expect(FileManager.default.fileExists(atPath: staged.path))
+
+    let outside = root.appendingPathComponent("unowned.jpg")
+    try Data([0x04]).write(to: outside)
+    #expect(throws: OutgoingPhotoManifestError.fileOutsideOutgoingDirectory) {
+        try relaunched.register(outside)
+    }
+}
+
+@Test func outgoingPhotoManifestRefusesToReplaceCorruptState() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let state = root.appendingPathComponent("state", isDirectory: true)
+    let files = root.appendingPathComponent("files", isDirectory: true)
+    let outgoing = files.appendingPathComponent("Outgoing", isDirectory: true)
+    try FileManager.default.createDirectory(at: outgoing, withIntermediateDirectories: true)
+    try FileManager.default.createDirectory(at: state, withIntermediateDirectories: true)
+    let manifestURL = state.appendingPathComponent("outgoing-photos.json")
+    let corrupt = Data("not-json".utf8)
+    try corrupt.write(to: manifestURL)
+    let staged = outgoing.appendingPathComponent("pending.jpg")
+    try Data([0x01]).write(to: staged)
+
+    let store = OutgoingPhotoManifestStore(stateDirectory: state, accountFilesDirectory: files)
+    #expect(throws: OutgoingPhotoManifestError.invalidManifest) { try store.register(staged) }
+    #expect(try Data(contentsOf: manifestURL) == corrupt)
+    #expect(FileManager.default.fileExists(atPath: staged.path))
+}
+
 @Test func photoDecodeAdmissionReservesBoundedCapacityForAnotherAccount() async {
     let accountA = AccountUUID()
     let accountB = AccountUUID()

@@ -131,6 +131,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var stagedOutgoingPhotosByFileID: [AccountUUID: [Int32: URL]] = [:]
     private var pendingStagedPhotoPaths: [AccountUUID: Set<URL>] = [:]
     private var completedOutgoingPhotoFileIDs: [AccountUUID: Set<Int32>] = [:]
+    private var outgoingPhotoManifestStoresByAccount: [AccountUUID: OutgoingPhotoManifestStore] = [:]
+    private var unavailableOutgoingPhotoManifestAccounts: Set<AccountUUID> = []
     private let networkMonitor = NWPathMonitor()
     private let networkMonitorQueue = DispatchQueue(label: "org.affpapa.netelegram.network-monitor", qos: .utility)
     private var networkTypeUpdateTask: Task<Void, Never>?
@@ -1027,6 +1029,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         stagedOutgoingPhotosByFileID.removeValue(forKey: account)
         pendingStagedPhotoPaths.removeValue(forKey: account)
         completedOutgoingPhotoFileIDs.removeValue(forKey: account)
+        outgoingPhotoManifestStoresByAccount.removeValue(forKey: account)
+        unavailableOutgoingPhotoManifestAccounts.remove(account)
         chatRowsByAccount.removeValue(forKey: account)
         chatOrderByAccount.removeValue(forKey: account)
         selectedChatByAccount.removeValue(forKey: account)
@@ -1221,6 +1225,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     showPhoneEntry()
                     setStatus("Введите номер и нажмите «Продолжить», чтобы начать вход.")
                 }
+                refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()
                 return
             }
@@ -1233,6 +1238,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             for start in starts { await start.value }
             refreshAccountPicker()
+            refreshOutgoingPhotoRecoveryStatus()
             if authorized.isEmpty {
                 setStatus(phoneCountries.isEmpty
                     ? "Введите полный номер с + и кодом страны. Список стран загружается."
@@ -1334,6 +1340,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 // Keep unreadable ciphertext intact and refuse edits that could overwrite it.
                 unavailableDraftAccounts.insert(profile.id)
                 setStatus("Черновики этого аккаунта не открыты; сохранённые данные не изменены.")
+            }
+            let outgoingPhotoStore = OutgoingPhotoManifestStore(
+                stateDirectory: prepared.0.appState,
+                accountFilesDirectory: prepared.0.files
+            )
+            outgoingPhotoManifestStoresByAccount[profile.id] = outgoingPhotoStore
+            do {
+                pendingStagedPhotoPaths[profile.id] = try outgoingPhotoStore.load()
+                unavailableOutgoingPhotoManifestAccounts.remove(profile.id)
+            } catch {
+                // Preserve the manifest and staged files; refuse new staged sends
+                // until the user can recover the account storage safely.
+                pendingStagedPhotoPaths[profile.id] = []
+                unavailableOutgoingPhotoManifestAccounts.insert(profile.id)
+                setStatus("Не удалось прочитать очередь фотографий аккаунта. Данные отправки сохранены.")
             }
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
             let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.0, databaseKey: prepared.1, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
@@ -1939,8 +1960,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if let extra = object["@extra"] as? String,
                let pending = pendingSendByExtra.removeValue(forKey: extra) {
                 for attachment in pending.intent.attachments {
-                    pendingStagedPhotoPaths[pending.intent.account]?.remove(attachment.localFileURL.standardizedFileURL)
-                    try? FileManager.default.removeItem(at: attachment.localFileURL)
+                    releaseStagedOutgoingPhoto(attachment.localFileURL, account: pending.intent.account)
                 }
                 if !lockState, target === runtime {
                     setStatus("Отправка не принята. Черновик сохранён; проверьте права или тему чата.")
@@ -2611,6 +2631,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 attachments: [SendAttachment(localFileURL: stagedURL)],
                 privacyEpoch: context.privacyEpoch
             )
+            guard let photoStore = self.outgoingPhotoManifestStoresByAccount[context.account] else {
+                try? FileManager.default.removeItem(at: stagedURL)
+                self.setStatus("Не удалось безопасно сохранить состояние фото. Отправка не начата.")
+                return
+            }
+            do {
+                // Persist ownership before dispatch so a crash cannot turn an
+                // in-flight local file into an invisible orphan.
+                try photoStore.register(stagedURL)
+            } catch {
+                try? FileManager.default.removeItem(at: stagedURL)
+                self.setStatus("Не удалось сохранить состояние фото. Отправка не начата.")
+                return
+            }
             let input: [String: Any] = [
                 "@type": "inputMessagePhoto",
                 "photo": [
@@ -2648,8 +2682,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     currentGeneration: context.runtimeGeneration
                 ) { try runtime.send(request) }
                 guard accepted else {
-                    self.pendingStagedPhotoPaths[context.account]?.remove(stagedURL.standardizedFileURL)
-                    try? FileManager.default.removeItem(at: stagedURL)
+                    self.releaseStagedOutgoingPhoto(stagedURL, account: context.account)
                     self.setStatus("Отправка фото отменена: блокировка или профиль изменились.")
                     return
                 }
@@ -2658,8 +2691,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 self.sendButton.isEnabled = false
                 self.setStatus("Фото передано TDLib; ожидаю подтверждение.")
             } catch {
-                self.pendingStagedPhotoPaths[context.account]?.remove(stagedURL.standardizedFileURL)
-                try? FileManager.default.removeItem(at: stagedURL)
+                self.releaseStagedOutgoingPhoto(stagedURL, account: context.account)
                 self.setStatus("Не удалось передать фото TDLib. Подпись оставлена в черновике.")
             }
         }
@@ -2716,8 +2748,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         for fileID in fileIDs {
             if completedOutgoingPhotoFileIDs[account]?.remove(fileID) != nil {
-                pendingStagedPhotoPaths[account]?.remove(stagedURL.standardizedFileURL)
-                try? FileManager.default.removeItem(at: stagedURL)
+                releaseStagedOutgoingPhoto(stagedURL, account: account)
                 return
             } else {
                 stagedOutgoingPhotosByFileID[account, default: [:]][fileID] = stagedURL
@@ -2730,14 +2761,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               let remote = file["remote"] as? [String: Any],
               remote["is_uploading_completed"] as? Bool == true else { return }
         if let stagedURL = stagedOutgoingPhotosByFileID[account]?.removeValue(forKey: fileID) {
-            pendingStagedPhotoPaths[account]?.remove(stagedURL.standardizedFileURL)
-            try? FileManager.default.removeItem(at: stagedURL)
+            releaseStagedOutgoingPhoto(stagedURL, account: account)
         } else if let local = file["local"] as? [String: Any],
                   let path = local["path"] as? String,
                   let stagedURL = pendingStagedPhotoPaths[account]?.first(where: { $0 == URL(fileURLWithPath: path).standardizedFileURL }) {
-            pendingStagedPhotoPaths[account]?.remove(stagedURL)
             completedOutgoingPhotoFileIDs[account, default: []].insert(fileID)
-            try? FileManager.default.removeItem(at: stagedURL)
+            releaseStagedOutgoingPhoto(stagedURL, account: account)
         } else if stagedOutgoingPhotosByFileID[account]?.isEmpty == true {
             return
         } else {
@@ -2746,6 +2775,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if completedOutgoingPhotoFileIDs[account]?.count ?? 0 > 256,
            let oldest = completedOutgoingPhotoFileIDs[account]?.first {
             completedOutgoingPhotoFileIDs[account]?.remove(oldest)
+        }
+    }
+
+    private func releaseStagedOutgoingPhoto(_ url: URL, account: AccountUUID) {
+        guard let store = outgoingPhotoManifestStoresByAccount[account] else { return }
+        do {
+            // The durable owner record is removed first. If the disk write
+            // fails, retain the image so TDLib/recovery still has its source.
+            try store.remove(url)
+            pendingStagedPhotoPaths[account]?.remove(url.standardizedFileURL)
+            try FileManager.default.removeItem(at: url)
+        } catch {
+            if !lockState { setStatus("Не удалось очистить временное фото; файл сохранён для восстановления.") }
+        }
+    }
+
+    private func refreshOutgoingPhotoRecoveryStatus() {
+        let pendingCount = pendingStagedPhotoPaths.values.reduce(0) { $0 + $1.count }
+        if pendingCount > 0 {
+            setStatus("Для \(pendingCount) фото сохранён исходный файл; ожидаю подтверждения TDLib. Повторная отправка не выполняется автоматически.")
+        } else if !unavailableOutgoingPhotoManifestAccounts.isEmpty {
+            setStatus("Не удалось проверить состояние фото в \(unavailableOutgoingPhotoManifestAccounts.count) аккаунте(ах). Данные сохранены; новая отправка фото недоступна.")
         }
     }
 
