@@ -2045,13 +2045,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else { return }
             Task { @MainActor [weak self] in
                 guard let self, self.runtimesByAccount[value.account] === target else { return }
-                let content = UNMutableNotificationContent()
-                content.title = self.lockState ? "NeTelegram" : (self.chatRowsByAccount[value.account]?[value.conversation.chatID]?.title ?? "Новое сообщение")
-                content.body = self.lockState ? "Новое сообщение" : (value.showsPreview ? (value.preview ?? "Новое сообщение") : "Новое сообщение")
-                content.sound = value.isSilent ? nil : .default
-                content.userInfo = ["route": value.systemIdentifier]
-                let request = UNNotificationRequest(identifier: value.systemIdentifier, content: content, trigger: nil)
-                try? await UNUserNotificationCenter.current().add(request)
+                self.privacyDispatchBarrier.withState { isLocked, _ in
+                    let content = UNMutableNotificationContent()
+                    content.title = isLocked ? "NeTelegram" : (self.chatRowsByAccount[value.account]?[value.conversation.chatID]?.title ?? "Новое сообщение")
+                    content.body = isLocked ? "Новое сообщение" : (value.showsPreview ? (value.preview ?? "Новое сообщение") : "Новое сообщение")
+                    content.sound = value.isSilent ? nil : .default
+                    content.userInfo = ["route": value.systemIdentifier]
+                    let request = UNNotificationRequest(identifier: value.systemIdentifier, content: content, trigger: nil)
+                    // Enqueue while holding the same barrier used by lock(). If
+                    // locking wins first, only a generic preview is queued; if
+                    // this call wins, lock's subsequent removeAll is ordered after it.
+                    UNUserNotificationCenter.current().add(request) { _ in }
+                }
             }
         }
     }

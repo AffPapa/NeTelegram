@@ -71,8 +71,8 @@
       "expected": "Lock между вычислением и publish отменяет detailed preview; reconcile/remove не раскрывает текст.",
       "method": "fault+native Notification Center",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "PrivacyDispatchBarrier.withState сериализует постановку системного уведомления с переходом lock; локальный тест notificationPublicationIsSerializedWithPrivacyLock прошёл. Native UNUserNotificationCenter fault/race smoke и reconcile/remove проверка не выполнялись."
     },
     {
       "id": "APP09",

@@ -900,6 +900,42 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(sendCount.get() == 1)
 }
 
+@Test func notificationPublicationIsSerializedWithPrivacyLock() async {
+    let barrier = PrivacyDispatchBarrier()
+    let publicationEntered = LockedTestValue(false)
+    let finishPublication = DispatchSemaphore(value: 0)
+    let lockAttemptStarted = LockedTestValue(false)
+    let lockFinished = LockedTestValue(false)
+    let publicationQueue = DispatchQueue(label: "NeTelegram.Tests.NotificationPrivacy")
+    let lockQueue = DispatchQueue(label: "NeTelegram.Tests.NotificationPrivacyLock")
+
+    publicationQueue.async {
+        barrier.withState { isLocked, _ in
+            publicationEntered.set(true)
+            if !isLocked { finishPublication.wait() }
+        }
+    }
+    let publicationDidEnter = await waitForTrue(publicationEntered, timeout: .seconds(2))
+    lockQueue.async {
+        lockAttemptStarted.set(true)
+        barrier.setLocked(true)
+        lockFinished.set(true)
+    }
+    let lockAttemptDidStart = await waitForTrue(lockAttemptStarted, timeout: .seconds(2))
+    let lockFinishedBeforePublication = await waitForTrue(lockFinished, timeout: .milliseconds(20))
+
+    finishPublication.signal()
+    let lockDidFinish = await waitForTrue(lockFinished, timeout: .seconds(2))
+    let finalState = barrier.withState { ($0, $1) }
+
+    #expect(publicationDidEnter)
+    #expect(lockAttemptDidStart)
+    #expect(!lockFinishedBeforePublication)
+    #expect(lockDidFinish)
+    #expect(finalState.0)
+    #expect(finalState.1 == 1)
+}
+
 @Test func conversationAndMessageKeysIncludeAccountAndTopic() {
     let accountA = AccountUUID()
     let accountB = AccountUUID()

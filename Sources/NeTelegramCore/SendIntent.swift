@@ -139,6 +139,14 @@ public final class PrivacyDispatchBarrier: @unchecked Sendable {
         return epoch
     }
 
+    /// Keeps a small synchronous privacy-sensitive action ordered against lock
+    /// transitions. Callers must not suspend inside `body`.
+    public func withState<T>(_ body: (Bool, UInt64) throws -> T) rethrows -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return try body(isLocked, epoch)
+    }
+
     @discardableResult
     public func dispatch(
         _ intent: SendIntent,
