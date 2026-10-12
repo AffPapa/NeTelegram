@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_ROOT="$ROOT_DIR/.build/canonical-dev-build"
 APP_PATH="/private/tmp/NeTelegram-Dev.app"
+PGREP_BIN="${NETELEGRAM_PGREP_BIN:-/usr/bin/pgrep}"
 SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support}"
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
@@ -18,9 +19,15 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
-if /usr/bin/pgrep -x NeTelegram >/dev/null; then
+if "$PGREP_BIN" -x NeTelegram >/dev/null 2>&1; then
     echo "NeTelegram is already running. Quit the canonical development app before rebuilding it." >&2
     exit 1
+else
+    pgrep_status=$?
+    if [[ $pgrep_status -ne 1 ]]; then
+        echo "Unable to confirm whether NeTelegram is running (pgrep exit $pgrep_status); refusing to replace the canonical app." >&2
+        exit 1
+    fi
 fi
 
 swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift"
