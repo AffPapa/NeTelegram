@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app code 5643711ab4fca7372f8be50bce7d67a127d40027 and docs commit c3225a1 are on AffPapa/NeTelegram/main. Exact-code local Swift suite 69/69, macOS CI 38320651016 passed, and pinned TDLib/Dev.app run 38320651012 passed with arm64 development artifact 11779476633 (ad-hoc only). Public Site v57 is live with factual devlog and no app download. Real Telegram account tests, all-20 certification, app title/sponsored-video compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
+  "status": "implementation_in_progress; app source commit 8a33430674c4dc9d5dc0503f22a765c8566637c1 is public. Local Swift suite 71/71 and exact-source macOS CI 38324310011 passed. Pinned TDLib/Dev.app run 38324310012 is still in progress. Public Site v57 remains live with no app downloads. Real Telegram account tests, all-20 certification, product compatibility decisions, Developer ID/notarization, updater, and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -379,6 +379,15 @@
       "required_for": "all public actions",
       "status": "not_run",
       "evidence": null
+    },
+    {
+      "id": "AUTH01",
+      "name": "Подсказка шага кода авторизации",
+      "expected": "Использовать тип доставки и номер из TDLib; показывать только маску с последними двумя цифрами; не сохранять полный номер в UI-журнале.",
+      "method": "unit+native UI",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "AuthenticationCodePrompt uses authenticationCodeInfo.phone_number and the TDLib delivery type; local tests verify the destination mask and that the full digits are absent. 71/71 Swift tests and exact-source CI run 38324310011 passed for commit 8a33430674c4dc9d5dc0503f22a765c8566637c1. Native prompt rendering has not been visually verified; pinned TDLib/Dev.app run 38324310012 is still in progress."
     }
   ],
   "last_verification": {
