@@ -23,6 +23,23 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     }
 }
 
+private actor AsyncTestGate {
+    private var isOpen = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func wait() async {
+        guard !isOpen else { return }
+        await withCheckedContinuation { waiters.append($0) }
+    }
+
+    func open() {
+        isOpen = true
+        let pending = waiters
+        waiters.removeAll()
+        pending.forEach { $0.resume() }
+    }
+}
+
 private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) async -> Bool {
     let clock = ContinuousClock()
     let deadline = clock.now.advanced(by: timeout)
@@ -250,12 +267,16 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(buffer.count == 1)
     #expect(buffer.queuedByteCount == first.count)
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take()?.json == first)
+    let firstUpdate = buffer.take()
+    #expect(firstUpdate?.json == first)
+    if let firstUpdate { buffer.complete(firstUpdate) }
     #expect(await producer.value)
     #expect(buffer.count == 1)
     #expect(buffer.queuedByteCount == second.count)
     #expect(buffer.blockedProducerCount == 0)
-    #expect(buffer.take()?.json == second)
+    let secondUpdate = buffer.take()
+    #expect(secondUpdate?.json == second)
+    if let secondUpdate { buffer.complete(secondUpdate) }
     #expect(buffer.queuedByteCount == 0)
 }
 
@@ -283,7 +304,9 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let producerFinished = await waitForTrue(appendFinished, timeout: .seconds(2))
     #expect(producerFinished)
     #expect(appendResult.get() == false)
-    #expect(buffer.take()?.json == accepted)
+    let acceptedUpdate = buffer.take()
+    #expect(acceptedUpdate?.json == accepted)
+    if let acceptedUpdate { buffer.complete(acceptedUpdate) }
     #expect(buffer.take()?.json == nil)
     #expect(buffer.count == 0)
 }
@@ -302,10 +325,14 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     }
     #expect(buffer.queuedByteCount == 4)
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take()?.json == first)
+    let firstUpdate = buffer.take()
+    #expect(firstUpdate?.json == first)
+    if let firstUpdate { buffer.complete(firstUpdate) }
     #expect(await producer.value)
     #expect(buffer.queuedByteCount == 2)
-    #expect(buffer.take()?.json == second)
+    let secondUpdate = buffer.take()
+    #expect(secondUpdate?.json == second)
+    if let secondUpdate { buffer.complete(secondUpdate) }
     #expect(buffer.queuedByteCount == 0)
 
     let oversized = Data(repeating: 0x7f, count: 9)
@@ -317,9 +344,13 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         await Task.yield()
     }
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take()?.json == oversized)
+    let oversizedUpdate = buffer.take()
+    #expect(oversizedUpdate?.json == oversized)
+    if let oversizedUpdate { buffer.complete(oversizedUpdate) }
     #expect(await following.value)
-    #expect(buffer.take()?.json == Data("x".utf8))
+    let followingUpdate = buffer.take()
+    #expect(followingUpdate?.json == Data("x".utf8))
+    if let followingUpdate { buffer.complete(followingUpdate) }
 }
 
 @Test func updateBufferRoundRobinsClientsAndPreservesEachClientFIFO() {
@@ -341,11 +372,11 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
 
     #expect(buffer.queuedClientCount(for: ClientID(1)) == 3)
     #expect(buffer.queuedClientCount(for: ClientID(2)) == 2)
-    #expect(buffer.take()?.json == a1)
-    #expect(buffer.take()?.json == b1)
-    #expect(buffer.take()?.json == a2)
-    #expect(buffer.take()?.json == b2)
-    #expect(buffer.take()?.json == a3)
+    for expected in [a1, b1, a2, b2, a3] {
+        let update = buffer.take()
+        #expect(update?.json == expected)
+        if let update { buffer.complete(update) }
+    }
     #expect(buffer.queuedClientCount(for: ClientID(1)) == 0)
     #expect(buffer.queuedClientCount(for: ClientID(2)) == 0)
 }
@@ -360,11 +391,66 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
 
     // The hot lane gets one turn, then each sparse lane gets one before the
     // hot lane can consume its next item.
-    #expect(buffer.take()?.clientID == ClientID(1))
+    let hot = buffer.take()
+    #expect(hot?.clientID == ClientID(1))
+    if let hot { buffer.complete(hot) }
     for client in 2...20 {
-        #expect(buffer.take()?.clientID == ClientID(Int32(client)))
+        let sparse = buffer.take()
+        #expect(sparse?.clientID == ClientID(Int32(client)))
+        if let sparse { buffer.complete(sparse) }
     }
     #expect(buffer.queuedClientCount(for: ClientID(1)) == 39)
+}
+
+@Test func asynchronousDeliveryKeepsClientOrderWithoutCrossAccountHeadOfLineBlocking() async {
+    let buffer = TDLibUpdateBuffer(capacity: 8)
+    let scheduler = TDLibUpdateDeliveryScheduler()
+    let blockedFirstAccountEvent = AsyncTestGate()
+    let started = LockedTestValue<[String]>([])
+    let completed = LockedTestValue<[String]>([])
+    func update(_ client: Int32, _ sequence: Int) -> Data {
+        Data("{\"@client_id\":\(client),\"sequence\":\(sequence)}".utf8)
+    }
+
+    let a1 = update(1, 1)
+    let a2 = update(1, 2)
+    let b1 = update(2, 1)
+    for bytes in [a1, a2, b1] { #expect(buffer.append(bytes)) }
+
+    for _ in 0..<3 {
+        guard let item = buffer.take(), let client = item.clientID else {
+            Issue.record("Expected routed update in the buffer")
+            break
+        }
+        let route = RuntimeRoute(account: AccountUUID(), generation: RuntimeGeneration(1), client: client)
+        let event = TDLibPipelineEvent.routed(RoutedTDLibUpdate(route: route, json: item.json))
+        scheduler.enqueue(event, update: item, buffer: buffer) { event in
+            guard case .routed(let routed) = event,
+                  let object = try? JSONSerialization.jsonObject(with: routed.json) as? [String: Any],
+                  let sequence = object["sequence"] as? Int else { return }
+            let label = "\(routed.route.client.value):\(sequence)"
+            started.set(started.get() + [label])
+            if label == "1:1" { await blockedFirstAccountEvent.wait() }
+            completed.set(completed.get() + [label])
+        }
+    }
+
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while (!started.get().contains("1:1") || !completed.get().contains("2:1")) && clock.now < deadline {
+        await Task.yield()
+    }
+    #expect(started.get().contains("1:1"))
+    #expect(completed.get().contains("2:1"))
+    #expect(!started.get().contains("1:2"))
+    #expect(buffer.count == 2, "The blocked callback and its queued same-account event remain charged to the shared bound")
+
+    await blockedFirstAccountEvent.open()
+    let drainDeadline = clock.now.advanced(by: .seconds(2))
+    while buffer.count != 0 && clock.now < drainDeadline { await Task.yield() }
+    #expect(buffer.count == 0)
+    let finished = completed.get()
+    #expect((finished.firstIndex(of: "1:1") ?? .max) < (finished.firstIndex(of: "1:2") ?? .min))
 }
 
 @Test func tdlibGatewayFailsClosedWhenPinnedLibraryIsUnavailable() {

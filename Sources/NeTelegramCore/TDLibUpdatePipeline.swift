@@ -43,6 +43,8 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private var readyLanes: [Lane] = []
     private var storedItemCount = 0
     private var storedByteCount = 0
+    private var inFlightItemCount = 0
+    private var inFlightByteCount = 0
     private var waitingAppends = 0
     private var closed = false
 
@@ -54,7 +56,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     public var count: Int {
         condition.lock()
         defer { condition.unlock() }
-        return storedItemCount
+        return storedItemCount + inFlightItemCount
     }
 
     /// Number of receive producers currently blocked by a full FIFO. The
@@ -66,12 +68,12 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         return waitingAppends
     }
 
-    /// Bytes currently waiting for ordered reduction. The byte budget is shared
-    /// by every account because TDLib has one process-wide receive stream.
+    /// Bytes queued or being reduced. The byte budget covers the whole pipeline,
+    /// so asynchronous delivery cannot turn backpressure into an unbounded task queue.
     public var queuedByteCount: Int {
         condition.lock()
         defer { condition.unlock() }
-        return storedByteCount
+        return storedByteCount + inFlightByteCount
     }
 
     /// Buffered event count for one client. Exposed for diagnostics and to
@@ -125,6 +127,8 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         }
         storedItemCount -= 1
         storedByteCount -= update.json.count
+        inFlightItemCount += 1
+        inFlightByteCount += update.json.count
         if laneQueue.count == 0 {
             storage.removeValue(forKey: lane)
         } else {
@@ -134,6 +138,24 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         condition.broadcast()
         condition.unlock()
         return update
+    }
+
+    /// Releases capacity only after the account's asynchronous reducer callback
+    /// finishes, including time spent awaiting MainActor work.
+    public func complete(_ update: BufferedTDLibUpdate) {
+        condition.lock()
+        precondition(inFlightItemCount > 0 && inFlightByteCount >= update.json.count)
+        inFlightItemCount -= 1
+        inFlightByteCount -= update.json.count
+        condition.broadcast()
+        condition.unlock()
+    }
+
+    /// Waits for queued and delivered work to finish after input has closed.
+    public func waitUntilDrained() {
+        condition.lock()
+        while storedItemCount > 0 || inFlightItemCount > 0 { condition.wait() }
+        condition.unlock()
     }
 
     /// Wakes blocked producers and the consumer. Accepted events remain queued
@@ -146,9 +168,11 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     }
 
     private func isFull(for nextItemBytes: Int) -> Bool {
-        if storedItemCount >= capacity { return true }
-        if storedItemCount == 0 { return false }
-        if storedByteCount <= byteCapacity, nextItemBytes <= byteCapacity - storedByteCount {
+        let outstandingItems = storedItemCount + inFlightItemCount
+        let outstandingBytes = storedByteCount + inFlightByteCount
+        if outstandingItems >= capacity { return true }
+        if outstandingItems == 0 { return false }
+        if outstandingBytes <= byteCapacity, nextItemBytes <= byteCapacity - outstandingBytes {
             return false
         }
         // Never drop a TDLib update just because a single response exceeds the
@@ -163,14 +187,16 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     }
 }
 
-/// Owns exactly one TDLib receive worker and a fair routing stage. Updates remain
-/// ordered within each client; cross-client delivery is round-robin. The reducer
-/// waits for each callback to finish before taking the next update, allowing the
-/// bounded ingress queue to provide explicit backpressure without silent loss.
+/// Owns exactly one TDLib receive worker and a fair routing stage. Each client has
+/// an asynchronous serial delivery lane: one slow account callback does not hold
+/// the reducer at the head of every other account's stream. Shared capacity stays
+/// charged until callbacks finish, preserving explicit backpressure and no-loss
+/// behavior without creating a thread per account.
 public final class TDLibUpdatePipeline: @unchecked Sendable {
     private let gateway: TDLibGateway
     private let coordinator: RuntimeCoordinator
     private let buffer: TDLibUpdateBuffer
+    private let delivery = TDLibUpdateDeliveryScheduler()
     private let lock = NSLock()
     private let reducerExited = DispatchGroup()
     private var started = false
@@ -187,30 +213,33 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         self.buffer = TDLibUpdateBuffer(capacity: capacity, byteCapacity: byteCapacity)
     }
 
-    public func start(onEvent: @escaping @Sendable (TDLibPipelineEvent) -> Void) {
+    public func start(onEvent: @escaping @Sendable (TDLibPipelineEvent) async -> Void) {
         lock.lock()
         precondition(!started, "TDLib update pipeline may only be started once")
         started = true
         reducerExited.enter()
         lock.unlock()
 
-        let reducer = Thread { [buffer, coordinator, reducerExited] in
+        let reducer = Thread { [buffer, coordinator, reducerExited, delivery] in
             defer { reducerExited.leave() }
             while let update = buffer.take() {
                 let completed = DispatchSemaphore(value: 0)
                 Task {
+                    let event: TDLibPipelineEvent
                     do {
-                        onEvent(.routed(try await coordinator.routeUpdate(update)))
+                        event = .routed(try await coordinator.routeUpdate(update))
                     } catch let error as TDLibRoutingError {
-                        onEvent(.routingFailure(error))
+                        event = .routingFailure(error)
                     } catch {
-                        onEvent(.routingFailure(.malformedUpdate))
+                        event = .routingFailure(.malformedUpdate)
                     }
+                    delivery.enqueue(event, update: update, buffer: buffer, onEvent: onEvent)
                     completed.signal()
                 }
-                // Do not let actor scheduling reorder the reducer stream.
+                // Route each event in ingress order before starting its client lane.
                 completed.wait()
             }
+            buffer.waitUntilDrained()
         }
         reducer.name = "NeTelegram.TDLib.reducer"
         reducer.start()
@@ -235,5 +264,85 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
 
         if shouldClose { buffer.close() }
         reducerExited.wait()
+    }
+}
+
+/// Serializes callbacks within each client while allowing independent client lanes
+/// to make progress concurrently. These are tasks, not account-owned threads.
+final class TDLibUpdateDeliveryScheduler: @unchecked Sendable {
+    private enum Lane: Hashable {
+        case client(ClientID)
+        case unrouteable
+    }
+
+    private struct Work: Sendable {
+        let event: TDLibPipelineEvent
+        let update: BufferedTDLibUpdate
+        let buffer: TDLibUpdateBuffer
+        let callback: @Sendable (TDLibPipelineEvent) async -> Void
+    }
+
+    private struct WorkQueue {
+        var items: [Work] = []
+        var head = 0
+
+        mutating func append(_ work: Work) { items.append(work) }
+
+        mutating func take() -> Work? {
+            guard head < items.count else { return nil }
+            let work = items[head]
+            head += 1
+            if head >= 256 && head * 2 >= items.count {
+                items.removeFirst(head)
+                head = 0
+            }
+            return work
+        }
+
+        var isEmpty: Bool { head >= items.count }
+    }
+
+    private let lock = NSLock()
+    private var queues: [Lane: WorkQueue] = [:]
+    private var draining: Set<Lane> = []
+
+    func enqueue(
+        _ event: TDLibPipelineEvent,
+        update: BufferedTDLibUpdate,
+        buffer: TDLibUpdateBuffer,
+        onEvent: @escaping @Sendable (TDLibPipelineEvent) async -> Void
+    ) {
+        let lane = update.clientID.map(Lane.client) ?? .unrouteable
+        lock.lock()
+        queues[lane, default: WorkQueue()].append(Work(event: event, update: update, buffer: buffer, callback: onEvent))
+        let shouldStart = draining.insert(lane).inserted
+        lock.unlock()
+
+        if shouldStart {
+            Task { await drain(lane) }
+        }
+    }
+
+    private func drain(_ lane: Lane) async {
+        while let work = take(lane) {
+            await work.callback(work.event)
+            work.buffer.complete(work.update)
+        }
+    }
+
+    private func take(_ lane: Lane) -> Work? {
+        lock.lock()
+        defer { lock.unlock() }
+        guard var queue = queues[lane], let work = queue.take() else {
+            queues.removeValue(forKey: lane)
+            draining.remove(lane)
+            return nil
+        }
+        if queue.isEmpty {
+            queues.removeValue(forKey: lane)
+        } else {
+            queues[lane] = queue
+        }
+        return work
     }
 }

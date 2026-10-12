@@ -1196,14 +1196,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)
                 updatePipeline = pipeline
                 pipeline.start { [weak self] event in
-                    // Synchronous handoff is intentional: the pipeline must
-                    // wait for UI reduction before it accepts another event.
-                    let completed = DispatchSemaphore(value: 0)
-                    Task { @MainActor [weak self] in
-                        defer { completed.signal() }
-                        await self?.receive(event)
-                    }
-                    completed.wait()
+                    // Each client has an ordered async delivery lane. Awaiting
+                    // MainActor here preserves that client's order without
+                    // holding the shared TDLib reducer behind another account.
+                    await self?.receive(event)
                 }
             }
             await runtimeCoordinator.setState(.waitingForAuthorization, for: profile.id)
