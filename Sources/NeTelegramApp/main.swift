@@ -1158,13 +1158,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func addAccountProfile() async {
         do {
+            let apiHash = try SecretsStore().telegramAPIHash()
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
-            let apiHash = try SecretsStore().telegramAPIHash()
             await openProfile(profile, apiHash: apiHash, select: true)
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-            setStatus("API hash не найден в Keychain; профиль сохранён без подмены identity.")
+            setStatus("API hash не найден в Keychain; новый профиль не создавался.")
         } catch {
             setStatus("Не удалось создать профиль. Проверьте хранилище и Keychain.")
         }
