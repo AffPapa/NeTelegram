@@ -8,7 +8,7 @@ The source includes a TDLib-backed authorization flow, account-scoped runtime an
 
 The current local and hosted verification record is in [`ACCEPTANCE.json`](ACCEPTANCE.json). It covers core contract/unit tests and a source build only. No Telegram account has completed login. Sending, photo delivery, accessibility across the full app, sleep/wake recovery, and twenty concurrently authorized accounts remain unverified. This is not a production messenger or signed release.
 
-The project targets macOS 14+ and Apple Silicon. TDLib 1.8.68 and its source schema are pinned in `TDLIB.lock.json`. See `DEV-WORKFLOW.md` for the local build/test cadence, `RELEASE.txt` for release gates, `PRODUCT-ARCHITECTURE.txt` for intended behavior, and `website/README.md` for how the static Site copy is synchronized without changing this repository remote.
+The project targets macOS 14+ and Apple Silicon. TDLib 1.8.68 and its source schema are pinned in `TDLIB.lock.json`. See `DEV-WORKFLOW.md` for the local build/test cadence, [`RELEASE.md`](RELEASE.md) for release gates, `PRODUCT-ARCHITECTURE.txt` for intended behavior, and `website/README.md` for how the static Site copy is synchronized without changing this repository remote.
 
 ## Local development setup
 
