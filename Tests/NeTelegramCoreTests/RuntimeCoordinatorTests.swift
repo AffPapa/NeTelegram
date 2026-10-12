@@ -16,6 +16,12 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
         lock.unlock()
     }
 
+    func mutate(_ body: (inout Value) -> Void) {
+        lock.lock()
+        body(&stored)
+        lock.unlock()
+    }
+
     func get() -> Value {
         lock.lock()
         defer { lock.unlock() }
@@ -200,6 +206,34 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         pending: [emptyPending, storedPending],
         pendingWithStoredDatabase: [storedPending.id]
     ) == [storedPending])
+}
+
+@Test func chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure() {
+    var state = ChatListLoadState()
+    let firstLoad = state.beginLoad()
+    #expect(firstLoad)
+    #expect(state.state == .loading)
+    let duplicateLoad = state.beginLoad()
+    #expect(!duplicateLoad)
+
+    state.completeLoad()
+    #expect(state.state == .loaded)
+    let alreadyLoaded = state.beginLoad()
+    #expect(!alreadyLoaded)
+
+    state.invalidate()
+    #expect(state.state == .needsLoad)
+    let privacyReload = state.beginLoad()
+    #expect(privacyReload)
+    state.failLoad()
+    let retryAfterFailure = state.beginLoad()
+    #expect(retryAfterFailure)
+    state.completeLoad()
+    #expect(state.state == .loaded)
+
+    let forcedReload = state.beginLoad(reload: true)
+    #expect(forcedReload)
+    #expect(state.state == .loading)
 }
 
 @Test func restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains() async {
@@ -562,9 +596,9 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
                   let object = try? JSONSerialization.jsonObject(with: routed.json) as? [String: Any],
                   let sequence = object["sequence"] as? Int else { return }
             let label = "\(routed.route.client.value):\(sequence)"
-            started.set(started.get() + [label])
+            started.mutate { $0.append(label) }
             if label == "1:1" { await blockedFirstAccountEvent.wait() }
-            completed.set(completed.get() + [label])
+            completed.mutate { $0.append(label) }
         }
     }
 

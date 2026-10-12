@@ -4056,6 +4056,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         topicPickerIDs.removeAll()
         topicPicker.isHidden = true
         sendEligibilityByAccount.removeAll()
+        for accountRuntime in runtimesByAccount.values {
+            accountRuntime.invalidateMainChatSnapshot()
+        }
         pendingHistoryByExtra.removeAll()
         pendingForumTopicsByExtra.removeAll()
         selectedChatByAccount.removeAll()
@@ -4225,7 +4228,7 @@ private final class LocalAccountRuntime {
     private(set) var logoutWasAccepted = false
     private var logoutFailureNotice = false
     private var didRequestCurrentUser = false
-    private var didLoadMainChats = false
+    private var mainChatLoadState = ChatListLoadState()
     private var didSendTDLibParameters = false
     fileprivate var initializationRequestWasQueued: Bool { didSendTDLibParameters }
     private(set) var authorizationState: String?
@@ -4298,14 +4301,17 @@ private final class LocalAccountRuntime {
 
     func loadMainChats(reload: Bool = false) {
         guard authorizationState == "authorizationStateReady", telegramUserID != nil else { return }
-        if reload { didLoadMainChats = false }
-        guard !didLoadMainChats else { return }
+        guard mainChatLoadState.beginLoad(reload: reload) else { return }
         do {
             try send(["@type": "loadChats", "chat_list": NSNull(), "limit": 100])
-            didLoadMainChats = true
+            mainChatLoadState.completeLoad()
         } catch {
-            // A later account selection or explicit reopen can retry safely.
+            mainChatLoadState.failLoad()
         }
+    }
+
+    func invalidateMainChatSnapshot() {
+        mainChatLoadState.invalidate()
     }
 
     func consume(_ update: Data) async {
