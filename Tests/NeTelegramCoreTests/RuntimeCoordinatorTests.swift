@@ -380,15 +380,42 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(!(await coordinator.mayCoalesce(.ttl)))
 }
 
-@Test func networkTypePolicyDropsDuplicatePathEventsButAllowsWakeRefresh() {
+@Test func networkTypePolicyTracksPathEventsEvenWhenTDLibTypeIsUnchanged() {
     #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: false, usesWiFi: false, usesCellular: false) == "networkTypeNone")
     #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: true, usesCellular: false) == "networkTypeWiFi")
     #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: false, usesCellular: true) == "networkTypeMobile")
     #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: false, usesCellular: false) == "networkTypeOther")
     #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: true, usesCellular: true) == "networkTypeWiFi")
-    #expect(!NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeWiFi"))
-    #expect(NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeNone"))
-    #expect(NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeWiFi", force: true))
+    #expect(!NetworkTypeUpdatePolicy.shouldApply(currentRevision: 8, nextRevision: 8))
+    #expect(NetworkTypeUpdatePolicy.shouldApply(currentRevision: 8, nextRevision: 9)) // Wi-Fi route A → B
+    #expect(NetworkTypeUpdatePolicy.shouldApply(currentRevision: 9, nextRevision: 10)) // offline → online
+    #expect(NetworkTypeUpdatePolicy.shouldApply(currentRevision: 10, nextRevision: 10, force: true)) // wake
+}
+
+@Test func networkPathRevisionGateRejectsDuplicatesAndSupersededDebounceWork() {
+    var gate = NetworkPathRevisionGate()
+    let acceptedFirst = gate.accept(1)
+    let acceptedDuplicate = gate.accept(1)
+    #expect(acceptedFirst)
+    #expect(!acceptedDuplicate)
+    #expect(gate.isLatest(1))
+
+    let acceptedSecond = gate.accept(2) // Wi-Fi route B arrives before A's debounce expires.
+    let acceptedThird = gate.accept(3) // Route C supersedes B; only C may be applied.
+    #expect(acceptedSecond)
+    #expect(acceptedThird)
+    #expect(!gate.isLatest(1))
+    #expect(!gate.isLatest(2))
+    #expect(gate.isLatest(3))
+    let acceptedLate = gate.accept(2) // Late delivery from an older actor task.
+    #expect(!acceptedLate)
+}
+
+@Test func networkPathRevisionCounterProducesMonotonicObservations() {
+    let counter = NetworkPathRevisionCounter()
+    #expect(counter.next() == 1)
+    #expect(counter.next() == 2)
+    #expect(counter.next() == 3)
 }
 
 @Test func updateBufferPreservesFIFOAndBackpressuresAtCapacity() async {

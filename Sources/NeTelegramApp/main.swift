@@ -142,8 +142,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var unavailableOutgoingPhotoManifestAccounts: Set<AccountUUID> = []
     private let networkMonitor = NWPathMonitor()
     private let networkMonitorQueue = DispatchQueue(label: "org.affpapa.netelegram.network-monitor", qos: .utility)
-    private var networkTypeUpdateTask: Task<Void, Never>?
+    private let networkPathRevisionCounter = NetworkPathRevisionCounter()
+    private var networkPathRevisionGate = NetworkPathRevisionGate()
+    private var currentAppliedNetworkPathRevision: UInt64 = 0
     private var currentTDLibNetworkType = "networkTypeNone"
+    private var networkTypeUpdateTask: Task<Void, Never>?
     private var pendingProfileStorageWarnings = 0
     private var suppressDraftUpdate = false
     private var chatRowsByAccount: [AccountUUID: [Int64: (title: String, lastText: String)]] = [:]
@@ -618,13 +621,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func startConnectionObservers() {
-        networkMonitor.pathUpdateHandler = { [weak self] path in
+        let revisionCounter = networkPathRevisionCounter
+        networkMonitor.pathUpdateHandler = { [weak self, revisionCounter] path in
+            // NWPathMonitor delivers path-change observations. Keep their
+            // identity separate from TDLib's coarse Wi-Fi/mobile/other type.
+            let revision = revisionCounter.next()
             let type = NetworkTypeUpdatePolicy.tdlibType(
                 isSatisfied: path.status == .satisfied,
                 usesWiFi: path.usesInterfaceType(.wifi),
                 usesCellular: path.usesInterfaceType(.cellular)
             )
-            Task { @MainActor [weak self] in self?.scheduleNetworkTypeUpdate(type) }
+            Task { @MainActor [weak self] in
+                self?.scheduleNetworkTypeUpdate(type, revision: revision)
+            }
         }
         networkMonitor.start(queue: networkMonitorQueue)
         NSWorkspace.shared.notificationCenter.addObserver(
@@ -635,17 +644,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         )
     }
 
-    private func scheduleNetworkTypeUpdate(_ type: String, force: Bool = false) {
-        guard NetworkTypeUpdatePolicy.shouldApply(current: currentTDLibNetworkType, next: type, force: force) else { return }
+    private func scheduleNetworkTypeUpdate(_ type: String, revision: UInt64, force: Bool = false) {
+        let accepted = networkPathRevisionGate.accept(revision)
+        guard accepted || (force && networkPathRevisionGate.isLatest(revision)) else { return }
         networkTypeUpdateTask?.cancel()
         networkTypeUpdateTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled, let self else { return }
+            guard self.networkPathRevisionGate.isLatest(revision) else { return }
             guard NetworkTypeUpdatePolicy.shouldApply(
-                current: self.currentTDLibNetworkType,
-                next: type,
+                currentRevision: self.currentAppliedNetworkPathRevision,
+                nextRevision: revision,
                 force: force
             ) else { return }
+            self.currentAppliedNetworkPathRevision = revision
             self.currentTDLibNetworkType = type
             for accountRuntime in self.runtimesByAccount.values {
                 do { try accountRuntime.applyNetworkType(type) }
@@ -660,12 +672,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // Network.framework snapshot, then reapply once to every existing
         // client without recreating runtimes or keeping the Mac awake.
         let path = networkMonitor.currentPath
+        let revision = networkPathRevisionCounter.next()
         scheduleNetworkTypeUpdate(
             NetworkTypeUpdatePolicy.tdlibType(
                 isSatisfied: path.status == .satisfied,
                 usesWiFi: path.usesInterfaceType(.wifi),
                 usesCellular: path.usesInterfaceType(.cellular)
             ),
+            revision: revision,
             force: true
         )
     }
