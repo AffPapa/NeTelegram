@@ -480,8 +480,10 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let closeAttempted = DispatchSemaphore(value: 0)
     let closeFinished = DispatchSemaphore(value: 0)
     let events = LockedTestValue<[String]>([])
+    let commandQueue = DispatchQueue(label: "NeTelegram.Tests.RuntimeCommandGate.command")
+    let closeQueue = DispatchQueue(label: "NeTelegram.Tests.RuntimeCommandGate.close")
 
-    DispatchQueue.global().async {
+    commandQueue.async {
         _ = gate.dispatch {
             commandEntered.signal()
             finishCommand.wait()
@@ -490,7 +492,7 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     }
     #expect(commandEntered.wait(timeout: .now() + 2) == .success)
 
-    DispatchQueue.global().async {
+    closeQueue.async {
         closeAttempted.signal()
         _ = gate.beginClosing {
             events.set(events.get() + ["close"])
@@ -603,8 +605,10 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let lockFinished = LockedTestValue(false)
     let dispatchAccepted = LockedTestValue(false)
     let sendCount = LockedTestValue(0)
+    let dispatchQueue = DispatchQueue(label: "NeTelegram.Tests.PrivacyDispatch")
+    let lockQueue = DispatchQueue(label: "NeTelegram.Tests.PrivacyLock")
 
-    DispatchQueue.global().async {
+    dispatchQueue.async {
         let accepted = barrier.dispatch(
             intent,
             currentAccount: account,
@@ -620,7 +624,7 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     }
     let sendDidEnter = await waitForTrue(sendEntered, timeout: .seconds(2))
 
-    DispatchQueue.global().async {
+    lockQueue.async {
         lockAttemptStarted.set(true)
         barrier.setLocked(true)
         lockFinished.set(true)
@@ -783,7 +787,7 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
         decodeCalls.set(call)
         if call == 1 {
             firstDecodeStarted.set(true)
-            _ = releaseFirstDecode.wait(timeout: .now() + 3)
+            releaseFirstDecode.wait()
         }
         return Data([0x01])
     })
