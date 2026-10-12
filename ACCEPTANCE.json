@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; code commit 0aa8254 is public; 53/53 local tests and macOS CI passed; pinned TDLib/Dev.app workflow produced a verified ad-hoc artifact; Site v51 is public; real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable release gates remain open",
+  "status": "implementation_in_progress; source commit 8ee8218 is public; 61/61 local tests and macOS CI run 38311884453 passed; pinned TDLib/Dev.app run 38311884452 is in progress; public Site v53 is live. Real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -45,7 +45,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent; lockingInvalidatesQueuedSendIntentsAcrossUnlock; privacyBarrierBindsAccountLogoutAndRejectsLockedOrStaleCommands; unlockRestoresOnlyVerifiedAndCurrentAuthorizationIdentity passes in the current 55/55 local suite. AppKit lock/unlock pixel/callback races and photo-picker races remain untested."
+      "evidence": "privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent; lockingInvalidatesQueuedSendIntentsAcrossUnlock; privacyBarrierBindsAccountLogoutAndRejectsLockedOrStaleCommands; unlockRestoresOnlyVerifiedAndCurrentAuthorizationIdentity passes in the current 61/61 local suite on source commit 8ee8218. AppKit lock/unlock pixel/callback races and photo-picker races remain untested."
     },
     {
       "id": "APP06",
@@ -63,7 +63,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Notification targets preserve exact account/chat/typed-topic identity. conversationHistoryRequestsPreserveEveryTypedTopic passes. The current full local suite is 55/55 on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Native Notification Center routing, real Telegram notifications, lock/unlock click flow, and duplicate-sound behavior remain unverified."
+      "evidence": "Notification targets preserve exact account/chat/typed-topic identity. conversationHistoryRequestsPreserveEveryTypedTopic passes. The current full local suite is 61/61 on source commit 8ee8218 on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Native Notification Center routing, real Telegram notifications, lock/unlock click flow, and duplicate-sound behavior remain unverified."
     },
     {
       "id": "APP08",
@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates and updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput pass in the current 55/55 local suite. Pinned TDLib/Dev.app workflow 38305844510 successfully built and verified the app and produced a first-run screenshot; the workflow quit its single unauthenticated Dev.app. Closing 20 actual authorized TDLib clients and proving no residual process with live accounts remains unverified."
+      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates and updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput pass in the current 61/61 local suite on source commit 8ee8218. Pinned TDLib/Dev.app workflow 38305844510 successfully built and verified the app and produced a first-run screenshot; the workflow quit its single unauthenticated Dev.app. Closing 20 actual authorized TDLib clients and proving no residual process with live accounts remains unverified."
     },
     {
       "id": "APP16",
@@ -144,7 +144,7 @@
       "method": "C bridge/reducer tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "updatesNeverFallBackToTheSelectedAccount; criticalEventsAreNotCoalescedAway; rejectedFirstRequestRemovesOnlyItsUninitializedRoute; bounded FIFO tests pass in the current 55/55 local suite. Native simultaneous early auth event with 19 established clients and C-buffer lifetime remain unproven."
+      "evidence": "updatesNeverFallBackToTheSelectedAccount; criticalEventsAreNotCoalescedAway; rejectedFirstRequestRemovesOnlyItsUninitializedRoute; bounded FIFO tests pass in the current 61/61 local suite on source commit 8ee8218. Native simultaneous early auth event with 19 established clients and C-buffer lifetime remain unproven."
     },
     {
       "id": "APP17",
@@ -170,8 +170,8 @@
       "expected": "Не создаётся дубль new send по timeout; temporary IDs и can_retry/retry_after правильны.",
       "method": "fault injection",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "sendLifecycleMatchesTerminalResultToPendingIntent, sendLifecycleCorrelatesOutcomeArrivingBeforeSendResponse, sendLifecycleCanMoveRetryToTDLibReturnedTemporaryID, sendLifecycleKeepsAccountsAndEarlyOutcomesIsolatedAndBounded, sendDeletionIsTerminalOnlyWhenPermanentAndNotFromCache, and stagedPhotoDeletionWaitsForKnownInactiveUpload pass within the 61/61 local suite on source commit 8ee8218. The source retains drafts until TDLib success and uses TDLib resendMessages for explicit eligible retries; no timeout creates a new sendMessage. Fault-injected live TDLib/network retry, retry_after, and real-account behavior remain unverified."
     },
     {
       "id": "APP20",
@@ -180,7 +180,7 @@
       "method": "native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "OutgoingPhotoManifestSurvivesRestartAndReleasesOnlyOwnedFiles and OutgoingPhotoManifestRefusesToReplaceCorruptState pass in the 55/55 local suite. The source now persists per-account staged-photo ownership before TDLib dispatch, restores ownership after relaunch without retrying sends, and keeps files when the manifest cannot be read or updated. Real-account photo send, album handling, picker switch races, and interrupted-upload reconciliation remain unverified."
+      "evidence": "OutgoingPhotoManifestSurvivesRestartAndReleasesOnlyOwnedFiles and OutgoingPhotoManifestRefusesToReplaceCorruptState pass in the earlier 55/55 suite; the current 61/61 suite on 8ee8218 additionally verifies send lifecycle correlation, terminal deletion classification, and staged-photo cleanup only after upload is known inactive. Real-account photo send, album handling, picker switch races, and interrupted-upload reconciliation remain unverified."
     },
     {
       "id": "APP21",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passes in the current 55/55 local suite. Pinned Dev.app workflow 38305844510 produced a screenshot of the actual first-run window. This does not test VoiceOver, RTL, IME, Reduced Motion, keyboard navigation, or a real account identity; those remain untested."
+      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passes in the current 61/61 local suite on source commit 8ee8218. Pinned Dev.app workflow 38305844510 produced a screenshot of the actual first-run window. This does not test VoiceOver, RTL, IME, Reduced Motion, keyboard navigation, or a real account identity; those remain untested."
     },
     {
       "id": "APP23",
@@ -234,7 +234,7 @@
       "method": "deterministic core + native TDLib quit smoke",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "RuntimeCommandGateOrdersAcceptedCommandsBeforeClose and runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected pass in the current 55/55 local suite. Scripts/tdlib-smoke.c previously reached authorizationStateClosed with pinned TDLib 1.8.68. Workflow 38305844510 built and quit one unauthenticated Dev.app successfully; ordering and close barriers across 20 live clients and delayed photo-send ordering remain unverified."
+      "evidence": "RuntimeCommandGateOrdersAcceptedCommandsBeforeClose and runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected pass in the current 61/61 local suite on source commit 8ee8218. Scripts/tdlib-smoke.c previously reached authorizationStateClosed with pinned TDLib 1.8.68. Workflow 38305844510 built and quit one unauthenticated Dev.app successfully; ordering and close barriers across 20 live clients and delayed photo-send ordering remain unverified."
     },
     {
       "id": "PERF01",
@@ -279,7 +279,7 @@
       "method": "source+CI",
       "required_for": "all public releases",
       "status": "partial",
-      "evidence": "Public source code commit is 0aa8254a9ccb5478875f4b1731ea31a71e63cd96. macOS CI run 38305844500 passed for that exact SHA; pinned TDLib/Dev.app run 38305844510 succeeded and its artifact metadata records TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64, macOS 14, and ad-hoc development signing. Transitive NOTICE/SBOM audit and reproducible signed-release package remain open."
+      "evidence": "Public source commit 8ee82186e1dbceaf1f481881eec5cf6a0129b6bd is on AffPapa/NeTelegram/main. macOS CI run 38311884453 passed for this exact commit; pinned TDLib/Dev.app run 38311884452 is still in progress. The public development Site v53 records the same source commit and 61/61 local tests. Transitive NOTICE/SBOM audit and reproducible signed-release package remain open."
     },
     {
       "id": "REL03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public Site v48 states no application release/download is available, links the verified application code commit 70c250e, and includes current test/CI state. Downloads has no ZIP/DMG link; alpha/stable feeds remain valid empty XML. Real login, all-20 runtime coverage, Developer ID, and notarization remain unverified."
+      "evidence": "Public Site v53 states no application release/download is available, links current source commit 8ee8218, and reports 61/61 local tests, passing macOS CI, and pinned TDLib/Dev.app still in progress. No ZIP/DMG link is shown; alpha/stable feeds remain valid empty XML. Real login, all-20 runtime coverage, Developer ID, and notarization remain unverified."
     },
     {
       "id": "SITE04",
@@ -351,7 +351,7 @@
       "method": "local build+browser",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Buildless static output parsed locally. Site v48 was checked anonymously: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, both update feeds, and /site.css returned HTTP 200 with expected HTML/XML/CSS MIME types. Home/devlog include source commit 70c250e and 55/55 test result. Responsive/mobile, keyboard, and VoiceOver layout remain unverified."
+      "evidence": "Buildless static output passed local HTML link/ID validation. Site v53 was checked anonymously: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/ returned HTTP 200 text/html; /site.css returned 200 text/css; both update feeds returned 200 text/xml and parsed as XML. Homepage includes source commit 8ee8218 and 61/61 local test result. Responsive/mobile layout, keyboard and VoiceOver remain unverified."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v48 source commit a12a27eb60cdc92d5030a5541e8894b39941e92a and deployment appgdep_6acd40046440819180fc8e2b774394a7 are distinct from application source commit 70c250ee031e68bc4dbabbad7ae474f97d944f19. Site pages and both appcasts deployed together. No immutable application release manifest/assets exist, so app release coherence remains partial."
+      "evidence": "Site v53 source commit 0f019155481bfde1393a10a258fa2dc318edff16 and deployment appgdep_6acd5426c89c8191b78c74c4ce7e9bee are distinct from app source commit 8ee82186e1dbceaf1f481881eec5cf6a0129b6bd. Pages and both empty appcasts were deployed together and checked anonymously. No immutable application release manifest/assets exist, so app release coherence remains partial."
     },
     {
       "id": "OPS01",
@@ -383,12 +383,13 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "8d86c5c1c6639e95a3942964fca0a311659f6905",
+    "source_commit": "8ee82186e1dbceaf1f481881eec5cf6a0129b6bd",
     "local_command": "git diff --check; CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-swiftpm",
-    "local_result": "55/55 Swift Testing tests passed for exact source tree 8d86c5c. The two new outgoing-photo manifest tests cover restart recovery, account-owned path scope, permissions, and refusal to overwrite corrupt state. No live Telegram login or photo send was performed.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38309042415 ; https://github.com/AffPapa/NeTelegram/actions/runs/38309042436",
-    "hosted_result": "macOS CI run 38309042415 passed for exact commit 8d86c5c1c6639e95a3942964fca0a311659f6905. Pinned TDLib/Dev.app run 38309042436 is still building pinned TDLib; no artifact result is claimed yet.",
-    "artifact": {
+    "local_result": "61/61 Swift Testing tests passed for exact source commit 8ee8218 on Xcode 27.0 / Swift 6.4 / arm64e. Added lifecycle coverage for early/late TDLib send outcomes, retry ID remapping, permanent-vs-cache deletion classification, and staged-photo cleanup. No live Telegram login or send was performed.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38311884453 ; https://github.com/AffPapa/NeTelegram/actions/runs/38311884452",
+    "hosted_result": "macOS CI run 38311884453 passed for exact commit 8ee82186e1dbceaf1f481881eec5cf6a0129b6bd. Pinned TDLib/Dev.app run 38311884452 is still in progress at Build and verify pinned TDLib; Dev.app assembly/artifact steps have not started.",
+    "artifact": null,
+    "previous_verified_artifact": {
       "id": "11772339633",
       "name": "NeTelegram-Dev-0aa8254a9ccb5478875f4b1731ea31a71e63cd96-arm64",
       "sha256": "632b1817468bee22ea517cd6d0f2db7187590fe19023faeecf97092d83f9797b",
@@ -397,24 +398,26 @@
       "minimum_macos": "14.0",
       "app_executable_sha256": "a087066a7fb3f56f12ed74a2cc1ffae4b26de5c735603525feba6dfddffb5b7e",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "native_smoke": "Historical Dev.app artifact is for source 0aa8254 and is not the 8d86c5c candidate. Run 38309042436 is building a fresh artifact; no login or credentials were used."
+      "native_smoke": "Historical artifact for 0aa8254; it is not built from current source 8ee8218 and does not verify the current candidate."
     },
-    "site": "Public Site v51 remains live at https://netelegram.iryadom.chatgpt.site with no app binary. A factual devlog update for source 8d86c5c is pending native workflow completion.",
+    "site": "Public Site v53 is live at https://netelegram.iryadom.chatgpt.site. Source commit 0f019155481bfde1393a10a258fa2dc318edff16; deployment appgdep_6acd5426c89c8191b78c74c4ce7e9bee. Anonymous checks returned HTTP 200 with correct HTML/CSS/XML MIME for all public routes, both feeds parsed as XML, and homepage status markers matched source 8ee8218. No app binary/download is offered.",
     "scope": "No real Telegram login/send/read/logout, 20-account lifecycle or resource matrix, physical sleep/wake/network-flap test, full accessibility certification, Developer ID/notarization, quarantine install, updater smoke, or real-data migration test.",
-    "publication": "Code commit 8d86c5c1c6639e95a3942964fca0a311659f6905 is pushed to AffPapa/NeTelegram/main. macOS CI 38309042415 passed; native app build 38309042436 is in progress. No GitHub PAT settings were changed and no new GitHub token was created.",
-    "tested_app_code_commit": "8d86c5c1c6639e95a3942964fca0a311659f6905",
-    "documented_source_commit": "8d86c5c1c6639e95a3942964fca0a311659f6905",
-    "source_tree_note": "This record reflects source commit 8d86c5c1c6639e95a3942964fca0a311659f6905, including the outgoing photo recovery implementation and two additional tests. The upcoming documentation commit changes ACCEPTANCE.json only; it does not alter Sources, Tests, Package.swift, or TDLIB.lock.json."
+    "publication": "Code commit 8ee82186e1dbceaf1f481881eec5cf6a0129b6bd is pushed to AffPapa/NeTelegram/main. macOS CI 38311884453 passed; native app build 38311884452 is in progress. No GitHub PAT was created or changed; ordinary Git authentication was sufficient.",
+    "tested_app_code_commit": null,
+    "documented_source_commit": "8ee82186e1dbceaf1f481881eec5cf6a0129b6bd",
+    "source_tree_note": "This record reflects app source commit 8ee8218 and its local test/CI evidence. No Dev.app artifact for 8ee8218 is available yet; earlier artifact metadata is retained under previous_verified_artifact. The documentation commit containing this ACCEPTANCE.json update does not alter Sources, Tests, Package.swift, or TDLIB.lock.json."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 51,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_80de79aeb3d881918df41d5e35bcfccd",
-    "source_commit": "7c55b11c3ba27c8797d6a678721d467682cbf32e",
-    "deployment_id": "appgdep_6acd4abe0fa88191a8422f3bf8f2b6a0",
+    "version": 53,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_f56d1a3f992081918fc76ea0da6c72ca",
+    "source_commit": "0f019155481bfde1393a10a258fa2dc318edff16",
+    "deployment_id": "appgdep_6acd5426c89c8191b78c74c4ce7e9bee",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
     "status": "succeeded",
+    "archive_sha256": "fd58a5c5c7e72737444fdff2026204a7119a4675d61317c6e9392bded10a94f9",
+    "archive_storage_hash": "sha256:c57ac171deeacc4c738991d0e97700460a374ab2dc3833adc3fc13038c84eca7",
     "no_app_download": true
   }
 }
