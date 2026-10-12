@@ -163,6 +163,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var historyRequestCounter: UInt64 = 0
     private var notificationIDsByAccount: [AccountUUID: Set<String>] = [:]
     private var notificationTargets: [String: RoutedTDLibNotification] = [:]
+    private var notificationUnlockHandoff = NotificationUnlockHandoff()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
@@ -1042,6 +1043,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func purgeInMemoryAccountState(_ account: AccountUUID) {
+        notificationUnlockHandoff.clear(account: account)
         draftsByConversation = draftsByConversation.filter { $0.key.account != account }
         draftStoresByAccount.removeValue(forKey: account)
         dirtyDraftAccounts.remove(account)
@@ -2261,23 +2263,48 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         Task { @MainActor [weak self] in
             defer { completionHandler() }
             guard let self, let identifier, let value = self.notificationTargets[identifier] else { return }
-            if self.lockState { self.showWindow(); return }
-            guard let accountRuntime = self.runtimesByAccount[value.account], accountRuntime.telegramUserID != nil else { return }
-            self.runtime = accountRuntime
-            self.refreshAccountPicker(select: value.account)
-            switch value.conversation.topic {
-            case .main, .forum:
-                self.selectedConversationTopicsByAccount[value.account]?.removeValue(forKey: value.conversation.chatID)
-            default:
-                self.selectedConversationTopicsByAccount[value.account, default: [:]][value.conversation.chatID] = value.conversation.topic
+            guard let accountRuntime = self.runtimesByAccount[value.account],
+                  let telegramUserID = accountRuntime.telegramUserID,
+                  AccountPresentation.restoresAuthenticatedChat(
+                    telegramUserID: telegramUserID,
+                    authorizationState: accountRuntime.authorizationState
+                  ),
+                  self.notificationTargets[identifier] == value else { return }
+            if self.lockState {
+                self.notificationUnlockHandoff.stage(
+                    value,
+                    runtimeGeneration: accountRuntime.generation,
+                    expectedTelegramUserID: telegramUserID
+                )
+                self.showWindow()
+                return
             }
-            if case .forum(let topicID) = value.conversation.topic {
-                self.forumChatsByAccount[value.account, default: []].insert(value.conversation.chatID)
-                self.selectedForumTopicIDsByAccount[value.account, default: [:]][value.conversation.chatID] = topicID
-            }
-            self.showWindow()
-            self.openChat(chatID: value.conversation.chatID, in: accountRuntime)
+            self.openNotificationRoute(value)
         }
+    }
+
+    private func openNotificationRoute(_ value: RoutedTDLibNotification) {
+        guard !lockState,
+              notificationTargets[value.systemIdentifier] == value,
+              let accountRuntime = runtimesByAccount[value.account],
+              AccountPresentation.restoresAuthenticatedChat(
+                telegramUserID: accountRuntime.telegramUserID,
+                authorizationState: accountRuntime.authorizationState
+              ) else { return }
+        runtime = accountRuntime
+        refreshAccountPicker(select: value.account)
+        switch value.conversation.topic {
+        case .main, .forum:
+            selectedConversationTopicsByAccount[value.account]?.removeValue(forKey: value.conversation.chatID)
+        default:
+            selectedConversationTopicsByAccount[value.account, default: [:]][value.conversation.chatID] = value.conversation.topic
+        }
+        if case .forum(let topicID) = value.conversation.topic {
+            forumChatsByAccount[value.account, default: []].insert(value.conversation.chatID)
+            selectedForumTopicIDsByAccount[value.account, default: [:]][value.conversation.chatID] = topicID
+        }
+        showWindow()
+        openChat(chatID: value.conversation.chatID, in: accountRuntime)
     }
 
     private func upsertChat(_ chat: [String: Any], for target: LocalAccountRuntime) {
@@ -4565,10 +4592,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.unlockInProgress = false
-                guard self.lockState, success else { return }
+                guard self.lockState else {
+                    self.notificationUnlockHandoff.clear()
+                    return
+                }
+                guard success else {
+                    self.notificationUnlockHandoff.clear()
+                    return
+                }
                 self.lockState = false
                 self.privacyDispatchBarrier.setLocked(false)
                 self.lockedView.isHidden = true
+                let pendingNotification = self.notificationUnlockHandoff.pending
+                let pendingRuntime = pendingNotification.flatMap { self.runtimesByAccount[$0.notification.account] }
+                if let route = self.notificationUnlockHandoff.resolve(
+                    unlockSucceeded: true,
+                    account: pendingRuntime?.account,
+                    runtimeGeneration: pendingRuntime?.generation,
+                    telegramUserID: pendingRuntime?.telegramUserID,
+                    authorizationState: pendingRuntime?.authorizationState,
+                    notificationIsCurrent: pendingNotification.map {
+                        self.notificationTargets[$0.notification.systemIdentifier] == $0.notification
+                    } ?? false
+                ) {
+                    self.openNotificationRoute(route)
+                    return
+                }
                 if let selected = self.runtime,
                    AccountPresentation.restoresAuthenticatedChat(
                     telegramUserID: selected.telegramUserID,

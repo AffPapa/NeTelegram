@@ -1395,6 +1395,122 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(routedA.systemIdentifier != routedB.systemIdentifier)
 }
 
+@Test func lockedNotificationHandoffOpensExactCurrentTopicAfterVerifiedUnlock() {
+    let account = AccountUUID()
+    let notification = RoutedTDLibNotification(
+        account: account,
+        groupID: 3,
+        notificationID: 9,
+        conversation: ConversationKey(account: account, chatID: -44, topic: .forum(topicID: 12)),
+        messageID: 77,
+        date: 123,
+        isSilent: true,
+        showsPreview: false,
+        preview: nil
+    )
+    var handoff = NotificationUnlockHandoff()
+    handoff.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+
+    let opened = handoff.resolve(
+        unlockSucceeded: true,
+        account: account,
+        runtimeGeneration: RuntimeGeneration(4),
+        telegramUserID: 701,
+        authorizationState: "authorizationStateReady",
+        notificationIsCurrent: true
+    )
+
+    #expect(opened == notification)
+    #expect(opened?.conversation.chatID == -44)
+    #expect(opened?.conversation.topic == .forum(topicID: 12))
+    #expect(opened?.messageID == 77)
+    #expect(handoff.pending == nil)
+}
+
+@Test func lockedNotificationHandoffClearsOnCancelOrStaleIdentity() {
+    let account = AccountUUID()
+    let notification = RoutedTDLibNotification(
+        account: account,
+        groupID: 3,
+        notificationID: 9,
+        conversation: ConversationKey(account: account, chatID: 55, topic: .main),
+        messageID: 77,
+        date: 123,
+        isSilent: true,
+        showsPreview: false,
+        preview: nil
+    )
+
+    var cancelled = NotificationUnlockHandoff()
+    cancelled.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+    let cancelledRoute = cancelled.resolve(
+        unlockSucceeded: false,
+        account: account,
+        runtimeGeneration: RuntimeGeneration(4),
+        telegramUserID: 701,
+        authorizationState: "authorizationStateReady",
+        notificationIsCurrent: true
+    )
+    #expect(cancelledRoute == nil)
+    #expect(cancelled.pending == nil)
+
+    var replaced = NotificationUnlockHandoff()
+    replaced.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+    let staleRoute = replaced.resolve(
+        unlockSucceeded: true,
+        account: account,
+        runtimeGeneration: RuntimeGeneration(5),
+        telegramUserID: 701,
+        authorizationState: "authorizationStateReady",
+        notificationIsCurrent: true
+    )
+    #expect(staleRoute == nil)
+    #expect(replaced.pending == nil)
+
+    var loggedOut = NotificationUnlockHandoff()
+    loggedOut.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+    let changedIdentity = loggedOut.resolve(
+        unlockSucceeded: true,
+        account: account,
+        runtimeGeneration: RuntimeGeneration(4),
+        telegramUserID: 702,
+        authorizationState: "authorizationStateReady",
+        notificationIsCurrent: true
+    )
+    #expect(changedIdentity == nil)
+    #expect(loggedOut.pending == nil)
+}
+
+@Test func lockedNotificationHandoffRejectsRemovedNotificationOrAccount() {
+    let account = AccountUUID()
+    let notification = RoutedTDLibNotification(
+        account: account,
+        groupID: 3,
+        notificationID: 9,
+        conversation: ConversationKey(account: account, chatID: 55, topic: .main),
+        messageID: 77,
+        date: 123,
+        isSilent: true,
+        showsPreview: false,
+        preview: nil
+    )
+    var handoff = NotificationUnlockHandoff()
+    handoff.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+    let removed = handoff.resolve(
+        unlockSucceeded: true,
+        account: account,
+        runtimeGeneration: RuntimeGeneration(4),
+        telegramUserID: 701,
+        authorizationState: "authorizationStateReady",
+        notificationIsCurrent: false
+    )
+    #expect(removed == nil)
+
+    handoff.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
+    handoff.clear(account: account)
+    #expect(handoff.pending == nil)
+}
+
 @Test func tdlibNotificationRouterDoesNotInventRoutesForUnknownKindsOrTopics() {
     let account = AccountUUID()
     let call: [String: Any] = [
