@@ -28,7 +28,7 @@ Cmd+K — поиск аккаунта; Cmd+Shift+K — существующие 
 
 Каналы v1 доступны для чтения; administrative posting отложен. В группах anonymous-admin/send-as всё равно проверяется; sender явно показан либо отправка блокируется. Темы/комментарии не объединяются незаметно с общим чатом. Внешняя ссылка доступна лишь при существующем пригодном getMessageLink; внешний клиент может иметь другой аккаунт. Handoff не обещается как универсальный способ просмотра неподдержанного контента.
 
-Telegram compatibility: basic functionality и sponsored media остаются конкретными release gates. На странице каналов нельзя просто вырезать официальную рекламу. Video/audio sponsored requirements могут конфликтовать с product scope. Не маскировать этот конфликт, не отключать каналы молча ради PASS и не встраивать дополнительный player без решения пользователя.
+Telegram compatibility: basic functionality и sponsored media остаются конкретными release gates. На странице каналов нельзя просто вырезать официальную рекламу. Pinned TDLib 1.8.68 предоставляет `getChatSponsoredMessages` и `getVideoMessageAdvertisements` (когда `messageProperties.can_get_video_advertisements` разрешает); официальный channel-video ad flow требует fullscreen playback. Это конфликтует с исключением общего видеоплеера. Не маскировать конфликт, не отключать каналы молча ради PASS и не добавлять playback без решения пользователя. Название `NeTelegram` также не удовлетворяет API Terms §2.3 для публичного app title; публичное имя не менять самостоятельно.
 
 4. МОДУЛИ И ВЛАДЕНИЕ
 
