@@ -40,6 +40,17 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
 /// server identity. Local AccountUUIDs are storage keys and must never leak
 /// into account pickers or window titles as if they were Telegram profiles.
 public enum AccountPresentation {
+    /// A verified account normally clears its transient `ready` update after
+    /// identity reconciliation. Restore its chat on unlock only when no newer
+    /// authorization state superseded that identity state.
+    public static func restoresAuthenticatedChat(
+        telegramUserID: Int64?,
+        authorizationState: String?
+    ) -> Bool {
+        guard telegramUserID != nil else { return false }
+        return authorizationState == nil || authorizationState == "authorizationStateReady"
+    }
+
     public static func verifiedDisplayName(telegramUserID: Int64?, candidate: String?) -> String? {
         guard telegramUserID != nil,
               let name = candidate?.trimmingCharacters(in: .whitespacesAndNewlines),

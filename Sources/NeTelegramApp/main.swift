@@ -4091,7 +4091,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 self.lockState = false
                 self.privacyDispatchBarrier.setLocked(false)
                 self.lockedView.isHidden = true
-                if let selected = self.runtime, selected.telegramUserID != nil {
+                if let selected = self.runtime,
+                   AccountPresentation.restoresAuthenticatedChat(
+                    telegramUserID: selected.telegramUserID,
+                    authorizationState: self.pendingAuthorizationType
+                   ) {
                     self.reloadPersistedDrafts(for: selected.account)
                     selected.loadMainChats(reload: true)
                     self.showAuthenticatedChatUI()

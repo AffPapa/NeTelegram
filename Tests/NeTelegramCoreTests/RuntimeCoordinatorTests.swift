@@ -58,6 +58,14 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(AccountPresentation.verifiedDisplayName(telegramUserID: 123, candidate: " Test User ") == "Test User")
 }
 
+@Test func unlockRestoresOnlyVerifiedAndCurrentAuthorizationIdentity() {
+    #expect(AccountPresentation.restoresAuthenticatedChat(telegramUserID: 441, authorizationState: nil))
+    #expect(AccountPresentation.restoresAuthenticatedChat(telegramUserID: 441, authorizationState: "authorizationStateReady"))
+    #expect(!AccountPresentation.restoresAuthenticatedChat(telegramUserID: nil, authorizationState: "authorizationStateReady"))
+    #expect(!AccountPresentation.restoresAuthenticatedChat(telegramUserID: 441, authorizationState: "authorizationStateClosing"))
+    #expect(!AccountPresentation.restoresAuthenticatedChat(telegramUserID: 441, authorizationState: "authorizationStateWaitCode"))
+}
+
 @Test func accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus() {
     let firstPending = AccountPresentation.pickerTitle(
         localOrdinal: 1,
