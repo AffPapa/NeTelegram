@@ -17,7 +17,9 @@ swift test
 Scripts/dev-app.sh --launch
 ```
 
-Сначала соберите закреплённую TDLib через `Scripts/build-tdlib.sh`. Скрипт запуска всегда использует один development bundle и каталог данных; он откажется заменять работающий процесс. Инструкции и проверки исходников находятся в `Scripts/build-tdlib.sh` и `TDLIB.lock.json`.
+Сначала соберите закреплённую TDLib через `Scripts/build-tdlib.sh`. Перед первым запуском сохраните API hash этого приложения в macOS Keychain: `swift Scripts/store-telegram-api-hash.swift`. Ввод скрыт; значение не записывается в исходники или журнал. Для отдельного форка получите собственные API ID и hash и настройте `TelegramApplicationIdentity`. Скрипт запуска использует один development bundle и каталог данных; он откажется заменять работающий процесс. Инструкции и проверки исходников находятся в `Scripts/build-tdlib.sh` и `TDLIB.lock.json`.
+
+Текущие результаты локальной и hosted-проверки, а также их ограничения указаны в [`ACCEPTANCE.json`](ACCEPTANCE.json). Unit-тесты не подтверждают вход через реальный аккаунт, доставку сообщений, 20 runtime или готовность релиза.
 
 ## Вклад и безопасность
 
