@@ -3,6 +3,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 import LocalAuthentication
 import Network
+import ServiceManagement
 import UniformTypeIdentifiers
 import UserNotifications
 import NeTelegramCore
@@ -680,6 +681,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: "О NeTelegram", action: nil, keyEquivalent: "")
         appMenu.addItem(.separator())
+        let loginSettings = NSMenuItem(
+            title: "Запускать при входе в macOS…",
+            action: #selector(configureLoginAtStartup),
+            keyEquivalent: ""
+        )
+        loginSettings.target = self
+        appMenu.addItem(loginSettings)
+        appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Выйти", action: #selector(quit), keyEquivalent: "q")
         appMenu.items.forEach { $0.target = self }
         appMenuItem.submenu = appMenu
@@ -707,6 +716,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         windowMenuItem.submenu = windowMenu
         NSApp.mainMenu = main
         NSApp.windowsMenu = windowMenu
+    }
+
+    @objc private func configureLoginAtStartup() {
+        let service = SMAppService.mainApp
+        guard service.status != .notFound else {
+            let error = NSAlert()
+            error.messageText = "macOS не нашла службу автозапуска NeTelegram"
+            error.informativeText = "Откройте приложение из установленного пакета и повторите попытку."
+            error.runModal()
+            return
+        }
+
+        let enabled = service.status == .enabled || service.status == .requiresApproval
+        let toggle = NSButton(checkboxWithTitle: "Запускать NeTelegram при входе в macOS", target: nil, action: nil)
+        toggle.state = enabled ? .on : .off
+
+        let alert = NSAlert()
+        alert.messageText = "Автозапуск NeTelegram"
+        alert.informativeText = service.status == .requiresApproval
+            ? "Подтвердите NeTelegram в Системных настройках → Основные → Объекты входа. Выключите переключатель здесь, чтобы отменить регистрацию."
+            : "Настройка использует встроенную службу входа macOS. По умолчанию автозапуск выключен."
+        alert.accessoryView = toggle
+        alert.addButton(withTitle: "Применить")
+        alert.addButton(withTitle: "Отмена")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        do {
+            if toggle.state == .on {
+                if service.status == .requiresApproval {
+                    setStatus("Автозапуск ожидает разрешения в Системных настройках.")
+                    SMAppService.openSystemSettingsLoginItems()
+                    return
+                }
+                if service.status != .enabled { try service.register() }
+                if service.status == .requiresApproval {
+                    setStatus("Автозапуск ожидает разрешения в Системных настройках.")
+                    SMAppService.openSystemSettingsLoginItems()
+                } else {
+                    setStatus("Автозапуск NeTelegram при входе включён.")
+                }
+            } else {
+                if service.status != .notRegistered { try service.unregister() }
+                setStatus("Автозапуск NeTelegram при входе выключен.")
+            }
+        } catch {
+            setStatus("macOS не изменила настройку автозапуска. Проверьте объекты входа в Системных настройках.")
+        }
     }
 
     @objc private func primaryAction() {
