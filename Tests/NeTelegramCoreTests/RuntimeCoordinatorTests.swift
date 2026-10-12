@@ -159,13 +159,32 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     await scheduler.acquire()
     await scheduler.acquire()
     let third = Task { await scheduler.acquire() }
-    while await scheduler.queuedStarts() == 0 { await Task.yield() }
+
+    // A broken scheduler must fail this test instead of hanging the whole CI job.
+    var queued = false
+    for _ in 0..<2_000 {
+        if await scheduler.queuedStarts() == 1 {
+            queued = true
+            break
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(queued)
     #expect(await scheduler.activeStarts() == 2)
     await scheduler.release()
+    var thirdStarted = false
+    for _ in 0..<2_000 {
+        if await scheduler.activeStarts() == 2 {
+            thirdStarted = true
+            break
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(thirdStarted)
+    await scheduler.release()
+    await scheduler.release()
+    // Once both permits have been released, the queued acquire has no reason to remain blocked.
     await third.value
-    #expect(await scheduler.activeStarts() == 2)
-    await scheduler.release()
-    await scheduler.release()
     #expect(await scheduler.activeStarts() == 0)
 }
 
@@ -422,19 +441,24 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
         dispatchAccepted.set(accepted)
         dispatchFinished.signal()
     }
-    sendEntered.wait()
+    let sendDidEnter = sendEntered.wait(timeout: .now() + .seconds(2)) == .success
 
     DispatchQueue.global().async {
         lockAttemptStarted.signal()
         barrier.setLocked(true)
         lockFinished.signal()
     }
-    lockAttemptStarted.wait()
+    let lockAttemptDidStart = lockAttemptStarted.wait(timeout: .now() + .seconds(2)) == .success
     let lockWasSerializedBehindSend = lockFinished.wait(timeout: .now() + .milliseconds(20)) == .timedOut
+    // Always release the simulated send, even when an earlier synchronization point failed.
     finishSend.signal()
-    dispatchFinished.wait()
-    lockFinished.wait()
+    let dispatchDidFinish = dispatchFinished.wait(timeout: .now() + .seconds(2)) == .success
+    let lockDidFinish = lockFinished.wait(timeout: .now() + .seconds(2)) == .success
 
+    #expect(sendDidEnter)
+    #expect(lockAttemptDidStart)
+    #expect(dispatchDidFinish)
+    #expect(lockDidFinish)
     #expect(lockWasSerializedBehindSend)
     #expect(dispatchAccepted.get())
     #expect(sendCount.get() == 1)
