@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_ROOT="$ROOT_DIR/.build/canonical-dev-build"
 APP_PATH="/private/tmp/NeTelegram-Dev.app"
-SUPPORT_ROOT="/private/tmp/netelegram-dev-support"
+SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support}"
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
 FRAMEWORKS="$APP_PATH/Contents/Frameworks"
