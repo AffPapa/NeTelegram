@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; application auth/privacy commit 70c250e is public, macOS CI passed, pinned TDLib/Dev.app CI is in progress, and Site v48 is public; real-account/all-20 coverage, Telegram compatibility decisions, Developer ID/notarization, updater, and release acceptance remain open",
+  "status": "implementation_in_progress; code commit 0aa8254 is public; 53/53 local tests and macOS CI passed; pinned TDLib/Dev.app workflow produced a verified ad-hoc artifact; Site v51 is public; real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable release gates remain open",
   "cases": [
     {
       "id": "APP01",
@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates and updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput pass in the current 51/51 local suite. Shutdown stops the receive worker and closes queue admission before awaiting worker exit. Full CI quit smoke for the current commit is still in progress; closing 20 actual TDLib clients remains unverified."
+      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates and updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput pass in the current 53/53 local suite. Pinned TDLib/Dev.app workflow 38305844510 successfully built and verified the app and produced a first-run screenshot; the workflow quit its single unauthenticated Dev.app. Closing 20 actual authorized TDLib clients and proving no residual process with live accounts remains unverified."
     },
     {
       "id": "APP16",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passes. RTL, IME, VoiceOver, Reduced Motion, and real keyboard navigation remain untested. Current native CI screenshot is pending in run 38302139903; no new visual result is claimed."
+      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passes in the current 53/53 local suite. Pinned Dev.app workflow 38305844510 produced a screenshot of the actual first-run window. This does not test VoiceOver, RTL, IME, Reduced Motion, keyboard navigation, or a real account identity; those remain untested."
     },
     {
       "id": "APP23",
@@ -234,7 +234,7 @@
       "method": "deterministic core + native TDLib quit smoke",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "RuntimeCommandGateOrdersAcceptedCommandsBeforeClose and runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected pass in the current 51/51 local suite. Scripts/tdlib-smoke.c previously reached authorizationStateClosed with pinned TDLib 1.8.68. Current Dev.app smoke is pending in CI run 38302139903; closing 20 runtimes and delayed photo-send ordering in AppKit remain unverified."
+      "evidence": "RuntimeCommandGateOrdersAcceptedCommandsBeforeClose and runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected pass in the current 53/53 local suite. Scripts/tdlib-smoke.c previously reached authorizationStateClosed with pinned TDLib 1.8.68. Workflow 38305844510 built and quit one unauthenticated Dev.app successfully; ordering and close barriers across 20 live clients and delayed photo-send ordering remain unverified."
     },
     {
       "id": "PERF01",
@@ -279,7 +279,7 @@
       "method": "source+CI",
       "required_for": "all public releases",
       "status": "partial",
-      "evidence": "Public application source main is commit 70c250ee031e68bc4dbabbad7ae474f97d944f19. macOS CI run 38302139901 succeeded for that exact SHA. Pinned TDLib/Dev.app run 38302139903 is still in progress. Final transitive NOTICE/SBOM audit and reproducible release package remain open."
+      "evidence": "Public source code commit is 0aa8254a9ccb5478875f4b1731ea31a71e63cd96. macOS CI run 38305844500 passed for that exact SHA; pinned TDLib/Dev.app run 38305844510 succeeded and its artifact metadata records TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64, macOS 14, and ad-hoc development signing. Transitive NOTICE/SBOM audit and reproducible signed-release package remain open."
     },
     {
       "id": "REL03",
@@ -383,25 +383,35 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "70c250ee031e68bc4dbabbad7ae474f97d944f19",
-    "local_command": "git diff --check; env CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox",
-    "local_result": "Code tree at 5322ece built NeTelegramApp and passed 51/51 Swift Testing tests on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Documentation-only source commit 70c250e has identical Sources/Tests/Package.swift/TDLIB.lock.json. Tests include unlockRestoresOnlyVerifiedAndCurrentAuthorizationIdentity and auth status handling; AppKit pixels, native lock races, and live Telegram authorization are not exercised.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38302139901",
-    "hosted_result": "macOS CI run 38302139901 completed success for exact commit 70c250ee031e68bc4dbabbad7ae474f97d944f19. Pinned TDLib/Dev.app run 38302139903 / job 114987360850 remains in_progress at Build and verify pinned TDLib; no artifact or Dev.app smoke result is available yet.",
-    "artifact": null,
-    "site": "Public Site v48 source a12a27eb60cdc92d5030a5541e8894b39941e92a; deployment appgdep_6acd40046440819180fc8e2b774394a7 succeeded. Anonymous checks returned 200 for the main content routes, both XML feeds, and CSS with expected MIME types. Site is public and currently has no app binary.",
-    "scope": "No real Telegram login, Notification Center interaction, real account send/read/logout, 20-account lifecycle/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or complete all-active lifecycle proof.",
-    "publication": "Application source commit 70c250ee031e68bc4dbabbad7ae474f97d944f19 is pushed to AffPapa/NeTelegram main and verified equal to origin/main. Existing GitHub credential was used; no new PAT or settings changes. Site v48 was published through the existing Sites project/helper.",
-    "tested_app_code_commit": "5322ece8525b2e16b215dad191117d9602400b00",
-    "documented_source_commit": "70c250ee031e68bc4dbabbad7ae474f97d944f19",
-    "source_tree_note": "Commit 70c250e changes ACCEPTANCE.json only relative to tested code commit 5322ece; Sources, Tests, Package.swift, and TDLIB.lock.json are identical."
+    "source_commit": "0aa8254a9ccb5478875f4b1731ea31a71e63cd96",
+    "local_command": "git diff --check; CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox",
+    "local_result": "53/53 Swift Testing tests passed for the code tree at 0aa8254. The test suite covers synthetic account/runtime/routing, privacy-lock, command ordering, photo queue, and storage invariants; it does not prove real Telegram login or 20 live TDLib clients.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38305844500 ; https://github.com/AffPapa/NeTelegram/actions/runs/38305844510",
+    "hosted_result": "macOS CI run 38305844500 passed for exact commit 0aa8254a9ccb5478875f4b1731ea31a71e63cd96. Pinned TDLib/Dev.app run 38305844510 also succeeded for the same commit and uploaded artifact 11772339633.",
+    "artifact": {
+      "id": "11772339633",
+      "name": "NeTelegram-Dev-0aa8254a9ccb5478875f4b1731ea31a71e63cd96-arm64",
+      "sha256": "632b1817468bee22ea517cd6d0f2db7187590fe19023faeecf97092d83f9797b",
+      "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "app_executable_sha256": "a087066a7fb3f56f12ed74a2cc1ffae4b26de5c735603525feba6dfddffb5b7e",
+      "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "native_smoke": "workflow launched the actual first-run Dev.app, captured a screenshot, and quit it; local exact artifact is running from an empty isolated support root. No phone/code or real account was used."
+    },
+    "site": "Public Site v51 source 7c55b11c3ba27c8797d6a678721d467682cbf32e; deployment appgdep_6acd4abe0fa88191a8422f3bf8f2b6a0 succeeded. Anonymous /devlog/ and /downloads/ checks returned 200 text/html. Site remains public with no app binary.",
+    "scope": "No real Telegram login/send/read/logout, 20-account lifecycle or resource matrix, physical sleep/wake/network-flap test, full accessibility certification, Developer ID/notarization, quarantine install, updater smoke, or real-data migration test.",
+    "publication": "Code commit 0aa8254a9ccb5478875f4b1731ea31a71e63cd96 is pushed to AffPapa/NeTelegram/main. A separate documentation-only update to this acceptance record is being prepared. No GitHub PAT settings were changed and no new GitHub token was created.",
+    "tested_app_code_commit": "0aa8254a9ccb5478875f4b1731ea31a71e63cd96",
+    "documented_source_commit": "0aa8254a9ccb5478875f4b1731ea31a71e63cd96",
+    "source_tree_note": "This acceptance record reflects the exact tested source commit 0aa8254; when this documentation-only update is committed, it changes ACCEPTANCE.json only and does not change Sources, Tests, Package.swift, or TDLIB.lock.json."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 48,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_b824160781fc81918f38ca42825c1e81",
-    "source_commit": "a12a27eb60cdc92d5030a5541e8894b39941e92a",
-    "deployment_id": "appgdep_6acd40046440819180fc8e2b774394a7",
+    "version": 51,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_80de79aeb3d881918df41d5e35bcfccd",
+    "source_commit": "7c55b11c3ba27c8797d6a678721d467682cbf32e",
+    "deployment_id": "appgdep_6acd4abe0fa88191a8422f3bf8f2b6a0",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
     "status": "succeeded",
