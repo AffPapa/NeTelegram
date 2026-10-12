@@ -47,6 +47,8 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private var inFlightByteCount = 0
     private var waitingAppends = 0
     private var closed = false
+    private var allowFinalInFlightAppend = false
+    private var finalInFlightAppendUsed = false
 
     public init(capacity: Int = 2_048, byteCapacity: Int = 64 * 1_024 * 1_024) {
         self.capacity = max(1, capacity)
@@ -94,10 +96,17 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
             condition.wait()
             waitingAppends -= 1
         }
-        guard !closed else {
+        guard !closed || (allowFinalInFlightAppend && !finalInFlightAppendUsed) else {
             condition.unlock()
             return false
         }
+        // The receive worker calls append synchronously and is the sole producer.
+        // During shutdown, it may already hold one JSON result (including while
+        // blocked above). Admit that one result so closing input cannot silently
+        // discard a critical authorization/delete/TTL update. This final item may
+        // exceed the normal budget by at most one update, then all later appends
+        // are rejected.
+        if closed { finalInFlightAppendUsed = true }
         let lane = lane(for: update)
         if storage[lane] == nil {
             storage[lane] = LaneQueue()
@@ -160,9 +169,10 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
 
     /// Wakes blocked producers and the consumer. Accepted events remain queued
     /// and are returned by take() before it reports end-of-stream.
-    public func close() {
+    public func close(allowInFlightReceive: Bool = false) {
         condition.lock()
         closed = true
+        allowFinalInFlightAppend = allowFinalInFlightAppend || allowInFlightReceive
         condition.broadcast()
         condition.unlock()
     }
@@ -247,6 +257,25 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         gateway.startSingleReceiveWorker { [buffer] update in
             buffer.append(update)
         }
+    }
+
+    /// Stops TDLib input and closes admission immediately. Closing the buffer
+    /// wakes a receive callback blocked on backpressure; that sole in-flight
+    /// callback may append its already-received JSON once, after which no new
+    /// input is admitted. Accepted events remain queued for finishInputAndDrain.
+    public func requestInputStop() {
+        lock.lock()
+        guard started else {
+            lock.unlock()
+            gateway.requestWorkerStop()
+            return
+        }
+        let shouldClose = !drainRequested
+        drainRequested = true
+        lock.unlock()
+
+        gateway.requestWorkerStop()
+        if shouldClose { buffer.close(allowInFlightReceive: true) }
     }
 
     /// Call only after the receive worker has exited. This closes the FIFO,

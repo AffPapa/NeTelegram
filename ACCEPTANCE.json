@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates. Receive-buffer drain is tested; closing 20 actual TDLib clients and process termination are not."
+      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates; updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput. Local suite now passes 46/46. Shutdown stops the receive worker and closes queue admission before waiting for worker exit; one already-returned update is retained and drained. Closing 20 actual TDLib clients and process termination remain unverified."
     },
     {
       "id": "APP16",

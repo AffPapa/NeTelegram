@@ -311,6 +311,42 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(buffer.count == 0)
 }
 
+@Test func updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput() async {
+    let buffer = TDLibUpdateBuffer(capacity: 1)
+    let accepted = Data("accepted".utf8)
+    let inFlight = Data("TDLib-final-receive".utf8)
+    #expect(buffer.append(accepted))
+    let appendResult = LockedTestValue<Bool?>(nil)
+    let appendFinished = LockedTestValue(false)
+    DispatchQueue(label: "NeTelegramTests.shutdown-in-flight-receive").async {
+        appendResult.set(buffer.append(inFlight))
+        appendFinished.set(true)
+    }
+
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(1))
+    while buffer.blockedProducerCount == 0 && clock.now < deadline {
+        await Task.yield()
+    }
+    #expect(buffer.blockedProducerCount == 1)
+
+    buffer.close(allowInFlightReceive: true)
+    let producerFinished = await waitForTrue(appendFinished, timeout: .seconds(2))
+    #expect(producerFinished)
+    #expect(appendResult.get() == true)
+    #expect(buffer.count == 2)
+
+    let first = buffer.take()
+    #expect(first?.json == accepted)
+    if let first { buffer.complete(first) }
+    let final = buffer.take()
+    #expect(final?.json == inFlight)
+    if let final { buffer.complete(final) }
+    #expect(!buffer.append(Data("after-stop".utf8)))
+    #expect(buffer.take() == nil)
+    #expect(buffer.count == 0)
+}
+
 @Test func updateBufferBackpressuresByBytesAndAdmitsOneOversizedUpdateAlone() async {
     let buffer = TDLibUpdateBuffer(capacity: 8, byteCapacity: 5)
     let first = Data("1234".utf8)

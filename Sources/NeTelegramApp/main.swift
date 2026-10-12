@@ -1160,7 +1160,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func stopReceiverAndReplyWhenExited(_ gateway: TDLibGateway) {
-        gateway.requestWorkerStop()
+        if let pipeline = updatePipeline {
+            pipeline.requestInputStop()
+        } else {
+            gateway.requestWorkerStop()
+        }
         Task { @MainActor [weak self, gateway] in
             var polls = 0
             while !gateway.receiveWorkerHasExited {
