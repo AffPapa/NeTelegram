@@ -79,6 +79,14 @@
     "drop_critical_protocol_updates": false,
     "fairness": "Bounded app-owned expensive work, not reordering protocol stream"
   },
+  "photo_decode": {
+    "max_concurrent_default": 2,
+    "max_queued_default": 4,
+    "max_outstanding_per_account_default": 4,
+    "reserved_slots_for_other_accounts_default": 2,
+    "accepted_order": "FIFO",
+    "overflow": "Return unavailable preview; never drop or reorder TDLib protocol updates"
+  },
   "privacy_lock": {
     "closes_runtimes": false,
     "blocks_user_mutations": true,

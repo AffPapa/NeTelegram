@@ -14,18 +14,41 @@ public final class PhotoPipeline: @unchecked Sendable {
     private let queue: OperationQueue
     private let cache = NSCache<NSString, NSData>()
     private let lock = NSLock()
+    private let decoder: @Sendable (URL, Int) -> Data?
     private var operations: [UUID: Operation] = [:]
     private var accountByOperation: [UUID: AccountUUID] = [:]
     private var keysByAccount: [AccountUUID: Set<String>] = [:]
     private var generationByAccount: [AccountUUID: UInt64] = [:]
     private var queuedDecodeCount = 0
+    private var queuedDecodeCountByAccount: [AccountUUID: Int] = [:]
 
     public let maxConcurrentDecodes: Int
     public let maxQueuedDecodes: Int
+    /// Caps one account below the global bound so late visible-work from a
+    /// previous account cannot consume every queued slot after a UI switch.
+    private let maxOutstandingDecodesPerAccount: Int
 
-    public init(maxConcurrentDecodes: Int = 2, maxQueuedDecodes: Int = 4, cacheCostLimit: Int = 128 * 1024 * 1024) {
+    public convenience init(maxConcurrentDecodes: Int = 2, maxQueuedDecodes: Int = 4, cacheCostLimit: Int = 128 * 1024 * 1024) {
+        self.init(
+            maxConcurrentDecodes: maxConcurrentDecodes,
+            maxQueuedDecodes: maxQueuedDecodes,
+            cacheCostLimit: cacheCostLimit,
+            decoder: { url, size in Self.downsample(fileURL: url, maxPixelSize: size) }
+        )
+    }
+
+    init(
+        maxConcurrentDecodes: Int,
+        maxQueuedDecodes: Int,
+        cacheCostLimit: Int = 128 * 1024 * 1024,
+        decoder: @escaping @Sendable (URL, Int) -> Data?
+    ) {
         self.maxConcurrentDecodes = max(1, maxConcurrentDecodes)
         self.maxQueuedDecodes = max(0, maxQueuedDecodes)
+        let totalDecodeLimit = self.maxConcurrentDecodes + self.maxQueuedDecodes
+        let reservedForOtherAccounts = self.maxQueuedDecodes == 0 ? 0 : max(1, self.maxQueuedDecodes / 2)
+        self.maxOutstandingDecodesPerAccount = max(1, totalDecodeLimit - reservedForOtherAccounts)
+        self.decoder = decoder
         queue = OperationQueue()
         queue.name = "NeTelegram.PhotoDecode"
         queue.qualityOfService = .userInitiated
@@ -47,19 +70,24 @@ public final class PhotoPipeline: @unchecked Sendable {
         let cacheKey = key(account: account, messageID: messageID, fileID: fileID, fileURL: fileURL, maxPixelSize: pixelSize)
         let cachedData = cache.object(forKey: cacheKey as NSString).map(Data.init(referencing:))
         lock.lock()
-        if cachedData == nil, queuedDecodeCount >= maxConcurrentDecodes + maxQueuedDecodes {
+        if cachedData == nil,
+           (queuedDecodeCount >= maxConcurrentDecodes + maxQueuedDecodes
+                || queuedDecodeCountByAccount[account, default: 0] >= maxOutstandingDecodesPerAccount) {
             lock.unlock()
             DispatchQueue.main.async { completion(token, nil) }
             return token
         }
-        if cachedData == nil { queuedDecodeCount += 1 }
+        if cachedData == nil {
+            queuedDecodeCount += 1
+            queuedDecodeCountByAccount[account, default: 0] += 1
+        }
         let requestGeneration = generationByAccount[account, default: 0]
         lock.unlock()
 
         let operation = BlockOperation()
         operation.addExecutionBlock { [weak self, weak operation] in
             guard let self, let operation, !operation.isCancelled else { return }
-            let data = cachedData ?? Self.downsample(fileURL: fileURL, maxPixelSize: pixelSize)
+            let data = cachedData ?? self.decoder(fileURL, pixelSize)
             guard !operation.isCancelled, let data else { return }
             if cachedData == nil {
                 self.lock.lock()
@@ -85,7 +113,15 @@ public final class PhotoPipeline: @unchecked Sendable {
             self.lock.lock()
             self.operations.removeValue(forKey: token.id)
             self.accountByOperation.removeValue(forKey: token.id)
-            if cachedData == nil { self.queuedDecodeCount = max(0, self.queuedDecodeCount - 1) }
+            if cachedData == nil {
+                self.queuedDecodeCount = max(0, self.queuedDecodeCount - 1)
+                let remainingForAccount = max(0, self.queuedDecodeCountByAccount[account, default: 0] - 1)
+                if remainingForAccount == 0 {
+                    self.queuedDecodeCountByAccount.removeValue(forKey: account)
+                } else {
+                    self.queuedDecodeCountByAccount[account] = remainingForAccount
+                }
+            }
             self.lock.unlock()
         }
         lock.lock()
@@ -132,6 +168,12 @@ public final class PhotoPipeline: @unchecked Sendable {
         let keys = keysByAccount.removeValue(forKey: account) ?? []
         for key in keys { cache.removeObject(forKey: key as NSString) }
         lock.unlock()
+    }
+
+    func outstandingDecodeCount(for account: AccountUUID) -> Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return queuedDecodeCountByAccount[account, default: 0]
     }
 
     public static func downsample(fileURL: URL, maxPixelSize: Int) -> Data? {

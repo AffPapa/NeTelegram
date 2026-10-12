@@ -636,6 +636,50 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(pipeline.maxConcurrentDecodes == 2)
 }
 
+@Test func photoDecodeAdmissionReservesBoundedCapacityForAnotherAccount() async {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let firstDecodeStarted = LockedTestValue(false)
+    let decodeCalls = LockedTestValue(0)
+    let releaseFirstDecode = DispatchSemaphore(value: 0)
+    let completionCount = LockedTestValue(0)
+    let successfulCompletionCount = LockedTestValue(0)
+    let allCompletionsFinished = LockedTestValue(false)
+    let pipeline = PhotoPipeline(maxConcurrentDecodes: 1, maxQueuedDecodes: 2, decoder: { _, _ in
+        let call = decodeCalls.get() + 1
+        decodeCalls.set(call)
+        if call == 1 {
+            firstDecodeStarted.set(true)
+            _ = releaseFirstDecode.wait(timeout: .now() + 3)
+        }
+        return Data([0x01])
+    })
+    defer { releaseFirstDecode.signal() }
+
+    let completed: @Sendable (PhotoPreviewToken, Data?) -> Void = { _, data in
+        completionCount.set(completionCount.get() + 1)
+        if data != nil { successfulCompletionCount.set(successfulCompletionCount.get() + 1) }
+        if completionCount.get() == 4 { allCompletionsFinished.set(true) }
+    }
+    let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
+    _ = pipeline.requestPreview(account: accountA, messageID: 1, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completed)
+    #expect(await waitForTrue(firstDecodeStarted, timeout: .seconds(2)))
+
+    _ = pipeline.requestPreview(account: accountA, messageID: 2, fileID: 2, fileURL: url, maxPixelSize: 64, completion: completed)
+    _ = pipeline.requestPreview(account: accountA, messageID: 3, fileID: 3, fileURL: url, maxPixelSize: 64, completion: completed)
+    #expect(pipeline.outstandingDecodeCount(for: accountA) == 2)
+
+    _ = pipeline.requestPreview(account: accountB, messageID: 4, fileID: 4, fileURL: url, maxPixelSize: 64, completion: completed)
+    #expect(pipeline.outstandingDecodeCount(for: accountB) == 1)
+    #expect(pipeline.outstandingDecodeCount(for: accountA) + pipeline.outstandingDecodeCount(for: accountB) == 3)
+
+    releaseFirstDecode.signal()
+    #expect(await waitForTrue(allCompletionsFinished, timeout: .seconds(3)))
+    #expect(successfulCompletionCount.get() == 3)
+    #expect(pipeline.outstandingDecodeCount(for: accountA) == 0)
+    #expect(pipeline.outstandingDecodeCount(for: accountB) == 0)
+}
+
 @Test func mediaAlbumGroupingKeepsAdjacentAlbumsAndOrdinaryMessagesInOrder() {
     let runs = MediaAlbumGrouping.runs(albumIDs: [0, 44, 44, 0, 0, 91, 91, 91, 0])
     #expect(runs == [
