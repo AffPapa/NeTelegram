@@ -5,15 +5,43 @@ public enum TDLibPipelineEvent: Sendable {
     case routingFailure(TDLibRoutingError)
 }
 
-/// A bounded FIFO between the one blocking td_receive worker and ordered
-/// reducer delivery. When full, the producer blocks and stops calling
-/// td_receive; it never drops authorization, deletion, TTL, or ordinary updates.
+/// A bounded fair queue between the one blocking td_receive worker and the
+/// reducer. Each client keeps FIFO order; ready clients take turns so a busy
+/// account cannot indefinitely starve sparse accounts. Capacity and byte
+/// budgets are shared across every lane. When full, the producer blocks and
+/// stops calling td_receive; it never drops updates.
 public final class TDLibUpdateBuffer: @unchecked Sendable {
+    private enum Lane: Hashable {
+        case client(ClientID)
+        case unrouteable
+    }
+
+    private struct LaneQueue {
+        var items: [BufferedTDLibUpdate] = []
+        var head = 0
+        var count: Int { items.count - head }
+
+        mutating func append(_ update: BufferedTDLibUpdate) { items.append(update) }
+
+        mutating func take() -> BufferedTDLibUpdate? {
+            guard head < items.count else { return nil }
+            let update = items[head]
+            head += 1
+            if head >= 256 && head * 2 >= items.count {
+                items.removeFirst(head)
+                head = 0
+            }
+            return update
+        }
+    }
+
     private let condition = NSCondition()
     private let capacity: Int
     private let byteCapacity: Int
-    private var storage: [Data] = []
-    private var head = 0
+    private var storage: [Lane: LaneQueue] = [:]
+    /// Contains only non-empty lanes. A lane moves to the tail after each take.
+    private var readyLanes: [Lane] = []
+    private var storedItemCount = 0
     private var storedByteCount = 0
     private var waitingAppends = 0
     private var closed = false
@@ -26,7 +54,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     public var count: Int {
         condition.lock()
         defer { condition.unlock() }
-        return storage.count - head
+        return storedItemCount
     }
 
     /// Number of receive producers currently blocked by a full FIFO. The
@@ -46,11 +74,20 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         return storedByteCount
     }
 
+    /// Buffered event count for one client. Exposed for diagnostics and to
+    /// verify that a noisy lane cannot conceal sparse clients in the queue.
+    public func queuedClientCount(for clientID: ClientID) -> Int {
+        condition.lock()
+        defer { condition.unlock() }
+        return storage[.client(clientID)]?.count ?? 0
+    }
+
     /// Blocks until capacity is available. Returns false once shutdown starts.
     @discardableResult
-    public func append(_ update: Data) -> Bool {
+    public func append(_ json: Data) -> Bool {
+        let update = BufferedTDLibUpdate(json: json)
         condition.lock()
-        while !closed && isFull(for: update.count) {
+        while !closed && isFull(for: update.json.count) {
             waitingAppends += 1
             condition.wait()
             waitingAppends -= 1
@@ -59,27 +96,40 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
             condition.unlock()
             return false
         }
-        storage.append(update)
-        storedByteCount += update.count
+        let lane = lane(for: update)
+        if storage[lane] == nil {
+            storage[lane] = LaneQueue()
+            readyLanes.append(lane)
+        }
+        storage[lane, default: LaneQueue()].append(update)
+        storedItemCount += 1
+        storedByteCount += update.json.count
         condition.signal()
         condition.unlock()
         return true
     }
 
     /// Returns nil after close and after every already accepted item is drained.
-    public func take() -> Data? {
+    public func take() -> BufferedTDLibUpdate? {
         condition.lock()
-        while head == storage.count && !closed { condition.wait() }
-        guard head < storage.count else {
+        while readyLanes.isEmpty && !closed { condition.wait() }
+        guard !readyLanes.isEmpty else {
             condition.unlock()
             return nil
         }
-        let update = storage[head]
-        head += 1
-        storedByteCount -= update.count
-        if head >= 256 && head * 2 >= storage.count {
-            storage.removeFirst(head)
-            head = 0
+        let lane = readyLanes.removeFirst()
+        guard var laneQueue = storage[lane], let update = laneQueue.take() else {
+            condition.unlock()
+            assertionFailure("TDLib update queue contains an empty ready lane")
+            return nil
+        }
+        storedItemCount -= 1
+        storedByteCount -= update.json.count
+        if laneQueue.count == 0 {
+            storage.removeValue(forKey: lane)
+        } else {
+            storage[lane] = laneQueue
+            readyLanes.append(lane)
         }
         condition.broadcast()
         condition.unlock()
@@ -96,9 +146,8 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     }
 
     private func isFull(for nextItemBytes: Int) -> Bool {
-        let itemCount = storage.count - head
-        if itemCount >= capacity { return true }
-        if itemCount == 0 { return false }
+        if storedItemCount >= capacity { return true }
+        if storedItemCount == 0 { return false }
         if storedByteCount <= byteCapacity, nextItemBytes <= byteCapacity - storedByteCount {
             return false
         }
@@ -107,12 +156,17 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         // other item from being retained beside it until it has been consumed.
         return true
     }
+
+    private func lane(for update: BufferedTDLibUpdate) -> Lane {
+        guard let clientID = update.clientID else { return .unrouteable }
+        return .client(clientID)
+    }
 }
 
-/// Owns exactly one TDLib receive worker and a serial, ordered routing stage.
-/// The reducer waits for each callback to finish before taking the next update.
-/// UI consumers must synchronously hop to MainActor so backpressure reaches the
-/// bounded FIFO instead of accumulating an unbounded main-queue backlog.
+/// Owns exactly one TDLib receive worker and a fair routing stage. Updates remain
+/// ordered within each client; cross-client delivery is round-robin. The reducer
+/// waits for each callback to finish before taking the next update, allowing the
+/// bounded ingress queue to provide explicit backpressure without silent loss.
 public final class TDLibUpdatePipeline: @unchecked Sendable {
     private let gateway: TDLibGateway
     private let coordinator: RuntimeCoordinator

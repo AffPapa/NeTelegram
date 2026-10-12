@@ -45,11 +45,43 @@ public struct RoutedTDLibUpdate: Sendable {
     public let json: Data
 }
 
-public enum TDLibRoutingError: Error, Equatable {
+public enum TDLibRoutingError: Error, Equatable, Sendable {
     case malformedUpdate
     case missingClientID
     case invalidClientID
     case unregisteredClientID(ClientID)
+}
+
+/// TDLib JSON plus its validated client routing field, parsed once at ingress
+/// so the bounded update queue can schedule client lanes fairly.
+public struct BufferedTDLibUpdate: Sendable {
+    public let json: Data
+    public let clientID: ClientID?
+    public let routingError: TDLibRoutingError?
+
+    public init(json: Data) {
+        self.json = json
+        guard let object = try? JSONSerialization.jsonObject(with: json),
+              let fields = object as? [String: Any] else {
+            clientID = nil
+            routingError = .malformedUpdate
+            return
+        }
+        guard let number = fields["@client_id"] as? NSNumber else {
+            clientID = nil
+            routingError = .missingClientID
+            return
+        }
+        guard CFGetTypeID(number) != CFBooleanGetTypeID(),
+              number.doubleValue.rounded(.towardZero) == number.doubleValue,
+              number.int64Value >= Int64(Int32.min), number.int64Value <= Int64(Int32.max) else {
+            clientID = nil
+            routingError = .invalidClientID
+            return
+        }
+        clientID = ClientID(number.int32Value)
+        routingError = nil
+    }
 }
 
 public enum RuntimeEventKind: Sendable, Equatable {
@@ -106,17 +138,16 @@ public actor RuntimeCoordinator {
     /// or unknown IDs are explicit routing errors; selected UI state is never a
     /// substitute for a missing route.
     public func routeUpdate(_ json: Data) throws -> RoutedTDLibUpdate {
-        guard let object = try? JSONSerialization.jsonObject(with: json),
-              let fields = object as? [String: Any] else { throw TDLibRoutingError.malformedUpdate }
-        guard let number = fields["@client_id"] as? NSNumber else { throw TDLibRoutingError.missingClientID }
-        guard CFGetTypeID(number) != CFBooleanGetTypeID(),
-              number.doubleValue.rounded(.towardZero) == number.doubleValue,
-              number.int64Value >= Int64(Int32.min), number.int64Value <= Int64(Int32.max) else {
-            throw TDLibRoutingError.invalidClientID
-        }
-        let client = ClientID(number.int32Value)
+        try routeUpdate(BufferedTDLibUpdate(json: json))
+    }
+
+    /// Preserves each client's order while allowing the bounded ingress buffer
+    /// to alternate between independent TDLib clients.
+    public func routeUpdate(_ update: BufferedTDLibUpdate) throws -> RoutedTDLibUpdate {
+        if let routingError = update.routingError { throw routingError }
+        guard let client = update.clientID else { throw TDLibRoutingError.missingClientID }
         guard let route = routes[client] else { throw TDLibRoutingError.unregisteredClientID(client) }
-        return RoutedTDLibUpdate(route: route, json: json)
+        return RoutedTDLibUpdate(route: route, json: update.json)
     }
 
     public func state(for account: AccountUUID) -> AccountAvailability? { states[account] }

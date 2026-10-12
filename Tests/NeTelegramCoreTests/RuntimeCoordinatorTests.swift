@@ -250,12 +250,12 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(buffer.count == 1)
     #expect(buffer.queuedByteCount == first.count)
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take() == first)
+    #expect(buffer.take()?.json == first)
     #expect(await producer.value)
     #expect(buffer.count == 1)
     #expect(buffer.queuedByteCount == second.count)
     #expect(buffer.blockedProducerCount == 0)
-    #expect(buffer.take() == second)
+    #expect(buffer.take()?.json == second)
     #expect(buffer.queuedByteCount == 0)
 }
 
@@ -283,8 +283,8 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let producerFinished = await waitForTrue(appendFinished, timeout: .seconds(2))
     #expect(producerFinished)
     #expect(appendResult.get() == false)
-    #expect(buffer.take() == accepted)
-    #expect(buffer.take() == nil)
+    #expect(buffer.take()?.json == accepted)
+    #expect(buffer.take()?.json == nil)
     #expect(buffer.count == 0)
 }
 
@@ -302,10 +302,10 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     }
     #expect(buffer.queuedByteCount == 4)
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take() == first)
+    #expect(buffer.take()?.json == first)
     #expect(await producer.value)
     #expect(buffer.queuedByteCount == 2)
-    #expect(buffer.take() == second)
+    #expect(buffer.take()?.json == second)
     #expect(buffer.queuedByteCount == 0)
 
     let oversized = Data(repeating: 0x7f, count: 9)
@@ -317,9 +317,54 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         await Task.yield()
     }
     #expect(buffer.blockedProducerCount == 1)
-    #expect(buffer.take() == oversized)
+    #expect(buffer.take()?.json == oversized)
     #expect(await following.value)
-    #expect(buffer.take() == Data("x".utf8))
+    #expect(buffer.take()?.json == Data("x".utf8))
+}
+
+@Test func updateBufferRoundRobinsClientsAndPreservesEachClientFIFO() {
+    let buffer = TDLibUpdateBuffer(capacity: 8)
+    func update(_ client: Int, _ sequence: Int) -> Data {
+        Data("{\"@client_id\":\(client),\"sequence\":\(sequence)}".utf8)
+    }
+
+    let a1 = update(1, 1)
+    let a2 = update(1, 2)
+    let a3 = update(1, 3)
+    let b1 = update(2, 1)
+    let b2 = update(2, 2)
+    #expect(buffer.append(a1))
+    #expect(buffer.append(a2))
+    #expect(buffer.append(a3))
+    #expect(buffer.append(b1))
+    #expect(buffer.append(b2))
+
+    #expect(buffer.queuedClientCount(for: ClientID(1)) == 3)
+    #expect(buffer.queuedClientCount(for: ClientID(2)) == 2)
+    #expect(buffer.take()?.json == a1)
+    #expect(buffer.take()?.json == b1)
+    #expect(buffer.take()?.json == a2)
+    #expect(buffer.take()?.json == b2)
+    #expect(buffer.take()?.json == a3)
+    #expect(buffer.queuedClientCount(for: ClientID(1)) == 0)
+    #expect(buffer.queuedClientCount(for: ClientID(2)) == 0)
+}
+
+@Test func updateBufferGivesSparseClientsProgressBesideOneHotClient() {
+    let buffer = TDLibUpdateBuffer(capacity: 64)
+    func update(_ client: Int, _ sequence: Int) -> Data {
+        Data("{\"@client_id\":\(client),\"sequence\":\(sequence)}".utf8)
+    }
+    for sequence in 1...40 { #expect(buffer.append(update(1, sequence))) }
+    for client in 2...20 { #expect(buffer.append(update(client, 1))) }
+
+    // The hot lane gets one turn, then each sparse lane gets one before the
+    // hot lane can consume its next item.
+    #expect(buffer.take()?.clientID == ClientID(1))
+    for client in 2...20 {
+        #expect(buffer.take()?.clientID == ClientID(Int32(client)))
+    }
+    #expect(buffer.queuedClientCount(for: ClientID(1)) == 39)
 }
 
 @Test func tdlibGatewayFailsClosedWhenPinnedLibraryIsUnavailable() {
