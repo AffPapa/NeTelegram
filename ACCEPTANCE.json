@@ -383,14 +383,21 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "5e24ba7396f69216792c93789e3d5627fd8585ae",
-    "local_command": "swift test; git diff --check",
-    "local_result": "50/50 Swift Testing tests passed on Xcode 27.0 (27A5228h), Swift 6.4, arm64e; test target macOS 14. AppKit target compiled as part of swift test. The new conversationHistoryRequestsPreserveEveryTypedTopic test verifies request type and identifiers for five TDLib topic variants. git diff --check passed.",
+    "source_commit": "15bbad952f19abda41501ecea96264d73c751e14",
+    "local_command": "git diff --check; env CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox",
+    "local_result": "Auth state/presentation candidate 15bbad9 built NeTelegramApp and passed 50/50 Swift Testing tests on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Covers enum/picker classifications and existing runtime/core cases; AppKit pixels and live Telegram authorization are not exercised.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38298878351",
-    "hosted_result": "Pinned TDLib app bundle workflow run 38298878351 is in_progress for code commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Separate macOS CI run 38298878365 was cancelled; no hosted PASS is claimed.",
-    "artifact": null,
-    "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded. Anonymous HTTPS checks: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/alpha.xml, /updates/stable.xml and /site.css all returned 200; appcasts are text/xml and CSS is text/css. Live devlog contains the 5e24ba7 milestone. Downloads correctly contain no app binary.",
-    "scope": "Synthetic history-request tests only. No live Notification Center, Telegram login, real notification click, real read/send/logout, 20-account runtime/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or all-active lifecycle proof."
+    "hosted_result": "Run 38298878351 / job 114976608214 completed success for prior app-code commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Steps verified pinned TDLib build, isolated arm64 Dev.app assembly/smoke, and development artifact upload. This run does not cover local candidate 15bbad9.",
+    "artifact": {
+      "id": "11769449032",
+      "name": "NeTelegram-Dev-5e24ba7396f69216792c93789e3d5627fd8585ae-arm64",
+      "size_bytes": 12135031,
+      "sha256": "1080c5de0e8953caf11f3f2b09043905654b2d648857c975bc31d94609529aa5",
+      "kind": "CI development artifact, ad-hoc signed; not a public release or download"
+    },
+    "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded and anonymous route/MIME checks passed. Site is unchanged and currently has no app binary.",
+    "scope": "No real Telegram login, Notification Center interaction, real account send/read/logout, 20-account lifecycle/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or complete all-active lifecycle proof.",
+    "publication": "Local commit 15bbad952f19abda41501ecea96264d73c751e14 is not pushed. Non-mutating git push --dry-run failed because github.com did not resolve. gh CLI saved sessions report invalid. No GitHub settings were opened and no token was created."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
