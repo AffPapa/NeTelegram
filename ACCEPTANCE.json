@@ -8,8 +8,8 @@
       "expected": "После startup работают20 авторизованных runtime; выбор UI не отключает ни один.",
       "method": "native real accounts",
       "required_for": "stable",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains proves the restore planner returns all 20 authorized synthetic profiles and a startup scheduler with parallelism 2 drains 20 queued starts while activeStarts stays at or below 2. No TDLib clients or real Telegram accounts were opened; all-20 native runtime acceptance remains not run."
     },
     {
       "id": "APP02",
@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates; updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput. Local suite now passes 46/46. Shutdown stops the receive worker and closes queue admission before waiting for worker exit; one already-returned update is retained and drained. Closing 20 actual TDLib clients and process termination remain unverified."
+      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates; updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput. Local suite passes 48/48. Shutdown stops the receive worker and closes queue admission before waiting for worker exit; one already-returned update is retained and drained. Closing 20 actual TDLib clients and process termination remain unverified."
     },
     {
       "id": "APP16",

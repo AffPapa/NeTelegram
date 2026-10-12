@@ -182,6 +182,44 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     ) == [storedPending])
 }
 
+@Test func restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains() async {
+    let profiles = (1...20).map { n in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "30000000-0000-0000-0000-%012d", n))!),
+            telegramUserID: Int64(10_000 + n)
+        )
+    }
+    let plan = AccountRestorePlanner.profilesToRestore(
+        authorized: profiles,
+        pending: [],
+        pendingWithStoredDatabase: []
+    )
+    #expect(plan == profiles)
+
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    await scheduler.acquire()
+    await scheduler.acquire()
+    let queuedStarts = (0..<18).map { _ in Task { await scheduler.acquire() } }
+    var allQueued = false
+    for _ in 0..<2_000 {
+        if await scheduler.queuedStarts() == 18 {
+            allQueued = true
+            break
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(allQueued)
+    #expect(await scheduler.activeStarts() == 2)
+
+    for _ in 0..<20 {
+        await scheduler.release()
+        #expect(await scheduler.activeStarts() <= 2)
+    }
+    for start in queuedStarts { await start.value }
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func runtimeGenerationChangesForEveryClientOfAnAccount() async {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()
