@@ -923,6 +923,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
         photoPipeline.cancelPreviews(for: account)
+        if photoViewerKey?.account == account {
+            photoViewerToken = nil
+            photoViewerPrivacyEpoch = nil
+            photoViewerImageView?.image = nil
+            photoViewerWindow?.close()
+            photoViewerWindow = nil
+            photoViewerImageView = nil
+            photoViewerKey = nil
+        }
         for key in photoViews.keys.filter({ $0.account == account }) {
             photoViews[key]?.removeFromSuperview()
             photoViews.removeValue(forKey: key)
@@ -942,6 +951,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingForumTopicsByExtra.removeAll()
         pendingSearchByExtra = pendingSearchByExtra.filter { $0.value.account != account }
         searchResults.removeAll()
+        searchResultByControlID.removeAll()
+        activeSearchQuery = ""
+        deferredSearch = nil
+        searchField.stringValue = ""
         refreshChatList()
     }
 
