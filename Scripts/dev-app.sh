@@ -30,13 +30,26 @@ else
     fi
 fi
 
+SWIFT_BIN_PATH="$(swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --show-bin-path)"
 swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift"
-BUILT_EXECUTABLE="$BUILD_ROOT/swift/out/Products/Debug/NeTelegram"
+BUILT_EXECUTABLE="$SWIFT_BIN_PATH/NeTelegram"
+if [[ ! -x "$BUILT_EXECUTABLE" ]]; then
+    # SwiftPM has changed the executable output layout across toolchain
+    # releases. Prefer `--show-bin-path`, then search this exact scratch path.
+    BUILT_EXECUTABLE="$(python3 - "$BUILD_ROOT/swift" <<'PY'
+import os, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+candidates = [p for p in root.rglob("NeTelegram") if p.is_file() and os.access(p, os.X_OK)]
+if candidates:
+    print(max(candidates, key=lambda p: p.stat().st_mtime_ns))
+PY
+)"
+fi
 if [[ ! -f "$TDJSON" ]]; then
     echo "Pinned TDLib is missing: $TDJSON (run Scripts/build-tdlib.sh first)" >&2
     exit 1
 fi
-if [[ ! -x "$BUILT_EXECUTABLE" ]]; then
+if [[ -z "$BUILT_EXECUTABLE" || ! -x "$BUILT_EXECUTABLE" ]]; then
     echo "NeTelegram executable is missing after build" >&2
     exit 1
 fi
