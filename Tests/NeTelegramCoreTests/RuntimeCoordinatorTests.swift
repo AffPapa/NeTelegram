@@ -246,7 +246,14 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let buffer = TDLibUpdateBuffer(capacity: 1)
     let accepted = Data("accepted".utf8)
     #expect(buffer.append(accepted))
-    let producer = Task.detached { buffer.append(Data("after-close".utf8)) }
+    let appendResult = LockedTestValue<Bool?>(nil)
+    let appendFinished = LockedTestValue(false)
+    // append() intentionally blocks under backpressure. Keep that blocking call off
+    // Swift's cooperative executor so this test remains reliable on older CI toolchains.
+    DispatchQueue(label: "NeTelegramTests.blocked-update-append").async {
+        appendResult.set(buffer.append(Data("after-close".utf8)))
+        appendFinished.set(true)
+    }
 
     let clock = ContinuousClock()
     let deadline = clock.now.advanced(by: .seconds(1))
@@ -256,7 +263,9 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(buffer.blockedProducerCount == 1)
 
     buffer.close()
-    #expect(!(await producer.value))
+    let producerFinished = await waitForTrue(appendFinished, timeout: .seconds(2))
+    #expect(producerFinished)
+    #expect(appendResult.get() == false)
     #expect(buffer.take() == accepted)
     #expect(buffer.take() == nil)
     #expect(buffer.count == 0)
