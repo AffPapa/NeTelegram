@@ -395,6 +395,29 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(sameIdentityUpdate.first?.displayName == "Updated Name")
 }
 
+@Test func accountCatalogueRemovesOnlyTheExpectedLoggedOutIdentity() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let first = AccountUUID()
+    let second = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: first)
+    _ = try await catalogue.addProfile(id: second)
+    try await catalogue.associateVerifiedIdentity(101, with: first)
+    try await catalogue.associateVerifiedIdentity(202, with: second)
+
+    await #expect(throws: AccountCatalogueError.identityMismatch) {
+        try await catalogue.removeProfile(first, expectedTelegramUserID: 202)
+    }
+    #expect(await catalogue.allProfiles().count == 2)
+
+    try await catalogue.removeProfile(first, expectedTelegramUserID: 101)
+    let reopened = try AccountCatalogue(rootURL: root)
+    let remaining = await reopened.allProfiles()
+    #expect(remaining.map(\.id) == [second])
+    #expect(remaining.first?.telegramUserID == 202)
+}
+
 @Test func accountCatalogueDoesNotExposeUnpersistedTelegramIdentity() async throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }
@@ -467,6 +490,45 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(!barrier.dispatch(queued, currentAccount: account, currentTelegramUserID: 101, currentGeneration: RuntimeGeneration(1)) { sent = true })
     #expect(!sent)
     #expect(SendIntent.maximumPaidStars == 0)
+}
+
+@Test func privacyBarrierBindsAccountLogoutAndRejectsLockedOrStaleCommands() throws {
+    let account = AccountUUID()
+    let barrier = PrivacyDispatchBarrier()
+    let generation = RuntimeGeneration(3)
+    let epoch = barrier.currentEpoch()
+    var dispatched = 0
+
+    #expect(barrier.dispatchBoundUserCommand(
+        account: account,
+        expectedTelegramUserID: 101,
+        runtimeGeneration: generation,
+        privacyEpoch: epoch,
+        currentAccount: account,
+        currentTelegramUserID: 101,
+        currentGeneration: generation
+    ) { dispatched += 1 })
+    #expect(!barrier.dispatchBoundUserCommand(
+        account: account,
+        expectedTelegramUserID: 101,
+        runtimeGeneration: generation,
+        privacyEpoch: epoch,
+        currentAccount: account,
+        currentTelegramUserID: 101,
+        currentGeneration: RuntimeGeneration(4)
+    ) { dispatched += 1 })
+
+    _ = barrier.setLocked(true)
+    #expect(!barrier.dispatchBoundUserCommand(
+        account: account,
+        expectedTelegramUserID: 101,
+        runtimeGeneration: generation,
+        privacyEpoch: barrier.currentEpoch(),
+        currentAccount: account,
+        currentTelegramUserID: 101,
+        currentGeneration: generation
+    ) { dispatched += 1 })
+    #expect(dispatched == 1)
 }
 
 @Test func privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent() async {

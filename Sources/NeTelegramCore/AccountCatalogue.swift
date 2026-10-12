@@ -84,6 +84,23 @@ public actor AccountCatalogue {
         }
     }
 
+    /// Removes a local profile only after the caller has observed TDLib's
+    /// confirmed logout/Closed barrier and still knows which server identity
+    /// the profile represented. Persistence failure restores the record.
+    public func removeProfile(_ account: AccountUUID, expectedTelegramUserID: Int64) throws {
+        guard let index = profiles.firstIndex(where: { $0.id == account }) else {
+            throw AccountCatalogueError.accountNotFound
+        }
+        guard profiles[index].telegramUserID == expectedTelegramUserID else {
+            throw AccountCatalogueError.identityMismatch
+        }
+        let removed = profiles.remove(at: index)
+        do { try persist() } catch {
+            profiles.insert(removed, at: index)
+            throw error
+        }
+    }
+
     private func persist() throws {
         do {
             let data = try JSONEncoder.neTelegram.encode(profiles)

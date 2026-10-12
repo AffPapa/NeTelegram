@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private var statusMenuItem: NSMenuItem!
+    private var logoutAccountMenuItem: NSMenuItem?
     private var statusLabel: NSTextField!
     private var inputField: NSTextField!
     private var secureInputField: NSSecureTextField!
@@ -175,6 +176,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             setStatus("Восстанавливаю профили. Повторите выход после завершения запуска.")
             return .terminateCancel
         }
+        guard !resumeProfilesAfterAbortedTermination, pendingClosures.isEmpty else {
+            setStatus("Ожидаю подтверждения TDLib перед повторной попыткой выхода.")
+            return .terminateCancel
+        }
         if runtimesByClient.isEmpty {
             guard let gateway, !gateway.receiveWorkerHasExited else { return .terminateNow }
             terminationReply = { [weak self] allow in
@@ -183,10 +188,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             stopReceiverAndReplyWhenExited(gateway)
             return .terminateLater
-        }
-        guard !resumeProfilesAfterAbortedTermination, pendingClosures.isEmpty else {
-            setStatus("Ожидаю подтверждения TDLib перед повторной попыткой выхода.")
-            return .terminateCancel
         }
         closingForTermination = true
         pendingClosures = Set(runtimesByClient.keys)
@@ -686,6 +687,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         } else {
             statusMenuItem.title = "Аккаунты: \(authorized) авторизованы · \(awaitingInput) требуют входа · \(failed) с ошибкой\(storageWarning)"
         }
+        logoutAccountMenuItem?.isEnabled = !lockState
+            && runtime?.telegramUserID != nil
+            && runtime?.isLogoutRequested == false
     }
 
     private func buildMainMenu() {
@@ -698,6 +702,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         appMenu.addItem(withTitle: "Выйти", action: #selector(quit), keyEquivalent: "q")
         appMenu.items.forEach { $0.target = self }
         appMenuItem.submenu = appMenu
+
+        let accountMenuItem = NSMenuItem(title: "Аккаунт", action: nil, keyEquivalent: "")
+        main.addItem(accountMenuItem)
+        let accountMenu = NSMenu(title: "Аккаунт")
+        let addAccount = NSMenuItem(title: "Добавить аккаунт…", action: #selector(addAccountFromMenu), keyEquivalent: "")
+        addAccount.target = self
+        accountMenu.addItem(addAccount)
+        accountMenu.addItem(.separator())
+        let logout = NSMenuItem(title: "Выйти из выбранного аккаунта…", action: #selector(logOutSelectedAccount), keyEquivalent: "")
+        logout.target = self
+        logoutAccountMenuItem = logout
+        accountMenu.addItem(logout)
+        accountMenuItem.submenu = accountMenu
 
         let windowMenuItem = NSMenuItem()
         main.addItem(windowMenuItem)
@@ -815,6 +832,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             cancelPhotoDownloads(account: previous.account, chatID: previousChat)
             try? previous.send(["@type": "closeChat", "chat_id": previousChat])
         }
+        presentRuntime(selected)
+    }
+
+    private func presentRuntime(_ selected: LocalAccountRuntime) {
         runtime = selected
         pendingAuthorizationType = selected.authorizationState
         inputField.isHidden = true
@@ -836,6 +857,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         case "authorizationStateWaitEmailAddress": showEmailEntry()
         case "authorizationStateWaitEmailCode": showEmailCode(authPresentationInfoByAccount[selected.account] ?? [:])
         case "authorizationStateWaitRegistration": showRegistration(authPresentationInfoByAccount[selected.account] ?? [:])
+        case "authorizationStateLoggingOut": showLogoutProgress()
         default: break
         }
     }
@@ -859,8 +881,129 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
+        do {
+            guard let catalogue else { return false }
+            try await Task.detached(priority: .utility) {
+                if FileManager.default.fileExists(atPath: target.paths.accountRoot.path) {
+                    try FileManager.default.removeItem(at: target.paths.accountRoot)
+                }
+            }.value
+            try SecretsStore().removeAccountKeys(for: target.account)
+            try await catalogue.removeProfile(target.account, expectedTelegramUserID: expectedTelegramUserID)
+            return true
+        } catch {
+            return false
+        }
+    }
+
+    private func purgeInMemoryAccountState(_ account: AccountUUID) {
+        draftsByConversation = draftsByConversation.filter { $0.key.account != account }
+        draftStoresByAccount.removeValue(forKey: account)
+        dirtyDraftAccounts.remove(account)
+        unavailableDraftAccounts.remove(account)
+        sendEligibilityByAccount.removeValue(forKey: account)
+        stagedOutgoingPhotosByFileID.removeValue(forKey: account)
+        pendingStagedPhotoPaths.removeValue(forKey: account)
+        completedOutgoingPhotoFileIDs.removeValue(forKey: account)
+        chatRowsByAccount.removeValue(forKey: account)
+        chatOrderByAccount.removeValue(forKey: account)
+        selectedChatByAccount.removeValue(forKey: account)
+        messagesByConversation = messagesByConversation.filter { $0.key.account != account }
+        replyTargetsByConversation = replyTargetsByConversation.filter { $0.key.account != account }
+        messageEditDrafts = messageEditDrafts.filter { $0.key.conversation.account != account }
+        pendingMessagePropertiesByExtra = pendingMessagePropertiesByExtra.filter { $0.value.key.conversation.account != account }
+        pendingMessageMutationsByExtra = pendingMessageMutationsByExtra.filter { $0.value.context.key.conversation.account != account }
+        pendingSendByExtra = pendingSendByExtra.filter { $0.value.intent.account != account }
+        forumTopicsByAccount.removeValue(forKey: account)
+        forumChatsByAccount.removeValue(forKey: account)
+        selectedForumTopicIDsByAccount.removeValue(forKey: account)
+        let notificationIDs = notificationIDsByAccount.removeValue(forKey: account) ?? []
+        notificationTargets = notificationTargets.filter { !notificationIDs.contains($0.key) }
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
+        photoPipeline.cancelPreviews(for: account)
+        for key in photoViews.keys.filter({ $0.account == account }) {
+            photoViews[key]?.removeFromSuperview()
+            photoViews.removeValue(forKey: key)
+            photoButtons.removeValue(forKey: key)?.removeFromSuperview()
+            photoLocalURLs.removeValue(forKey: key)
+            photoOriginalFileIDs.removeValue(forKey: key)
+            photoOriginalCanBeDownloaded.removeValue(forKey: key)
+            photoOriginalLocalURLs.removeValue(forKey: key)
+            photoTokens.removeValue(forKey: key)
+        }
+        photoOriginalKeysByFileID.removeValue(forKey: account)
+        pendingPhotoByExtra = pendingPhotoByExtra.filter { $0.value.account != account }
+        pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter { $0.value.account != account }
+        requestedOriginalPhotos = requestedOriginalPhotos.filter { $0.account != account }
+        photoDownloadsByConversation = photoDownloadsByConversation.filter { $0.key.account != account }
+        pendingHistoryByExtra = pendingHistoryByExtra.filter { $0.value.account != account }
+        pendingForumTopicsByExtra.removeAll()
+        pendingSearchByExtra = pendingSearchByExtra.filter { $0.value.account != account }
+        searchResults.removeAll()
+        refreshChatList()
+    }
+
     @objc private func addAccount() {
         Task { @MainActor in await addAccountProfile() }
+    }
+
+    @objc private func addAccountFromMenu() { addAccount() }
+
+    @objc private func logOutSelectedAccount() {
+        guard !lockState,
+              let selected = runtime,
+              let expectedUserID = selected.telegramUserID,
+              !selected.isLogoutRequested else {
+            setStatus("Выберите разблокированный авторизованный аккаунт для выхода.")
+            return
+        }
+
+        let account = selected.account
+        let generation = selected.generation
+        let epoch = privacyDispatchBarrier.currentEpoch()
+        let title = safeAccountName(selected) ?? "выбранный аккаунт"
+        let alert = NSAlert()
+        alert.alertStyle = .critical
+        alert.messageText = "Выйти из аккаунта «\(title)»?"
+        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; NeTelegram также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
+        alert.addButton(withTitle: "Выйти и удалить локальные данные")
+        alert.addButton(withTitle: "Отмена")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        guard !lockState,
+              runtime === selected,
+              selected.account == account,
+              selected.telegramUserID == expectedUserID,
+              selected.generation == generation else {
+            setStatus("Выбранный аккаунт изменился или заблокирован; выход не отправлен.")
+            return
+        }
+
+        do {
+            let accepted = try privacyDispatchBarrier.dispatchBoundUserCommand(
+                account: account,
+                expectedTelegramUserID: expectedUserID,
+                runtimeGeneration: generation,
+                privacyEpoch: epoch,
+                currentAccount: selected.account,
+                currentTelegramUserID: expectedUserID,
+                currentGeneration: selected.generation
+            ) {
+                try selected.requestLogout()
+            }
+            guard accepted else {
+                setStatus("Состояние блокировки или аккаунта изменилось; выход не отправлен.")
+                return
+            }
+            if let client = selected.route?.client.value { pendingClosures.insert(client) }
+            setStatus("Запросил выход у Telegram. Этот аккаунт освободится после подтверждённого закрытия; остальные продолжают работу.")
+            refreshStatusMenu()
+        } catch {
+            setStatus("TDLib не принял запрос выхода. Профиль и локальные данные сохранены.")
+            refreshStatusMenu()
+        }
     }
 
     private func accountStorageRoot() throws -> URL {
@@ -1133,6 +1276,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 return
             }
             await target.consume(update.json)
+            if target.takeLogoutFailureNotice() {
+                if let client = target.route?.client.value { pendingClosures.remove(client) }
+                setStatus("Telegram не подтвердил выход. Локальный профиль и данные сохранены; проверьте сеть и повторите позже.")
+                refreshAccountPicker()
+                refreshStatusMenu()
+            }
             if let authorizationState = target.authorizationState, let route = target.route {
                 let accepted = await runtimeCoordinator.applyAuthorizationState(
                     authorizationState,
@@ -1158,12 +1307,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     setStatus("Аккаунт авторизован.")
                 }
             }
-            handle(update.json, from: target)
+            await handle(update.json, from: target)
             refreshStatusMenu()
         }
     }
 
-    private func handle(_ update: Data, from target: LocalAccountRuntime) {
+    private func handle(_ update: Data, from target: LocalAccountRuntime) async {
         guard let object = (try? JSONSerialization.jsonObject(with: update)) as? [String: Any] else { return }
         let updateType = object["@type"] as? String ?? ""
         if target.telegramUserID == nil,
@@ -1268,15 +1417,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             pendingAuthRequestsByExtra = pendingAuthRequestsByExtra.filter { $0.value.account != target.account }
             if authType == "authorizationStateClosed" {
                 let client = target.route?.client.value
+                let wasSelected = target === runtime
+                let confirmedLogout = target.logoutWasAccepted
+                let loggedOutUserID = target.telegramUserID
+                var removedLogoutProfile = false
+                if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
-                if let client {
-                    runtimesByClient.removeValue(forKey: client)
-                    pendingClosures.remove(client)
-                    if let route = target.route { Task { await runtimeCoordinator.removeRouteAfterClosed(route.client) } }
-                }
                 runtimesByAccount.removeValue(forKey: target.account)
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
-                if target === runtime { runtime = runtimesByAccount.values.first }
+                if wasSelected { runtime = runtimesByAccount.values.first }
+                if confirmedLogout, let loggedOutUserID {
+                    purgeInMemoryAccountState(target.account)
+                    let cleanup = await finishLogoutProfile(target, expectedTelegramUserID: loggedOutUserID)
+                    removedLogoutProfile = cleanup
+                    setStatus(cleanup
+                        ? "Аккаунт вышел из Telegram, локальные данные и профиль удалены."
+                        : "Выход в Telegram завершён, но локальная очистка не закончена. Профиль сохранён для безопасного восстановления очистки.")
+                } else if target.isLogoutRequested {
+                    setStatus("Соединение закрылось до подтверждения выхода Telegram; локальный профиль сохранён.")
+                }
+                if let client {
+                    runtimesByClient.removeValue(forKey: client)
+                    if let route = target.route { await runtimeCoordinator.removeRouteAfterClosed(route.client) }
+                    pendingClosures.remove(client)
+                }
+                if wasSelected, let next = runtime {
+                    refreshAccountPicker(select: next.account)
+                    presentRuntime(next)
+                } else if wasSelected, confirmedLogout, removedLogoutProfile, runtimesByAccount.isEmpty {
+                    Task { @MainActor [weak self] in await self?.addAccountProfile() }
+                } else if wasSelected, confirmedLogout, runtimesByAccount.isEmpty {
+                    chatPane.isHidden = true
+                    authStack.isHidden = false
+                    loginHeading.stringValue = "Очистка профиля не завершена"
+                    loginSubtitle.stringValue = "Telegram подтвердил выход. Локальная запись сохранена из-за ошибки очистки; добавьте другой аккаунт через меню «Аккаунт» после устранения ошибки Keychain или диска."
+                    phoneField.isHidden = true
+                    inputField.isHidden = true
+                    secureInputField.isHidden = true
+                    qrImageView.isHidden = true
+                    actionButton.isHidden = true
+                }
                 refreshAccountPicker()
                 if closingForTermination && pendingClosures.isEmpty {
                     closingForTermination = false
@@ -3479,6 +3659,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         phoneField.becomeFirstResponder()
     }
 
+    private func showLogoutProgress() {
+        chatPane.isHidden = true
+        authStack.isHidden = false
+        loginHeading.stringValue = "Выходим из аккаунта"
+        loginSubtitle.stringValue = "Ожидаю подтверждения Telegram. Остальные аккаунты продолжают работать."
+        phoneField.isHidden = true
+        countryPicker.isHidden = true
+        emailField.isHidden = true
+        inputField.isHidden = true
+        secureInputField.isHidden = true
+        firstNameField.isHidden = true
+        lastNameField.isHidden = true
+        registrationConsent.isHidden = true
+        registrationTermsScroll.isHidden = true
+        qrImageView.isHidden = true
+        qrButton.isHidden = true
+        actionButton.isEnabled = false
+        window.title = "Выход из аккаунта — NeTelegram"
+        setStatus("Telegram завершает сеанс и удаляет локальные данные аккаунта…")
+    }
+
     @objc private func selectCountry() {
         let index = countryPicker.indexOfSelectedItem
         guard phoneCountries.indices.contains(index) else { return }
@@ -3771,6 +3972,10 @@ private final class LocalAccountRuntime {
     fileprivate var route: RuntimeRoute?
     fileprivate let generation: RuntimeGeneration
     private var closeRequested = false
+    private var logoutExtra: String?
+    private(set) var isLogoutRequested = false
+    private(set) var logoutWasAccepted = false
+    private var logoutFailureNotice = false
     private var didRequestCurrentUser = false
     private var didLoadMainChats = false
     private var didSendTDLibParameters = false
@@ -3802,9 +4007,31 @@ private final class LocalAccountRuntime {
 
     func send(_ request: [String: Any]) throws {
         guard let route else { return }
+        let type = request["@type"] as? String
+        guard !isLogoutRequested || type == "close" || type == "logOut" else {
+            throw CocoaError(.userCancelled)
+        }
         let bytes = try JSONSerialization.data(withJSONObject: request, options: [.sortedKeys])
         try gateway.send(String(decoding: bytes, as: UTF8.self), to: route.client)
-        if request["@type"] as? String == "setTdlibParameters" { didSendTDLibParameters = true }
+        if type == "setTdlibParameters" { didSendTDLibParameters = true }
+    }
+
+    func requestLogout() throws {
+        guard !isLogoutRequested,
+              route != nil,
+              telegramUserID != nil,
+              authorizationState == "authorizationStateReady" else {
+            throw CocoaError(.userCancelled)
+        }
+        let extra = "netetelegram-logout-\(account.id.uuidString.lowercased())-\(generation.value)-\(UUID().uuidString.lowercased())"
+        try send(["@type": "logOut", "@extra": extra])
+        logoutExtra = extra
+        isLogoutRequested = true
+    }
+
+    func takeLogoutFailureNotice() -> Bool {
+        defer { logoutFailureNotice = false }
+        return logoutFailureNotice
     }
 
     func applyNetworkType(_ type: String) throws {
@@ -3832,11 +4059,23 @@ private final class LocalAccountRuntime {
            let authorization = object["authorization_state"] as? [String: Any],
            let state = authorization["@type"] as? String {
             authorizationState = state
+            if state == "authorizationStateLoggingOut", isLogoutRequested {
+                logoutWasAccepted = true
+            }
             if state == "authorizationStateReady", !didRequestCurrentUser {
                 didRequestCurrentUser = true
                 try? send(["@type": "getMe"])
             }
+        } else if object["@type"] as? String == "ok",
+                  object["@extra"] as? String == logoutExtra {
+            logoutWasAccepted = true
         } else if object["@type"] as? String == "error" {
+            if object["@extra"] as? String == logoutExtra {
+                isLogoutRequested = false
+                logoutWasAccepted = false
+                logoutExtra = nil
+                logoutFailureNotice = true
+            }
             lastTDLibError = "TDLib error \(object["code"] ?? "unknown")"
         } else if object["@type"] as? String == "user" {
             let names = [object["first_name"] as? String, object["last_name"] as? String]

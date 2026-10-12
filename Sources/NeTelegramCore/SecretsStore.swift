@@ -41,6 +41,26 @@ public struct SecretsStore: Sendable {
         try key(for: account, service: "org.affpapa.netelegram.app-state-key", createIfMissing: createIfMissing)
     }
 
+    /// Removes only this account's local database and app-state keys. Call
+    /// after its TDLib client has acknowledged logout and reached Closed.
+    public func removeAccountKeys(for account: AccountUUID) throws {
+        let accountName = account.id.uuidString.lowercased()
+        try removeKey(account: accountName, service: "org.affpapa.netelegram.database-key")
+        try removeKey(account: accountName, service: "org.affpapa.netelegram.app-state-key")
+    }
+
+    private func removeKey(account: String, service: String) throws {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+        ]
+        let status = SecItemDelete(query as CFDictionary)
+        guard status == errSecSuccess || status == errSecItemNotFound else {
+            throw SecretsStoreError.keychain(status)
+        }
+    }
+
     private func key(for account: AccountUUID, service: String, createIfMissing: Bool) throws -> Data {
         let accountName = account.id.uuidString.lowercased()
         let baseQuery: [String: Any] = [

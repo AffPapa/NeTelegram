@@ -158,4 +158,30 @@ public final class PrivacyDispatchBarrier: @unchecked Sendable {
         try send()
         return true
     }
+
+    /// Serializes non-message user commands such as explicit account logout
+    /// against privacy lock and account switching. The caller captures identity
+    /// before any modal UI and supplies the current runtime immediately before
+    /// dispatch.
+    @discardableResult
+    public func dispatchBoundUserCommand(
+        account: AccountUUID,
+        expectedTelegramUserID: Int64,
+        runtimeGeneration: RuntimeGeneration,
+        privacyEpoch: UInt64,
+        currentAccount: AccountUUID,
+        currentTelegramUserID: Int64,
+        currentGeneration: RuntimeGeneration,
+        send: () throws -> Void
+    ) rethrows -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !isLocked,
+              privacyEpoch == epoch,
+              account == currentAccount,
+              expectedTelegramUserID == currentTelegramUserID,
+              runtimeGeneration == currentGeneration else { return false }
+        try send()
+        return true
+    }
 }
