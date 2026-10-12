@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; local_core_suite_and_hosted_CI_passed; native_real_account_performance_compatibility_and_release_acceptance_open",
+  "status": "implementation_in_progress; latest native Dev.app clean-launch smoke and Site v44 public verification passed; real-account, 20-runtime, compatibility, signing and release acceptance open",
   "cases": [
     {
       "id": "APP01",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passed. RTL, IME, VoiceOver, Reduced Motion, and real keyboard navigation remain untested."
+      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passed. RTL, IME, VoiceOver, Reduced Motion, and real keyboard navigation remain untested. A clean first-run screenshot from native CI run 38292860280 confirms the centered phone-entry form and clear missing-app-API-hash status; VoiceOver, RTL, IME and real keyboard workflows remain untested."
     },
     {
       "id": "APP23",
@@ -279,7 +279,7 @@
       "method": "source+CI",
       "required_for": "all public releases",
       "status": "partial",
-      "evidence": "Public source and CI exist; latest hosted run passed. Final transitive NOTICE/SBOM audit and reproducible release package remain open."
+      "evidence": "Public source is current through docs commit 1dd332df4a3cf411190f88978c39e9409de8c784; application source commit a90df16d676bc37dacd5630552ee235341f70c25 passed fast CI 38292860292 and pinned TDLib/Dev.app CI 38292860280. Final transitive NOTICE/SBOM audit and reproducible release package remain open."
     },
     {
       "id": "REL03",
@@ -323,8 +323,8 @@
       "expected": "New Site ID/hostname and source checkout; NeAntik/browsers untouched.",
       "method": "native tool receipts",
       "required_for": "site",
-      "status": "not_run",
-      "evidence": null
+      "status": "passed",
+      "evidence": "Existing Site project appgprj_6acba85192e08191acdf7011928848cf and hostname https://netelegram.iryadom.chatgpt.site are separate from the app Git remote; Site source commit 47cd092c2d551f91b0c574d8dba422b664bf42fe was pushed by the official Sites helper. No NeAntik project was changed."
     },
     {
       "id": "SITE02",
@@ -333,7 +333,7 @@
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Sites v26 access_mode=public; anonymous GET /devlog/ and /downloads/ returned HTTP 200 text/html. This proves those public routes only."
+      "evidence": "Site v44 deployment appgdep_6acd3085d8f08191b54d0f38705edad9 succeeded; get_site confirms access_mode=public. Anonymous Playwright requests returned HTTP 200 for home, features, devlog, downloads, changelog, roadmap, privacy, source, alpha/stable appcasts; stylesheet returned 200/304. Appcasts serve text/xml."
     },
     {
       "id": "SITE03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public v26 downloads page correctly states no GitHub Release/installer exists; alpha/stable appcasts are empty valid XML. A real downloadable latest app build is unavailable."
+      "evidence": "Site v44 links current app source commit a90df16 and passing CI runs 38292860292/38292860280. It truthfully states no real account login, 20-runtime certification, Developer ID or notarization. Downloads has no installer URL; alpha/stable feeds remain valid empty XML."
     },
     {
       "id": "SITE04",
@@ -350,8 +350,8 @@
       "expected": "Одинаковые input→output; internal links; desktop/mobile/keyboard; HTML содержит downloads без JS.",
       "method": "local build+browser",
       "required_for": "site",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Buildless static output validated: 8 HTML routes, local internal links, both appcast XML files, source/run links and no-download state. Public browser navigation and content were checked. Responsive/mobile, keyboard and VoiceOver layout checks remain unverified; direct urllib was blocked by Cloudflare 1010, while anonymous Playwright browser access succeeded."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v26 devlog links the exact current source commit and passing CI run. No app release manifest/assets exist to verify app-version coherence."
+      "evidence": "Site v44 source commit 47cd092c2d551f91b0c574d8dba422b664bf42fe is explicitly distinct from application source a90df16 and docs commit 1dd332d. Devlog links the exact CI runs. No immutable app release manifest or downloadable assets exist yet, so application-version coherence is not applicable/passed."
     },
     {
       "id": "OPS01",
@@ -383,11 +383,23 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "75a5c61939130923d74bab46b25fe6660301c694",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-module-cache swift test --disable-sandbox",
-    "local_result": "49/49 Swift Testing tests passed; Xcode 27.0 / Swift 6.4; arm64e host; macOS 14 target (local at e83a9ea)",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38284254151",
-    "hosted_result": "success for the exact source commit; GitHub macos-15-arm64 runner, macOS 15.7.9, Xcode 16.4, Swift 6.1.2; built app, 49 tests passed, JSON validation passed",
-    "scope": "Core contract/unit tests and native app compilation only. Does not verify a real Telegram account, native login/read/send/logout, all accessibility paths, sleep/wake, twenty authorized runtimes, physical performance, Developer ID/notarization, quarantined installation, or updater release smoke."
+    "source_commit": "a90df16d676bc37dacd5630552ee235341f70c25",
+    "local_command": "swiftc -frontend -parse Sources/NeTelegramApp/main.swift; git diff --check; static website parser/link/feed validation",
+    "local_result": "Swift source parse and diff checks passed. Website check passed 8 HTML routes, local links, alpha/stable XML, current source/run links, and no installer href.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38292860280",
+    "hosted_result": "Native macOS 15 Apple Silicon run succeeded: pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64 Dev.app, bundle/signature/build metadata checks, fresh support-root launch, screenshot, graceful quit, artifact upload. Fast run 38292860292 also passed Swift tests and JSON validation.",
+    "artifact": "GitHub Actions artifact 11767911208; temporary ad-hoc Dev.app only; screenshot SHA-256 ca1bb93f50e4f534ed6e49a66cedd64862956b47f29761e331c73c51309d6d0d.",
+    "site": "Public Site v44 deployment appgdep_6acd3085d8f08191b54d0f38705edad9 succeeded; browser-verified routes and XML MIME.",
+    "scope": "No Telegram account login/read/send/logout, no real profile data, no 20-account runtime/resource matrix, no physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, or updater smoke."
+  },
+  "latest_site_deployment": {
+    "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
+    "version": 44,
+    "source_commit": "47cd092c2d551f91b0c574d8dba422b664bf42fe",
+    "deployment_id": "appgdep_6acd3085d8f08191b54d0f38705edad9",
+    "url": "https://netelegram.iryadom.chatgpt.site",
+    "audience": "public",
+    "status": "succeeded",
+    "no_app_download": true
   }
 }
