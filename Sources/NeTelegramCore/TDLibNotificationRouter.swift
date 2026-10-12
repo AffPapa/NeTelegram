@@ -18,9 +18,38 @@ public struct RoutedTDLibNotification: Hashable, Sendable {
     }
 }
 
+public struct TDLibNotificationPresentation: Equatable, Sendable {
+    public let title: String
+    public let body: String
+    public let playsSound: Bool
+
+    public init(title: String, body: String, playsSound: Bool) {
+        self.title = title
+        self.body = body
+        self.playsSound = playsSound
+    }
+}
+
 /// Converts TDLib's per-client update payloads into explicit account/chat/topic
 /// targets. Unknown topics and non-message notification kinds fail closed.
 public enum TDLibNotificationRouter {
+    public static func presentation(
+        for notification: RoutedTDLibNotification,
+        isPrivacyLocked: Bool,
+        chatTitle: String?,
+        isReconciliation: Bool = false
+    ) -> TDLibNotificationPresentation {
+        let playsSound = !isReconciliation && !notification.isSilent
+        guard !isPrivacyLocked else {
+            return TDLibNotificationPresentation(title: "NeTelegram", body: "Новое сообщение", playsSound: playsSound)
+        }
+        return TDLibNotificationPresentation(
+            title: chatTitle ?? "Новое сообщение",
+            body: notification.showsPreview ? (notification.preview ?? "Новое сообщение") : "Новое сообщение",
+            playsSound: playsSound
+        )
+    }
+
     public static func route(
         account: AccountUUID,
         groupID: Int32,

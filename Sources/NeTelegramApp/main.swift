@@ -2234,22 +2234,50 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func deliverNotification(_ value: RoutedTDLibNotification, for target: LocalAccountRuntime) {
-        guard target.telegramUserID != nil else { return }
+        deliverNotifications([(value, target)])
+    }
+
+    private func deliverActiveNotifications() {
+        let current = notificationTargets.values.compactMap { value -> (RoutedTDLibNotification, LocalAccountRuntime)? in
+            guard notificationIDsByAccount[value.account]?.contains(value.systemIdentifier) == true,
+                  let target = runtimesByAccount[value.account] else { return nil }
+            return (value, target)
+        }
+        deliverNotifications(current, isReconciliation: true)
+    }
+
+    private func deliverNotifications(
+        _ values: [(RoutedTDLibNotification, LocalAccountRuntime)],
+        isReconciliation: Bool = false
+    ) {
+        let eligible = values.filter { $0.1.telegramUserID != nil }
+        guard !eligible.isEmpty else { return }
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else { return }
             Task { @MainActor [weak self] in
-                guard let self, self.runtimesByAccount[value.account] === target else { return }
+                guard let self else { return }
                 self.privacyDispatchBarrier.withState { isLocked, _ in
-                    let content = UNMutableNotificationContent()
-                    content.title = isLocked ? "NeTelegram" : (self.chatRowsByAccount[value.account]?[value.conversation.chatID]?.title ?? "Новое сообщение")
-                    content.body = isLocked ? "Новое сообщение" : (value.showsPreview ? (value.preview ?? "Новое сообщение") : "Новое сообщение")
-                    content.sound = value.isSilent ? nil : .default
-                    content.userInfo = ["route": value.systemIdentifier]
-                    let request = UNNotificationRequest(identifier: value.systemIdentifier, content: content, trigger: nil)
-                    // Enqueue while holding the same barrier used by lock(). If
-                    // locking wins first, only a generic preview is queued; if
-                    // this call wins, lock's subsequent removeAll is ordered after it.
-                    UNUserNotificationCenter.current().add(request) { _ in }
+                    for (value, target) in eligible {
+                        guard self.runtimesByAccount[value.account] === target,
+                              self.notificationTargets[value.systemIdentifier] == value,
+                              self.notificationIDsByAccount[value.account]?.contains(value.systemIdentifier) == true else { continue }
+                        let presentation = TDLibNotificationRouter.presentation(
+                            for: value,
+                            isPrivacyLocked: isLocked,
+                            chatTitle: self.chatRowsByAccount[value.account]?[value.conversation.chatID]?.title,
+                            isReconciliation: isReconciliation
+                        )
+                        let content = UNMutableNotificationContent()
+                        content.title = presentation.title
+                        content.body = presentation.body
+                        content.sound = presentation.playsSound ? .default : nil
+                        content.userInfo = ["route": value.systemIdentifier]
+                        let request = UNNotificationRequest(identifier: value.systemIdentifier, content: content, trigger: nil)
+                        // Enqueue under the same barrier used by lock(). This
+                        // preserves each route while preventing a late callback
+                        // from restoring sensitive text after the lock wins.
+                        UNUserNotificationCenter.current().add(request) { _ in }
+                    }
                 }
             }
         }
@@ -4539,6 +4567,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         privacyDispatchBarrier.setLocked(true)
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+        // The lock clears any already-published preview. Reconcile the active
+        // TDLib snapshot immediately with generic content so notifications do
+        // not disappear until another update arrives.
+        deliverActiveNotifications()
         inputField.stringValue = ""
         secureInputField.stringValue = ""
         inputField.isHidden = true

@@ -45,7 +45,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Privacy dispatch barrier, queued-send invalidation across lock/unlock, and verified unlock identity tests pass in the 66/66 local Swift suite on candidate 760c29e (local, based on public 637b820). The notification handoff also rejects cancelled auth and stale generation/identity. AppKit lock/unlock pixel, picker, and callback races remain untested."
+      "evidence": "69/69 local Swift tests pass on 2026-10-13. Privacy lock now reissues the currently active TDLib notification set with generic title/body while retaining each account/chat/topic route; a pure projection test confirms lock hides chat title and message text and unlock restores allowed content. Native lock/unlock, Notification Center races, and picker/app UI behavior remain untested."
     },
     {
       "id": "APP06",
@@ -63,7 +63,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Notification targets preserve account/chat/typed-topic identity. Candidate 760c29e adds an in-memory locked-notification handoff that opens the exact current route only after successful system auth and matching account, runtime generation, Telegram user ID, authorization state, and notification. All 66 local Swift tests pass; native Notification Center clicks, real Telegram notifications, and duplicate-sound behavior remain unverified."
+      "evidence": "Notification targets preserve account/chat/typed-topic identity. Active notifications are reconciled with generic content after privacy lock and previews return only when unlocked. 69/69 local Swift tests pass. Native Notification Center clicks, real Telegram notifications, OS permission behavior, and duplicate sounds remain unverified."
     },
     {
       "id": "APP08",
@@ -72,7 +72,7 @@
       "method": "fault+native Notification Center",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "The local 66/66 suite covers privacy serialization of notification publication and candidate 760c29e clears/revalidates a staged route across lock/unlock. Native UNUserNotificationCenter race/reconcile/remove smoke remains unrun."
+      "evidence": "Local 69/69 Swift suite covers lock serialization and generic locked-content projection; publish revalidates runtime, notification target, and active ID under the privacy barrier. Native UNUserNotificationCenter remove/reconcile races and real preview observation remain unrun."
     },
     {
       "id": "APP09",

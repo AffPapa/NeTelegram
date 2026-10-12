@@ -1431,6 +1431,34 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(routedA.systemIdentifier != routedB.systemIdentifier)
 }
 
+@Test func privacyLockKeepsActiveNotificationRouteWithGenericContent() throws {
+    let account = AccountUUID()
+    let raw: [String: Any] = [
+        "id": 9,
+        "is_silent": false,
+        "type": [
+            "@type": "notificationTypeNewMessage",
+            "show_preview": true,
+            "message": [
+                "id": 77,
+                "chat_id": 44,
+                "content": ["@type": "messageText", "text": ["text": "Sensitive message text"]],
+            ],
+        ],
+    ]
+    let routed = try #require(TDLibNotificationRouter.route(account: account, groupID: 3, groupChatID: 44, notification: raw))
+    let identifier = routed.systemIdentifier
+    let locked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: true, chatTitle: "Private chat", isReconciliation: true)
+    let unlocked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: false, chatTitle: "Alice")
+
+    #expect(locked == TDLibNotificationPresentation(title: "NeTelegram", body: "Новое сообщение", playsSound: false))
+    #expect(!locked.title.contains("Private chat"))
+    #expect(!locked.body.contains("Sensitive message text"))
+    #expect(unlocked == TDLibNotificationPresentation(title: "Alice", body: "Sensitive message text", playsSound: true))
+    #expect(routed.systemIdentifier == identifier)
+    #expect(routed.conversation == ConversationKey(account: account, chatID: 44, topic: .main))
+}
+
 @Test func lockedNotificationHandoffOpensExactCurrentTopicAfterVerifiedUnlock() {
     let account = AccountUUID()
     let notification = RoutedTDLibNotification(
