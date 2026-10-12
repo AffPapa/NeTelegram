@@ -20,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var actionButton: NSButton!
     private var addAccountButton: NSButton!
     private var accountPicker: NSPopUpButton!
+    private var accountPickerAccounts: [AccountUUID] = []
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
     private var phoneField: NSTextField!
@@ -41,6 +42,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private let runtimeCoordinator = RuntimeCoordinator(startupParallelism: 2)
     private let startupScheduler = RuntimeStartupScheduler(parallelism: 2)
     private var catalogue: AccountCatalogue?
+    private var knownProfilesByAccount: [AccountUUID: AccountProfile] = [:]
+    private var profileOrder: [AccountUUID] = []
+    private var profileStartupFailures: Set<AccountUUID> = []
+    private var profileOpenRequests: Set<AccountUUID> = []
     private var catalogueRoot: URL?
     private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
     private var runtimesByAccount: [AccountUUID: LocalAccountRuntime] = [:]
@@ -251,7 +256,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountPicker.isHidden = true
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
-        accountPicker.setAccessibilityLabel("Авторизованный аккаунт")
+        accountPicker.setAccessibilityLabel("Локальный профиль и статус входа")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.isHidden = true
@@ -857,11 +862,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func selectAccount() {
-        let accounts = runtimesByAccount.keys.filter { runtimesByAccount[$0]?.telegramUserID != nil }.sorted {
-            (runtimesByAccount[$0].flatMap(safeAccountName) ?? "") < (runtimesByAccount[$1].flatMap(safeAccountName) ?? "")
-        }
         let index = accountPicker.indexOfSelectedItem
-        guard accounts.indices.contains(index), let selected = runtimesByAccount[accounts[index]] else { return }
+        guard accountPickerAccounts.indices.contains(index) else { return }
+        let account = accountPickerAccounts[index]
+        guard let selected = runtimesByAccount[account] else {
+            retryOpeningProfile(account)
+            return
+        }
         authRequestInFlight = false
         closePhotoViewer()
         if let previous = runtime, previous !== selected,
@@ -900,22 +907,101 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func refreshAccountPicker(select account: AccountUUID? = nil) {
-        let accounts = runtimesByAccount.keys.filter { runtimesByAccount[$0]?.telegramUserID != nil }.sorted {
-            (runtimesByAccount[$0].flatMap(safeAccountName) ?? "") < (runtimesByAccount[$1].flatMap(safeAccountName) ?? "")
-        }
+        accountPickerAccounts = profileOrder.filter { knownProfilesByAccount[$0] != nil }
         accountPicker.removeAllItems()
-        accounts.enumerated().forEach { index, id in
-            accountPicker.addItem(withTitle: runtimesByAccount[id].flatMap(safeAccountName) ?? "Аккаунт \(index + 1)")
+        accountPickerAccounts.enumerated().forEach { index, id in
+            guard let profile = knownProfilesByAccount[id] else { return }
+            let runtime = runtimesByAccount[id]
+            accountPicker.addItem(withTitle: AccountPresentation.pickerTitle(
+                localOrdinal: index + 1,
+                telegramUserID: runtime?.telegramUserID ?? profile.telegramUserID,
+                candidate: runtime?.displayName ?? profile.displayName,
+                authorizationState: runtime?.authorizationState,
+                runtimeIsOpen: runtime != nil,
+                hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil
+            ))
         }
-        accountPicker.isHidden = accounts.count < 2
-        addAccountButton.isHidden = runtimesByAccount.isEmpty
-        accountPicker.isEnabled = accounts.count > 1
-        if let account, let index = accounts.firstIndex(of: account) {
+        accountPicker.isHidden = accountPickerAccounts.isEmpty
+        addAccountButton.isHidden = knownProfilesByAccount.isEmpty
+        accountPicker.isEnabled = !accountPickerAccounts.isEmpty && !lockState
+        if let account, let index = accountPickerAccounts.firstIndex(of: account) {
             accountPicker.selectItem(at: index)
             runtime = runtimesByAccount[account]
-        } else if let runtime, let index = accounts.firstIndex(of: runtime.account) {
+        } else if let runtime, let index = accountPickerAccounts.firstIndex(of: runtime.account) {
             accountPicker.selectItem(at: index)
         }
+    }
+
+    private func rememberProfiles(_ profiles: [AccountProfile]) {
+        knownProfilesByAccount = Dictionary(uniqueKeysWithValues: profiles.map { ($0.id, $0) })
+        profileOrder = profiles.sorted {
+            if $0.createdAt != $1.createdAt { return $0.createdAt < $1.createdAt }
+            return $0.id.id.uuidString < $1.id.id.uuidString
+        }.map(\.id)
+    }
+
+    private func retryOpeningProfile(_ account: AccountUUID) {
+        guard !lockState, !profileRestoreInProgress, !closingForTermination,
+              !profileOpenRequests.contains(account),
+              let profile = knownProfilesByAccount[account] else { return }
+        prepareToSelectUnopenedProfile(account)
+        profileOpenRequests.insert(account)
+        setStatus("Повторно открываю локальный профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…")
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.profileOpenRequests.remove(account) }
+            do {
+                let apiHash = try SecretsStore().telegramAPIHash()
+                await self.openProfile(profile, apiHash: apiHash, select: true)
+            } catch SecretsStoreError.missing {
+                self.profileStartupFailures.insert(account)
+                self.setStatus("API hash не найден в Keychain; локальный профиль сохранён и не заменён.")
+            } catch {
+                self.profileStartupFailures.insert(account)
+                self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
+            }
+            self.refreshAccountPicker(select: account)
+        }
+    }
+
+    /// Clears the previous account's visible conversation before opening a
+    /// local profile that does not currently have a runtime. The profile's
+    /// own TDLib database remains untouched; other account runtimes stay open.
+    private func prepareToSelectUnopenedProfile(_ account: AccountUUID) {
+        authRequestInFlight = false
+        closePhotoViewer()
+        if let previous = runtime,
+           let previousChat = selectedChatByAccount[previous.account] {
+            cancelPhotoDownloads(account: previous.account, chatID: previousChat)
+            try? previous.send(["@type": "closeChat", "chat_id": previousChat])
+        }
+        runtime = nil
+        pendingAuthorizationType = nil
+        pendingInitialAuthorizationAction = nil
+        chatPane.isHidden = true
+        authStack.isHidden = false
+        registrationTermsScroll.isHidden = true
+        countryPicker.isHidden = true
+        phoneField.isHidden = true
+        emailField.isHidden = true
+        inputField.isHidden = true
+        secureInputField.isHidden = true
+        firstNameField.isHidden = true
+        lastNameField.isHidden = true
+        registrationConsent.isHidden = true
+        qrImageView.isHidden = true
+        qrButton.isHidden = true
+        actionButton.isHidden = true
+        phoneField.stringValue = ""
+        emailField.stringValue = ""
+        inputField.stringValue = ""
+        secureInputField.stringValue = ""
+        firstNameField.stringValue = ""
+        lastNameField.stringValue = ""
+        loginHeading.stringValue = "Локальный профиль"
+        loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные предыдущего профиля скрыты."
+        statusLabel.stringValue = "Открываю профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…"
+        window.title = "NeTelegram"
     }
 
     private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
@@ -928,8 +1014,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }.value
             try SecretsStore().removeAccountKeys(for: target.account)
             try await catalogue.removeProfile(target.account, expectedTelegramUserID: expectedTelegramUserID)
+            knownProfilesByAccount.removeValue(forKey: target.account)
+            profileOrder.removeAll { $0 == target.account }
+            profileStartupFailures.remove(target.account)
+            refreshAccountPicker()
             return true
         } catch {
+            profileStartupFailures.insert(target.account)
+            refreshAccountPicker()
             return false
         }
     }
@@ -1098,6 +1190,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         do {
             let catalogue = try accountCatalogue()
             let profiles = await catalogue.allProfiles()
+            rememberProfiles(profiles)
+            refreshAccountPicker()
             let apiHash = try SecretsStore().telegramAPIHash()
             let authorized = profiles.filter { $0.telegramUserID != nil }
             let pending = profiles.filter { $0.telegramUserID == nil }.sorted { $0.createdAt < $1.createdAt }
@@ -1153,8 +1247,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     : "Выберите страну и введите номер телефона.")
             }
         } catch SecretsStoreError.missing {
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
             setStatus("API hash не найден в Keychain; профили не будут заменены или пересозданы.")
         } catch {
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
             setStatus("Каталог профилей не удалось безопасно открыть. Данные не сброшены.")
         }
     }
@@ -1202,6 +1300,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let apiHash = try SecretsStore().telegramAPIHash()
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
+            knownProfilesByAccount[profile.id] = profile
+            if !profileOrder.contains(profile.id) { profileOrder.append(profile.id) }
+            profileStartupFailures.remove(profile.id)
+            refreshAccountPicker(select: profile.id)
             await openProfile(profile, apiHash: apiHash, select: true)
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
@@ -1266,6 +1368,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             try runtime.send(parametersRequest(for: runtime))
             try runtime.applyNetworkType(currentTDLibNetworkType)
             if presentsThisRuntime { try runtime.send(["@type": "getCountries"]) }
+            profileStartupFailures.remove(profile.id)
             await startupScheduler.release()
         } catch {
             if didRegisterStartupRoute, let startupRuntime {
@@ -1312,6 +1415,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("Не удалось подготовить профиль до запуска TDLib. Сохранённые данные не удалены.")
             }
             await startupScheduler.release()
+            profileStartupFailures.insert(profile.id)
+            refreshAccountPicker(select: profile.id)
             refreshStatusMenu()
         }
     }
@@ -1325,7 +1430,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("TDLib update пришёл от неизвестного профиля; fallback на выбранный аккаунт запрещён.")
                 return
             }
+            let previousAuthorizationState = target.authorizationState
+            let previousTelegramUserID = target.telegramUserID
+            let previousDisplayName = target.displayName
+            let previousError = target.lastTDLibError
+            let previousIdentityPersistenceFailure = target.identityPersistenceFailed
             await target.consume(update.json)
+            if let verifiedUserID = target.telegramUserID,
+               var profile = knownProfilesByAccount[target.account],
+               profile.telegramUserID != verifiedUserID || profile.displayName != target.displayName {
+                profile.associateVerifiedIdentity(verifiedUserID, displayName: target.displayName)
+                knownProfilesByAccount[target.account] = profile
+            }
+            if previousAuthorizationState != target.authorizationState
+                || previousTelegramUserID != target.telegramUserID
+                || previousDisplayName != target.displayName
+                || previousError != target.lastTDLibError
+                || previousIdentityPersistenceFailure != target.identityPersistenceFailed {
+                refreshAccountPicker(select: target === runtime ? target.account : nil)
+            }
             if target.takeLogoutFailureNotice() {
                 if let client = target.route?.client.value { pendingClosures.remove(client) }
                 setStatus("Telegram не подтвердил выход. Локальный профиль и данные сохранены; проверьте сеть и повторите позже.")

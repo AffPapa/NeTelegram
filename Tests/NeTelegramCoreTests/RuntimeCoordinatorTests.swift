@@ -58,6 +58,45 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(AccountPresentation.verifiedDisplayName(telegramUserID: 123, candidate: " Test User ") == "Test User")
 }
 
+@Test func accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus() {
+    let firstPending = AccountPresentation.pickerTitle(
+        localOrdinal: 1,
+        telegramUserID: nil,
+        candidate: "6BFF7C49-92B1-4883-8262-BF1E56906A42",
+        authorizationState: "authorizationStateWaitPhoneNumber",
+        runtimeIsOpen: true,
+        hasError: false
+    )
+    let secondPending = AccountPresentation.pickerTitle(
+        localOrdinal: 2,
+        telegramUserID: nil,
+        candidate: "Unverified name",
+        authorizationState: "authorizationStateWaitCode",
+        runtimeIsOpen: true,
+        hasError: false
+    )
+    let verified = AccountPresentation.pickerTitle(
+        localOrdinal: 3,
+        telegramUserID: 123,
+        candidate: "Test User",
+        authorizationState: "authorizationStateReady",
+        runtimeIsOpen: true,
+        hasError: false
+    )
+
+    #expect(firstPending == "Локальный вход 1 — ожидает номер")
+    #expect(secondPending == "Локальный вход 2 — ожидает код")
+    #expect(verified == "Test User · профиль 3 — подключён")
+    #expect(!firstPending.contains("6BFF7C49"))
+    #expect(!secondPending.contains("Unverified name"))
+    #expect(AccountPresentation.pickerStatus(
+        telegramUserID: nil,
+        authorizationState: nil,
+        runtimeIsOpen: false,
+        hasError: true
+    ) == .failed)
+}
+
 @Test func unsupportedIncomingContentKeepsHumanReadableContextWithoutLeakingConstructors() {
     #expect(IncomingMessagePresentation.cardText(for: "messageVoiceNote") == "Голосовое сообщение · воспроизведение не поддерживается")
     #expect(IncomingMessagePresentation.chatPreview(for: "messagePaidMedia") == "Платный контент")
