@@ -91,25 +91,6 @@ public actor RuntimeCoordinator {
         return RuntimeGeneration(next)
     }
 
-    /// Registers the new TDLib identity before issuing its first request. The
-    /// supplied request is immutable input owned by this account startup flow.
-    public func startRuntime(
-        account: AccountUUID,
-        generation: RuntimeGeneration,
-        gateway: TDLibGateway,
-        initializationRequest: String
-    ) throws -> RuntimeRoute {
-        let route = RuntimeRoute(account: account, generation: generation, client: try gateway.createClientID())
-        try registerBeforeFirstRequest(route)
-        do {
-            try gateway.send(initializationRequest, to: route.client)
-            return route
-        } catch {
-            removeRouteAfterInitializationRequestRejected(route)
-            throw error
-        }
-    }
-
     /// Removes a route only when the first request was rejected before it was
     /// queued. Once TDLib has accepted initialization, callers must retain the
     /// route and database ownership until an authorizationStateClosed update.
