@@ -69,3 +69,32 @@ public enum AuthorizationStep: String, CaseIterable, Sendable {
         }
     }
 }
+
+/// Builds the short instruction shown while TDLib waits for a login code.
+/// The destination is deliberately masked because this screen can be visible
+/// during support or screen sharing.
+public enum AuthenticationCodePrompt {
+    public static func message(codeType: String?, phoneNumber: String?) -> String {
+        let instruction: String
+        switch codeType ?? "" {
+        case "authenticationCodeTypeTelegramMessage": instruction = "Введите код из сообщения Telegram на другом устройстве."
+        case "authenticationCodeTypeSms": instruction = "Введите код из SMS."
+        case "authenticationCodeTypeCall": instruction = "Введите код из телефонного звонка."
+        case "authenticationCodeTypeSmsWord": instruction = "Введите слово из SMS."
+        case "authenticationCodeTypeSmsPhrase": instruction = "Введите фразу из SMS."
+        case "authenticationCodeTypeFlashCall", "authenticationCodeTypeMissedCall": instruction = "Следуйте инструкции для подтверждения звонком."
+        default: instruction = "Введите код, указанный в сообщении Telegram или способом, выбранным для этого входа."
+        }
+        guard let masked = maskedPhoneNumber(phoneNumber) else { return instruction }
+        return "\(instruction)\nНомер: \(masked)"
+    }
+
+    public static func maskedPhoneNumber(_ phoneNumber: String?) -> String? {
+        guard let phoneNumber else { return nil }
+        let digits = phoneNumber.filter(\.isNumber)
+        guard digits.count >= 4 else { return nil }
+        let suffix = digits.suffix(2)
+        let prefix = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("+") ? "+" : ""
+        return "\(prefix)••••••\(suffix)"
+    }
+}

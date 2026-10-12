@@ -5,6 +5,24 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func authenticationCodePromptUsesMaskedTDLibDestination() {
+    let message = AuthenticationCodePrompt.message(
+        codeType: "authenticationCodeTypeTelegramMessage",
+        phoneNumber: "+1 (555) 123-4567"
+    )
+    #expect(message.contains("сообщения Telegram"))
+    #expect(message.contains("Номер: +••••••67"))
+    #expect(!message.contains("555"))
+    #expect(!message.contains("123-4567"))
+}
+
+@Test func authenticationCodePromptHandlesUnknownMethodWithoutLeakingShortNumbers() {
+    let message = AuthenticationCodePrompt.message(codeType: nil, phoneNumber: "+123")
+    #expect(message.contains("способом, выбранным"))
+    #expect(!message.contains("Номер:"))
+    #expect(AuthenticationCodePrompt.message(codeType: "authenticationCodeTypeSms", phoneNumber: nil) == "Введите код из SMS.")
+}
+
 @Test func terminationBarrierWaitsForAccountCloseAndReceiverDrain() {
     var barrier = TerminationBarrier()
     #expect(!barrier.isPending)

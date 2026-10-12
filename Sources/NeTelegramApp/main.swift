@@ -4408,16 +4408,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func authCodeDescription(_ auth: [String: Any]) -> String {
         let codeInfo = auth["code_info"] as? [String: Any] ?? [:]
-        let kind = ((codeInfo["type"] as? [String: Any])?["@type"] as? String) ?? ""
-        switch kind {
-        case "authenticationCodeTypeTelegramMessage": return "Введите код из сообщения Telegram на другом устройстве."
-        case "authenticationCodeTypeSms": return "Введите код из SMS."
-        case "authenticationCodeTypeCall": return "Введите код из телефонного звонка."
-        case "authenticationCodeTypeSmsWord": return "Введите слово из SMS."
-        case "authenticationCodeTypeSmsPhrase": return "Введите фразу из SMS."
-        case "authenticationCodeTypeFlashCall", "authenticationCodeTypeMissedCall": return "Следуйте инструкции для подтверждения звонком."
-        default: return "Введите код, указанный в сообщении Telegram или способом, выбранным для этого входа."
-        }
+        let kind = (codeInfo["type"] as? [String: Any])?["@type"] as? String
+        let phoneNumber = codeInfo["phone_number"] as? String
+        return AuthenticationCodePrompt.message(codeType: kind, phoneNumber: phoneNumber)
     }
 
     private func showPhoneEntry() {
