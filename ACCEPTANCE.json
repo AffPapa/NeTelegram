@@ -383,9 +383,9 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "15bbad952f19abda41501ecea96264d73c751e14",
+    "source_commit": "5322ece",
     "local_command": "git diff --check; env CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox",
-    "local_result": "Auth state/presentation candidate 15bbad9 built NeTelegramApp and passed 50/50 Swift Testing tests on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Covers enum/picker classifications and existing runtime/core cases; AppKit pixels and live Telegram authorization are not exercised.",
+    "local_result": "Auth state/presentation candidate 5322ece built NeTelegramApp and passed 51/51 Swift Testing tests on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 target. Tests cover unsupported/purchase-required status and privacy-unlock destination rules; AppKit pixels and live Telegram authorization are not exercised.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38298878351",
     "hosted_result": "Run 38298878351 / job 114976608214 completed success for prior app-code commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Steps verified pinned TDLib build, isolated arm64 Dev.app assembly/smoke, and development artifact upload. This run does not cover local candidate 15bbad9.",
     "artifact": {
@@ -397,7 +397,7 @@
     },
     "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded and anonymous route/MIME checks passed. Site is unchanged and currently has no app binary.",
     "scope": "No real Telegram login, Notification Center interaction, real account send/read/logout, 20-account lifecycle/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or complete all-active lifecycle proof.",
-    "publication": "Local commit 15bbad952f19abda41501ecea96264d73c751e14 is not pushed. Non-mutating git push --dry-run failed because github.com did not resolve. gh CLI saved sessions report invalid. No GitHub settings were opened and no token was created."
+    "publication": "Local commits 15bbad9, 5309347, and 5322ece are not pushed. Non-mutating git push --dry-run failed because github.com did not resolve. gh CLI saved sessions report invalid. No GitHub settings were opened and no token was created."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
