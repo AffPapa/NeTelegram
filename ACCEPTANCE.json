@@ -270,7 +270,7 @@
       "method": "primary docs+implementation review",
       "required_for": "all public app releases",
       "status": "partial",
-      "evidence": "Own api_id is configured and API identity is kept out of source secrets. Public title and Telegram basic/sponsored compatibility gates remain unresolved."
+      "evidence": "Own api_id is configured without publishing api_hash. Current Telegram API Terms §2.3 require “Unofficial” before “Telegram” in the app title; requested public title NeTelegram does not satisfy that wording. The pinned TDLib 1.8.68 schema at c15d3f5 includes getChatSponsoredMessages and getVideoMessageAdvertisements; support/display behavior is not implemented or tested. Terms §1.3/1.4 minimum functionality and §3.3 sponsored media remain unresolved release gates."
     },
     {
       "id": "REL02",
@@ -384,7 +384,7 @@
   "last_verification": {
     "date": "2026-10-13",
     "source_commit": "760c29e1002cdc2b49710dd8918187b942c15f9c (local-only candidate; parent 637b820 is public)",
-    "local_command": "git diff --check; CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox --scratch-path /private/tmp/netetelegram-swiftpm",
+    "local_command": "git diff --check; CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-swiftpm",
     "local_result": "66/66 Swift Testing tests passed for candidate 760c29e on Xcode 27.0 / Swift 6.4 / arm64e, macOS 14 target. Includes notification-unlock handoff cancellation, identity/generation mismatch, removed notification, and exact forum-topic routing. This is synthetic/core coverage; no live Telegram login/send was performed.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38313736708 ; https://github.com/AffPapa/NeTelegram/actions/runs/38313736665",
     "hosted_result": "macOS CI run 38313736708 passed for public commit 637b82021455c4e4363ad897776d55d2cd72b7ab. Pinned TDLib/Dev.app run 38313736665 is still in progress at Build and verify pinned TDLib; App assembly/artifact upload have not started.",
