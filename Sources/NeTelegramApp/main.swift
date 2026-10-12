@@ -870,7 +870,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             retryOpeningProfile(account)
             return
         }
-        authRequestInFlight = false
+        authRequestInFlight = pendingAuthRequestsByExtra.values.contains { $0.account == account }
         closePhotoViewer()
         if let previous = runtime, previous !== selected,
            let previousChat = selectedChatByAccount[previous.account] {
@@ -895,16 +895,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshComposerState()
             return
         }
-        switch selected.authorizationState {
-        case "authorizationStateWaitPhoneNumber": showPhoneEntry()
-        case "authorizationStateWaitCode": showAuthInput("Введите код, полученный для этого входа.", placeholder: "Код", button: "Продолжить")
-        case "authorizationStateWaitPassword": showAuthInput("Введите пароль двухэтапной проверки. Он не сохраняется.", placeholder: "Пароль двухэтапной проверки", button: "Продолжить")
-        case "authorizationStateWaitEmailAddress": showEmailEntry()
-        case "authorizationStateWaitEmailCode": showEmailCode(authPresentationInfoByAccount[selected.account] ?? [:])
-        case "authorizationStateWaitRegistration": showRegistration(authPresentationInfoByAccount[selected.account] ?? [:])
-        case "authorizationStateLoggingOut": showLogoutProgress()
-        default: break
-        }
+        presentAuthorizationState(selected.authorizationState, info: authPresentationInfoByAccount[selected.account] ?? [:])
     }
 
     private func refreshAccountPicker(select account: AccountUUID? = nil) {
@@ -1697,34 +1688,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 actionButton.isEnabled = false
                 setStatus("Проверяю серверную identity профиля…")
             case "authorizationStateWaitOtherDeviceConfirmation":
-                showingQR = true
-                authStack.isHidden = false
-                phoneField.isHidden = true
-                emailField.isHidden = true
-                firstNameField.isHidden = true
-                lastNameField.isHidden = true
-                registrationConsent.isHidden = true
-                registrationTermsScroll.isHidden = true
-                phoneField.stringValue = ""
-                countryPicker.isHidden = true
-                inputField.isHidden = true
-                secureInputField.isHidden = true
-                qrImageView.isHidden = false
-                loginHeading.stringValue = "Вход по QR-коду"
-                loginSubtitle.stringValue = "Откройте Telegram на телефоне → Настройки → Устройства → Подключить устройство и отсканируйте код."
-                if let link = auth["link"] as? String { qrImageView.image = qrImage(for: link) }
-                actionButton.isHidden = true
-                qrButton.isHidden = true
-                setStatus("Подтвердите вход на своём телефоне.")
+                showQRConfirmation(auth)
             case "authorizationStateLoggingOut", "authorizationStateClosing":
                 pendingAuthorizationType = nil
-                if closingForTermination {
-                    setStatus("Завершаю работу: TDLib закрывает аккаунты и сохраняет базы…")
-                } else {
-                    setStatus("Состояние авторизации: \(authType)")
-                }
+                presentAuthorizationState(authType, info: auth)
             default:
-                setStatus("Состояние авторизации: \(authType)")
+                presentAuthorizationState(authType, info: auth)
             }
         } else if let type = object["@type"] as? String, type == "countries",
                   let countries = object["countries"] as? [[String: Any]], target === runtime {
@@ -1897,8 +1866,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         } else if let type = object["@type"] as? String, type == "error" {
             if let extra = object["@extra"] as? String,
                let pending = pendingAuthRequestsByExtra.removeValue(forKey: extra) {
+                if target === runtime, target.account == pending.account { authRequestInFlight = false }
                 guard !lockState, target === runtime, target.account == pending.account else { return }
-                authRequestInFlight = false
                 actionButton.isEnabled = true
                 qrButton.isEnabled = true
                 switch pending.step {
@@ -3687,6 +3656,119 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if secure { secureInputField.becomeFirstResponder() } else { inputField.becomeFirstResponder() }
     }
 
+    private func showQRConfirmation(_ auth: [String: Any]) {
+        showingQR = true
+        authStack.isHidden = false
+        loginHeading.stringValue = "Вход по QR-коду"
+        loginSubtitle.stringValue = "Откройте Telegram на телефоне → Настройки → Устройства → Подключить устройство и отсканируйте код."
+        registrationTermsScroll.isHidden = true
+        countryPicker.isHidden = true
+        phoneField.isHidden = true
+        phoneField.stringValue = ""
+        emailField.isHidden = true
+        emailField.stringValue = ""
+        inputField.isHidden = true
+        inputField.stringValue = ""
+        secureInputField.isHidden = true
+        secureInputField.stringValue = ""
+        firstNameField.isHidden = true
+        lastNameField.isHidden = true
+        registrationConsent.isHidden = true
+        qrImageView.isHidden = false
+        if let link = auth["link"] as? String {
+            qrImageView.image = qrImage(for: link)
+            setStatus("Подтвердите вход на своём телефоне.")
+        } else {
+            qrImageView.image = nil
+            setStatus("Ожидаю обновлённую ссылку для входа по QR-коду.")
+        }
+        actionButton.isHidden = true
+        actionButton.isEnabled = false
+        qrButton.isHidden = true
+    }
+
+    private func presentAuthorizationState(_ authorizationType: String?, info: [String: Any]) {
+        authStack.isHidden = false
+        chatPane.isHidden = true
+        if authorizationType != nil,
+           authorizationType != "authorizationStateWaitTdlibParameters",
+           authorizationType != "authorizationStateWaitPhoneNumber" {
+            pendingInitialAuthorizationAction = nil
+        }
+        if authorizationType != "authorizationStateWaitOtherDeviceConfirmation" {
+            qrImageView.image = nil
+            qrImageView.isHidden = true
+        }
+        switch authorizationType {
+        case nil:
+            showAuthorizationProgress(title: "Подключаем профиль", subtitle: "Ожидаю состояние авторизации от TDLib…")
+        case "authorizationStateWaitTdlibParameters":
+            showAuthorizationProgress(title: "Подготавливаем вход", subtitle: "Настраиваю локальную базу аккаунта…")
+        case "authorizationStateWaitPhoneNumber": showPhoneEntry()
+        case "authorizationStateWaitCode": showAuthInput("Введите код, полученный для этого входа.", placeholder: "Код", button: "Продолжить")
+        case "authorizationStateWaitPassword": showAuthInput("Введите пароль двухэтапной проверки. Он не сохраняется.", placeholder: "Пароль двухэтапной проверки", button: "Продолжить")
+        case "authorizationStateWaitEmailAddress": showEmailEntry()
+        case "authorizationStateWaitEmailCode": showEmailCode(info)
+        case "authorizationStateWaitRegistration": showRegistration(info)
+        case "authorizationStateWaitOtherDeviceConfirmation": showQRConfirmation(info)
+        case "authorizationStateWaitPremiumPurchase": showUnsupportedAuthorization(authorizationType)
+        case "authorizationStateReady":
+            showAuthorizationProgress(title: "Проверяем аккаунт", subtitle: "Проверяю серверную identity профиля…")
+        case "authorizationStateLoggingOut": showLogoutProgress()
+        case "authorizationStateClosing":
+            let subtitle = closingForTermination
+                ? "Завершаю работу: TDLib закрывает аккаунты и сохраняет базы…"
+                : "Закрываю профиль и сохраняю локальную базу…"
+            showAuthorizationProgress(title: "Закрываем профиль", subtitle: subtitle)
+        case "authorizationStateClosed":
+            showAuthorizationProgress(title: "Профиль закрыт", subtitle: "Состояние профиля сохранено.")
+        default: showUnsupportedAuthorization(authorizationType)
+        }
+    }
+
+    private func showAuthorizationProgress(title: String, subtitle: String) {
+        showingQR = false
+        authStack.isHidden = false
+        chatPane.isHidden = true
+        loginHeading.stringValue = title
+        loginSubtitle.stringValue = subtitle
+        phoneField.stringValue = ""
+        phoneField.isHidden = true
+        countryPicker.isHidden = true
+        emailField.stringValue = ""
+        emailField.isHidden = true
+        inputField.stringValue = ""
+        inputField.isHidden = true
+        secureInputField.stringValue = ""
+        secureInputField.isHidden = true
+        firstNameField.stringValue = ""
+        firstNameField.isHidden = true
+        lastNameField.stringValue = ""
+        lastNameField.isHidden = true
+        registrationConsent.state = .off
+        registrationConsent.isHidden = true
+        registrationTermsAvailable = false
+        registrationTermsScroll.isHidden = true
+        qrImageView.image = nil
+        qrImageView.isHidden = true
+        actionButton.isEnabled = false
+        actionButton.isHidden = true
+        qrButton.isEnabled = true
+        qrButton.isHidden = true
+        setStatus(subtitle)
+    }
+
+    private func showUnsupportedAuthorization(_ authorizationType: String?) {
+        let availability = AuthorizationStep(tdlibType: authorizationType).uiAvailability
+        let purchaseRequired = availability == .purchaseNotAvailable
+        showAuthorizationProgress(
+            title: purchaseRequired ? "Для входа требуется покупка" : "Шаг входа не поддерживается",
+            subtitle: purchaseRequired
+                ? "Telegram запрашивает покупку Premium. NeTelegram не проводит покупки; для этого профиля вход остановлен."
+                : "Telegram сообщил неизвестный шаг авторизации. Ввод временно выключен, сохранённые данные профиля не изменены."
+        )
+    }
+
     private func showEmailEntry() {
         authStack.isHidden = false
         registrationTermsScroll.isHidden = true
@@ -3781,6 +3863,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return pattern.map { ["code_info": ["email_address_pattern": $0]] } ?? [:]
         case "authorizationStateWaitRegistration":
             return (auth["terms_of_service"] as? [String: Any]).map { ["terms_of_service": $0] } ?? [:]
+        case "authorizationStateWaitOtherDeviceConfirmation":
+            return (auth["link"] as? String).map { ["link": $0] } ?? [:]
         default:
             return [:]
         }
@@ -3827,6 +3911,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField.isHidden = true
         qrImageView.isHidden = true
         qrButton.isHidden = false
+        qrButton.isEnabled = !authRequestInFlight
         actionButton.isHidden = false
         actionButton.title = "Продолжить"
         actionButton.isEnabled = !authRequestInFlight
@@ -3837,22 +3922,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func showLogoutProgress() {
-        chatPane.isHidden = true
-        authStack.isHidden = false
-        loginHeading.stringValue = "Выходим из аккаунта"
-        loginSubtitle.stringValue = "Ожидаю подтверждения Telegram. Остальные аккаунты продолжают работать."
-        phoneField.isHidden = true
-        countryPicker.isHidden = true
-        emailField.isHidden = true
-        inputField.isHidden = true
-        secureInputField.isHidden = true
-        firstNameField.isHidden = true
-        lastNameField.isHidden = true
-        registrationConsent.isHidden = true
-        registrationTermsScroll.isHidden = true
-        qrImageView.isHidden = true
-        qrButton.isHidden = true
-        actionButton.isEnabled = false
+        showAuthorizationProgress(
+            title: "Выходим из аккаунта",
+            subtitle: "Ожидаю подтверждения Telegram. Остальные аккаунты продолжают работать."
+        )
         window.title = "Выход из аккаунта — NeTelegram"
         setStatus("Telegram завершает сеанс и удаляет локальные данные аккаунта…")
     }
@@ -3946,8 +4019,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField.stringValue = ""
         firstNameField.stringValue = ""
         lastNameField.stringValue = ""
+        pendingInitialAuthorizationAction = nil
+        qrImageView.image = nil
+        qrImageView.isHidden = true
         registrationConsent.state = .off
-        authRequestInFlight = false
         for (account, info) in Array(authPresentationInfoByAccount) {
             if let terms = info["terms_of_service"] {
                 authPresentationInfoByAccount[account] = ["terms_of_service": terms]
@@ -4024,15 +4099,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.displaySelectedConversation()
                     self.window.title = self.safeAccountName(selected).map { "\($0) — NeTelegram" } ?? "NeTelegram"
                 } else if let selected = self.runtime {
-                    switch self.pendingAuthorizationType {
-                    case "authorizationStateWaitPhoneNumber": self.showPhoneEntry()
-                    case "authorizationStateWaitCode": self.showAuthInput("Введите код, полученный для этого входа.", placeholder: "Код", button: "Продолжить")
-                    case "authorizationStateWaitPassword": self.showAuthInput("Введите пароль двухэтапной проверки. Он не сохраняется.", placeholder: "Пароль двухэтапной проверки", button: "Продолжить")
-                    case "authorizationStateWaitEmailAddress": self.showEmailEntry()
-                    case "authorizationStateWaitEmailCode": self.showEmailCode(self.authPresentationInfoByAccount[selected.account] ?? [:])
-                    case "authorizationStateWaitRegistration": self.showRegistration(self.authPresentationInfoByAccount[selected.account] ?? [:])
-                    default: break
-                    }
+                    self.presentAuthorizationState(self.pendingAuthorizationType, info: self.authPresentationInfoByAccount[selected.account] ?? [:])
                 }
             }
         }

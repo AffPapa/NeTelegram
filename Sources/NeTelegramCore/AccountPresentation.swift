@@ -10,6 +10,8 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
     case awaitingEmailCode
     case awaitingRegistration
     case awaitingConfirmation
+    case purchaseRequired
+    case unsupported
     case authorized
     case verifyingIdentity
     case failed
@@ -25,6 +27,8 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
         case .awaitingEmailCode: "ожидает код из email"
         case .awaitingRegistration: "ожидает регистрацию"
         case .awaitingConfirmation: "ожидает подтверждение"
+        case .purchaseRequired: "требуется покупка"
+        case .unsupported: "шаг не поддерживается"
         case .authorized: "подключён"
         case .verifyingIdentity: "проверяет identity"
         case .failed: "ошибка"
@@ -82,12 +86,15 @@ public enum AccountPresentation {
         case .emailAddress: return .awaitingEmail
         case .emailCode: return .awaitingEmailCode
         case .registration: return .awaitingRegistration
-        case .qrConfirmation, .premiumPurchase: return .awaitingConfirmation
+        case .qrConfirmation: return .awaitingConfirmation
+        case .premiumPurchase: return .purchaseRequired
         case .ready:
             return telegramUserID == nil ? .verifyingIdentity : .authorized
         case .parameters, .loggingOut, .closing:
             return runtimeIsOpen ? .starting : .notStarted
-        case .closed, .unknown:
+        case .unknown:
+            return .unsupported
+        case .closed:
             return runtimeIsOpen ? .starting : .notStarted
         }
     }

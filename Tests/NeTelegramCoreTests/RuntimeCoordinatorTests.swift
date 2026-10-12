@@ -95,6 +95,18 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         runtimeIsOpen: false,
         hasError: true
     ) == .failed)
+    #expect(AccountPresentation.pickerStatus(
+        telegramUserID: nil,
+        authorizationState: "authorizationStateWaitPremiumPurchase",
+        runtimeIsOpen: true,
+        hasError: false
+    ) == .purchaseRequired)
+    #expect(AccountPresentation.pickerStatus(
+        telegramUserID: nil,
+        authorizationState: "authorizationStateWaitEncryptionKey",
+        runtimeIsOpen: true,
+        hasError: false
+    ) == .unsupported)
 }
 
 @Test func unsupportedIncomingContentKeepsHumanReadableContextWithoutLeakingConstructors() {
@@ -1133,6 +1145,19 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitOtherDeviceConfirmation").awaitsUserInput)
     #expect(!AuthorizationStep(tdlibType: "authorizationStateReady").awaitsUserInput)
     #expect(!AuthorizationStep(tdlibType: "unrecognizedAuthorizationState").awaitsUserInput)
+    #expect(AuthorizationStep(tdlibType: "authorizationStateWaitPhoneNumber").uiAvailability == .interactive)
+    #expect(AuthorizationStep(tdlibType: "authorizationStateWaitOtherDeviceConfirmation").uiAvailability == .interactive)
+    #expect(AuthorizationStep(tdlibType: "authorizationStateWaitPremiumPurchase").uiAvailability == .purchaseNotAvailable)
+    #expect(AuthorizationStep(tdlibType: "unrecognizedAuthorizationState").uiAvailability == .unsupported)
+    // The pinned TDLib 1.8.68 schema does not define this legacy state; fail
+    // closed instead of leaving a stale login form interactive if it appears.
+    #expect(AuthorizationStep(tdlibType: "authorizationStateWaitEncryptionKey").uiAvailability == .unsupported)
+    #expect(AccountReducer.reduce(
+        current: .starting,
+        authorizationState: "authorizationStateWaitEncryptionKey",
+        telegramUserID: nil
+    ) == .failed("Unsupported TDLib authorization state"))
+    #expect(AuthorizationStep(tdlibType: "authorizationStateReady").uiAvailability == .nonInteractive)
 }
 
 @Test func forumTopicCatalogKeepsTypedIDsAndPlacesGeneralFirst() {

@@ -1,5 +1,12 @@
 import Foundation
 
+public enum AuthorizationUIAvailability: Sendable, Equatable {
+    case interactive
+    case purchaseNotAvailable
+    case unsupported
+    case nonInteractive
+}
+
 /// Typed view of TDLib authorization states used to keep account-status copy
 /// and interactive login handling aligned with the pinned TDLib schema.
 public enum AuthorizationStep: String, CaseIterable, Sendable {
@@ -43,6 +50,22 @@ public enum AuthorizationStep: String, CaseIterable, Sendable {
             return true
         case .parameters, .ready, .loggingOut, .closing, .closed, .unknown:
             return false
+        }
+    }
+
+    /// Whether this client has an implemented, safe presentation for the
+    /// current TDLib state. Purchase requests intentionally never dispatch a
+    /// purchase command; unknown states must not retain stale input controls.
+    public var uiAvailability: AuthorizationUIAvailability {
+        switch self {
+        case .phoneNumber, .code, .password, .emailAddress, .emailCode, .registration, .qrConfirmation:
+            return .interactive
+        case .premiumPurchase:
+            return .purchaseNotAvailable
+        case .unknown:
+            return .unsupported
+        case .parameters, .ready, .loggingOut, .closing, .closed:
+            return .nonInteractive
         }
     }
 }

@@ -5,13 +5,12 @@ import Foundation
 /// event belongs to the currently registered RuntimeRoute.
 public enum AccountReducer {
     public static func reduce(
-        current: AccountAvailability?,
+        current _: AccountAvailability?,
         authorizationState: String,
         telegramUserID: Int64?
     ) -> AccountAvailability {
         switch authorizationState {
-        case "authorizationStateWaitTdlibParameters",
-             "authorizationStateWaitEncryptionKey":
+        case "authorizationStateWaitTdlibParameters":
             return .starting
 
         case "authorizationStateWaitPhoneNumber",
@@ -34,10 +33,8 @@ public enum AccountReducer {
             return .closed
 
         default:
-            // TDLib retains authorizationStateReady while transport changes
-            // between connecting, updating, and waiting for the network.
             if let telegramUserID { return .active(telegramUserID: telegramUserID) }
-            return current ?? .waitingForAuthorization
+            return .failed("Unsupported TDLib authorization state")
         }
     }
 }
