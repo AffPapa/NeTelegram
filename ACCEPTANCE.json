@@ -1,0 +1,375 @@
+{
+  "schema_version": 2,
+  "status": "planned_only_no_native_or_release_tests_run",
+  "cases": [
+    {
+      "id": "APP01",
+      "name": "20 реальных runtime",
+      "expected": "После startup работают20 авторизованных runtime; выбор UI не отключает ни один.",
+      "method": "native real accounts",
+      "required_for": "stable",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP02",
+      "name": "Запуск без head-of-line blocking",
+      "expected": "Ошибка ключа, отсутствие сети или reauth A не блокирует запуск остальных; не появляется второй DB owner.",
+      "method": "native+fault fixtures",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP03",
+      "name": "1000 переключений",
+      "expected": "Нет close/create/generation change из-за UI; drafts/history/topic разделены.",
+      "method": "deterministic+native",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP04",
+      "name": "Закрытое последнее окно",
+      "expected": "Все аккаунты продолжают обработку; Dock/menu возвращают окно.",
+      "method": "native AppKit",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP05",
+      "name": "Privacy lock при send/decode",
+      "expected": "Runtime продолжаются; UI/previews скрыты; queued send → lock → unlock не отправляется позже; draft сохранён; поздние callbacks не раскрывают контент.",
+      "method": "native+fault fixtures",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP06",
+      "name": "Lock при startup/reauth",
+      "expected": "Неинтерактивный bootstrap продолжается; auth UI ждёт owner unlock; остальные не выключаются.",
+      "method": "native",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP07",
+      "name": "Уведомления всех аккаунтов",
+      "expected": "С учётом mute/OS permission и privacy; exact account/chat/topic route, без duplicate sounds.",
+      "method": "native notifications",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP08",
+      "name": "Late notification race",
+      "expected": "Lock между вычислением и publish отменяет detailed preview; reconcile/remove не раскрывает текст.",
+      "method": "fault+native Notification Center",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP09",
+      "name": "Dirty draft и disk full",
+      "expected": "Последняя dirty копия не теряется при lock/quit/save error; успешный save снимает barrier.",
+      "method": "storage fault injection",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP10",
+      "name": "Presence/read",
+      "expected": "online=false не close; невидимые сообщения не получают искусственные view/read.",
+      "method": "protocol fixtures+native",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP11",
+      "name": "Шумный аккаунт",
+      "expected": "Burst не создаёт бесконечные UI/tasks/фото queues и не теряет edit/delete/auth/TTL; foreground B остаётся отзывчивым.",
+      "method": "load fixtures+Instruments",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP12",
+      "name": "Смена сетей",
+      "expected": "Wi-Fi→Wi-Fi/offline/online обработаны событийно; нет timer/reconnect storm.",
+      "method": "real network+fixtures",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP13",
+      "name": "Sleep/wake",
+      "expected": "Нет обещания sync во сне; recovery всех без duplicated send/notification.",
+      "method": "native hardware",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP14",
+      "name": "Revoke/re-auth identity",
+      "expected": "Отзыв A не влияет на19; другой userID не наследует прежнее private app-state.",
+      "method": "authorized real accounts",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP15",
+      "name": "Graceful quit всех",
+      "expected": "Close каждого, receive до всех Closed, отзывчивый main thread; нет оставленного скрытого процесса.",
+      "method": "native lifecycle",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP16",
+      "name": "Buffer и route",
+      "expected": "C buffer copied; route зарегистрирован до первого request; немедленное auth event нового клиента при работающих19 не теряется; неизвестный ID отвергается без fallback.",
+      "method": "C bridge/reducer tests",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP17",
+      "name": "Send A / switch B",
+      "expected": "Immutable intent и callback остаются A; send-as/topic/права проверяются.",
+      "method": "native+integration",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP18",
+      "name": "Paid sends",
+      "expected": "Max allowed Stars0, error не повышает лимит; draft сохранён.",
+      "method": "contract+authorized test",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP19",
+      "name": "Timeout / retry",
+      "expected": "Не создаётся дубль new send по timeout; temporary IDs и can_retry/retry_after правильны.",
+      "method": "fault injection",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP20",
+      "name": "Фото",
+      "expected": "Реальные read/send/caption; huge/corrupt decode bounded; album context; picker A не отправляет B.",
+      "method": "native",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP21",
+      "name": "TTL/protected/paid",
+      "expected": "Не обходятся ограничения; app caches/previews invalidated; voice card не отмечает прослушивание.",
+      "method": "content fixtures+native",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP22",
+      "name": "Entities/accessibility",
+      "expected": "UTF16/ZWJ/RTL/IME/spoiler + keyboard/VoiceOver/Reduced Motion, UI identity читается правильно.",
+      "method": "fixtures+native accessibility",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP23",
+      "name": "Keychain/lock authentication",
+      "expected": "Missing/locked/error отличаются; no reset/key overwrite; cancel owner-auth не unlock.",
+      "method": "native fault cases",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP24",
+      "name": "Upgrade/recovery",
+      "expected": "Все runtime закрыты перед replacement, drafts/accounts восстановлены; unsafe downgrade заблокирован.",
+      "method": "isolated test DB/native",
+      "required_for": "updates",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "APP25",
+      "name": "Autostart",
+      "expected": "Только user opt-in; disable реально отменяет регистрацию; no hidden daemon.",
+      "method": "native supported OS",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "PERF01",
+      "name": "Активные1/5/10/20",
+      "expected": "Footprint/RSS/CPU/wakeups/network/cache/startup/switch измерены отдельно, с hardware/build/corpus.",
+      "method": "real benchmark",
+      "required_for": "stable",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "PERF02",
+      "name": "Закрытое окно/App Nap",
+      "expected": "Профиль idle и доставка при закрытом окне/lock; no unbounded assertions и no gallery decode.",
+      "method": "native energy traces",
+      "required_for": "stable",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "PERF03",
+      "name": "Soak/recovery",
+      "expected": "Минимум60мин контролируемой нагрузки20, отдельно idle/burst/photos/wake; нет необъяснимого монотонного роста/backlog.",
+      "method": "native soak",
+      "required_for": "stable",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL01",
+      "name": "Identity/name/API",
+      "expected": "Own app id, repo owner, namespaces, public title, basic/sponsored compatibility verified.",
+      "method": "primary docs+implementation review",
+      "required_for": "all public app releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL02",
+      "name": "Source/CI/license",
+      "expected": "Чистый pinned commit, dependencies/toolchain, tests, notices, no secrets; fork CI не получает release keys.",
+      "method": "source+CI",
+      "required_for": "all public releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL03",
+      "name": "Signing/notary",
+      "expected": "DeveloperID/HR/entitlements, Accepted, staple, final hashes and layout.",
+      "method": "build/release tools",
+      "required_for": "signed app releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL04",
+      "name": "Quarantined install",
+      "expected": "Downloaded byte equality; clean-machine Gatekeeper/install/launch без снятия quarantine.",
+      "method": "native release smoke",
+      "required_for": "signed app releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL05",
+      "name": "Immutable assets",
+      "expected": "Tag/source mapping, full draft assets, published hashes unchanged, server enforcement or honest procedural status.",
+      "method": "GitHub readback/download",
+      "required_for": "all public releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "REL06",
+      "name": "Sparkle channel",
+      "expected": "HTTPS feed+EdDSA final archive, version/build/bytes/minOS, alpha/stable separation; actual update smoke.",
+      "method": "native updater",
+      "required_for": "updates",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "SITE01",
+      "name": "Отдельная identity",
+      "expected": "New Site ID/hostname and source checkout; NeAntik/browsers untouched.",
+      "method": "native tool receipts",
+      "required_for": "site",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "SITE02",
+      "name": "Public access",
+      "expected": "Succeeded deployment AND confirmed access_mode public AND anonymous URL works.",
+      "method": "native tools+anonymous HTTP",
+      "required_for": "site",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "SITE03",
+      "name": "Контент/downloads",
+      "expected": "Реальные assets/version/claims, correct SHA/bytes, no placeholderDownload или секретов.",
+      "method": "generator+public download",
+      "required_for": "site",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "SITE04",
+      "name": "Deterministic/render/UX",
+      "expected": "Одинаковые input→output; internal links; desktop/mobile/keyboard; HTML содержит downloads без JS.",
+      "method": "local build+browser",
+      "required_for": "site",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "SITE05",
+      "name": "Version coherence",
+      "expected": "Одно deployment pages+channel appcast из единого verified record; app/source/site SHAs различены.",
+      "method": "schema+readback",
+      "required_for": "site",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "OPS01",
+      "name": "Resume/partial failure",
+      "expected": "Create/notary/upload/save/deploy timeouts не создают дубликатов и не меняют frozen bytes.",
+      "method": "fixtures+operation receipts",
+      "required_for": "all releases",
+      "status": "not_run",
+      "evidence": null
+    },
+    {
+      "id": "OPS02",
+      "name": "Data redaction",
+      "expected": "Source/dist/archive/devlog исключают credentials, sessions, messages, raw logs и private receipt.",
+      "method": "allowlist+secret scan",
+      "required_for": "all public actions",
+      "status": "not_run",
+      "evidence": null
+    }
+  ]
+}

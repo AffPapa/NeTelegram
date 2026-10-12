@@ -1,0 +1,119 @@
+NeTelegram / АРХИТЕКТУРА ALL-ACTIVE
+Версия 2.0. Нормативная спецификация для реализации, 2026-10-11.
+Ни приложение, ни GitHub repository, ни Site этим документом не созданы.
+
+1. ПРОДУКТ И ПРИОРИТЕТЫ
+
+Задача: минимальный нативный клиент Mac для примерно 20 собственных/разрешённых Telegram-аккаунтов. Все авторизованные аккаунты работают одновременно. В интерфейсе виден один выбранный контекст, остальные синхронизируются и обслуживают уведомления. Основные функции — чаты, каналы, текст и фотографии. Никакого обещания самого маленького footprint или абсолютной скорости до измерений.
+
+P0: account isolation, auth, all-active lifecycle, правильные text/photo sends, read/TTL/permissions, стабильное хранение, уведомления и restart recovery. P1: удобный поиск аккаунтов, компактный понятный UI, keyboard/VoiceOver, app/site version coherence. P2: дополнительные темы, универсальные документы, новые платформы, расширенный UI и экспериментальные способы изоляции — вне первого выпуска. При этом GitHub, signed direct release и Site входят в целевое завершение, а не откладываются бессрочно как «полировка».
+
+Нативность: Swift/AppKit, Cocoa controls, системные menu/file pickers, ImageIO. TDLib — C++ core через C/JSON. Нет Electron, Python runtime, web-оболочки как приложения; WebKit не добавляется для Mini Apps. Apple Silicon/macOS 14+ — выбранный baseline, подлежит проверке сборкой зависимостей. Intel не рекламируется, пока не собран и не испытан.
+
+2. ОСНОВНОЙ UX
+
+Три колонки: 20 подписанных аккаунтов с поиском, чаты выбранного аккаунта, переписка. Имя + username или маскированный номер позволяют различать похожие профили. Цвет не единственный идентификатор. Сортировка/закрепление — только расположение, не привилегия оставаться подключённым. Удалить настройки «максимум фоновых аккаунтов» и «усыплять неактивные».
+
+Статус каждого аккаунта: запускается, подключается, подключён, нет сети, нужен вход, ошибка ключа/данных, выходит. Показывать фактический auth/connection state; «20 добавлено» не подменяет «20 подключено». Общая строка состояния может показывать 18/20 готовы и раскрывать ровно две причины. Не показывать декоративный зелёный online-dot каждому только потому, что runtime создан. Presence Telegram зависит от реальной активности пользователя.
+
+Cmd+K — поиск аккаунта; Cmd+Shift+K — существующие чаты выбранного; Cmd+F — поиск сообщений. Все эти действия не инициируют глобальный peer discovery. Cmd+1…9 возможны для явно назначенных быстрых аккаунтов. A→B→A восстанавливает draft, topic, scroll и last chat отдельно. Нет общего inbox, twenty hidden timelines или dashboard.
+
+Закрытие окна не вызывает quit. Dock и маленькое menu-bar меню возвращают окно; notification click также возвращает его через privacy gate. Меню не становится отдельной CRM: Open, Lock, Quit, статус. Автозапуск опционален и включается пользователем; настройка открывается через поддержанный system mechanism. Не устанавливать скрытый daemon/launch agent. Не препятствовать sleep.
+
+3. ФУНКЦИИ И ОГРАНИЧЕНИЯ
+
+Полноценные text/photo, replies, edit/delete при разрешении, существующие темы, archive/pinned chats и сохранённые сообщения. Фото: одиночная исходящая фотография + подпись; входящие альбомы сохраняют контекст. Никаких Calls/Voice/GIF/Sticker/emoji-picker/Stories/AI/wallet/UI payments. Unicode в исходном тексте не удаляется; entities считаются в UTF-16. Реакции можно представить безопасным текстовым резюме при необходимости совместимости, без отдельного composer/анимации; поведение проверить на fixtures и current requirements.
+
+Неподдержанный media type остаётся карточкой: автор, timestamp, тип, доступная подпись, reply context. View-once/self-destruct не превращаются в постоянный архив. Не прослушанное голосовое не помечается прослушанным. Paid content не открывается за счёт preview; максимальный расход Stars на любую отправку =0. Если сервер требует оплату, draft остаётся и UI объясняет ограничение.
+
+Каналы v1 доступны для чтения; administrative posting отложен. В группах anonymous-admin/send-as всё равно проверяется; sender явно показан либо отправка блокируется. Темы/комментарии не объединяются незаметно с общим чатом. Внешняя ссылка доступна лишь при существующем пригодном getMessageLink; внешний клиент может иметь другой аккаунт. Handoff не обещается как универсальный способ просмотра неподдержанного контента.
+
+Telegram compatibility: basic functionality и sponsored media остаются конкретными release gates. На странице каналов нельзя просто вырезать официальную рекламу. Video/audio sponsored requirements могут конфликтовать с product scope. Не маскировать этот конфликт, не отключать каналы молча ради PASS и не встраивать дополнительный player без решения пользователя.
+
+4. МОДУЛИ И ВЛАДЕНИЕ
+
+MacApp: NSApplication lifecycle, window/menu/Dock, supported login-item integration, AppKit views.
+Domain: immutable identity, ConversationKey, MessageKey, typed topic, SendIntent, draft and snapshots.
+AccountCatalogue: локальные UUID/identity/labels/order, только минимальный индекс; no auth secrets.
+RuntimeCoordinator: один runtime на аккаунт, bootstrap/restart/recovery/shutdown, никогда не принадлежит окну.
+TDLibGateway: C buffer ownership, ClientID routing, @extra, command sequencing и receive worker.
+AccountReducer/Store: последовательное применение protocol events; bounded рабочие projections.
+PresentationCoordinator: один foreground account/chat/topic, ViewEpoch, focus/selection.
+PhotoPipeline: download intents, ImageIO decode, shared cost cache, permission/TTL invalidation.
+NotificationRouter: TDLib notification reconciliation, cross-account routing, privacy policy.
+SecretsStore/AppStateStore: Keychain, отдельное защищённое app-state, durable writes/error handling.
+LifecycleController: close-window ≠ lock ≠ logout ≠ quit ≠ update; их barriers и recovery.
+
+Основные proposed paths: Sources/NeTelegramApp, Sources/Domain, Sources/TelegramRuntime, Sources/Storage, Sources/Media, Sources/Notifications; Tests; Tools; docs; website; release. Реализация Swift modules может быть упрощена без размывания владельцев.
+
+5. IDENTITY И ROUTING
+
+AccountUUID постоянен в пределах локального профиля; после delete+add новый. TelegramUserID проверяется после входа. RuntimeGeneration меняется только при создании TDLib instance, не при выборе UI. ClientID временный, opaque; не сохраняется как имя аккаунта. ViewEpoch меняется при выборе account/chat/topic. PrivacyEpoch меняется при lock/unlock и защищает доступ к presentation.
+
+ConversationKey=(AccountUUID,chatID,typedTopicKey). MessageKey=(AccountUUID,chatID,messageID). RequestID уникален в runtime и передаётся в @extra. SendIntent включает expectedUserID, generation, sendAs, reply, text/entities, attachments и maxPaidStars=0. Callback сначала проверяет lifecycle identity, потом privacy/view eligibility. Фоновое событие старого UI не теряется: оно обновляет правильный AccountStore, но не чужую видимую ленту.
+
+Нет fallback на selectedAccount или client1. Отсутствующий/неизвестный ClientID — диагностическая ошибка с redacted metadata. Raw TDLib JSON с auth/text в production log не пишется. Допускаются event type, timing, counters и временный opaque diagnostic ID; локальный диагноз не становится публичным site log.
+
+6. ЗАПУСК ВСЕХ АККАУНТОВ
+
+Steady-state policy: все N авторизованных аккаунтов поддерживаются, target N≈20. Начальный bootstrap parallelism=2 — ограничение только стартовых работ. Очередь: получить доступ к ключу → установить эксклюзивное владение каталогом → создать client ID/generation и атомарно зарегистрировать маршрут → отправить первый поддержанный bootstrap request → обрабатывать authorization state и задавать параметры в допустимой фазе. Registry и ingress согласованы так, чтобы раннее событие нового client ID не было потеряно как unknown до регистрации. Не удерживать глобальный bootstrap permit всё время ожидания сети/OTP/Ready. Интерактивные auth flows обслуживаются отдельной очередью, не двадцатью sheets сразу.
+
+Startup fairness: аккаунт с отсутствующим ключом/необходимостью reauth становится явным needsAttention, остальные открываются. Если создание/инициализация застряли, зафиксировать фазу, не создавать дубль на ту же БД и не снимать lock до достоверного завершения. Ограничение app bootstrap не является доказательством ограничения внутренних sync jobs TDLib.
+
+Нельзя закрывать невыбранные runtime по LRU, переключению, background time или memory pressure. Restart допустим по документированной ошибке/runtime recovery; logout/removal/update/quit действительно закрывают. Account-level retry имеет backoff и не превращается в close/create на каждом network tick.
+
+7. RECEIVE, FAIRNESS И BACKPRESSURE
+
+Один serial blocking receive worker. Скопировать возвращённый buffer сразу. Дешёвое envelope validation и ordered synchronous reduce, без image decode, disk wait, main-thread await или нового Task на каждое событие. Промежуточный delivery channel, если появится, ограничен и имеет измеримый backlog. Нельзя переставить протокольные updates ради foreground priority или отбрасывать auth/delete/TTL. Ограничение нашего буфера не доказывает ограниченность внутренних очередей TDLib.
+
+Отдельные bounded queues для history, search, download, decode и app-state persistence. Fair scheduling по аккаунтам; foreground получает ограниченный приоритет, не вечную монополию. При перегрузке остановить prefetch и лишние запросы, coalesce presentation snapshots, уменьшить visible history working set. Не отключать аккаунты тайно и не считать молчаливую потерю events допустимой оптимизацией. Если основной ingress не успевает, показать diagnostic failure и расследовать до stable release.
+
+openChat/closeChat следуют реальной видимости чата; closeChat не закрывает аккаунт. All-active не обещает полную непрерывную репликацию каждой истории/channel member list. Только действительно видимые сообщения получают view/read processing; ни закрытое окно, ни locked screen не создают фиктивный read или sponsored view.
+
+8. СЕТЬ, PRESENCE И СОН
+
+Использовать событийный монитор сети, не 20 timers. online option регулирует user presence и не освобождает память/соединение. Активность пользователя, закрытое окно и privacy lock переводят presence корректно, без ghost mode и без искусственного online всех20.
+
+setNetworkType может переоткрывать network connections; вызывать при реальном изменении маршрута/доступности, включая переход между сетями одного типа. Повторы одного события подавлять, реальные Wi-Fi→Wi-Fi изменения не терять. Не вызывать на каждый UI switch. Сеть теряется — runtime сохраняются; после wake/update использовать TDLib recovery и не повторять sendMessage с неизвестным исходом.
+
+App Nap/energy изучаются на настоящем Mac с закрытым последним окном. По умолчанию не отключать App Nap глобально и не держать unbounded activity assertions. Для необходимой ограниченной операции assertion должен иметь причину и окончание. Во сне, при logout macOS, quit/crash/выключении continuous sync не гарантируется. APNS/relay/helper не добавляются, если текущая задача решается постоянно запущенным приложением.
+
+9. ХРАНЕНИЕ, DRAFT И PRIVACY LOCK
+
+accounts/<UUID>/{db,files,app-state}; отдельные ключи и namespace. TDLib message/chat/file DB включены, secret chats off. Локальный encrypted app-state для drafts/минимального index с проверенным crypto API; не реализовывать собственный формат криптографии без модели ошибок. Raw AuthKeys и 2FA пароли не извлекаются. Keychain unavailable/error/missing отличаются; не удалять данные для «исправления» ошибки. Один process/owner на каталог, новое открытие после Closed старого.
+
+Draft по account/chat/topic. Dirty state сохраняется до уничтожения последней копии. Disk-full и crypto/Keychain error оставляют скрытую dirty-копию и block destructive quit/removal/cleanup до успешного save или явного discard. Эта защита не обещает выживание несохранённой RAM после force-kill/потери питания; сделать этот предел понятным. Pending TDLib message и app draft различны.
+
+Lock: увеличить PrivacyEpoch/ViewEpoch, скрыть account labels/content, блокировать новые user send/edit/delete/auth/export/picker intents; закрыть sheets; сохранить draft; отменить восстановимые UI previews. Lock и фактическая передача пользовательской mutation в TDLib сериализованы одним dispatch barrier: непосредственно перед td_send проверяются identity, PrivacyEpoch и unlocked. Уже стоящие в очереди, но ещё не переданные user commands отменяются и не оживают после быстрого unlock; draft сохраняется. Переданный TDLib send продолжает получать outcome в фоне, не раскрывая UI. Системные команды init/reconnect/ack/close отделены по origin и не блокируются как пользовательская отправка. Runtime, receive, reductions, DB updates, reconnect и неинтерактивный bootstrap продолжаются. Auth, требующая человека, ждёт unlock; один locked/reauth профиль не закрывает остальные.
+
+Notification privacy policy проверяется перед самой публикацией. Pending и уже доставленные detailed previews удаляются/заменяются допустимым системным способом; новые показывают нейтральный текст. Race lock→callback не должен заново публиковать имя/текст. Unlock открывает доступ к уже работающим runtime, не создаёт новые client IDs. Для настоящего restart/shutdown Closed barrier остаётся.
+
+Unlock должен проверять владельца через поддержанный LocalAuthentication/device-owner механизм macOS с системным fallback, а не просто скрывать overlay по кнопке. Touch ID не обязателен для всех Mac; ошибки/отмена не раскрывают UI. Не создавать собственную PIN/парольную базу ради минимального клиента. Выбранную Keychain access policy проверить отдельно: недоступные ключи при холодном запуске дают явный needs-unlock, но не ложный статус подключения всех20.
+
+Privacy lock — защита интерфейса. Он не удаляет session keys и весь plaintext из памяти работающего TDLib и не останавливает записи на диск. Database encryption не означает, что media files и notification attachments защищены тем же ключом. Не обещать zero forensic footprint или защиту от контролирующего уже разблокированную ОС пользователя.
+
+10. ФОТО И УВЕДОМЛЕНИЯ
+
+ImageIO/CoreGraphics, target-pixel downsample, bounded decoded LRU, стартово 2 decode jobs. Account + resource/version + size/scale в cache key. Huge/corrupt image не блокирует UI; нет background gallery warmup всех аккаунтов. При закрытом окне новые previews не скачиваются ради невидимых ячеек. Memory pressure освобождает presentation/media caches, сохраняя sessions и pending sends. File optimizer не называется жёсткой квотой всей message DB.
+
+Notification API TDLib: startup active reconciliation; add/change/remove; mute/OS settings; no duplicate sounds после restart. Namespace аккаунта сохраняется в route. Нажатие уведомления B при открытом A сначала проходит privacy gate, затем B/chat/topic/message. Deleted account/reauth имеет явный результат без подстановки похожего чата A. Уведомления каждого аккаунта обрабатываются, но «все20» не отменяет пользовательский mute или системный запрет.
+
+11. ЗАВЕРШЕНИЕ/ОБНОВЛЕНИЕ
+
+Настоящий quit/update: остановить admission/restart/user mutations, сохранить app-state с dirty barrier, отменить восстановимые UI tasks, close всех созданных runtime, продолжать receive/reduce до Closed каждого, убрать routing/refs и завершить worker/process. Ответ ok не заменяет финальный authorization state. Main thread не busy-wait. Одна затянувшаяся база видна redacted diagnostic status; принудительное завершение не выдаётся за clean shutdown.
+
+Logout выполняет серверную операцию и отличается от offline local forget. Destroy не используется для обычного background lifecycle. Update мигрирует только после сохранения и close. Downgrade уже мигрированной БД без проверки запрещён. Закрытие окна, privacy lock, потеря сети и выбор другого аккаунта никогда не запускают этот quit contract.
+
+12. ПЕРВИЧНЫЕ КОНТРАКТЫ
+https://core.telegram.org/tdlib/docs/td__json__client_8h.html
+https://core.telegram.org/tdlib/options
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1open_chat.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1close_chat.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1set_network_type.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1view_messages.html
+https://core.telegram.org/tdlib/docs/classtd_1_1td__api_1_1close.html
+https://core.telegram.org/tdlib/notification-api
+https://developer.apple.com/documentation/appkit/nsapplicationdelegate/applicationshouldterminateafterlastwindowclosed(_:)
+https://developer.apple.com/library/archive/documentation/Performance/Conceptual/power_efficiency_guidelines_osx/AppNap.html
+
+Это проектные контракты. Их наличие в файле не доказывает прохождение native tests.

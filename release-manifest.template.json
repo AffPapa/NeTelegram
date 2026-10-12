@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "record_status": "template_not_a_release",
+  "release_id": null,
+  "product": "NeTelegram",
+  "public_title": null,
+  "version": null,
+  "build_number": null,
+  "channel": null,
+  "record_created_at": null,
+  "repository": "AffPapa/NeTelegram",
+  "tag": null,
+  "source_commit": null,
+  "tdlib_commit": null,
+  "license_spdx": null,
+  "release_url": null,
+  "minimum_macos": null,
+  "architectures": [],
+  "artifacts": [],
+  "changes": [],
+  "known_limitations": [],
+  "test_evidence": [],
+  "artifact_contract": {
+    "all": [
+      "kind",
+      "filename",
+      "url",
+      "bytes",
+      "sha256",
+      "signing_status",
+      "notarization_status",
+      "gatekeeper_status",
+      "verification_evidence"
+    ],
+    "update_zip_extra": [
+      "sparkle_ed_signature",
+      "sparkle_version",
+      "sparkle_short_version",
+      "update_channel",
+      "minimum_system_version"
+    ],
+    "private_key_included": false
+  },
+  "publication_guard": "Reject template/null/placeholder required fields and unsupported claims. Freeze candidate manifest before GitHub publish. Post-publication verification and actual published_at belong to a separate append-only receipt referencing manifest SHA; never overwrite immutable manifest. Site/appcast promotion requires successful receipt. Public record excludes secrets and operational submission IDs."
+}

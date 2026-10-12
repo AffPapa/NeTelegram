@@ -1,0 +1,19 @@
+NeTelegram is the name selected for this project and is currently a project
+codename. Copyright and trademark rights in Telegram belong to their owners.
+
+The MIT License in LICENSE applies only to original NeTelegram code authored
+for this project. Third-party components retain their separate terms:
+
+* TDLib 1.8.68, pinned to c15d3f5a5de6e3ba5839822c451152e5e18bb700, is licensed
+  under the Boost Software License 1.0. See ThirdPartyLicenses/TDLib-BSL-1.0.txt.
+* OpenSSL 3.6.4, pinned to d3c1b1169b3569ff3069e5b399f47b2b28e03d79, is licensed
+  under Apache License 2.0. See ThirdPartyLicenses/OpenSSL-Apache-2.0.txt.
+* TDLib's SQLite amalgamation contains SQLCipher contributions by ZETETIC LLC
+  under the included BSD terms. See ThirdPartyLicenses/SQLCipher-BSD.txt.
+* SQLite core portions carry the public-domain dedication reproduced in the
+  upstream amalgamation.
+* zlib is linked from the macOS SDK and is not redistributed in the app bundle.
+* gperf 3.3 is a build-only tool (GPL-3.0-or-later); it is not linked into or
+  distributed with the application.
+
+See DEPENDENCIES.md and TDLIB.lock.json for source revisions and build details.

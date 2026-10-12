@@ -1,0 +1,35 @@
+{
+  "name": "TDLib",
+  "upstream": "https://github.com/tdlib/td",
+  "ref": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
+  "version": "1.8.68",
+  "interface": "td_json_client C/JSON",
+  "schema": {
+    "path": "td/generate/scheme/td_api.tl",
+    "sha256": "cea6311c8a4ba0c73460b4f632b1e2b771499b32cf531f7297ee315a5a83eae5"
+  },
+  "json_header": {
+    "path": "td/telegram/td_json_client.h",
+    "sha256": "cdf6190b0264417c69c108d192d1f3381f3a1315ddb309798dbefc5036be1eb3"
+  },
+  "license": {
+    "spdx": "BSL-1.0",
+    "path": "LICENSE_1_0.txt",
+    "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+  },
+  "build_dependencies": {
+    "openssl": {
+      "upstream": "https://github.com/openssl/openssl",
+      "ref": "d3c1b1169b3569ff3069e5b399f47b2b28e03d79",
+      "version": "3.6.4",
+      "license": "Apache-2.0",
+      "license_path": "LICENSE.txt",
+      "license_sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+    },
+    "zlib": {
+      "provider": "macOS SDK",
+      "license": "Zlib"
+    }
+  },
+  "status": "TDLib_and_OpenSSL_arm64_builds_verified_for_macos_14; AppKit single-profile auth prompt and TDLib close barrier smoke passed; multi-account runtime, full DB recovery, and transitive release SBOM pending"
+}

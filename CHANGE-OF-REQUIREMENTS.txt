@@ -1,0 +1,28 @@
+ЧТО ИЗМЕНИЛ ПОЛЬЗОВАТЕЛЬ И ЧТО ТЕПЕРЬ ГЛАВНОЕ
+
+История: предыдущий проект telegram-client-design-20261011 предполагал 20 сохранённых, выбранный + два фоновых. Пользователь явно заменил это требованием фоновой работы ВСЕХ аккаунтов и назвал клиент NeTelegram, с GitHub рядом с NeAntik (AffPapa).
+
+Новый нормативный комплект: START-NETELEGRAM.txt → PRODUCT-ARCHITECTURE.txt → RELEASE.txt / WEBSITE.txt → ACCEPTANCE.json / CONTRACTS.json / PROJECT-STATE.json. Дата 2026-10-11, версия требований2.0. Предыдущие исследовательские отчёты — доказательная история, не действующее ТЗ.
+
+ОТМЕНЕНО → ЗАМЕНА
+1. resident_pool.default_cap=3 → все N≈20 авторизованных runtime одновременно работают.
+2. selected +2 background → selected UI, все остальные background runtime.
+3. dormant/eviction по LRU → автоматического усыпления аккаунтов нет.
+4. выбор пользователя открывает runtime → startup ramp открывает все доступные аккаунты независимо от выбора.
+5. slot leases удерживают место в пуле → operation tracking защищает send/draft/shutdown, не регулирует число active accounts.
+6. lock закрывает runtime/останавливает bootstrap → privacy lock скрывает UI/user mutations, сохраняет sync/reconnect/noninteractive bootstrap.
+7. unlock ждёт Closed всех → обычный unlock использует текущие runtime; Closed нужен только после реального close.
+8. закрыть последнее окно =quit → окно закрыто, процесс продолжает работать; explicit Cmd+Q завершает.
+9. уведомления только от выбранных трёх → notification processing всех доступных аккаунтов с уважением mute/OS permissions.
+10. 20 live отдельный будущий эксперимент → обязательная целевая приёмка, actual coverage честно измеряется.
+11. menu-bar companion отложен → компактное Open/Lock/Quit меню допустимо для управления работой без окна, без отдельного dashboard/helper.
+12. следующий этап только skeleton → новый чат получает цель реализации вплоть до GitHub, signed release и public OpenAI Site.
+13. нейтральное рабочее имя → пользовательское NeTelegram; repo AffPapa/NeTelegram, отдельный Site. Публичный app title имеет G-NAME из актуальных API Terms.
+
+СОХРАНЕНО
+Swift/AppKit + TDLib; separate DB/Keychain keys; no own MTProto; text/photo UI; исключённые медиа/звонки/лишние функции; Unicode preservation; explicit identity/context; no auto paid sends; dirty-state barrier; no duplicate retry; Developer ID direct distribution; source/provenance/evidence; performance ещё не измерена.
+
+ПРЕЖНИЙ prototype.html НЕ ПЕРЕНОСИТЬ КАК ТРЕБОВАНИЕ.
+В нём три фоновых runtime и saved/dormant подписи. Он остаётся историческим UX-эскизом, не продуктовой основой. В новом пакете его нет. Старые тексты/архивы не редактировались, чтобы сохранить историю исследований.
+
+Не путать bootstrap_parallelism=2 с лимитом runtime: через два стартовых worker должны последовательно запуститься все20. Не путать connected с полной репликацией всей истории всех каналов, online presence с транспортом, privacy lock с уничтожением ключей RAM, public repository с готовым public app release.

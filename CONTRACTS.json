@@ -1,0 +1,152 @@
+{
+  "schema_version": 2,
+  "product": "NeTelegram",
+  "status": "design_only_not_implemented",
+  "authority": "User 2026-10-11: all approximately20 accounts work in background; overrides prior cap3 design",
+  "account_runtime_policy": {
+    "target_simultaneously_authorized_accounts": 20,
+    "all_authorized_accounts_background": true,
+    "resident_cap": null,
+    "automatic_dormancy": false,
+    "evict_on_selection": false,
+    "evict_on_memory_pressure": false,
+    "bootstrap_parallelism_initial": 2,
+    "bootstrap_permit_release": "After bounded local/bootstrap work; network/auth wait does not hold shared permit indefinitely",
+    "selected_account_changes_presentation_only": true,
+    "one_database_owner": true,
+    "reopen_requires_previous_closed": true
+  },
+  "application_lifecycle": {
+    "last_window_closed": "continue_all_runtimes",
+    "dock_reopen": "show_window_through_privacy_gate",
+    "menu_bar": [
+      "open",
+      "privacy_lock",
+      "quit",
+      "status"
+    ],
+    "login_item": "user_opt_in_only",
+    "explicit_quit": "save_and_close_all_then_exit",
+    "sleep": "respect_OS_sleep_no_delivery_guarantee",
+    "wake": "recover_all_without_duplicate_sends",
+    "helper_or_daemon_required": false
+  },
+  "identity": {
+    "AccountUUID": "persistent local profile namespace",
+    "TelegramUserID": "verified server identity",
+    "RuntimeGeneration": "new on client creation only",
+    "ClientID": "ephemeral opaque route",
+    "ViewEpoch": "selection revision",
+    "PrivacyEpoch": "UI privacy revision",
+    "ConversationKey": [
+      "AccountUUID",
+      "chatID",
+      "typedTopicKey"
+    ],
+    "MessageKey": [
+      "AccountUUID",
+      "chatID",
+      "messageID"
+    ]
+  },
+  "send_intent": {
+    "immutable": [
+      "accountUUID",
+      "expectedUserID",
+      "runtimeGeneration",
+      "conversationKey",
+      "sendAs",
+      "replyTarget",
+      "textEntities",
+      "attachmentRefs",
+      "requestID",
+      "privacyEpoch"
+    ],
+    "max_paid_stars": 0,
+    "global_selection_lookup_after_await": false,
+    "retry_timeout_with_new_send": false,
+    "dispatch_barrier": "Serialize lock and actual user-mutation td_send; recheck identity/PrivacyEpoch/unlocked immediately before dispatch; cancel queued but undispatched commands permanently and preserve draft; protocol/system commands are distinct"
+  },
+  "ingress": {
+    "receive_workers": 1,
+    "concurrent_receive": false,
+    "copy_buffer_before_next_call": true,
+    "register_route_atomically_before_first_request": true,
+    "early_client_events_not_lost": true,
+    "missing_client_fallback": null,
+    "ordered_reduction": true,
+    "task_per_event": false,
+    "drop_critical_protocol_updates": false,
+    "fairness": "Bounded app-owned expensive work, not reordering protocol stream"
+  },
+  "privacy_lock": {
+    "closes_runtimes": false,
+    "blocks_user_mutations": true,
+    "allows_receive_reduce_reconnect": true,
+    "allows_noninteractive_bootstrap": true,
+    "hides_existing_and_future_notification_previews": true,
+    "late_callbacks_check_epoch": true,
+    "unlock": "system owner authentication; use existing runtimes",
+    "RAM_key_erasure_claim": false
+  },
+  "storage": {
+    "path": "Application Support/<new bundle>/accounts/<UUID>/{db,files,app-state}",
+    "TDLib_keys": "per-account database key in Keychain; session state owned by TDLib",
+    "app_state": "separate protected drafts/index",
+    "message_database": true,
+    "chat_info_database": true,
+    "file_database": true,
+    "secret_chats": false,
+    "store_2fa_or_otp": false,
+    "import_tdata_or_string_session": false,
+    "dirty_state_barrier": "No destruction of last dirty copy after save error; durable save or explicit discard required"
+  },
+  "media": {
+    "decode_jobs_initial": 2,
+    "cache": "global cost-based, account namespaced",
+    "background_gallery_prefetch": false,
+    "full_resolution": "explicit action",
+    "incoming_unhandled": "typed contextual card"
+  },
+  "notification": {
+    "accounts": "all available authorized runtimes",
+    "respects_mute_and_OS_permission": true,
+    "source": "TDLib notification API and reconcile",
+    "quick_reply": false,
+    "route": [
+      "accountUUID",
+      "chatID",
+      "topicKey",
+      "messageID"
+    ]
+  },
+  "presence": "online option is presence, not transport or unload",
+  "chat_visibility": "openChat/closeChat follows actual visibility; no false view/read while hidden/locked",
+  "shutdown": [
+    "stop new user mutations/admission/restarts",
+    "durable save with dirty-state barrier",
+    "cancel reconstructible UI work",
+    "close every created client",
+    "receive until Closed each",
+    "remove routes/refs",
+    "stop receiver",
+    "exit"
+  ],
+  "publication_order": [
+    "bootstrap public development site with no downloads and valid empty feeds before embedding feed URL",
+    "qualified final signed artifacts and frozen candidate release manifest",
+    "GitHub draft with all assets",
+    "publish immutable release",
+    "download and hash verify into separate append-only receipt referencing manifest digest",
+    "promotion allowed by frozen manifest plus successful receipt",
+    "single Sites deployment containing pages and channel appcast",
+    "confirm public audience and content",
+    "native install/update verification"
+  ],
+  "secret_boundaries": [
+    "No real profile data in source/CI/site",
+    "No credentials through arguments/logs",
+    "No public Apple submission IDs/private operational receipts",
+    "App API identity is not user session"
+  ]
+}
