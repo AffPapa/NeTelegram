@@ -207,6 +207,11 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
 }
 
 @Test func networkTypePolicyDropsDuplicatePathEventsButAllowsWakeRefresh() {
+    #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: false, usesWiFi: false, usesCellular: false) == "networkTypeNone")
+    #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: true, usesCellular: false) == "networkTypeWiFi")
+    #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: false, usesCellular: true) == "networkTypeMobile")
+    #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: false, usesCellular: false) == "networkTypeOther")
+    #expect(NetworkTypeUpdatePolicy.tdlibType(isSatisfied: true, usesWiFi: true, usesCellular: true) == "networkTypeWiFi")
     #expect(!NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeWiFi"))
     #expect(NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeNone"))
     #expect(NetworkTypeUpdatePolicy.shouldApply(current: "networkTypeWiFi", next: "networkTypeWiFi", force: true))

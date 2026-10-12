@@ -621,17 +621,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func startConnectionObservers() {
         networkMonitor.pathUpdateHandler = { [weak self] path in
-            let type: String
-            if path.status != .satisfied {
-                type = "networkTypeNone"
-            } else if path.usesInterfaceType(.wifi) {
-                type = "networkTypeWiFi"
-            } else if path.usesInterfaceType(.cellular) {
-                type = "networkTypeMobile"
-            } else {
-                // Ethernet, VPN and other interfaces use TDLib's generic type.
-                type = "networkTypeOther"
-            }
+            let type = NetworkTypeUpdatePolicy.tdlibType(
+                isSatisfied: path.status == .satisfied,
+                usesWiFi: path.usesInterfaceType(.wifi),
+                usesCellular: path.usesInterfaceType(.cellular)
+            )
             Task { @MainActor [weak self] in self?.scheduleNetworkTypeUpdate(type) }
         }
         networkMonitor.start(queue: networkMonitorQueue)
@@ -664,9 +658,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func didWakeFromSleep(_ notification: Notification) {
-        // Reapply the latest path to every existing client; do not recreate
-        // clients or keep the Mac awake to force delivery while sleeping.
-        scheduleNetworkTypeUpdate(currentTDLibNetworkType, force: true)
+        // The cached TDLib type may predate sleep. Reconcile from the current
+        // Network.framework snapshot, then reapply once to every existing
+        // client without recreating runtimes or keeping the Mac awake.
+        let path = networkMonitor.currentPath
+        scheduleNetworkTypeUpdate(
+            NetworkTypeUpdatePolicy.tdlibType(
+                isSatisfied: path.status == .satisfied,
+                usesWiFi: path.usesInterfaceType(.wifi),
+                usesCellular: path.usesInterfaceType(.cellular)
+            ),
+            force: true
+        )
     }
 
     private func refreshStatusMenu() {
