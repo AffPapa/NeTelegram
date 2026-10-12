@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "planned_only_no_native_or_release_tests_run",
+  "status": "implementation_in_progress; local_core_suite_and_hosted_CI_passed; native_real_account_performance_compatibility_and_release_acceptance_open",
   "cases": [
     {
       "id": "APP01",
@@ -17,8 +17,8 @@
       "expected": "Ошибка ключа, отсутствие сети или reauth A не блокирует запуск остальных; не появляется второй DB owner.",
       "method": "native+fault fixtures",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "startupSchedulerQueuesPastTheParallelOpenLimit; rejectedFirstRequestRemovesOnlyItsUninitializedRoute; accountRestoreIncludesStoredUnverifiedSessionsButSkipsEmptyPlaceholders. Synthetic scheduling/cleanup only; delayed or hung real TDLib login alongside other clients remains untested."
     },
     {
       "id": "APP03",
@@ -44,8 +44,8 @@
       "expected": "Runtime продолжаются; UI/previews скрыты; queued send → lock → unlock не отправляется позже; draft сохранён; поздние callbacks не раскрывают контент.",
       "method": "native+fault fixtures",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent; lockingInvalidatesQueuedSendIntentsAcrossUnlock; privacyBarrierBindsAccountLogoutAndRejectsLockedOrStaleCommands. Photo viewer and late UI callbacks have source cleanup but no native race test."
     },
     {
       "id": "APP06",
@@ -134,8 +134,8 @@
       "expected": "Close каждого, receive до всех Closed, отзывчивый main thread; нет оставленного скрытого процесса.",
       "method": "native lifecycle",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates. Receive-buffer drain is tested; closing 20 actual TDLib clients and process termination are not."
     },
     {
       "id": "APP16",
@@ -143,8 +143,8 @@
       "expected": "C buffer copied; route зарегистрирован до первого request; немедленное auth event нового клиента при работающих19 не теряется; неизвестный ID отвергается без fallback.",
       "method": "C bridge/reducer tests",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "updatesNeverFallBackToTheSelectedAccount; criticalEventsAreNotCoalescedAway; rejectedFirstRequestRemovesOnlyItsUninitializedRoute; bounded FIFO tests passed. Native simultaneous early auth event with 19 established clients and C-buffer lifetime are not proven by these tests."
     },
     {
       "id": "APP17",
@@ -161,8 +161,8 @@
       "expected": "Max allowed Stars0, error не повышает лимит; draft сохранён.",
       "method": "contract+authorized test",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "textSendPermissionRejectsChannelsUnknownSendersTopicsAndPaidOptions and SendIntent tests cover a zero-Stars contract. No authorized send or Telegram payment prompt smoke was run."
     },
     {
       "id": "APP19",
@@ -197,8 +197,8 @@
       "expected": "UTF16/ZWJ/RTL/IME/spoiler + keyboard/VoiceOver/Reduced Motion, UI identity читается правильно.",
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "urlEntitiesUseTDLibUTF16OffsetsAndPreserveSourceText passed. RTL, IME, VoiceOver, Reduced Motion, and real keyboard navigation remain untested."
     },
     {
       "id": "APP23",
@@ -260,8 +260,8 @@
       "expected": "Own app id, repo owner, namespaces, public title, basic/sponsored compatibility verified.",
       "method": "primary docs+implementation review",
       "required_for": "all public app releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Own api_id is configured and API identity is kept out of source secrets. Public title and Telegram basic/sponsored compatibility gates remain unresolved."
     },
     {
       "id": "REL02",
@@ -269,8 +269,8 @@
       "expected": "Чистый pinned commit, dependencies/toolchain, tests, notices, no secrets; fork CI не получает release keys.",
       "method": "source+CI",
       "required_for": "all public releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Public source and CI exist; latest hosted run passed. Final transitive NOTICE/SBOM audit and reproducible release package remain open."
     },
     {
       "id": "REL03",
@@ -278,8 +278,8 @@
       "expected": "DeveloperID/HR/entitlements, Accepted, staple, final hashes and layout.",
       "method": "build/release tools",
       "required_for": "signed app releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "blocked",
+      "evidence": "security find-identity -v -p codesigning returned 0 valid identities on the current host. No Developer ID-signed or notarized candidate exists."
     },
     {
       "id": "REL04",
@@ -323,8 +323,8 @@
       "expected": "Succeeded deployment AND confirmed access_mode public AND anonymous URL works.",
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
-      "status": "not_run",
-      "evidence": null
+      "status": "passed",
+      "evidence": "Sites v26 access_mode=public; anonymous GET /devlog/ and /downloads/ returned HTTP 200 text/html. This proves those public routes only."
     },
     {
       "id": "SITE03",
@@ -332,8 +332,8 @@
       "expected": "Реальные assets/version/claims, correct SHA/bytes, no placeholderDownload или секретов.",
       "method": "generator+public download",
       "required_for": "site",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Public v26 downloads page correctly states no GitHub Release/installer exists; alpha/stable appcasts are empty valid XML. A real downloadable latest app build is unavailable."
     },
     {
       "id": "SITE04",
@@ -350,8 +350,8 @@
       "expected": "Одно deployment pages+channel appcast из единого verified record; app/source/site SHAs различены.",
       "method": "schema+readback",
       "required_for": "site",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Site v26 devlog links the exact current source commit and passing CI run. No app release manifest/assets exist to verify app-version coherence."
     },
     {
       "id": "OPS01",
@@ -371,5 +371,14 @@
       "status": "not_run",
       "evidence": null
     }
-  ]
+  ],
+  "last_verification": {
+    "date": "2026-10-12",
+    "source_commit": "0dcfdbef0e0a4be5e20eebf6be35c95fd6f09daa",
+    "local_command": "swift test",
+    "local_result": "40/40 Swift Testing tests passed; Xcode 27.0 / Swift 6.4; arm64e host; macOS 14 target",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38254474726",
+    "hosted_result": "success; macOS Apple Silicon runner built app, ran tests, validated JSON",
+    "scope": "Core contract/unit tests only. No authorized Telegram account was logged in; no native account workflow, 20-runtime matrix, physical performance run, Developer ID/notarization, quarantined install, or updater release smoke is claimed."
+  }
 }
