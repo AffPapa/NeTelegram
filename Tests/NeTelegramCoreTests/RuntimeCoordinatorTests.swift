@@ -23,6 +23,16 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     }
 }
 
+private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) async -> Bool {
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: timeout)
+    while clock.now < deadline {
+        if value.get() { return true }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    return value.get()
+}
+
 @Test func accountPresentationNeverExposesLocalOrUnverifiedProfileNames() {
     #expect(AccountPresentation.verifiedDisplayName(telegramUserID: nil, candidate: "Test User") == nil)
     #expect(AccountPresentation.verifiedDisplayName(telegramUserID: 123, candidate: nil) == nil)
@@ -408,7 +418,7 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     #expect(SendIntent.maximumPaidStars == 0)
 }
 
-@Test func privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent() {
+@Test func privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent() async {
     let account = AccountUUID()
     let barrier = PrivacyDispatchBarrier()
     let intent = SendIntent(
@@ -419,11 +429,11 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
         text: "in flight",
         privacyEpoch: barrier.currentEpoch()
     )
-    let sendEntered = DispatchSemaphore(value: 0)
+    let sendEntered = LockedTestValue(false)
     let finishSend = DispatchSemaphore(value: 0)
-    let dispatchFinished = DispatchSemaphore(value: 0)
-    let lockAttemptStarted = DispatchSemaphore(value: 0)
-    let lockFinished = DispatchSemaphore(value: 0)
+    let dispatchFinished = LockedTestValue(false)
+    let lockAttemptStarted = LockedTestValue(false)
+    let lockFinished = LockedTestValue(false)
     let dispatchAccepted = LockedTestValue(false)
     let sendCount = LockedTestValue(0)
 
@@ -434,26 +444,32 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
             currentTelegramUserID: 101,
             currentGeneration: RuntimeGeneration(1)
         ) {
-            sendEntered.signal()
+            sendEntered.set(true)
             finishSend.wait()
             sendCount.set(sendCount.get() + 1)
         }
         dispatchAccepted.set(accepted)
-        dispatchFinished.signal()
+        dispatchFinished.set(true)
     }
-    let sendDidEnter = sendEntered.wait(timeout: .now() + .seconds(2)) == .success
+    let sendDidEnter = await waitForTrue(sendEntered, timeout: .seconds(2))
 
     DispatchQueue.global().async {
-        lockAttemptStarted.signal()
+        lockAttemptStarted.set(true)
         barrier.setLocked(true)
-        lockFinished.signal()
+        lockFinished.set(true)
     }
-    let lockAttemptDidStart = lockAttemptStarted.wait(timeout: .now() + .seconds(2)) == .success
-    let lockWasSerializedBehindSend = lockFinished.wait(timeout: .now() + .milliseconds(20)) == .timedOut
+    let lockAttemptDidStart = await waitForTrue(lockAttemptStarted, timeout: .seconds(2))
+    let lockFinishedBeforeSend = await waitForTrue(lockFinished, timeout: .milliseconds(20))
+    let lockWasSerializedBehindSend = !lockFinishedBeforeSend
     // Always release the simulated send, even when an earlier synchronization point failed.
     finishSend.signal()
-    let dispatchDidFinish = dispatchFinished.wait(timeout: .now() + .seconds(2)) == .success
-    let lockDidFinish = lockFinished.wait(timeout: .now() + .seconds(2)) == .success
+    let dispatchDidFinish = await waitForTrue(dispatchFinished, timeout: .seconds(2))
+    let lockDidFinish: Bool
+    if lockFinishedBeforeSend {
+        lockDidFinish = true
+    } else {
+        lockDidFinish = await waitForTrue(lockFinished, timeout: .seconds(2))
+    }
 
     #expect(sendDidEnter)
     #expect(lockAttemptDidStart)
