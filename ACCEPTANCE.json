@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; latest native Dev.app clean-launch smoke and Site v44 public verification passed; real-account, 20-runtime, compatibility, signing and release acceptance open",
+  "status": "implementation_in_progress; exact notification topic navigation is implemented and synthetic-tested; real-account, 20-runtime, compatibility, signing and release acceptance remain open",
   "cases": [
     {
       "id": "APP01",
@@ -62,8 +62,8 @@
       "expected": "С учётом mute/OS permission и privacy; exact account/chat/topic route, без duplicate sounds.",
       "method": "native notifications",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Notification targets preserve exact account/chat/typed-topic identity. ConversationHistoryRequest emits the pinned TDLib request for main, message-thread, forum, direct-message-topic, and saved-message-topic history; local test conversationHistoryRequestsPreserveEveryTypedTopic passes. Full suite passed 50/50 on Xcode 27.0 / Swift 6.4, arm64e, macOS 14 deployment target, source commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Native Notification Center routing, real Telegram notifications, lock/unlock click flow, and duplicate-sound behavior are not verified."
     },
     {
       "id": "APP08",
@@ -383,14 +383,14 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "a90df16d676bc37dacd5630552ee235341f70c25",
-    "local_command": "swiftc -frontend -parse Sources/NeTelegramApp/main.swift; git diff --check; static website parser/link/feed validation",
-    "local_result": "App source parse and prior CI remain as recorded for a90df16. Current docs-only website checks passed 8 HTML routes, internal links, both XML feeds and no installer href; public Site v46 routes/appcasts were anonymously verified.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38292860280",
-    "hosted_result": "Native macOS 15 Apple Silicon run succeeded: pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64 Dev.app, bundle/signature/build metadata checks, fresh support-root launch, screenshot, graceful quit, artifact upload. Fast run 38292860292 also passed Swift tests and JSON validation.",
-    "artifact": "GitHub Actions artifact 11767911208; temporary ad-hoc Dev.app only; screenshot SHA-256 ca1bb93f50e4f534ed6e49a66cedd64862956b47f29761e331c73c51309d6d0d.",
+    "source_commit": "5e24ba7396f69216792c93789e3d5627fd8585ae",
+    "local_command": "swift test; git diff --check",
+    "local_result": "50/50 Swift Testing tests passed on Xcode 27.0 (27A5228h), Swift 6.4, arm64e; test target macOS 14. AppKit target compiled as part of swift test. The new conversationHistoryRequestsPreserveEveryTypedTopic test verifies request type and identifiers for five TDLib topic variants. git diff --check passed.",
+    "hosted_ci": null,
+    "hosted_result": "No hosted CI result has been confirmed for source commit 5e24ba7396f69216792c93789e3d5627fd8585ae at this checkpoint.",
+    "artifact": null,
     "site": "Public Site v46 source b7eebc65a3aaa7db4a83e81eb764ad5da6df703d; deployment appgdep_6acd34e7942c81919f11dba75f542612 succeeded. Anonymous Playwright verified all 8 HTML routes, both XML feeds and stylesheet (HTTP 200; feed MIME text/xml), plus current provenance and honest no-download state.",
-    "scope": "No Telegram account login/read/send/logout, no real profile data, no 20-account runtime/resource matrix, no physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, or updater smoke."
+    "scope": "Synthetic history-request tests only. No live Notification Center, Telegram login, real notification click, real read/send/logout, 20-account runtime/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or all-active lifecycle proof."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
