@@ -955,7 +955,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 await self.openProfile(profile, apiHash: apiHash, select: true)
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
-                self.setStatus("API hash не найден в Keychain; локальный профиль сохранён и не заменён.")
+                self.setStatus("Не найден API hash самого NeTelegram в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
             } catch {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
@@ -1249,7 +1249,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         } catch SecretsStoreError.missing {
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
-            setStatus("API hash не найден в Keychain; профили не будут заменены или пересозданы.")
+            setStatus("Не найден API hash самого NeTelegram в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
         } catch {
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
@@ -1307,7 +1307,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             await openProfile(profile, apiHash: apiHash, select: true)
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-            setStatus("API hash не найден в Keychain; новый профиль не создавался.")
+            setStatus("Не найден API hash самого NeTelegram в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
         } catch {
             setStatus("Не удалось создать профиль. Проверьте хранилище и Keychain.")
         }
