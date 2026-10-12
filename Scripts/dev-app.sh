@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_ROOT="$ROOT_DIR/.build/canonical-dev-build"
-APP_PATH="$ROOT_DIR/.build/NeTelegram-Dev.app"
-SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-${HOME}/Library/Application Support/NeTelegram-Dev}"
+APP_PATH="/private/tmp/NeTelegram-Dev.app"
+SUPPORT_ROOT="/private/tmp/netelegram-dev-support"
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
 FRAMEWORKS="$APP_PATH/Contents/Frameworks"
@@ -18,6 +18,11 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
+if /usr/bin/pgrep -x NeTelegram >/dev/null; then
+    echo "NeTelegram is already running. Quit the canonical development app before rebuilding it." >&2
+    exit 1
+fi
+
 swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift"
 BUILT_EXECUTABLE="$BUILD_ROOT/swift/out/Products/Debug/NeTelegram"
 if [[ ! -f "$TDJSON" ]]; then
@@ -105,5 +110,5 @@ echo "Support root: $SUPPORT_ROOT"
 echo "Build record: $APP_PATH/Contents/Resources/BuildInfo.json"
 echo "Signed bytes record: $BUILD_RECORD"
 if [[ "$MODE" == "launch" ]]; then
-    open -n "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT"
+    open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT"
 fi

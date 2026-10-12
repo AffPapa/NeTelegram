@@ -1,12 +1,12 @@
 # Development build and verification
 
-Use one development bundle per checkout. `Scripts/dev-app.sh` builds the app under the repository's ignored `.build/` directory and writes a build record beside the build scratch data. The persistent development account catalogue lives under `~/Library/Application Support/NeTelegram-Dev`; it is separate from any installed Telegram client and from a release bundle. For an isolated first-run smoke, set `NETELEGRAM_SUPPORT_ROOT` to a disposable directory before `Scripts/dev-app.sh --launch`.
+Use one canonical development bundle and one account catalogue across checkouts: `/private/tmp/NeTelegram-Dev.app` and `/private/tmp/netelegram-dev-support`. `Scripts/dev-app.sh` builds intermediates under the repository's ignored `.build/` directory, writes the bundle to that fixed path, and records source and binary fingerprints. It refuses to replace a running NeTelegram process and opens the existing app instance without forcing a second process. The catalogue belongs only to this development app; it is never discovered from an installed Telegram client or shared with a release bundle.
 
 ## Test cadence
 
 1. Complete one related vertical slice before rebuilding.
 2. Run the existing `swift test` suite once at that boundary; do not rerun it when inputs have not changed.
-3. Launch the canonical development bundle only for auth, lifecycle, or visible UI changes. Record its build fingerprint and the single scenario checked.
+3. Launch the canonical development bundle only for auth, lifecycle, or visible UI changes. Record its build fingerprint and the single scenario checked. Do not use `swift run` to start a second app instance.
 4. Keep real-account checks separate from synthetic tests. Never seed fake Telegram identities or read installed Telegram app data.
 5. Report test count and scenario coverage accurately. A passing synthetic suite does not prove real login, send, multi-account behavior, sleep/wake recovery, or a signed release.
 

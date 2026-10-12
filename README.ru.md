@@ -14,10 +14,10 @@ NeTelegram — нативный клиент для macOS на Swift и AppKit �
 
 ```sh
 swift test
-swift run NeTelegram
+Scripts/dev-app.sh --launch
 ```
 
-Для запуска приложения нужен собранный закреплённый TDLib. Инструкции и проверки исходников находятся в `Scripts/build-tdlib.sh` и `TDLIB.lock.json`.
+Сначала соберите закреплённую TDLib через `Scripts/build-tdlib.sh`. Скрипт запуска всегда использует один development bundle и каталог данных; он откажется заменять работающий процесс. Инструкции и проверки исходников находятся в `Scripts/build-tdlib.sh` и `TDLIB.lock.json`.
 
 ## Вклад и безопасность
 
