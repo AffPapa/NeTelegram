@@ -128,9 +128,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var unavailableDraftAccounts: Set<AccountUUID> = []
     private var sendEligibilityByAccount: [AccountUUID: [Int64: ChatSendPermission]] = [:]
     private var pendingSendByExtra: [String: PendingSend] = [:]
+    private var pendingSendLifecycle = SendMessageLifecycle<PendingSend>()
+    private var retryableFailedSends: [MessageKey: PendingSend] = [:]
+    private var pendingRetryByExtra: [String: PendingRetryRequest] = [:]
+    private var pendingRetryRefreshByExtra: [String: PendingRetryRefresh] = [:]
+    private var retryingSendKeys: Set<SendMessageKey> = []
     private var stagedOutgoingPhotosByFileID: [AccountUUID: [Int32: URL]] = [:]
     private var pendingStagedPhotoPaths: [AccountUUID: Set<URL>] = [:]
     private var completedOutgoingPhotoFileIDs: [AccountUUID: Set<Int32>] = [:]
+    private var outgoingPhotoUploadActiveByFileID: [AccountUUID: [Int32: Bool]] = [:]
+    private var terminallyDeletedOutgoingPhotoURLs: [AccountUUID: Set<URL>] = [:]
     private var outgoingPhotoManifestStoresByAccount: [AccountUUID: OutgoingPhotoManifestStore] = [:]
     private var unavailableOutgoingPhotoManifestAccounts: Set<AccountUUID> = []
     private let networkMonitor = NWPathMonitor()
@@ -1029,6 +1036,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         stagedOutgoingPhotosByFileID.removeValue(forKey: account)
         pendingStagedPhotoPaths.removeValue(forKey: account)
         completedOutgoingPhotoFileIDs.removeValue(forKey: account)
+        outgoingPhotoUploadActiveByFileID.removeValue(forKey: account)
+        terminallyDeletedOutgoingPhotoURLs.removeValue(forKey: account)
         outgoingPhotoManifestStoresByAccount.removeValue(forKey: account)
         unavailableOutgoingPhotoManifestAccounts.remove(account)
         chatRowsByAccount.removeValue(forKey: account)
@@ -1040,6 +1049,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingMessagePropertiesByExtra = pendingMessagePropertiesByExtra.filter { $0.value.key.conversation.account != account }
         pendingMessageMutationsByExtra = pendingMessageMutationsByExtra.filter { $0.value.context.key.conversation.account != account }
         pendingSendByExtra = pendingSendByExtra.filter { $0.value.intent.account != account }
+        pendingSendLifecycle.removeAll(for: account)
+        retryableFailedSends = retryableFailedSends.filter { $0.key.conversation.account != account }
+        pendingRetryByExtra = pendingRetryByExtra.filter { $0.value.key.account != account }
+        pendingRetryRefreshByExtra = pendingRetryRefreshByExtra.filter { $0.value.key.conversation.account != account }
+        retryingSendKeys = retryingSendKeys.filter { $0.account != account }
         forumTopicsByAccount.removeValue(forKey: account)
         forumChatsByAccount.removeValue(forKey: account)
         selectedForumTopicIDsByAccount.removeValue(forKey: account)
@@ -1506,6 +1520,122 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         if let extra = object["@extra"] as? String,
+           let refresh = pendingRetryRefreshByExtra.removeValue(forKey: extra) {
+            let key = refresh.key
+            guard target.account == key.conversation.account,
+                  target.generation == refresh.runtimeGeneration else { return }
+            let mayPresentRetryRefresh = !lockState
+                && refresh.privacyEpoch == privacyDispatchBarrier.currentEpoch()
+                && target === runtime
+            if updateType == "message", let message = object["message"] as? [String: Any] {
+                if mayPresentRetryRefresh {
+                    updateCachedMessage(message, for: target.account)
+                }
+                let state = message["sending_state"] as? [String: Any]
+                let retryAfter = (state?["retry_after"] as? NSNumber)?.doubleValue ?? 0
+                if mayPresentRetryRefresh {
+                    setStatus(retryAfter > 0
+                        ? "TDLib обновила ожидание повтора; повтор станет доступен позже."
+                        : "TDLib обновила состояние сообщения. Повторите действие, если сообщение всё ещё не отправлено.")
+                }
+            } else if mayPresentRetryRefresh {
+                setStatus("Не удалось обновить состояние неотправленного сообщения; ничего не отправлено.")
+            }
+            return
+        }
+        if let extra = object["@extra"] as? String,
+           let retry = pendingRetryByExtra.removeValue(forKey: extra) {
+            let key = retry.key
+            guard target.account == key.account,
+                  target.generation == key.generation else { return }
+            let mayPresentRetryResponse = !lockState
+                && retry.privacyEpoch == privacyDispatchBarrier.currentEpoch()
+                && target === runtime
+            retryingSendKeys.remove(key)
+            if updateType == "error" {
+                if let pending = pendingSendLifecycle.resolve(.failed(canRetry: true), for: key, bufferIfUnregistered: false) {
+                    retryableFailedSends[MessageKey(
+                        conversation: pending.intent.conversation,
+                        messageID: key.temporaryMessageID
+                    )] = pending
+                }
+                if mayPresentRetryResponse {
+                    setStatus("TDLib не приняла повтор. Черновик и исходное сообщение сохранены.")
+                }
+                return
+            }
+            if updateType == "messages",
+               let values = object["messages"] as? [Any],
+               values.isEmpty || values.first is NSNull {
+                if let pending = pendingSendLifecycle.resolve(.failed(canRetry: true), for: key, bufferIfUnregistered: false) {
+                    retryableFailedSends[MessageKey(
+                        conversation: pending.intent.conversation,
+                        messageID: key.temporaryMessageID
+                    )] = pending
+                }
+                if mayPresentRetryResponse {
+                    setStatus("TDLib отказала в повторной отправке. Черновик сохранён.")
+                }
+            } else if updateType == "messages",
+                      let values = object["messages"] as? [[String: Any]],
+                      let resentMessage = values.first,
+                      let newMessageID = (resentMessage["id"] as? NSNumber)?.int64Value {
+                let pending = pendingSendLifecycle.take(for: key)
+                let nextKey = SendMessageKey(
+                    account: key.account,
+                    generation: key.generation,
+                    chatID: key.chatID,
+                    temporaryMessageID: newMessageID
+                )
+                if let pending {
+                    if let sendingState = resentMessage["sending_state"] as? [String: Any] {
+                        let earlyOutcome = pendingSendLifecycle.register(pending, for: nextKey)
+                        if let earlyOutcome {
+                            if case .failed(canRetry: true) = earlyOutcome {
+                                retryableFailedSends[MessageKey(
+                                    conversation: pending.intent.conversation,
+                                    messageID: newMessageID
+                                )] = pending
+                            }
+                            if earlyOutcome == .deleted {
+                                finishDeletedOutgoingPhotoIfSafe(pending, account: target.account)
+                            }
+                            applySendOutcome(earlyOutcome, pending: pending, target: target, mayPresent: mayPresentRetryResponse)
+                        } else if sendingState["@type"] as? String == "messageSendingStateFailed" {
+                            let canRetry = sendingState["can_retry"] as? Bool == true
+                            if canRetry {
+                                retryableFailedSends[MessageKey(
+                                    conversation: pending.intent.conversation,
+                                    messageID: newMessageID
+                                )] = pending
+                            }
+                            if let correlated = pendingSendLifecycle.resolve(
+                                .failed(canRetry: canRetry),
+                                for: nextKey,
+                                bufferIfUnregistered: false
+                            ) {
+                                applySendOutcome(.failed(canRetry: canRetry), pending: correlated, target: target, mayPresent: mayPresentRetryResponse)
+                            }
+                        } else if mayPresentRetryResponse {
+                            setStatus("Повтор передан TDLib; ожидаю окончательный результат отправки.")
+                        }
+                    } else {
+                        retryableFailedSends.removeValue(forKey: MessageKey(
+                            conversation: pending.intent.conversation,
+                            messageID: key.temporaryMessageID
+                        ))
+                        applySendOutcome(.succeeded, pending: pending, target: target, mayPresent: mayPresentRetryResponse)
+                    }
+                }
+                if !lockState, retry.privacyEpoch == privacyDispatchBarrier.currentEpoch() {
+                    updateCachedMessage(resentMessage, for: target.account, replacingMessageID: key.temporaryMessageID)
+                }
+            } else if mayPresentRetryResponse {
+                setStatus("TDLib ответила на повтор без нового сообщения ID. Исходная попытка сохранена для сверки.")
+            }
+            return
+        }
+        if let extra = object["@extra"] as? String,
            extra.hasPrefix("search-") {
             guard let pending = pendingSearchByExtra.removeValue(forKey: extra) else { return }
             guard pending.generation == searchGeneration, !lockState else {
@@ -1752,6 +1882,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let ids = object["message_ids"] as? [NSNumber] {
             let deletedIDs = Set(ids.map(\.int64Value))
+            let deletion = SendMessageDeletionClassification.classify(
+                isPermanent: (object["is_permanent"] as? NSNumber)?.boolValue,
+                fromCache: (object["from_cache"] as? NSNumber)?.boolValue
+            )
+            if deletion == .permanent {
+                for messageID in deletedIDs where messageID < 0 {
+                    let key = SendMessageKey(account: target.account, generation: target.generation, chatID: chatID, temporaryMessageID: messageID)
+                    if !retryingSendKeys.contains(key) {
+                        let pending = pendingSendLifecycle.resolve(.deleted, for: key, bufferIfUnregistered: true)
+                        if let pending {
+                            finishDeletedOutgoingPhotoIfSafe(pending, account: target.account)
+                            applySendOutcome(.deleted, pending: pending, target: target)
+                        }
+                    }
+                    retryableFailedSends.removeValue(forKey: MessageKey(
+                        conversation: ConversationKey(account: target.account, chatID: chatID),
+                        messageID: messageID
+                    ))
+                }
+            }
             messageEditDrafts = messageEditDrafts.filter {
                 $0.key.conversation.account != target.account
                     || $0.key.conversation.chatID != chatID
@@ -1829,23 +1979,60 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                   let extra = object["@extra"] as? String,
                   let pending = pendingSendByExtra.removeValue(forKey: extra) {
             associateOutgoingPhotoUpload(pending: pending, response: object, account: target.account)
-            if draftsByConversation[pending.intent.conversation] == pending.text {
-                draftsByConversation.removeValue(forKey: pending.intent.conversation)
-                persistDrafts(for: pending.intent.account)
-                if !lockState, currentConversationKey() == pending.intent.conversation {
-                    setComposerText("")
+            if let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
+               let temporaryMessageID = (object["id"] as? NSNumber)?.int64Value {
+                let key = SendMessageKey(account: target.account, generation: target.generation, chatID: chatID, temporaryMessageID: temporaryMessageID)
+                if let outcome = pendingSendLifecycle.register(pending, for: key) {
+                    if case .failed(canRetry: true) = outcome {
+                        retryableFailedSends[MessageKey(
+                            conversation: pending.intent.conversation,
+                            messageID: temporaryMessageID
+                        )] = pending
+                    }
+                    if outcome == .deleted {
+                        finishDeletedOutgoingPhotoIfSafe(pending, account: target.account)
+                    }
+                    applySendOutcome(outcome, pending: pending, target: target)
+                } else if !lockState, target === runtime {
+                    setStatus("TDLib приняла запрос; ожидаю окончательный результат отправки.")
+                    refreshComposerState()
                 }
+            } else if !lockState, target === runtime {
+                setStatus("Запрос передан TDLib, но временный ID не получен. Черновик сохранён; автоматического повтора не будет.")
             }
-            if let replyID = pending.intent.replyToMessageID,
-               replyTargetsByConversation[pending.intent.conversation] == replyID {
-                replyTargetsByConversation.removeValue(forKey: pending.intent.conversation)
-                if !lockState, currentConversationKey() == pending.intent.conversation {
-                    refreshReplyStatus(for: pending.intent.conversation)
+        } else if object["@type"] as? String == "updateMessageSendSucceeded",
+                  let message = object["message"] as? [String: Any],
+                  let chatID = (message["chat_id"] as? NSNumber)?.int64Value,
+                  let oldMessageID = (object["old_message_id"] as? NSNumber)?.int64Value {
+            let key = SendMessageKey(account: target.account, generation: target.generation, chatID: chatID, temporaryMessageID: oldMessageID)
+            let pending = pendingSendLifecycle.resolve(.succeeded, for: key, bufferIfUnregistered: oldMessageID < 0)
+            if !lockState { updateCachedMessage(message, for: target.account, replacingMessageID: oldMessageID) }
+            retryableFailedSends.removeValue(forKey: MessageKey(
+                conversation: conversationKey(for: message, account: target.account, chatID: chatID),
+                messageID: oldMessageID
+            ))
+            if let pending { applySendOutcome(.succeeded, pending: pending, target: target) }
+        } else if object["@type"] as? String == "updateMessageSendFailed",
+                  let message = object["message"] as? [String: Any],
+                  let chatID = (message["chat_id"] as? NSNumber)?.int64Value,
+                  let oldMessageID = (object["old_message_id"] as? NSNumber)?.int64Value {
+            let state = message["sending_state"] as? [String: Any]
+            let canRetry = state?["@type"] as? String == "messageSendingStateFailed"
+                && state?["can_retry"] as? Bool == true
+            let key = SendMessageKey(account: target.account, generation: target.generation, chatID: chatID, temporaryMessageID: oldMessageID)
+            let pending = pendingSendLifecycle.resolve(.failed(canRetry: canRetry), for: key, bufferIfUnregistered: oldMessageID < 0)
+            if !lockState { updateCachedMessage(message, for: target.account, replacingMessageID: oldMessageID) }
+            if let pending {
+                if canRetry, let messageID = (message["id"] as? NSNumber)?.int64Value {
+                    retryableFailedSends[MessageKey(
+                        conversation: conversationKey(for: message, account: target.account, chatID: chatID),
+                        messageID: messageID
+                    )] = pending
                 }
+                applySendOutcome(.failed(canRetry: canRetry), pending: pending, target: target)
             }
-            if !lockState, target === runtime {
-                setStatus("Сообщение принято TDLib.")
-                refreshComposerState()
+            else if !lockState, target === runtime {
+                setStatus("TDLib сообщила об отказе. Черновик и фото сохранены; повтор не выполняется автоматически.")
             }
         } else if let type = object["@type"] as? String, type == "messages",
                   let messages = object["messages"] as? [[String: Any]],
@@ -2734,6 +2921,47 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    private func applySendOutcome(
+        _ outcome: SendMessageOutcome,
+        pending: PendingSend,
+        target: LocalAccountRuntime,
+        mayPresent: Bool = true
+    ) {
+        switch outcome {
+        case .succeeded:
+            if draftsByConversation[pending.intent.conversation] == pending.text {
+                draftsByConversation.removeValue(forKey: pending.intent.conversation)
+                persistDrafts(for: pending.intent.account)
+                if mayPresent, !lockState, currentConversationKey() == pending.intent.conversation {
+                    setComposerText("")
+                }
+            }
+            if let replyID = pending.intent.replyToMessageID,
+               replyTargetsByConversation[pending.intent.conversation] == replyID {
+                replyTargetsByConversation.removeValue(forKey: pending.intent.conversation)
+                if mayPresent, !lockState, currentConversationKey() == pending.intent.conversation {
+                    refreshReplyStatus(for: pending.intent.conversation)
+                }
+            }
+            if mayPresent, !lockState, target === runtime {
+                setStatus("TDLib подтвердил отправку сообщения.")
+                refreshComposerState()
+            }
+        case .failed(let canRetry):
+            if mayPresent, !lockState, target === runtime {
+                setStatus(canRetry
+                    ? "TDLib не отправила сообщение и разрешает повтор. Черновик сохранён; повтор не запускается автоматически."
+                    : "TDLib не отправила сообщение. Черновик сохранён; повтор не запускается автоматически.")
+                refreshComposerState()
+            }
+        case .deleted:
+            if mayPresent, !lockState, target === runtime {
+                setStatus("TDLib удалила неотправленное сообщение. Черновик и исходное фото сохранены; повтор не выполняется автоматически.")
+                refreshComposerState()
+            }
+        }
+    }
+
     private func associateOutgoingPhotoUpload(pending: PendingSend, response: [String: Any], account: AccountUUID) {
         guard let stagedURL = pending.intent.attachments.first?.localFileURL,
               let content = response["content"] as? [String: Any],
@@ -2758,15 +2986,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func finishOutgoingPhotoUploadIfReady(_ file: [String: Any], account: AccountUUID) {
         guard let fileID = (file["id"] as? NSNumber)?.int32Value,
-              let remote = file["remote"] as? [String: Any],
-              remote["is_uploading_completed"] as? Bool == true else { return }
-        if let stagedURL = stagedOutgoingPhotosByFileID[account]?.removeValue(forKey: fileID) {
-            releaseStagedOutgoingPhoto(stagedURL, account: account)
+              let remote = file["remote"] as? [String: Any] else { return }
+        let isCompleted = remote["is_uploading_completed"] as? Bool == true
+        if let isActive = remote["is_uploading_active"] as? Bool {
+            outgoingPhotoUploadActiveByFileID[account, default: [:]][fileID] = isActive
+        }
+        if !isCompleted,
+           remote["is_uploading_active"] as? Bool == false,
+           let stagedURL = stagedOutgoingPhotosByFileID[account]?[fileID],
+           terminallyDeletedOutgoingPhotoURLs[account]?.contains(stagedURL.standardizedFileURL) == true {
+            finishTerminallyDeletedOutgoingPhoto(stagedURL, fileIDs: [fileID], account: account)
+            return
+        }
+        guard isCompleted else { return }
+        if let stagedURL = stagedOutgoingPhotosByFileID[account]?[fileID] {
+            if releaseStagedOutgoingPhoto(stagedURL, account: account) {
+                stagedOutgoingPhotosByFileID[account]?.removeValue(forKey: fileID)
+                terminallyDeletedOutgoingPhotoURLs[account]?.remove(stagedURL.standardizedFileURL)
+            }
         } else if let local = file["local"] as? [String: Any],
                   let path = local["path"] as? String,
                   let stagedURL = pendingStagedPhotoPaths[account]?.first(where: { $0 == URL(fileURLWithPath: path).standardizedFileURL }) {
             completedOutgoingPhotoFileIDs[account, default: []].insert(fileID)
-            releaseStagedOutgoingPhoto(stagedURL, account: account)
+            if releaseStagedOutgoingPhoto(stagedURL, account: account) {
+                terminallyDeletedOutgoingPhotoURLs[account]?.remove(stagedURL.standardizedFileURL)
+            }
         } else if stagedOutgoingPhotosByFileID[account]?.isEmpty == true {
             return
         } else {
@@ -2778,16 +3022,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func releaseStagedOutgoingPhoto(_ url: URL, account: AccountUUID) {
-        guard let store = outgoingPhotoManifestStoresByAccount[account] else { return }
+    private func finishDeletedOutgoingPhotoIfSafe(_ pending: PendingSend, account: AccountUUID) {
+        guard let url = pending.intent.attachments.first?.localFileURL.standardizedFileURL else { return }
+        terminallyDeletedOutgoingPhotoURLs[account, default: []].insert(url)
+        guard let files = stagedOutgoingPhotosByFileID[account] else { return }
+        let matchingIDs = files.compactMap { fileID, stagedURL in
+            stagedURL.standardizedFileURL == url ? fileID : nil
+        }
+        guard !matchingIDs.isEmpty,
+              matchingIDs.allSatisfy({
+                  StagedPhotoDeletionPolicy.mayReleaseSource(
+                      isTerminalDelete: true,
+                      uploadIsActive: outgoingPhotoUploadActiveByFileID[account]?[$0]
+                  )
+              }) else { return }
+        finishTerminallyDeletedOutgoingPhoto(url, fileIDs: matchingIDs, account: account)
+    }
+
+    private func finishTerminallyDeletedOutgoingPhoto(_ url: URL, fileIDs: [Int32], account: AccountUUID) {
+        guard terminallyDeletedOutgoingPhotoURLs[account]?.contains(url.standardizedFileURL) == true,
+              fileIDs.allSatisfy({
+                  StagedPhotoDeletionPolicy.mayReleaseSource(
+                      isTerminalDelete: true,
+                      uploadIsActive: outgoingPhotoUploadActiveByFileID[account]?[$0]
+                  )
+              }),
+              releaseStagedOutgoingPhoto(url, account: account) else { return }
+        stagedOutgoingPhotosByFileID[account] = stagedOutgoingPhotosByFileID[account]?.filter {
+            $0.value.standardizedFileURL != url.standardizedFileURL
+        }
+        fileIDs.forEach { outgoingPhotoUploadActiveByFileID[account]?.removeValue(forKey: $0) }
+        terminallyDeletedOutgoingPhotoURLs[account]?.remove(url.standardizedFileURL)
+    }
+
+    @discardableResult
+    private func releaseStagedOutgoingPhoto(_ url: URL, account: AccountUUID) -> Bool {
+        guard let store = outgoingPhotoManifestStoresByAccount[account] else { return false }
         do {
             // The durable owner record is removed first. If the disk write
             // fails, retain the image so TDLib/recovery still has its source.
             try store.remove(url)
             pendingStagedPhotoPaths[account]?.remove(url.standardizedFileURL)
             try FileManager.default.removeItem(at: url)
+            return true
         } catch {
             if !lockState { setStatus("Не удалось очистить временное фото; файл сохранён для восстановления.") }
+            return false
         }
     }
 
@@ -3008,6 +3288,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         case "messagePhoto": editKind = .editCaption
         default: editKind = nil
         }
+        if let sendingState = context.message["sending_state"] as? [String: Any],
+           sendingState["@type"] as? String == "messageSendingStateFailed",
+           sendingState["can_retry"] as? Bool == true {
+            let retry = NSMenuItem(title: "Повторить отправку через Telegram", action: #selector(retryFailedMessage(_:)), keyEquivalent: "")
+            retry.target = self
+            retry.representedObject = context
+            let blocked = ((sendingState["required_paid_message_star_count"] as? NSNumber)?.int64Value ?? 0) > 0
+                || sendingState["need_another_sender"] as? Bool == true
+                || sendingState["need_another_reply_quote"] as? Bool == true
+                || sendingState["need_drop_reply"] as? Bool == true
+            retry.isEnabled = !blocked && !lockState && runtime?.account == context.key.conversation.account
+            menu.addItem(retry)
+        }
         if permissions.canEdit, let editKind {
             addMessageMenuItem("Изменить…", kind: editKind, context: context, to: menu)
         }
@@ -3024,6 +3317,121 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let anchor = messageActionButton(for: context.key)
         guard let anchor else { return }
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: anchor.bounds.height), in: anchor)
+    }
+
+    @objc private func retryFailedMessage(_ sender: NSMenuItem) {
+        guard let context = sender.representedObject as? MessageActionContext,
+              !lockState,
+              context.privacyEpoch == privacyDispatchBarrier.currentEpoch(),
+              currentConversationKey() == context.key.conversation,
+              let runtime,
+              runtime.account == context.key.conversation.account,
+              runtime.generation == context.runtimeGeneration,
+              let telegramUserID = runtime.telegramUserID,
+              telegramUserID == context.expectedTelegramUserID,
+              let sendingState = context.message["sending_state"] as? [String: Any],
+              sendingState["@type"] as? String == "messageSendingStateFailed",
+              sendingState["can_retry"] as? Bool == true else { return }
+
+        let requiredStars = (sendingState["required_paid_message_star_count"] as? NSNumber)?.int64Value ?? 0
+        let needsAnotherSender = sendingState["need_another_sender"] as? Bool == true
+        let needsAnotherQuote = sendingState["need_another_reply_quote"] as? Bool == true
+        let needsDropReply = sendingState["need_drop_reply"] as? Bool == true
+        let retryAfter = (sendingState["retry_after"] as? NSNumber)?.doubleValue ?? 0
+        guard requiredStars == SendIntent.maximumPaidStars,
+              !needsAnotherSender, !needsAnotherQuote, !needsDropReply else {
+            setStatus("Повтор требует изменения отправителя/ответа или платных Stars. Ничего не отправлено.")
+            return
+        }
+        if retryAfter > 0 {
+            historyRequestCounter &+= 1
+            let extra = "retry-refresh-\(historyRequestCounter)"
+            do {
+                try runtime.send([
+                    "@type": "getMessage",
+                    "chat_id": context.key.conversation.chatID,
+                    "message_id": context.key.messageID,
+                    "@extra": extra,
+                ])
+                pendingRetryRefreshByExtra[extra] = PendingRetryRefresh(
+                    key: context.key,
+                    runtimeGeneration: context.runtimeGeneration,
+                    privacyEpoch: context.privacyEpoch
+                )
+                setStatus("Сверяю с TDLib, истекло ли время ожидания. Автоповтора не будет.")
+            } catch {
+                setStatus("Не удалось проверить время ожидания в TDLib; ничего не отправлено.")
+            }
+            return
+        }
+
+        let original = retryableFailedSends[context.key]
+        let originalIntent = original?.intent
+        let intent = SendIntent(
+            account: runtime.account,
+            expectedTelegramUserID: telegramUserID,
+            runtimeGeneration: runtime.generation,
+            conversation: context.key.conversation,
+            replyToMessageID: originalIntent?.replyToMessageID,
+            sendAsUserID: originalIntent?.sendAsUserID ?? telegramUserID,
+            text: originalIntent?.text ?? messageTextForRetry(context.message),
+            entities: originalIntent?.entities ?? [],
+            attachments: originalIntent?.attachments ?? [],
+            privacyEpoch: privacyDispatchBarrier.currentEpoch()
+        )
+        let pending = PendingSend(intent: intent, text: intent.text)
+        let sendKey = SendMessageKey(
+            account: runtime.account,
+            generation: runtime.generation,
+            chatID: context.key.conversation.chatID,
+            temporaryMessageID: context.key.messageID
+        )
+        guard pendingSendLifecycle.register(pending, for: sendKey) == nil else {
+            setStatus("У результата предыдущей попытки ещё нет однозначной сверки. Повтор не отправлен.")
+            return
+        }
+        retryingSendKeys.insert(sendKey)
+        historyRequestCounter &+= 1
+        let extra = "resend-\(historyRequestCounter)"
+        let request: [String: Any] = [
+            "@type": "resendMessages",
+            "chat_id": context.key.conversation.chatID,
+            "message_ids": [context.key.messageID],
+            "quote": NSNull(),
+            "paid_message_star_count": SendIntent.maximumPaidStars,
+            "@extra": extra,
+        ]
+        do {
+            let accepted = try privacyDispatchBarrier.dispatch(
+                intent,
+                currentAccount: runtime.account,
+                currentTelegramUserID: telegramUserID,
+                currentGeneration: runtime.generation
+            ) { try runtime.send(request) }
+            guard accepted else {
+                retryingSendKeys.remove(sendKey)
+                _ = pendingSendLifecycle.resolve(.failed(canRetry: true), for: sendKey, bufferIfUnregistered: false)
+                setStatus("Повтор отменён: блокировка или профиль изменились.")
+                return
+            }
+            retryableFailedSends.removeValue(forKey: context.key)
+            pendingRetryByExtra[extra] = PendingRetryRequest(
+                key: sendKey,
+                privacyEpoch: intent.privacyEpoch
+            )
+            setStatus("Запрос безопасного повтора передан TDLib; новой копии сообщения не создаю.")
+        } catch {
+            retryingSendKeys.remove(sendKey)
+            _ = pendingSendLifecycle.resolve(.failed(canRetry: true), for: sendKey, bufferIfUnregistered: false)
+            retryableFailedSends[context.key] = pending
+            setStatus("TDLib не приняла запрос повтора. Исходное сообщение и черновик сохранены.")
+        }
+    }
+
+    private func messageTextForRetry(_ message: [String: Any]) -> String {
+        guard let content = message["content"] as? [String: Any] else { return "" }
+        let field = content["@type"] as? String == "messagePhoto" ? "caption" : "text"
+        return ((content[field] as? [String: Any])?["text"] as? String) ?? messagePreview(message)
     }
 
     private func addMessageMenuItem(_ title: String, kind: MessageMutationKind, context: MessageActionContext, to menu: NSMenu) {
@@ -3196,12 +3604,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func updateCachedMessage(_ message: [String: Any], for account: AccountUUID) {
+    private func updateCachedMessage(_ message: [String: Any], for account: AccountUUID, replacingMessageID: Int64? = nil) {
         guard let chatID = (message["chat_id"] as? NSNumber)?.int64Value,
               let messageID = (message["id"] as? NSNumber)?.int64Value else { return }
         let key = conversationKey(for: message, account: account, chatID: chatID)
         if var cache = messagesByConversation[key],
-           let index = cache.firstIndex(where: { ($0["id"] as? NSNumber)?.int64Value == messageID }) {
+           let index = cache.firstIndex(where: {
+               ($0["id"] as? NSNumber)?.int64Value == (replacingMessageID ?? messageID)
+           }) {
             cache[index] = message
             messagesByConversation[key] = cache
         }
@@ -4193,7 +4603,7 @@ private struct PhotoPresentationKey: Hashable, Sendable {
     let fileID: Int32
 }
 
-private struct PendingSend {
+private struct PendingSend: Sendable {
     let intent: SendIntent
     let text: String
 }
@@ -4224,6 +4634,17 @@ private struct MessageActionContext {
     let key: MessageKey
     let privacyEpoch: UInt64
     let message: [String: Any]
+}
+
+private struct PendingRetryRequest {
+    let key: SendMessageKey
+    let privacyEpoch: UInt64
+}
+
+private struct PendingRetryRefresh {
+    let key: MessageKey
+    let runtimeGeneration: RuntimeGeneration
+    let privacyEpoch: UInt64
 }
 
 private enum MessageMutationKind: Equatable {

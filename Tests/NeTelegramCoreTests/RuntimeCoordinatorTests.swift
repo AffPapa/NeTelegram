@@ -1167,6 +1167,68 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(FileManager.default.fileExists(atPath: staged.path))
 }
 
+@Test func sendLifecycleMatchesTerminalResultToPendingIntent() {
+    let account = AccountUUID()
+    let key = SendMessageKey(account: account, generation: RuntimeGeneration(1), chatID: 50, temporaryMessageID: -10)
+    var lifecycle = SendMessageLifecycle<String>()
+
+    #expect(lifecycle.register("caption and photo", for: key) == nil)
+    #expect(lifecycle.resolve(.failed(canRetry: true), for: key, bufferIfUnregistered: true) == "caption and photo")
+    #expect(lifecycle.resolve(.succeeded, for: key, bufferIfUnregistered: true) == nil)
+}
+
+@Test func sendLifecycleCorrelatesOutcomeArrivingBeforeSendResponse() {
+    let key = SendMessageKey(account: AccountUUID(), generation: RuntimeGeneration(1), chatID: 77, temporaryMessageID: -11)
+    var lifecycle = SendMessageLifecycle<String>(earlyOutcomeLimit: 2)
+
+    #expect(lifecycle.resolve(.succeeded, for: key, bufferIfUnregistered: true) == nil)
+    #expect(lifecycle.register("draft", for: key) == .succeeded)
+    #expect(lifecycle.register("next send", for: key) == nil)
+    #expect(lifecycle.resolve(.deleted, for: key, bufferIfUnregistered: false) == "next send")
+}
+
+@Test func sendLifecycleCanMoveRetryToTDLibReturnedTemporaryID() {
+    let account = AccountUUID()
+    let oldKey = SendMessageKey(account: account, generation: RuntimeGeneration(1), chatID: 77, temporaryMessageID: -11)
+    let newKey = SendMessageKey(account: account, generation: RuntimeGeneration(1), chatID: 77, temporaryMessageID: -12)
+    var lifecycle = SendMessageLifecycle<String>()
+
+    #expect(lifecycle.register("original text", for: oldKey) == nil)
+    let pending = lifecycle.take(for: oldKey)
+    #expect(pending == "original text")
+    #expect(lifecycle.register(pending!, for: newKey) == nil)
+    #expect(lifecycle.resolve(.succeeded, for: newKey, bufferIfUnregistered: false) == "original text")
+}
+
+@Test func sendLifecycleKeepsAccountsAndEarlyOutcomesIsolatedAndBounded() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let a = SendMessageKey(account: accountA, generation: RuntimeGeneration(1), chatID: 7, temporaryMessageID: -1)
+    let b = SendMessageKey(account: accountB, generation: RuntimeGeneration(1), chatID: 7, temporaryMessageID: -1)
+    var lifecycle = SendMessageLifecycle<String>(earlyOutcomeLimit: 1)
+
+    #expect(lifecycle.resolve(.failed(canRetry: false), for: a, bufferIfUnregistered: true) == nil)
+    #expect(lifecycle.register("account B", for: b) == nil)
+    #expect(lifecycle.register("account A", for: a) == .failed(canRetry: false))
+    lifecycle.removeAll(for: accountB)
+    #expect(lifecycle.resolve(.deleted, for: b, bufferIfUnregistered: false) == nil)
+}
+
+@Test func sendDeletionIsTerminalOnlyWhenPermanentAndNotFromCache() {
+    #expect(SendMessageDeletionClassification.classify(isPermanent: true, fromCache: false) == .permanent)
+    #expect(SendMessageDeletionClassification.classify(isPermanent: true, fromCache: true) == .cacheEviction)
+    #expect(SendMessageDeletionClassification.classify(isPermanent: false, fromCache: false) == .nonPermanent)
+    #expect(SendMessageDeletionClassification.classify(isPermanent: nil, fromCache: false) == .nonPermanent)
+    #expect(SendMessageDeletionClassification.classify(isPermanent: true, fromCache: nil) == .unknown)
+}
+
+@Test func stagedPhotoDeletionWaitsForKnownInactiveUpload() {
+    #expect(StagedPhotoDeletionPolicy.mayReleaseSource(isTerminalDelete: false, uploadIsActive: false) == false)
+    #expect(StagedPhotoDeletionPolicy.mayReleaseSource(isTerminalDelete: true, uploadIsActive: nil) == false)
+    #expect(StagedPhotoDeletionPolicy.mayReleaseSource(isTerminalDelete: true, uploadIsActive: true) == false)
+    #expect(StagedPhotoDeletionPolicy.mayReleaseSource(isTerminalDelete: true, uploadIsActive: false) == true)
+}
+
 @Test func photoDecodeAdmissionReservesBoundedCapacityForAnotherAccount() async {
     let accountA = AccountUUID()
     let accountB = AccountUUID()
