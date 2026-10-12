@@ -242,6 +242,26 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(buffer.queuedByteCount == 0)
 }
 
+@Test func updateBufferCloseRejectsBlockedAppendAndDrainsAcceptedUpdates() async {
+    let buffer = TDLibUpdateBuffer(capacity: 1)
+    let accepted = Data("accepted".utf8)
+    #expect(buffer.append(accepted))
+    let producer = Task.detached { buffer.append(Data("after-close".utf8)) }
+
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(1))
+    while buffer.blockedProducerCount == 0 && clock.now < deadline {
+        await Task.yield()
+    }
+    #expect(buffer.blockedProducerCount == 1)
+
+    buffer.close()
+    #expect(!(await producer.value))
+    #expect(buffer.take() == accepted)
+    #expect(buffer.take() == nil)
+    #expect(buffer.count == 0)
+}
+
 @Test func updateBufferBackpressuresByBytesAndAdmitsOneOversizedUpdateAlone() async {
     let buffer = TDLibUpdateBuffer(capacity: 8, byteCapacity: 5)
     let first = Data("1234".utf8)

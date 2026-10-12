@@ -16,6 +16,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private var head = 0
     private var storedByteCount = 0
     private var waitingAppends = 0
+    private var closed = false
 
     public init(capacity: Int = 2_048, byteCapacity: Int = 64 * 1_024 * 1_024) {
         self.capacity = max(1, capacity)
@@ -45,15 +46,18 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         return storedByteCount
     }
 
-    /// Blocks until capacity is available. False is reserved for future
-    /// shutdown use; this implementation stays open for the process lifetime.
+    /// Blocks until capacity is available. Returns false once shutdown starts.
     @discardableResult
     public func append(_ update: Data) -> Bool {
         condition.lock()
-        while isFull(for: update.count) {
+        while !closed && isFull(for: update.count) {
             waitingAppends += 1
             condition.wait()
             waitingAppends -= 1
+        }
+        guard !closed else {
+            condition.unlock()
+            return false
         }
         storage.append(update)
         storedByteCount += update.count
@@ -62,9 +66,14 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         return true
     }
 
-    public func take() -> Data {
+    /// Returns nil after close and after every already accepted item is drained.
+    public func take() -> Data? {
         condition.lock()
-        while head == storage.count { condition.wait() }
+        while head == storage.count && !closed { condition.wait() }
+        guard head < storage.count else {
+            condition.unlock()
+            return nil
+        }
         let update = storage[head]
         head += 1
         storedByteCount -= update.count
@@ -75,6 +84,15 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         condition.broadcast()
         condition.unlock()
         return update
+    }
+
+    /// Wakes blocked producers and the consumer. Accepted events remain queued
+    /// and are returned by take() before it reports end-of-stream.
+    public func close() {
+        condition.lock()
+        closed = true
+        condition.broadcast()
+        condition.unlock()
     }
 
     private func isFull(for nextItemBytes: Int) -> Bool {
@@ -100,7 +118,9 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
     private let coordinator: RuntimeCoordinator
     private let buffer: TDLibUpdateBuffer
     private let lock = NSLock()
+    private let reducerExited = DispatchGroup()
     private var started = false
+    private var drainRequested = false
 
     public init(
         gateway: TDLibGateway,
@@ -117,11 +137,12 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         lock.lock()
         precondition(!started, "TDLib update pipeline may only be started once")
         started = true
+        reducerExited.enter()
         lock.unlock()
 
-        let reducer = Thread { [buffer, coordinator] in
-            while true {
-                let update = buffer.take()
+        let reducer = Thread { [buffer, coordinator, reducerExited] in
+            defer { reducerExited.leave() }
+            while let update = buffer.take() {
                 let completed = DispatchSemaphore(value: 0)
                 Task {
                     do {
@@ -143,5 +164,22 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         gateway.startSingleReceiveWorker { [buffer] update in
             buffer.append(update)
         }
+    }
+
+    /// Call only after the receive worker has exited. This closes the FIFO,
+    /// drains accepted updates in order, and waits until the reducer callback
+    /// for the final update has completed.
+    public func finishInputAndDrain() {
+        lock.lock()
+        guard started else {
+            lock.unlock()
+            return
+        }
+        let shouldClose = !drainRequested
+        drainRequested = true
+        lock.unlock()
+
+        if shouldClose { buffer.close() }
+        reducerExited.wait()
     }
 }

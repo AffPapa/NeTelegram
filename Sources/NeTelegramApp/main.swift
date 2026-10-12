@@ -978,6 +978,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
             }
             guard let self else { return }
+            let pipeline = self.updatePipeline
+            await Task.detached {
+                pipeline?.finishInputAndDrain()
+            }.value
+            guard self.closingForTermination else { return }
             self.setStatus("Все runtime закрыты; подтверждаю выход macOS…")
             self.terminationBarrierFinished = true
             self.shutdownProgressTask?.cancel()
