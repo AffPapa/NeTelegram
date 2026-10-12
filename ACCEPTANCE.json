@@ -389,7 +389,7 @@
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38298878351",
     "hosted_result": "Pinned TDLib app bundle workflow run 38298878351 is in_progress for code commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Separate macOS CI run 38298878365 was cancelled; no hosted PASS is claimed.",
     "artifact": null,
-    "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded. Anonymous HTTPS GET of /devlog/ returned 200 text/html and contained the 5e24ba7 milestone.",
+    "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded. Anonymous HTTPS checks: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/alpha.xml, /updates/stable.xml and /site.css all returned 200; appcasts are text/xml and CSS is text/css. Live devlog contains the 5e24ba7 milestone. Downloads correctly contain no app binary.",
     "scope": "Synthetic history-request tests only. No live Notification Center, Telegram login, real notification click, real read/send/logout, 20-account runtime/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or all-active lifecycle proof."
   },
   "latest_site_deployment": {
