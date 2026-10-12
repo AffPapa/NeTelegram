@@ -105,9 +105,20 @@ public actor RuntimeCoordinator {
             try gateway.send(initializationRequest, to: route.client)
             return route
         } catch {
-            states[account] = .failed("TDLib initialization request could not be queued")
+            removeRouteAfterInitializationRequestRejected(route)
             throw error
         }
+    }
+
+    /// Removes a route only when the first request was rejected before it was
+    /// queued. Once TDLib has accepted initialization, callers must retain the
+    /// route and database ownership until an authorizationStateClosed update.
+    @discardableResult
+    public func removeRouteAfterInitializationRequestRejected(_ route: RuntimeRoute) -> Bool {
+        guard routes[route.client] == route else { return false }
+        routes.removeValue(forKey: route.client)
+        states[route.account] = .failed("TDLib initialization request could not be queued")
+        return true
     }
 
     /// TDLib's global JSON interface tags every update with @client_id. Missing

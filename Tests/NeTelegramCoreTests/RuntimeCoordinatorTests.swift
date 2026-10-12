@@ -164,6 +164,23 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(await coordinator.route(for: newRoute.client) == nil)
 }
 
+@Test func rejectedFirstRequestRemovesOnlyItsUninitializedRoute() async throws {
+    let coordinator = RuntimeCoordinator()
+    let account = AccountUUID()
+    let first = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(301))
+    try await coordinator.registerBeforeFirstRequest(first)
+
+    #expect(await coordinator.removeRouteAfterInitializationRequestRejected(first))
+    #expect(await coordinator.route(for: first.client) == nil)
+    #expect(await coordinator.state(for: account) == .failed("TDLib initialization request could not be queued"))
+
+    let retry = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(302))
+    try await coordinator.registerBeforeFirstRequest(retry)
+    #expect(await coordinator.route(for: retry.client) == retry)
+    #expect(!(await coordinator.removeRouteAfterInitializationRequestRejected(first)))
+    #expect(await coordinator.route(for: retry.client) == retry)
+}
+
 @Test func startupSchedulerQueuesPastTheParallelOpenLimit() async {
     let scheduler = RuntimeStartupScheduler(parallelism: 2)
     await scheduler.acquire()

@@ -1016,6 +1016,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func openProfile(_ profile: AccountProfile, apiHash: String, select: Bool = false) async {
         await startupScheduler.acquire()
+        var startupRuntime: LocalAccountRuntime?
+        var didRegisterStartupRoute = false
         do {
             guard let library = tdjsonLibraryURL() else { throw TDLibGatewayError.libraryLoad("Pinned TDLib not found") }
             if gateway == nil { gateway = try TDLibGateway(libraryURL: library) }
@@ -1044,8 +1046,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
             let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.0, databaseKey: prepared.1, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
+            startupRuntime = runtime
             let route = try runtime.registerRoute()
             try await runtimeCoordinator.registerBeforeFirstRequest(route)
+            didRegisterStartupRoute = true
             runtimesByClient[route.client.value] = runtime
             runtimesByAccount[profile.id] = runtime
             refreshStatusMenu()
@@ -1071,9 +1075,51 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if presentsThisRuntime { try runtime.send(["@type": "getCountries"]) }
             await startupScheduler.release()
         } catch {
-            await runtimeCoordinator.setState(.failed("Profile startup failed"), for: profile.id)
+            if didRegisterStartupRoute, let startupRuntime {
+                if !startupRuntime.initializationRequestWasQueued, let route = startupRuntime.route {
+                    let removed = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
+                    if removed {
+                        if runtimesByClient[route.client.value] === startupRuntime {
+                            runtimesByClient.removeValue(forKey: route.client.value)
+                        }
+                        if runtimesByAccount[profile.id] === startupRuntime {
+                            runtimesByAccount.removeValue(forKey: profile.id)
+                        }
+                        if self.runtime === startupRuntime {
+                            self.runtime = runtimesByAccount.values.first
+                            pendingAuthorizationType = nil
+                            pendingInitialAuthorizationAction = nil
+                            authRequestInFlight = false
+                            emailField.stringValue = ""
+                            inputField.stringValue = ""
+                            secureInputField.stringValue = ""
+                        }
+                        setStatus("TDLib не принял первый запрос. Незапущенный route снят; профиль и данные сохранены. Повторный вход не начат автоматически.")
+                    } else {
+                        await runtimeCoordinator.setState(.failed("Profile startup route ownership changed"), for: profile.id)
+                        setStatus("Не удалось подтвердить владение стартовым route; профиль не будет открыт повторно до проверки состояния.")
+                    }
+                } else if startupRuntime.close() {
+                    await runtimeCoordinator.setState(.closing, for: profile.id)
+                    if self.runtime === startupRuntime {
+                        pendingAuthorizationType = nil
+                        pendingInitialAuthorizationAction = nil
+                        authRequestInFlight = false
+                        emailField.stringValue = ""
+                        inputField.stringValue = ""
+                        secureInputField.stringValue = ""
+                    }
+                    setStatus("Не удалось завершить запуск профиля; отправлен запрос TDLib close. Освобождение профиля дождётся подтверждения Closed.")
+                } else {
+                    await runtimeCoordinator.setState(.failed("Profile startup failed; TDLib close was not accepted"), for: profile.id)
+                    setStatus("Не удалось завершить запуск и TDLib не принял close. Профиль останется занятым до подтверждённого закрытия; база не будет открыта повторно.")
+                }
+            } else {
+                await runtimeCoordinator.setState(.failed("Profile startup failed before TDLib initialization"), for: profile.id)
+                setStatus("Не удалось подготовить профиль до запуска TDLib. Сохранённые данные не удалены.")
+            }
             await startupScheduler.release()
-            setStatus("Не удалось открыть вход. Сохранённые данные не удалены; остальные аккаунты продолжают работу.")
+            refreshStatusMenu()
         }
     }
 
@@ -3728,6 +3774,7 @@ private final class LocalAccountRuntime {
     private var didRequestCurrentUser = false
     private var didLoadMainChats = false
     private var didSendTDLibParameters = false
+    fileprivate var initializationRequestWasQueued: Bool { didSendTDLibParameters }
     private(set) var authorizationState: String?
     private(set) var lastTDLibError: String?
     private(set) var identityPersistenceFailed = false
