@@ -324,7 +324,7 @@
       "method": "native tool receipts",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Existing Site project appgprj_6acba85192e08191acdf7011928848cf and hostname https://netelegram.iryadom.chatgpt.site are separate from the app Git remote; Site source commit 47cd092c2d551f91b0c574d8dba422b664bf42fe was pushed by the official Sites helper. No NeAntik project was changed."
+      "evidence": "Existing Site project appgprj_6acba85192e08191acdf7011928848cf and hostname https://netelegram.iryadom.chatgpt.site are distinct from app Git remote. Current Site source commit b7eebc65a3aaa7db4a83e81eb764ad5da6df703d was pushed through the official Sites helper. No NeAntik project was changed."
     },
     {
       "id": "SITE02",
@@ -333,7 +333,7 @@
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Site v44 deployment appgdep_6acd3085d8f08191b54d0f38705edad9 succeeded; get_site confirms access_mode=public. Anonymous Playwright requests returned HTTP 200 for home, features, devlog, downloads, changelog, roadmap, privacy, source, alpha/stable appcasts; stylesheet returned 200/304. Appcasts serve text/xml."
+      "evidence": "Site v46 deployment appgdep_6acd34e7942c81919f11dba75f542612 succeeded; get_site confirms the existing Site remains public. Anonymous Playwright fetch returned HTTP 200 for home, features, downloads, changelog, devlog, roadmap, privacy, source, both appcasts and site.css; appcasts served text/xml."
     },
     {
       "id": "SITE03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v44 links current app source commit a90df16 and passing CI runs 38292860292/38292860280. It truthfully states no real account login, 20-runtime certification, Developer ID or notarization. Downloads has no installer URL; alpha/stable feeds remain valid empty XML."
+      "evidence": "Site v46 states that no app release or download is available, preserves the verified app-code commit a90df16, and links to the live main history rather than a stale docs commit. Downloads has no ZIP/DMG link; alpha/stable feeds remain valid empty XML. Real login, all-20 runtime coverage, Developer ID and notarization are unverified."
     },
     {
       "id": "SITE04",
@@ -351,7 +351,7 @@
       "method": "local build+browser",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Buildless static output validated: 8 HTML routes, local internal links, both appcast XML files, source/run links and no-download state. Public browser navigation and content were checked. Responsive/mobile, keyboard and VoiceOver layout checks remain unverified; direct urllib was blocked by Cloudflare 1010, while anonymous Playwright browser access succeeded."
+      "evidence": "Buildless static output passed local parsing for 8 HTML routes, internal links, alpha/stable XML, and absence of empty installer links. Site v46 was checked anonymously in Playwright: 11 public routes/assets returned HTTP 200, XML feeds were text/xml, and the home/features provenance copy rendered. Responsive/mobile, keyboard and VoiceOver layout checks remain unverified."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v44 source commit 47cd092c2d551f91b0c574d8dba422b664bf42fe is explicitly distinct from application source a90df16 and docs commit 1dd332d. Devlog links the exact CI runs. No immutable app release manifest or downloadable assets exist yet, so application-version coherence is not applicable/passed."
+      "evidence": "Site v46 source commit b7eebc65a3aaa7db4a83e81eb764ad5da6df703d is distinct from application source a90df16 and GitHub docs-only main head 5c0e3ea. Pages use the stable verified app-code SHA and live main-history link, avoiding stale HEAD claims. No immutable app release manifest or assets exist, so application release coherence remains partial."
     },
     {
       "id": "OPS01",
@@ -385,18 +385,19 @@
     "date": "2026-10-13",
     "source_commit": "a90df16d676bc37dacd5630552ee235341f70c25",
     "local_command": "swiftc -frontend -parse Sources/NeTelegramApp/main.swift; git diff --check; static website parser/link/feed validation",
-    "local_result": "Swift source parse and diff checks passed. Website check passed 8 HTML routes, local links, alpha/stable XML, current source/run links, and no installer href.",
+    "local_result": "App source parse and prior CI remain as recorded for a90df16. Current docs-only website checks passed 8 HTML routes, internal links, both XML feeds and no installer href; public Site v46 routes/appcasts were anonymously verified.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38292860280",
     "hosted_result": "Native macOS 15 Apple Silicon run succeeded: pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64 Dev.app, bundle/signature/build metadata checks, fresh support-root launch, screenshot, graceful quit, artifact upload. Fast run 38292860292 also passed Swift tests and JSON validation.",
     "artifact": "GitHub Actions artifact 11767911208; temporary ad-hoc Dev.app only; screenshot SHA-256 ca1bb93f50e4f534ed6e49a66cedd64862956b47f29761e331c73c51309d6d0d.",
-    "site": "Public Site v44 deployment appgdep_6acd3085d8f08191b54d0f38705edad9 succeeded; browser-verified routes and XML MIME.",
+    "site": "Public Site v46 source b7eebc65a3aaa7db4a83e81eb764ad5da6df703d; deployment appgdep_6acd34e7942c81919f11dba75f542612 succeeded. Anonymous Playwright verified all 8 HTML routes, both XML feeds and stylesheet (HTTP 200; feed MIME text/xml), plus current provenance and honest no-download state.",
     "scope": "No Telegram account login/read/send/logout, no real profile data, no 20-account runtime/resource matrix, no physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, or updater smoke."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 44,
-    "source_commit": "47cd092c2d551f91b0c574d8dba422b664bf42fe",
-    "deployment_id": "appgdep_6acd3085d8f08191b54d0f38705edad9",
+    "version": 46,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_4932c7fc322c8191914f6e0ccb831c7e",
+    "source_commit": "b7eebc65a3aaa7db4a83e81eb764ad5da6df703d",
+    "deployment_id": "appgdep_6acd34e7942c81919f11dba75f542612",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
     "status": "succeeded",
