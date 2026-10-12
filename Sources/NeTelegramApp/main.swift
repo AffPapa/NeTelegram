@@ -222,21 +222,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let contentWidth: CGFloat = 1060
         let contentHeight: CGFloat = 720
         let content = NSView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
-        // The window can be restored at a size larger than the original frame.
-        // Keep the constraint container in sync with the live window bounds so
-        // centerX/centerY based auth layout remains centered after restoration.
         content.autoresizingMask = [.width, .height]
-        content.autoresizesSubviews = true
-        // Auth content follows the live bounds; the stack owns vertical spacing
-        // so changing auth states never depends on independently tuned offsets.
-        func centered(_ width: CGFloat, y: CGFloat, height: CGFloat) -> NSRect {
-            NSRect(x: (content.bounds.midX) - width / 2, y: y, width: width, height: height)
-        }
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
         content.wantsLayer = true
         content.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
 
-        let mark = NSView(frame: centered(64, y: 520, height: 64))
+        let mark = NSView(frame: .zero)
         mark.wantsLayer = true
         mark.layer?.backgroundColor = NSColor.systemBlue.cgColor
         mark.layer?.cornerRadius = 32
@@ -261,7 +252,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountPicker.action = #selector(selectAccount)
         accountPicker.setAccessibilityLabel("Авторизованный аккаунт")
 
-        countryPicker = NSPopUpButton(frame: centered(300, y: 365, height: 34), pullsDown: false)
+        countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.isHidden = true
         countryPicker.target = self
         countryPicker.action = #selector(selectCountry)
@@ -269,7 +260,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
-        phoneField.frame = centered(360, y: 315, height: 38)
+        phoneField.frame = .zero
         phoneField.alignment = .center
         phoneField.setAccessibilityLabel("Номер телефона")
         phoneField.isHidden = false
@@ -314,7 +305,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         inputField = NSTextField(string: "")
         inputField.placeholderString = "Код из Telegram"
         inputField.font = .systemFont(ofSize: 17)
-        inputField.frame = phoneField.frame
+        inputField.frame = .zero
         inputField.alignment = .center
         inputField.setAccessibilityLabel("Код подтверждения входа")
         inputField.isHidden = true
@@ -322,7 +313,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField = NSSecureTextField(string: "")
         secureInputField.placeholderString = "Пароль двухэтапной проверки"
         secureInputField.font = .systemFont(ofSize: 17)
-        secureInputField.frame = phoneField.frame
+        secureInputField.frame = .zero
         secureInputField.alignment = .center
         secureInputField.setAccessibilityLabel("Пароль двухэтапной проверки")
         secureInputField.isHidden = true
@@ -334,23 +325,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         statusLabel.alignment = .center
         statusLabel.setAccessibilityLabel("Статус авторизации")
 
-        qrImageView = NSImageView(frame: centered(180, y: 290, height: 180))
+        qrImageView = NSImageView(frame: .zero)
         qrImageView.imageScaling = .scaleProportionallyUpOrDown
         qrImageView.isHidden = true
 
         actionButton = NSButton(title: "Продолжить", target: self, action: #selector(primaryAction))
         actionButton.bezelStyle = .rounded
-        actionButton.frame = centered(360, y: 210, height: 38)
+        actionButton.frame = .zero
         actionButton.setAccessibilityLabel("Продолжить вход")
         qrButton = NSButton(title: "Войти по QR-коду", target: self, action: #selector(beginQRLogin))
         qrButton.isBordered = false
         qrButton.contentTintColor = .systemBlue
-        qrButton.frame = centered(280, y: 165, height: 28)
+        qrButton.frame = .zero
         qrButton.setAccessibilityLabel("Войти по QR-коду")
         addAccountButton = NSButton(title: "Добавить ещё аккаунт", target: self, action: #selector(addAccount))
         addAccountButton.isBordered = false
         addAccountButton.contentTintColor = .systemBlue
-        addAccountButton.frame = centered(280, y: 125, height: 28)
+        addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
         authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPicker, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
@@ -519,9 +510,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let window = NSWindow(contentRect: content.frame, styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = "NeTelegram"
         window.contentView = content
-        // Assign the content view before fixing the size. This prevents a stale
-        // restored frame from leaving the root view narrower than its window,
-        // which would make centerX constraints look left-aligned on wide screens.
+        // NSWindow owns the content view's frame. The auth stack is centered
+        // by Auto Layout inside that coordinate space, independent of window size.
         window.setContentSize(NSSize(width: contentWidth, height: contentHeight))
         window.center()
         window.minSize = NSSize(width: 900, height: 620)
@@ -556,15 +546,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func layoutWindowContents() {
         guard let window, let content = window.contentView else { return }
-        // NSWindow can restore a frame independently of a programmatically
-        // created root view. Keep the view's actual coordinate space equal to
-        // the visible content area before centering the login stack.
-        let visibleContentSize = window.contentLayoutRect.size
-        if abs(content.frame.width - visibleContentSize.width) > 0.5 ||
-            abs(content.frame.height - visibleContentSize.height) > 0.5 {
-            content.setFrameSize(visibleContentSize)
-            content.setBoundsSize(visibleContentSize)
-        }
         let size = content.bounds.size
         guard size.width > 0, size.height > 0 else { return }
 
