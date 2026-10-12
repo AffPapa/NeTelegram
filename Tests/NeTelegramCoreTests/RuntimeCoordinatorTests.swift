@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import ImageIO
+import Security
 import Testing
 @testable import NeTelegramCore
 
@@ -164,6 +165,14 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(releaseA == releaseB)
     #expect(override.path == "/tmp/isolation")
     #expect(!first.path.contains("/../"))
+}
+
+@Test func secretsStoreUsesStandardMacOSKeychainWithoutUnsupportedAttributes() {
+    let query = SecretsStore.itemQuery(account: "test-account", service: "test-service")
+    #expect(query[kSecAttrAccount as String] as? String == "test-account")
+    #expect(query[kSecAttrService as String] as? String == "test-service")
+    #expect(query[kSecUseDataProtectionKeychain as String] == nil)
+    #expect(query[kSecAttrAccessible as String] == nil)
 }
 
 @Test func startupLimitDoesNotBecomeResidentAccountLimit() async throws {

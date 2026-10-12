@@ -17,7 +17,6 @@ let query: [String: Any] = [
 ]
 let attributes: [String: Any] = [
     kSecValueData as String: valueData,
-    kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
 ]
 let updateStatus = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
 let status: OSStatus

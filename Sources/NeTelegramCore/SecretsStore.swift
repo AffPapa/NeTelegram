@@ -6,19 +6,17 @@ public enum SecretsStoreError: Error, Equatable {
     case keychain(OSStatus)
 }
 
-/// Keychain access for local project credentials. This is separate from the
-/// per-account TDLib database-key records that will be added with profile storage.
+/// Keychain access for local project credentials and per-account encryption keys.
 public struct SecretsStore: Sendable {
     public init() {}
 
     public func telegramAPIHash() throws -> String {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: TelegramApplicationIdentity.keychainService,
-            kSecAttrAccount as String: TelegramApplicationIdentity.keychainAccount,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne,
-        ]
+        var query = Self.itemQuery(
+            account: TelegramApplicationIdentity.keychainAccount,
+            service: TelegramApplicationIdentity.keychainService
+        )
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &result)
         guard status != errSecItemNotFound else { throw SecretsStoreError.missing("Telegram API hash") }
@@ -50,11 +48,7 @@ public struct SecretsStore: Sendable {
     }
 
     private func removeKey(account: String, service: String) throws {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-        ]
+        let query = Self.itemQuery(account: account, service: service)
         let status = SecItemDelete(query as CFDictionary)
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw SecretsStoreError.keychain(status)
@@ -63,11 +57,7 @@ public struct SecretsStore: Sendable {
 
     private func key(for account: AccountUUID, service: String, createIfMissing: Bool) throws -> Data {
         let accountName = account.id.uuidString.lowercased()
-        let baseQuery: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: accountName,
-        ]
+        let baseQuery = Self.itemQuery(account: accountName, service: service)
 
         var readQuery = baseQuery
         readQuery[kSecReturnData as String] = true
@@ -92,17 +82,33 @@ public struct SecretsStore: Sendable {
 
         var addQuery = baseQuery
         addQuery[kSecValueData as String] = generated
-        addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
         if addStatus == errSecSuccess { return generated }
         if addStatus == errSecDuplicateItem {
+            var retryQuery = baseQuery
+            retryQuery[kSecReturnData as String] = true
+            retryQuery[kSecMatchLimit as String] = kSecMatchLimitOne
             result = nil
-            let retryStatus = SecItemCopyMatching(readQuery as CFDictionary, &result)
+            let retryStatus = SecItemCopyMatching(retryQuery as CFDictionary, &result)
             guard retryStatus == errSecSuccess, let existing = result as? Data, existing.count == 32 else {
                 throw SecretsStoreError.keychain(retryStatus == errSecSuccess ? errSecDecode : retryStatus)
             }
             return existing
         }
         throw SecretsStoreError.keychain(addStatus)
+    }
+
+    /// Uses the user's standard macOS login Keychain. Accessibility attributes
+    /// and the Data Protection Keychain are intentionally omitted because this
+    /// app has no Data Protection Keychain entitlement.
+    static func itemQuery(
+        account: String,
+        service: String
+    ) -> [String: Any] {
+        [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+        ]
     }
 }
