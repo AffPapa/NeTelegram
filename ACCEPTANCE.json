@@ -382,12 +382,12 @@
     }
   ],
   "last_verification": {
-    "date": "2026-10-12",
-    "source_commit": "c74aedcac319a60008d0dc180d0f4c5d9a0a09eb",
+    "date": "2026-10-13",
+    "source_commit": "75a5c61939130923d74bab46b25fe6660301c694",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-module-cache swift test --disable-sandbox",
-    "local_result": "47/47 Swift Testing tests passed; Xcode 27.0 / Swift 6.4; arm64 host; macOS 14 target",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38276881868",
-    "hosted_result": "success for the exact source commit; macOS Apple Silicon runner built app, ran tests, validated JSON",
-    "scope": "Core contract/unit tests only. This does not verify a real Telegram account, native login/read/send/logout, all-accessibility paths, sleep/wake, twenty authorized runtimes, physical performance, Developer ID/notarization, quarantined installation, or updater release smoke."
+    "local_result": "49/49 Swift Testing tests passed; Xcode 27.0 / Swift 6.4; arm64e host; macOS 14 target (local at e83a9ea)",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38284254151",
+    "hosted_result": "success for the exact source commit; GitHub macos-15-arm64 runner, macOS 15.7.9, Xcode 16.4, Swift 6.1.2; built app, 49 tests passed, JSON validation passed",
+    "scope": "Core contract/unit tests and native app compilation only. Does not verify a real Telegram account, native login/read/send/logout, all accessibility paths, sleep/wake, twenty authorized runtimes, physical performance, Developer ID/notarization, quarantined installation, or updater release smoke."
   }
 }
