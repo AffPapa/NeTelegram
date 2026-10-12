@@ -473,6 +473,60 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(sends == 1)
 }
 
+@Test func runtimeCommandGateOrdersAcceptedCommandsBeforeCloseAndRejectsLateDispatch() {
+    let gate = RuntimeCommandGate()
+    let commandEntered = DispatchSemaphore(value: 0)
+    let finishCommand = DispatchSemaphore(value: 0)
+    let closeAttempted = DispatchSemaphore(value: 0)
+    let closeFinished = DispatchSemaphore(value: 0)
+    let events = LockedTestValue<[String]>([])
+
+    DispatchQueue.global().async {
+        _ = gate.dispatch {
+            commandEntered.signal()
+            finishCommand.wait()
+            events.set(events.get() + ["command"])
+        }
+    }
+    #expect(commandEntered.wait(timeout: .now() + 2) == .success)
+
+    DispatchQueue.global().async {
+        closeAttempted.signal()
+        _ = gate.beginClosing {
+            events.set(events.get() + ["close"])
+        }
+        closeFinished.signal()
+    }
+    #expect(closeAttempted.wait(timeout: .now() + 2) == .success)
+    #expect(closeFinished.wait(timeout: .now()) == .timedOut)
+    finishCommand.signal()
+    #expect(closeFinished.wait(timeout: .now() + 2) == .success)
+    #expect(events.get() == ["command", "close"])
+
+    var lateCommandRan = false
+    #expect(!gate.dispatch { lateCommandRan = true })
+    #expect(!lateCommandRan)
+}
+
+@Test func runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected() throws {
+    let gate = RuntimeCommandGate()
+    var closeFailed = false
+    do {
+        _ = try gate.beginClosing { throw CocoaError(.fileWriteUnknown) }
+    } catch {
+        closeFailed = true
+    }
+    #expect(closeFailed)
+    #expect(!gate.isClosing)
+
+    var commandRan = false
+    #expect(gate.dispatch { commandRan = true })
+    #expect(commandRan)
+    #expect(gate.beginClosing {})
+    #expect(gate.isClosing)
+    #expect(!gate.dispatch { commandRan = false })
+}
+
 @Test func lockingInvalidatesQueuedSendIntentsAcrossUnlock() throws {
     let account = AccountUUID()
     let barrier = PrivacyDispatchBarrier()

@@ -12,7 +12,7 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 
 ## Current evidence
 
-- Source `b3350623dd6498532dce219e7bb76ca35ac8696c` is the current `main` tip. The last code-changing slice, account logout/presentation cleanup at `0dcfdbef0e0a4be5e20eebf6be35c95fd6f09daa`, passed the full synthetic/core suite: 40/40 on Swift 6.4 / Xcode 27.0. The current tip also passed hosted CI run `38255270635` on Apple Silicon; that docs-only commit did not require another local test run.
-- The sole canonical bundle at `/private/tmp/NeTelegram-Dev.app` still records source `5e48cece3119ce0118930b27fa94dcd39f9a928b` and ad-hoc development signing. It is currently running as PID 124. Do not kill it or replace its bundle; rebuild this same path once after it exits.
-- The earlier first-run smoke showed phone entry and a QR option without entering credentials. No real Telegram account has been authorized, so real login/read/send/logout and multi-account behavior remain unverified.
+- `ACCEPTANCE.json.last_verification` is the single source for exact test count, source revision, toolchain, architecture, and hosted CI evidence. Keep revision numbers and test totals out of duplicated prose here; update the acceptance record after a verification boundary.
+- The only development bundle is `/private/tmp/NeTelegram-Dev.app`. Before rebuilding it, inspect its embedded `Contents/Resources/BuildInfo.json` and confirm the process has exited. Rebuild this same path once; never launch a second development identity for routine smoke.
+- The prior no-account first-run smoke reached phone entry and QR login without entering credentials. That does not prove a real Telegram login/read/send/logout flow or multi-account behavior.
 - Developer ID signing, notarization, real-account scenarios, and twenty-runtime measurements remain open release gates.

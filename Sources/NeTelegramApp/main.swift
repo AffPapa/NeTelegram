@@ -3982,9 +3982,9 @@ private final class LocalAccountRuntime {
     let apiHash: String
     private let gateway: TDLibGateway
     private let catalogue: AccountCatalogue
+    private let commandGate = RuntimeCommandGate()
     fileprivate var route: RuntimeRoute?
     fileprivate let generation: RuntimeGeneration
-    private var closeRequested = false
     private var logoutExtra: String?
     private(set) var isLogoutRequested = false
     private(set) var logoutWasAccepted = false
@@ -4024,6 +4024,13 @@ private final class LocalAccountRuntime {
         guard !isLogoutRequested || type == "close" || type == "logOut" else {
             throw CocoaError(.userCancelled)
         }
+        let accepted = try commandGate.dispatch {
+            try sendRaw(request, type: type, route: route)
+        }
+        guard accepted else { throw CocoaError(.userCancelled) }
+    }
+
+    private func sendRaw(_ request: [String: Any], type: String?, route: RuntimeRoute) throws {
         let bytes = try JSONSerialization.data(withJSONObject: request, options: [.sortedKeys])
         try gateway.send(String(decoding: bytes, as: UTF8.self), to: route.client)
         if type == "setTdlibParameters" { didSendTDLibParameters = true }
@@ -4139,11 +4146,11 @@ private final class LocalAccountRuntime {
 
     @discardableResult
     func close() -> Bool {
-        guard !closeRequested else { return true }
+        guard let route else { return false }
         do {
-            try send(["@type": "close"])
-            closeRequested = true
-            return true
+            return try commandGate.beginClosing {
+                try sendRaw(["@type": "close"], type: "close", route: route)
+            }
         } catch {
             // Keep the receive worker alive. Without a close acknowledgement,
             // the app must not claim a clean TDLib shutdown.

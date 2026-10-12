@@ -228,6 +228,15 @@
       "evidence": null
     },
     {
+      "id": "APP26",
+      "name": "Команды runtime упорядочены перед close",
+      "expected": "Принятая команда завершается до запроса close; после принятого close новые команды этого runtime не отправляются. Если TDLib не принял close, runtime остаётся доступным.",
+      "method": "deterministic core + native TDLib quit smoke",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "RuntimeCommandGateOrdersAcceptedCommandsBeforeCloseAndRejectsLateDispatch и runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected прошли локально в suite 42/42. Прямой Cmd+Q против отложенной фото-отправки в AppKit/TDLib ещё не проверен."
+    },
+    {
       "id": "PERF01",
       "name": "Активные1/5/10/20",
       "expected": "Footprint/RSS/CPU/wakeups/network/cache/startup/switch измерены отдельно, с hardware/build/corpus.",
