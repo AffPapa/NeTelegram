@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public app source 50e408d is on AffPapa/NeTelegram; local Swift suite 66/66 and macOS CI 38315606043 passed. Pinned TDLib/Dev.app run 38315606030 passed and uploaded exact-source arm64 Dev.app artifact 11777601028 (ad-hoc development signature only). The first-run smoke had no API hash in CI Keychain, so login was not performed. Public Site v55 is live with factual development status and no app download. Real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
+  "status": "implementation_in_progress; app code 5643711ab4fca7372f8be50bce7d67a127d40027 and docs commit c3225a1 are on AffPapa/NeTelegram/main. Exact-code local Swift suite 69/69, macOS CI 38320651016 passed, and pinned TDLib/Dev.app run 38320651012 passed with arm64 development artifact 11779476633 (ad-hoc only). Public Site v57 is live with factual devlog and no app download. Real Telegram account tests, all-20 certification, app title/sponsored-video compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -135,7 +135,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Source lifecycle now keeps quit pending through account close and shared TDLib receive/update drain; added TerminationBarrier tests for pre-drain rejection, exactly-once finish, and retry after rejected close. All 68 Swift tests pass on 2026-10-13. Native close/quit smoke with real authorized Telegram accounts remains not run."
+      "evidence": "Source lifecycle waits for account closes and shared TDLib receive/update drain; 69/69 exact-source Swift suite passes. Native Dev.app run 38320651012 launched an unauthenticated clean first run, captured a screenshot, and verified process quit. No authorized account was present, so Cmd+Q with real runtimes and all-20 close remain unverified."
     },
     {
       "id": "APP16",
@@ -270,7 +270,7 @@
       "method": "primary docs+implementation review",
       "required_for": "all public app releases",
       "status": "partial",
-      "evidence": "Own api_id is configured without publishing api_hash. Current Telegram API Terms §2.3 require “Unofficial” before “Telegram” in the app title; requested public title NeTelegram does not satisfy that wording. The pinned TDLib 1.8.68 schema at c15d3f5 includes getChatSponsoredMessages and getVideoMessageAdvertisements; support/display behavior is not implemented or tested. Terms §1.3/1.4 minimum functionality and §3.3 sponsored media remain unresolved release gates."
+      "evidence": "Primary Telegram API Terms §2.3 say the title must not include Telegram unless “Unofficial” precedes that word; current requested public title NeTelegram does not meet that wording. Terms §1.3/1.4 require correct basic functionality. Sponsored-messages documentation requires official ads in channel clients and specifies fullscreen playback behavior for sponsored videos. Current source does not implement sponsored messages and product scope excludes ordinary video playback. User product/title decision remains pending; no compatibility or stable-release pass is claimed."
     },
     {
       "id": "REL02",
@@ -279,7 +279,7 @@
       "method": "source+CI",
       "required_for": "all public releases",
       "status": "partial",
-      "evidence": "Public app source commit 50e408d0e27410a0cc3abc1c874e0c90fba22e1e includes code commit 760c29e. macOS CI 38315606043 and pinned TDLib/Dev.app run 38315606030 passed for exact source 50e408d. Artifact 11777601028 is the 12,231,133-byte arm64 dev bundle with GitHub archive digest sha256:194a956fffae5c335bf8f35fede952503cdd9e9e96ec75e86d50431eb7236ac2; BuildInfo records TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, macOS 14.0 and ad-hoc signing. This is not Developer ID, notarized, or a public app release."
+      "evidence": "Public app code commit 5643711ab4fca7372f8be50bce7d67a127d40027; docs-only mirror commit c3225a1. Exact-source local Swift suite 69/69 passed; macOS CI 38320651016 succeeded. Pinned TDLib/Dev.app run 38320651012 succeeded on macOS 15.7.9 arm64, Xcode 16.4 / Swift 6.1.2; artifact 11779476633 is 12,236,441 bytes with GitHub archive digest sha256:9ce7bf76ccbb3111f8d22e2163ab8c6ab4ecdb59c2c48a9cfb733ab1fee451ce, pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, arm64, min macOS 14, ad-hoc development signing. First-run screenshot/quit only; no real login. Not a signed release."
     },
     {
       "id": "REL03",
@@ -324,7 +324,7 @@
       "method": "native tool receipts",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Existing Site project appgprj_6acba85192e08191acdf7011928848cf and hostname https://netelegram.iryadom.chatgpt.site are distinct from app Git remote. Current Site source commit b7eebc65a3aaa7db4a83e81eb764ad5da6df703d was pushed through the official Sites helper. No NeAntik project was changed."
+      "evidence": "Existing Site project appgprj_6acba85192e08191acdf7011928848cf and hostname https://netelegram.iryadom.chatgpt.site remain separate from the app repository and NeAntik. Source commit 10dc13e45141386a3dc674d570f43d58a9aa2b4c was pushed through the official Sites helper; no duplicate Site was created."
     },
     {
       "id": "SITE02",
@@ -333,7 +333,7 @@
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Site v46 deployment appgdep_6acd34e7942c81919f11dba75f542612 succeeded; get_site confirms the existing Site remains public. Anonymous Playwright fetch returned HTTP 200 for home, features, downloads, changelog, devlog, roadmap, privacy, source, both appcasts and site.css; appcasts served text/xml."
+      "evidence": "Site v57 deployment appgdep_6acd6f63659481918246fef77420445e succeeded; sites_get_site confirms public access. Anonymous HTTPS returned 200 text/html for all 8 routes and 200 text/xml for both appcasts; both feeds parse as XML."
     },
     {
       "id": "SITE03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v55 is live and reports exact app source 50e408d, local 66/66, passing macOS CI and successful pinned TDLib/Dev.app workflow 38315606030 with development artifact 11777601028. The page correctly offers no app download because the artifact is ad-hoc, no real Telegram login was performed, and Developer ID/notarization are absent."
+      "evidence": "Site v57 reports code commit 5643711ab4fca7372f8be50bce7d67a127d40027, 69/69 tests, exact CI/native run IDs and development artifact 11779476633; downloads correctly offer no app binary because the artifact is ad-hoc and no real-account, Developer ID/notarization, compatibility or stable-release gates have passed."
     },
     {
       "id": "SITE04",
@@ -351,7 +351,7 @@
       "method": "local build+browser",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v55 source 89b7926c4536b3df07718f29415f244f74e08be6 is pushed and saved as version 55; deployment appgdep_6acd60bf92dc8191b9cdc11a3a3bbfc6 succeeded. Anonymous HTTPS checks returned 200 text/html for all eight routes and 200 text/xml for both RSS feeds; both feeds parse as XML. Local HTML/link validation found 8 HTML pages and no broken internal href/src targets."
+      "evidence": "Site source 10dc13e45141386a3dc674d570f43d58a9aa2b4c was saved as v57 and deployment appgdep_6acd6f63659481918246fef77420445e succeeded. Anonymous live checks: all 8 HTML routes returned 200 text/html, both alpha/stable XML feeds returned 200 text/xml and parse, devlog contains exact code/artifact IDs, download page has no ZIP/DMG CTA."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public Site project appgprj_6acba85192e08191acdf7011928848cf remains separate from app GitHub repo. Version 55 uses Site source commit 89b7926c4536b3df07718f29415f244f74e08be6 and deployment appgdep_6acd60bf92dc8191b9cdc11a3a3bbfc6; the app download page remains a truthful development status with no binary CTA."
+      "evidence": "Public Site project appgprj_6acba85192e08191acdf7011928848cf version 57, source 10dc13e45141386a3dc674d570f43d58a9aa2b4c, deployment appgdep_6acd6f63659481918246fef77420445e; current devlog points to code commit 5643711ab4fca7372f8be50bce7d67a127d40027 and artifact 11779476633. Site archive SHA-256 8255c2837fece350b5e6fda16c7251cb21963c68d6a1d2e61c7e60aa96296e23; no app download is offered."
     },
     {
       "id": "OPS01",
@@ -383,46 +383,46 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "50e408d0e27410a0cc3abc1c874e0c90fba22e1e",
+    "source_commit": "5643711ab4fca7372f8be50bce7d67a127d40027",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-swiftpm",
-    "local_result": "66/66 Swift Testing tests passed on code commit 760c29e, which is included in public source commit 50e408d. CI and native artifact are for exact 50e408d.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38315606043 ; https://github.com/AffPapa/NeTelegram/actions/runs/38315606030",
-    "hosted_result": "macOS CI and pinned TDLib/Dev.app workflows both passed for exact source 50e408d. Native workflow verified arm64, macOS 14 minimum, strict ad-hoc codesign, first-run launch/screenshot and clean quit. No login because the CI Keychain did not contain the app API hash.",
+    "local_result": "69/69 Swift Testing tests passed on exact app code commit 5643711ab4fca7372f8be50bce7d67a127d40027; checkout clean before docs mirror.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38320651016 ; https://github.com/AffPapa/NeTelegram/actions/runs/38320651012",
+    "hosted_result": "Both exact-source runs passed. macOS CI ran Swift tests and JSON validation. Native job on macOS 15.7.9 arm64 / Xcode 16.4 / Swift 6.1.2 built pinned TDLib and Dev.app, verified arm64/minimum macOS 14/ad-hoc signing, launched clean first run, captured screenshot and verified process quit. No Telegram login was performed.",
     "artifact": {
-      "id": "11777601028",
-      "name": "NeTelegram-Dev-50e408d0e27410a0cc3abc1c874e0c90fba22e1e-arm64",
-      "size_in_bytes": 12231133,
-      "archive_sha256": "sha256:194a956fffae5c335bf8f35fede952503cdd9e9e96ec75e86d50431eb7236ac2",
-      "expires_at": "2026-10-19T22:30:06Z",
-      "git_head": "50e408d0e27410a0cc3abc1c874e0c90fba22e1e",
-      "source_fingerprint_sha256": "d8631d76d0c94d63580e2bc7db8e1fbf9682b7cea28f680910ef4093ffaa6181",
+      "id": 11779476633,
+      "name": "NeTelegram-Dev-5643711ab4fca7372f8be50bce7d67a127d40027-arm64",
+      "size_in_bytes": 12236441,
+      "archive_sha256": "sha256:9ce7bf76ccbb3111f8d22e2163ab8c6ab4ecdb59c2c48a9cfb733ab1fee451ce",
+      "expires_at": "2026-10-19T23:32:22Z",
+      "git_head": "5643711ab4fca7372f8be50bce7d67a127d40027",
       "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
       "architecture": "arm64",
       "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "app_executable_sha256": "412cbabdda2e78d43913ca2c0c4d0e37b5f2d81e0c29cd8d5e8f3cf4814a5840",
-      "tdjson_sha256": "1363c6287da6eb86823d01cad0155e56cfab8fa2d2ab669492f61322f01991d7",
-      "screenshot_sha256": "6bf13ebf9e063ca98f1ef52b5661c99d9866a661c919e7d3671859e767e69d5a",
-      "local_download_verification": "GitHub gh CLI download completed through existing macOS Keychain credential. BuildInfo/source fingerprint and both binary SHA-256 values match manifest; codesign and arm64/minimum-OS checks pass. Screenshot visually inspected; app not launched locally."
+      "signing": "ad-hoc development only",
+      "local_download_verification": "Not downloaded to the local machine. GitHub Actions artifact metadata and upload digest are recorded; CI job logs show the Dev.app launch, screenshot, signature checks and clean quit."
     },
-    "site": "Public Site v55 at https://netelegram.iryadom.chatgpt.site, source 89b7926c4536b3df07718f29415f244f74e08be6, deployment appgdep_6acd60bf92dc8191b9cdc11a3a3bbfc6. Archive SHA-256 0fa0bfc715af52e512b66dd2ccad73c3095515f618cb9a1dc5dd3b8d6f02e561; saved archive content hash sha256:f5577194441d8309f9e6486f193e4c7992b3e229eb55e3bccf1e9416072a96a9. Public pages/feeds returned expected HTTP 200 and MIME/XML. No app download.",
-    "scope": "No real Telegram login/read/send/logout, real 20-account lifecycle/resource matrix, physical sleep/wake/network flaps, full accessibility, Developer ID/notarization, quarantine install, updater smoke, or real-data migration. API hash missing from isolated CI Keychain; login was not attempted.",
-    "publication": "App source is 50e408d; app-repo docs mirror pending one docs-only push. Separate Site source commit 89b7926 was pushed through official Site helper; version 55 saved and public deployment succeeded. No GitHub PAT or ZCode settings were used.",
-    "next_action": "Continue native implementation from app source 50e408d. Real Telegram login/read/send and 20-account certification remain unverified; do not advertise Dev artifact 11777601028 as a release.",
-    "tested_app_code_commit": "50e408d0e27410a0cc3abc1c874e0c90fba22e1e",
-    "documented_source_commit": "50e408d0e27410a0cc3abc1c874e0c90fba22e1e"
+    "site": "Public Site v57 at https://netelegram.iryadom.chatgpt.site; source 10dc13e45141386a3dc674d570f43d58a9aa2b4c; deployment appgdep_6acd6f63659481918246fef77420445e; archive SHA-256 8255c2837fece350b5e6fda16c7251cb21963c68d6a1d2e61c7e60aa96296e23. Anonymous public checks passed for eight HTML routes, two valid XML feeds, factual devlog, and no empty app download links.",
+    "scope": "No real Telegram login/read/send/logout (user deferred login), no 20-authorized-account lifecycle/resource matrix, no sleep/wake soak, full accessibility review, Developer ID/notarization, quarantine install, updater smoke, or real-data migration. API title and sponsored-video compatibility decisions remain open.",
+    "publication": "App code 5643711ab4fca7372f8be50bce7d67a127d40027 is public on main; factual docs mirror c3225a1 is public on main. Existing public Site only, v57, separate source 10dc13e45141386a3dc674d570f43d58a9aa2b4c. No stable app release or binary download.",
+    "next_action": "Resolve public title and sponsored-video/player scope choices; continue app implementation and real account validation only when user says login is ready. Keep stable release blocked on compatibility, 20-account coverage, Developer ID/notarization and updater.",
+    "tested_app_code_commit": "5643711ab4fca7372f8be50bce7d67a127d40027",
+    "documented_source_commit": "5643711ab4fca7372f8be50bce7d67a127d40027"
   },
   "latest_site_deployment": {
+    "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 55,
-    "source_commit": "89b7926c4536b3df07718f29415f244f74e08be6",
-    "deployment_id": "appgdep_6acd60bf92dc8191b9cdc11a3a3bbfc6",
+    "source_commit": "10dc13e45141386a3dc674d570f43d58a9aa2b4c",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_57399f5142b0819199b207f1eb1fb23b",
+    "version_number": 57,
+    "deployment_id": "appgdep_6acd6f63659481918246fef77420445e",
     "url": "https://netelegram.iryadom.chatgpt.site",
-    "audience": "public",
     "status": "succeeded",
-    "archive_sha256": "0fa0bfc715af52e512b66dd2ccad73c3095515f618cb9a1dc5dd3b8d6f02e561",
-    "archive_storage_hash": "sha256:f5577194441d8309f9e6486f193e4c7992b3e229eb55e3bccf1e9416072a96a9",
+    "audience": "public",
+    "archive_sha256": "8255c2837fece350b5e6fda16c7251cb21963c68d6a1d2e61c7e60aa96296e23",
+    "archive_storage_hash": "sha256:f2e8a18692ef326a1890873a2c86f3b8013ae709c99b19287a140a341602a134",
+    "archive_size_bytes": 122880,
+    "file_count": 12,
     "no_app_download": true,
-    "live_check": "all 8 page routes: HTTP 200 text/html; alpha/stable feeds: HTTP 200 text/xml and valid XML; local links resolved"
+    "live_check": "Anonymous: 8 routes HTTP 200 text/html; alpha/stable feeds HTTP 200 text/xml and valid; devlog exact commit/artifact; no ZIP/DMG CTA."
   }
 }
