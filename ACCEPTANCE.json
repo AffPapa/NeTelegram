@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public app source 50e408d is on AffPapa/NeTelegram; local Swift suite 66/66 and macOS CI 38315606043 passed. Pinned TDLib/Dev.app run 38315606030 passed and uploaded exact-source arm64 Dev.app artifact 11777601028 (ad-hoc development signature only). The first-run smoke had no API hash in CI Keychain, so login was not performed. Site v54 remains live until the prepared factual v55 content is published. Real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
+  "status": "implementation_in_progress; public app source 50e408d is on AffPapa/NeTelegram; local Swift suite 66/66 and macOS CI 38315606043 passed. Pinned TDLib/Dev.app run 38315606030 passed and uploaded exact-source arm64 Dev.app artifact 11777601028 (ad-hoc development signature only). The first-run smoke had no API hash in CI Keychain, so login was not performed. Public Site v55 is live with factual development status and no app download. Real-account/all-20, Telegram compatibility, Developer ID/notarization, updater, and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
