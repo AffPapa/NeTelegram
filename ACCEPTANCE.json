@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; exact notification topic navigation is implemented and synthetic-tested; real-account, 20-runtime, compatibility, signing and release acceptance remain open",
+  "status": "implementation_in_progress; exact notification topic history requests pass synthetic tests and Site v47 records the milestone; real-account, 20-runtime, compatibility, signing and release acceptance remain open",
   "cases": [
     {
       "id": "APP01",
@@ -386,18 +386,18 @@
     "source_commit": "5e24ba7396f69216792c93789e3d5627fd8585ae",
     "local_command": "swift test; git diff --check",
     "local_result": "50/50 Swift Testing tests passed on Xcode 27.0 (27A5228h), Swift 6.4, arm64e; test target macOS 14. AppKit target compiled as part of swift test. The new conversationHistoryRequestsPreserveEveryTypedTopic test verifies request type and identifiers for five TDLib topic variants. git diff --check passed.",
-    "hosted_ci": null,
-    "hosted_result": "No hosted CI result has been confirmed for source commit 5e24ba7396f69216792c93789e3d5627fd8585ae at this checkpoint.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38298878351",
+    "hosted_result": "Pinned TDLib app bundle workflow run 38298878351 is in_progress for code commit 5e24ba7396f69216792c93789e3d5627fd8585ae. Separate macOS CI run 38298878365 was cancelled; no hosted PASS is claimed.",
     "artifact": null,
-    "site": "Public Site v46 source b7eebc65a3aaa7db4a83e81eb764ad5da6df703d; deployment appgdep_6acd34e7942c81919f11dba75f542612 succeeded. Anonymous Playwright verified all 8 HTML routes, both XML feeds and stylesheet (HTTP 200; feed MIME text/xml), plus current provenance and honest no-download state.",
+    "site": "Public Site v47 source 17eddccde7ec5d9088367572d71056df90703fda; deployment appgdep_6acd37a1827c8191a383073a1aeb5555 succeeded. Anonymous HTTPS GET of /devlog/ returned 200 text/html and contained the 5e24ba7 milestone.",
     "scope": "Synthetic history-request tests only. No live Notification Center, Telegram login, real notification click, real read/send/logout, 20-account runtime/resource matrix, physical sleep/wake, accessibility certification, Developer ID/notarization, quarantined installation, updater smoke, or all-active lifecycle proof."
   },
   "latest_site_deployment": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 46,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_4932c7fc322c8191914f6e0ccb831c7e",
-    "source_commit": "b7eebc65a3aaa7db4a83e81eb764ad5da6df703d",
-    "deployment_id": "appgdep_6acd34e7942c81919f11dba75f542612",
+    "version": 47,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_35ce5d473b088191816b0f57a6a7982d",
+    "source_commit": "17eddccde7ec5d9088367572d71056df90703fda",
+    "deployment_id": "appgdep_6acd37a1827c8191a383073a1aeb5555",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
     "status": "succeeded",
