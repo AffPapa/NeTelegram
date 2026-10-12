@@ -47,13 +47,13 @@ jobs:
           test "$(uname -m)" = arm64
 
       - name: Build and verify pinned TDLib
-        run: Scripts/build-tdlib.sh
+        run: bash Scripts/build-tdlib.sh
 
       - name: Assemble and verify isolated Dev.app
         env:
           NETELEGRAM_SUPPORT_ROOT: ${{ runner.temp }}/netelegram-ci-support
         run: |
-          Scripts/dev-app.sh
+          bash Scripts/dev-app.sh
           APP=/private/tmp/NeTelegram-Dev.app
           test -x "$APP/Contents/MacOS/NeTelegram"
           test -f "$APP/Contents/Frameworks/libtdjson.dylib"
