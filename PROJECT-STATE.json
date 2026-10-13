@@ -12,7 +12,7 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "fa021866d59db2f797fea5c49eab7f4798c95f2c",
+    "commit": "cd1fbe457ad8c14884bd781b84ef2ac007b88909",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
@@ -52,11 +52,11 @@
     },
     "repo_head_policy": "On resume, git rev-parse HEAD and origin/main are authoritative. App source SHA and documentation/workflow checkpoint HEAD are recorded separately; a later metadata-only checkpoint may advance HEAD without changing app source. Site source, saved version and deployment are separate.",
     "latest_checkpoint_ci": {
-      "run_id": 38454869806,
+      "run_id": 38457141078,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38454869806",
-      "checkpoint_commit": "55dd12b5bbcfab871df3473dba0d9e5a03b51814",
-      "note": "Dedicated metadata-only workflow passed all configured JSON checks."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38457141078",
+      "checkpoint_commit": "cd1fbe457ad8c14884bd781b84ef2ac007b88909",
+      "note": "Dedicated metadata-only workflow passed all configured JSON checks for the verified fast-CI checkpoint."
     }
   },
   "local_development_candidate": {

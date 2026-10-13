@@ -321,3 +321,8 @@
 - Workflow/checkpoint commit `fa021866d59db2f797fea5c49eab7f4798c95f2c` passed macOS CI [38456932580](https://github.com/AffPapa/NeTelegram/actions/runs/38456932580) for app-source `55dd12b5bbcfab871df3473dba0d9e5a03b51814`. `swift test --no-parallel --verbose` reported all 151 tests passed in 0.486 seconds after build; the complete hosted job took about 59 seconds.
 - This confirms the verbose command and serial suite. It does not retroactively turn prior cancelled run 38454870102 into a pass; that run stalled before visible test output. The new log boundary makes future runner-startup stalls diagnosable, and the five-minute limit bounds that wait.
 - Exact app-source local suite remains 151/151 (5.33-second build, 0.207-second test execution); exact-source native TDLib/Dev.app smoke 38454870134 and metadata validation 38454869806 passed. No Site, app release, or Telegram account state changed.
+
+
+### 2026-10-14 — validate the updated project checkpoint
+
+- Metadata-only validation [38457141078](https://github.com/AffPapa/NeTelegram/actions/runs/38457141078) passed for checkpoint commit `cd1fbe457ad8c14884bd781b84ef2ac007b88909`. It does not rerun the Swift suite; exact-source Swift PASS remains run 38456932580.
