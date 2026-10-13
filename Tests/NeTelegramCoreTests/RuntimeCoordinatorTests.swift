@@ -13,6 +13,21 @@ import Testing
     #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: now.addingTimeInterval(1), now: now))
 }
 
+@Test func phoneNumberInputRejectsAmbiguousAndMalformedNumbersWithoutSilentMutation() {
+    #expect(PhoneNumberInputPolicy.validate("(555) 123-4567", selectedCallingCode: "1") == .accepted("+15551234567"))
+    #expect(PhoneNumberInputPolicy.validate("+44 20 7183 8750", selectedCallingCode: "1") == .accepted("+442071838750"))
+    #expect(PhoneNumberInputPolicy.validate("٢٣٤٥٦٧٨٩", selectedCallingCode: "1") == .accepted("+123456789"))
+    #expect(PhoneNumberInputPolicy.validate("12a345", selectedCallingCode: "1") == .invalidCharacters)
+    #expect(PhoneNumberInputPolicy.validate("+1+5551234", selectedCallingCode: "1") == .invalidCharacters)
+    #expect(PhoneNumberInputPolicy.validate("1 (555) 123-4567", selectedCallingCode: "1") == .repeatedCountryCode)
+    #expect(PhoneNumberInputPolicy.validate("+1234", selectedCallingCode: "1") == .accepted("+1234"))
+    #expect(PhoneNumberInputPolicy.validate("+123456789012345", selectedCallingCode: "1") == .accepted("+123456789012345"))
+    #expect(PhoneNumberInputPolicy.validate("+123", selectedCallingCode: "1") == .invalidLength)
+    #expect(PhoneNumberInputPolicy.validate("+1234567890123456", selectedCallingCode: "1") == .invalidLength)
+    #expect(PhoneNumberInputPolicy.validate("   ", selectedCallingCode: "1") == .empty)
+    #expect(PhoneNumberInputPolicy.validate("5551234", selectedCallingCode: "US") == .invalidCountryCode)
+}
+
 @Test func sponsoredChannelPlacementsRespectServerIntervalAndKeepAlbumsWhole() {
     let spaced = SponsoredMessagesPolicy.placements(
         cardCount: 5,

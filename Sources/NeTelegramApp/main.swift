@@ -876,20 +876,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func validatedPhoneNumber() -> String? {
-        let rawPhone = phoneField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !rawPhone.isEmpty else { setStatus("Введите номер телефона."); return nil }
-        let digits = rawPhone.compactMap { character in character.wholeNumberValue.map(String.init) }.joined()
-        let explicitlyInternational = rawPhone.hasPrefix("+")
-        let normalizedDigitCount = explicitlyInternational ? digits.count : selectedCallingCode.count + digits.count
-        guard (4...15).contains(normalizedDigitCount) else {
-            setStatus("Введите номер с кодом страны: от 4 до 15 цифр.")
+        let result = PhoneNumberInputPolicy.validate(phoneField.stringValue, selectedCallingCode: selectedCallingCode)
+        guard case let .accepted(number) = result else {
+            switch result {
+            case .empty:
+                setStatus("Введите номер телефона.")
+            case .invalidCharacters:
+                setStatus("Проверьте номер: используйте цифры и разделители, без букв или второго знака +.")
+            case .invalidCountryCode:
+                setStatus("Не удалось определить код выбранной страны. Выберите страну или введите номер с +.")
+            case .repeatedCountryCode:
+                setStatus("Код страны уже выбран. Введите национальную часть или начните полный международный номер с +.")
+            case .invalidLength:
+                setStatus("Введите номер с кодом страны: от 4 до 15 цифр.")
+            case .accepted:
+                break
+            }
             return nil
         }
+        let explicitlyInternational = phoneField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("+")
         guard explicitlyInternational || !phoneCountries.isEmpty else {
             setStatus("Загружается список стран. Можно также ввести номер полностью, начиная с +.")
             return nil
         }
-        return explicitlyInternational ? "+\(digits)" : "+\(selectedCallingCode)\(digits)"
+        return number
     }
 
     private func beginFirstAccount() {
