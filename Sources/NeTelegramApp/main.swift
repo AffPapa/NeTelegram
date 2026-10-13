@@ -5888,6 +5888,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     @objc private func closeWindow() { window.performClose(nil) }
     @objc private func lock() {
         guard !lockState else { return }
+        // Establish the lock transition before any presentation cleanup or
+        // draft I/O. dispatch* holds the same barrier through td_send, so a
+        // queued user command is either already accepted before this point or
+        // rejected after it; it cannot slip through while drafts are flushed.
+        privacyDispatchBarrier.setLocked(true)
+        lockState = true
         stopTypingAction()
         visibleReadReceiptTask?.cancel()
         visibleReadReceiptTask = nil
@@ -5938,8 +5944,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             presentationDrafts: &draftsByConversation,
             dirtyAccounts: dirtyDraftAccounts
         )
-        lockState = true
-        privacyDispatchBarrier.setLocked(true)
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
         // The lock clears any already-published preview. Reconcile the active
