@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "App-source 2cd13c2 improves sign-in disclosure readability. Exact-source local and hosted Swift suites passed 151/151; metadata validation passed. Public Site v152 is live with factual devlog and no download assets. Real-account/all-20 coverage, signing/notarization, updater and Telegram compatibility gates remain open.",
+  "phase": "First-run country selection slice implemented: bundled region/calling-code catalog, locale suggestion without implicit +1, and international-number entry without selecting a country. Exact-source local serial suite passed 152/152; source/metadata push and hosted CI are pending. Public Site v152 still reflects the previous milestone. Real-account/all-20 coverage, signing/notarization, updater and Telegram compatibility gates remain open.",
   "verified_at": "2026-10-14T03:16:00+0700",
   "product": {
     "public_name": "NeTelegram",
@@ -154,7 +154,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Push this checkpoint-only correction, then rely on its metadata workflow; do not rerun app tests or rebuild Dev.app. Next P0 candidate is first-run country selection without phantom profile/runtime creation or guessed locale codes; retain explicit international-number fallback until a safe country-data source is established.",
+  "next_action": "Commit and push the tested country-picker candidate once; inspect its exact-source Swift and metadata CI results. GUI smoke is not current because the old canonical Dev.app process did not close with Cmd+Q; do not replace its running bundle. If native UI verification is needed, close it through the app UI first, then build the canonical bundle once. Next independent P0 is real single-account auth/read/send/close, pending the user's own login; do not inspect or import other Telegram app data.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -163,9 +163,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
-    "app_source_commit_authority": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
-    "app_source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb"
+    "repo_head_before_checkpoint": "549c55a24a0f756050e4a21446a74050d86be217",
+    "app_source_commit_authority": "pending commit for the country-picker slice",
+    "app_source_commit": "pending commit for the country-picker slice"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",

@@ -31,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var accountPickerAccounts: [AccountUUID] = []
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
+    private var countryPickerRegionCodes: [String?] = []
     private var phoneField: NSTextField!
     private var emailField: NSTextField!
     private var firstNameField: NSTextField!
@@ -78,7 +79,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var removeUnverifiedProfileMenuItem: NSMenuItem?
     private var profileRestoreGenerationGate = ProfileRestoreGenerationGate()
     private var phoneCountries: [PhoneCountry] = []
-    private var selectedCallingCode = "1"
+    private var selectedCallingCode = ""
+    private var selectedCountryRegionCode: String?
     private var showingQR = false
     private var authRequestInFlight = false
     private var pendingAuthRequestsByExtra: [String: (account: AccountUUID, step: String)] = [:]
@@ -212,6 +214,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         NSApp.setActivationPolicy(.regular)
         buildMainMenu()
         buildWindow()
+        loadBundledPhoneCountries()
         buildStatusItem()
         startConnectionObservers()
         NSApp.activate(ignoringOtherApps: true)
@@ -344,6 +347,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         countryPicker.target = self
         countryPicker.action = #selector(selectCountry)
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
+        countryPicker.setAccessibilityHelp("Регион macOS предлагается автоматически, когда он известен. Выбранную страну можно изменить; полный номер с + принимается отдельно.")
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -2743,22 +2747,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
         } else if let type = object["@type"] as? String, type == "countries",
                   let countries = object["countries"] as? [[String: Any]], target === runtime {
-            phoneCountries = countries.compactMap(PhoneCountry.init(json:)).filter { !$0.callingCodes.isEmpty }.sorted {
+            let selectedRegion = selectedCountryRegionCode
+            phoneCountries = countries.compactMap(PhoneCountry.init(json:)).filter {
+                !$0.callingCodes.isEmpty && !$0.isHidden
+            }.sorted {
                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
             }
             phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
-            countryPicker.removeAllItems()
-            for country in phoneCountries {
-                countryPicker.addItem(withTitle: "\(country.flag)  \(country.name)  +\(country.callingCodes[0])")
-            }
-            let preferredRegion = Locale.current.region?.identifier
-            let index = phoneCountries.firstIndex(where: { $0.code == preferredRegion })
-                ?? phoneCountries.firstIndex(where: { $0.code == "US" })
-                ?? phoneCountries.indices.first
-            if let index {
-                countryPicker.selectItem(at: index)
-                selectedCallingCode = phoneCountries[index].callingCodes[0]
-            }
+            populateCountryPicker(preferredRegion: selectedRegion ?? Locale.current.region?.identifier)
             countryPicker.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
             if target === runtime && pendingAuthorizationType == "authorizationStateWaitPhoneNumber" {
                 statusLabel.stringValue = phoneCountries.isEmpty
@@ -6328,8 +6324,50 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     @objc private func selectCountry() {
         let index = countryPicker.indexOfSelectedItem
-        guard phoneCountries.indices.contains(index) else { return }
-        selectedCallingCode = phoneCountries[index].callingCodes[0]
+        guard countryPickerRegionCodes.indices.contains(index) else { return }
+        guard let regionCode = countryPickerRegionCodes[index],
+              let country = phoneCountries.first(where: { $0.code == regionCode }) else {
+            selectedCallingCode = ""
+            selectedCountryRegionCode = nil
+            return
+        }
+        selectedCallingCode = country.callingCodes[0]
+        selectedCountryRegionCode = country.code
+    }
+
+    private func loadBundledPhoneCountries() {
+        phoneCountries = CountryCallingCodeCatalog.entries.map { entry in
+            let name = Locale.current.localizedString(forRegionCode: entry.regionCode) ?? entry.regionCode
+            return PhoneCountry(
+                code: entry.regionCode,
+                name: name,
+                flag: PhoneCountry.flagEmoji(for: entry.regionCode),
+                callingCodes: [entry.callingCode]
+            )
+        }.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        selectedCountryRegionCode = Locale.current.region?.identifier
+        phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
+        populateCountryPicker(preferredRegion: selectedCountryRegionCode)
+    }
+
+    private func populateCountryPicker(preferredRegion: String?) {
+        countryPicker.removeAllItems()
+        countryPicker.addItem(withTitle: "Выберите страну…")
+        countryPickerRegionCodes = [nil]
+        for country in phoneCountries {
+            countryPicker.addItem(withTitle: "\(country.flag)  \(country.name)  +\(country.callingCodes[0])")
+            countryPickerRegionCodes.append(country.code)
+        }
+        if let preferredRegion,
+           let index = phoneCountries.firstIndex(where: { $0.code == preferredRegion }) {
+            countryPicker.selectItem(at: index + 1)
+            selectedCountryRegionCode = preferredRegion
+            selectedCallingCode = phoneCountries[index].callingCodes[0]
+        } else {
+            countryPicker.selectItem(at: 0)
+            selectedCountryRegionCode = nil
+            selectedCallingCode = ""
+        }
     }
 
     @objc private func beginQRLogin() {
@@ -6623,6 +6661,15 @@ private struct PhoneCountry {
     let name: String
     let flag: String
     let callingCodes: [String]
+    let isHidden: Bool
+
+    init(code: String, name: String, flag: String, callingCodes: [String], isHidden: Bool = false) {
+        self.code = code
+        self.name = name
+        self.flag = flag
+        self.callingCodes = callingCodes
+        self.isHidden = isHidden
+    }
 
     init?(json: [String: Any]) {
         guard let code = json["country_code"] as? String,
@@ -6630,8 +6677,20 @@ private struct PhoneCountry {
               let callingCodes = json["calling_codes"] as? [String] else { return nil }
         self.code = code
         self.name = name
-        self.flag = json["flag_emoji"] as? String ?? "🌐"
+        self.flag = Self.flagEmoji(for: code)
         self.callingCodes = callingCodes
+        self.isHidden = json["is_hidden"] as? Bool ?? false
+    }
+
+    static func flagEmoji(for regionCode: String) -> String {
+        let scalars = regionCode.uppercased().unicodeScalars
+        guard scalars.count == 2,
+              scalars.allSatisfy({ (65...90).contains(Int($0.value)) }),
+              let first = UnicodeScalar(0x1F1E6 + scalars[scalars.startIndex].value - 65),
+              let second = UnicodeScalar(0x1F1E6 + scalars[scalars.index(after: scalars.startIndex)].value - 65) else {
+            return "🌐"
+        }
+        return String(String.UnicodeScalarView([first, second]))
     }
 }
 

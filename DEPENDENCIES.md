@@ -8,6 +8,7 @@ declares no third-party Swift package dependencies.
 |---|---|---|---|
 | TDLib | `tdlib/td` commit `c15d3f5a5de6e3ba5839822c451152e5e18bb700`, 1.8.68 | BSL-1.0 | Bundled as `Contents/Frameworks/libtdjson.dylib` in the Dev.app; tested dynamic dependencies are zlib, libc++, and macOS system libraries |
 | OpenSSL | `openssl/openssl` commit `d3c1b1169b3569ff3069e5b399f47b2b28e03d79`, 3.6.4 | Apache-2.0 | Built static for macOS 14 and linked into TDLib; its code is included in the TDLib binary |
+| Country calling-code list | `google/libphonenumber` v9.0.41 commit `b68df884d42d5e9860fc1956a99ce6afae361100`; source file hash in `COUNTRY-DATA.lock.json` | Apache-2.0 | Generated region/calling-code pairs for first-run sign-in only; localized names come from macOS Locale; TDLib server list replaces it after account runtime starts |
 | SQLCipher contributions | TDLib-pinned SQLite amalgamation | BSD terms | Included inside TDLib; license text retained in `ThirdPartyLicenses/SQLCipher-BSD.txt` |
 | SQLite core | TDLib-pinned amalgamation | Public domain | Included inside TDLib |
 | zlib | macOS SDK | zlib | System dynamic library; `otool -L libtdjson.dylib` reports `/usr/lib/libz.1.dylib`, not a bundled copy |

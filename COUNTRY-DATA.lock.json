@@ -1,0 +1,14 @@
+{
+  "name": "Google libphonenumber country calling-code data",
+  "upstream": "https://github.com/google/libphonenumber",
+  "version": "v9.0.41",
+  "ref": "b68df884d42d5e9860fc1956a99ce6afae361100",
+  "source_path": "resources/PhoneNumberMetadata.xml",
+  "source_sha256": "9d3b07b53c7e8a437ddc316249620b51d4090987026f9e8ffb9743aab4e4d5a6",
+  "generated_file": "Sources/NeTelegramCore/CountryCallingCodeCatalog.swift",
+  "generator": "Scripts/generate-country-catalog.py",
+  "license": "Apache-2.0",
+  "license_path": "ThirdPartyLicenses/google-libphonenumber-LICENSE.txt",
+  "license_sha256": "a6cba85bc92e0cff7a450b1d873c0eaa2e9fc96bf472df0247a26bec77bf3ff9",
+  "scope": "Region/calling-code pairs only; displayed region names come from the user's macOS Locale. TDLib server country data replaces this list once a profile runtime is available."
+}

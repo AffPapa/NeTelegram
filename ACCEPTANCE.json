@@ -475,18 +475,27 @@
       "required_for": "all releases",
       "status": "partial",
       "evidence": "App source d57d569 adds an explicit “Удалить незавершённый вход…” action, durable unverified-removal marker, identity-association guard, restore exclusion, and retryable Keychain/file/catalogue cleanup after authorizationStateClosed and route removal. Local serial suite passed 134/134, including verified-identity rejection, no-restore while pending, retry after file failure, and retaining files when key deletion fails. Native menu journey and actual TDLib close remain unverified pending exact-SHA Dev.app smoke; no real login or confirmed account was used."
+    },
+    {
+      "id": "AUTH05",
+      "name": "Страна на первом экране входа",
+      "expected": "На пустом каталоге доступен локальный список стран и кодов; регион macOS только предлагает выбор, невыбранная страна не превращается в +1; полный номер с + принимается. Профиль и TDLib runtime возникают только после явного продолжения или QR.",
+      "method": "AppKit empty-catalogue UI + deterministic catalog/phone tests",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "Implemented in the current uncommitted source candidate: 245 region/calling-code pairs are generated from Google libphonenumber v9.0.41 pinned by commit and SHA in COUNTRY-DATA.lock.json; Apache-2.0 notice retained. Before any account/runtime exists, the sign-in UI shows a bundled country list with macOS locale only as a suggestion; it no longer assumes +1. Full international numbers beginning with + validate without a country selection; national numbers require an explicit country. Empty catalogue still creates no profile/runtime until Continue or QR. Generator reproduced the checked-in Swift table byte-for-byte; data/license hashes and JSON checks passed; git diff --check passed. Local serial Swift suite passed 152/152 on Xcode 27.0 / Swift 6.4. Native GUI smoke of this new bundle, server-country reconciliation, real login and profile creation remain unverified; old Dev.app stayed running and was not overwritten. Hosted exact-source and metadata CI pending push."
     }
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
-    "app_source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
-    "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-auth-ui-support scripts/dev-app.sh --launch; swift test --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-swiftpm-cache --no-parallel",
-    "local_result": "Canonical AppKit arm64 Dev.app built and sign-in screen checked; serial suite passed 151/151 (5.30s test build, 0.203s tests) on Xcode 27.0 / Swift 6.4.",
-    "hosted_ci": "Run 38461168203 passed 151/151 tests for app source 2cd13c2 (workflow checkpoint 0c8ee83). Metadata run 38462120071 reported success for checkpoint f99ce19. These are distinct gates; GitHub API was unreachable on this resume, so no fresh remote query is claimed.",
-    "native_dev_app_smoke": "Accountless current-source sign-in UI screenshot /private/tmp/netelegram-auth-ui.png SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c; text visible and not clipped. No real login or lifecycle rerun.",
-    "scope": "App change was limited to sign-in disclosure font/color. This resume corrected stale checkpoint pointers only; no Swift suite, app bundle or Site deployment was repeated. No account/profile/session data accessed; no app release.",
-    "checkpoint_commit": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a"
+    "source_commit": "pending commit for country-picker slice",
+    "app_source_commit": "pending commit for country-picker slice",
+    "local_command": "python3 Scripts/generate-country-catalog.py /private/tmp/netelegram-PhoneNumberMetadata-v9.0.41.xml /private/tmp/netelegram-generated-country-catalog.swift; cmp Sources/NeTelegramCore/CountryCallingCodeCatalog.swift /private/tmp/netelegram-generated-country-catalog.swift; python3 -m json.tool COUNTRY-DATA.lock.json; git diff --check; swift test --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-swiftpm-cache --no-parallel",
+    "local_result": "Country catalog was reproduced byte-for-byte; locked upstream and license SHA-256 checks passed; JSON and git diff checks passed. Local serial Swift suite passed 152/152 on Xcode 27.0 / Swift 6.4 (4.88s build; 0.200s test execution).",
+    "hosted_ci": "Pending the single push of this candidate. GitHub CLI credentials currently report invalid; Git transport credential helper is the previously successful route. Query exact-source macOS CI and metadata workflow after push; do not rerun local suite absent source changes.",
+    "native_dev_app_smoke": "Not run for this candidate: the older canonical Dev.app remained running after a graceful Cmd+Q attempt; the launcher correctly refuses replacement. No account or credentials were entered. Prior screenshot does not prove this candidate's UI.",
+    "scope": "Pre-account country selector and phone validation only, with pinned generated data and license. No profile/session data accessed; no app release or Site deployment. Site v152 still reflects earlier milestone.",
+    "checkpoint_commit": "pending commit"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",

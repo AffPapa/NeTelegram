@@ -15,11 +15,10 @@ public enum PhoneNumberInputPolicy {
     public static func validate(_ raw: String, selectedCallingCode: String) -> PhoneNumberInputResult {
         let input = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else { return .empty }
-        guard !selectedCallingCode.isEmpty, selectedCallingCode.allSatisfy({ $0.isASCII && $0.isNumber }) else {
-            return .invalidCountryCode
-        }
-
         let isInternational = input.first == "+"
+        let hasSelectedCallingCode = !selectedCallingCode.isEmpty
+            && selectedCallingCode.allSatisfy({ $0.isASCII && $0.isNumber })
+        guard isInternational || hasSelectedCallingCode else { return .invalidCountryCode }
         let body = isInternational ? String(input.dropFirst()) : input
         var digits = ""
         for character in body {

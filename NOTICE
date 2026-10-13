@@ -8,6 +8,9 @@ for this project. Third-party components retain their separate terms:
   under the Boost Software License 1.0. See ThirdPartyLicenses/TDLib-BSL-1.0.txt.
 * OpenSSL 3.6.4, pinned to d3c1b1169b3569ff3069e5b399f47b2b28e03d79, is licensed
   under Apache License 2.0. See ThirdPartyLicenses/OpenSSL-Apache-2.0.txt.
+* The region/calling-code pairs in CountryCallingCodeCatalog.swift are derived
+  from Google libphonenumber v9.0.41 under Apache License 2.0. See
+  COUNTRY-DATA.lock.json and ThirdPartyLicenses/google-libphonenumber-LICENSE.txt.
 * TDLib's SQLite amalgamation contains SQLCipher contributions by ZETETIC LLC
   under the included BSD terms. See ThirdPartyLicenses/SQLCipher-BSD.txt.
 * SQLite core portions carry the public-domain dedication reproduced in the

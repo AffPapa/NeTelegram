@@ -171,6 +171,18 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("+1234567890123456", selectedCallingCode: "1") == .invalidLength)
     #expect(PhoneNumberInputPolicy.validate("   ", selectedCallingCode: "1") == .empty)
     #expect(PhoneNumberInputPolicy.validate("5551234", selectedCallingCode: "US") == .invalidCountryCode)
+    #expect(PhoneNumberInputPolicy.validate("+66 81 234 5678", selectedCallingCode: "") == .accepted("+66812345678"))
+    #expect(PhoneNumberInputPolicy.validate("0812345678", selectedCallingCode: "") == .invalidCountryCode)
+}
+
+@Test func bundledCountryCallingCodeCatalogIsCompleteAndWellFormed() {
+    let entries = CountryCallingCodeCatalog.entries
+    #expect(entries.count >= 240)
+    #expect(Set(entries.map(\.regionCode)).count == entries.count)
+    #expect(entries.allSatisfy { $0.regionCode.count == 2 && $0.regionCode.allSatisfy(\.isASCII) })
+    #expect(entries.allSatisfy { !$0.callingCode.isEmpty && $0.callingCode.allSatisfy(\.isNumber) })
+    #expect(entries.contains(.init(regionCode: "US", callingCode: "1")))
+    #expect(entries.contains(.init(regionCode: "CA", callingCode: "1")))
 }
 
 @Test func incomingTextEntitiesPreserveUTF16RangesAndResolveOnlySafeLinks() {
