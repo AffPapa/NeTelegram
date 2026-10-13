@@ -2817,9 +2817,11 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     let routed = try #require(TDLibNotificationRouter.route(account: account, groupID: 3, groupChatID: 44, notification: raw))
     let identifier = routed.systemIdentifier
     let locked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: true, chatTitle: "Private chat", isReconciliation: true)
+    let reconciled = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: false, chatTitle: "Alice", isReconciliation: true)
     let unlocked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: false, chatTitle: "Alice")
 
     #expect(locked == TDLibNotificationPresentation(title: ProductIdentity.displayName, body: "Новое сообщение", playsSound: false))
+    #expect(reconciled == TDLibNotificationPresentation(title: "Alice", body: "Sensitive message text", playsSound: false))
     #expect(!locked.title.contains("Private chat"))
     #expect(!locked.body.contains("Sensitive message text"))
     #expect(unlocked == TDLibNotificationPresentation(title: "Alice", body: "Sensitive message text", playsSound: true))

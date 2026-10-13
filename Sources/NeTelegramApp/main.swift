@@ -2836,6 +2836,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         notificationIDsByAccount[target.account] = next
         notificationTargets = notificationTargets.filter { $0.value.account != target.account }
         notificationTargets.merge(routed) { _, new in new }
+        // Re-publish TDLib's current snapshot without replaying sounds. This
+        // repairs missing OS requests after resume/reconciliation; delivery
+        // rechecks the account generation, route membership, and privacy lock.
+        deliverNotifications(routed.values.map { ($0, target) }, isReconciliation: true)
     }
 
     private func configureNotifications(for target: LocalAccountRuntime) {
