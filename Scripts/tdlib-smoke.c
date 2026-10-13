@@ -31,8 +31,17 @@ int main(int argc, char **argv) {
     int sent_close = 0;
     int got_closed = 0;
     for (int attempt = 0; attempt < 25 && !got_closed; attempt++) {
-        char *json = nt_tdlib_receive_copy(1.0);
-        if (json == NULL) continue;
+        char *json = NULL;
+        nt_tdlib_receive_status receive_status = nt_tdlib_receive_copy(1.0, &json);
+        if (receive_status == NT_TDLIB_RECEIVE_ERROR) {
+            fputs("TDLib receive-copy failed during smoke test\n", stderr);
+            return 1;
+        }
+        if (receive_status == NT_TDLIB_RECEIVE_TIMEOUT) continue;
+        if (json == NULL) {
+            fputs("TDLib returned update status without a copied buffer\n", stderr);
+            return 1;
+        }
         int same_client = strstr(json, client_tag) != NULL;
         if (same_client && strstr(json, "\"@extra\":\"netelegram-tdlib-smoke\"") != NULL &&
             strstr(json, "\"@type\":\"optionValueString\"") != NULL &&
