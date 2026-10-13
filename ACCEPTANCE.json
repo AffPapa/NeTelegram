@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; latest source 8274a5a ensures macOS notification authorization is requested once per process, with per-account TDLib options; 122/122 local Swift tests and exact-source CI/native accountless smoke passed. One local Dev.app remains on source 8098e82; no real authorized accounts, release, or download.",
+  "status": "implementation_in_progress; source 8274a5a: once-per-process macOS notification permission gate; 122/122 local tests and exact-source CI/native accountless smoke passed. Public Site v104 live-verified. One local Dev.app remains on 8098e82; real account coverage, signing/notarization, channels and stable release remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -432,8 +432,8 @@
     "local_result": "122/122 Swift tests passed; AppKit target built. Existing canonical Dev.app remains open on 8098e82; it was not replaced or duplicated.",
     "hosted_ci": "Exact-source macOS CI 38370730565 and pinned TDLib/Dev.app workflow 38370730581 succeeded.",
     "scope": "macOS notification permission requested only once per app process; each runtime keeps TDLib notification options. Accountless smoke only; real notification setting changes, alerts/clicks, real login, 20 accounts, performance, signing, notarization and release remain unverified.",
-    "publication": "Prior public Site v103 remains live; this milestone devlog entry is prepared locally and not yet deployed. No app release/download.",
-    "next_action": "Commit and push factual notification milestone/checkpoint; publish once to existing public Site and verify live route."
+    "publication": "Public Site v104 deployed at https://netelegram.iryadom.chatgpt.site; project appgprj_6acba85192e08191acdf7011928848cf; source commit 55c3c039045f6b45f68ea89315afb1aa74019a7d; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_bb45156cac6c8191993a3957acbc3b27; deployment appgdep_6acdef85c1c08191b8c911ec27152556 succeeded; audience public. Anonymous HTTPS GET /devlog/ returned 105440 bytes and included the 8274a5a entry, source link, and accountless limitation. Local archive SHA-256 bd6a9279206bb3fce59e161df7a869fbd656004b72cda2d6173fc1bbd732d8b6; Sites stored normalized SHA-256 dbb9c09b63814f0b88ba5264df4e5e6b219ceb1522f8d2433df0a447e2840e37; 194560 bytes, 12 files. No app release/download.",
+    "next_action": "Continue implementation. Keep accountless smoke separate from real account coverage; do not replace the sole local Dev.app while process 28662 remains open."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",

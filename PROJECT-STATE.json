@@ -12,7 +12,7 @@
     "repository_id": 1415421574,
     "branch": "main",
     "commit": "8274a5ad3344bfdad54e5462e3aec761345a5fbd",
-    "working_tree_clean": false,
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38370730565,
@@ -31,34 +31,35 @@
     "minimum_macos": "14.0",
     "signing": "ad-hoc development signature",
     "distribution_ready": false,
-    "process_state": "One canonical Dev.app process remains open; graceful Quit did not terminate it. Bundle not replaced; no second app launched."
+    "process_state": "PID 28662; sole canonical Dev.app; source 8098e82; still running after graceful Quit request; not replaced or duplicated."
   },
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
       "count": 122,
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/nettelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/nettelegram-swift-cache swift test --scratch-path /private/tmp/nettelegram-spm-test-run"
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache swift test --scratch-path /private/tmp/netelegram-spm-test-run"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38370730581 passed for exact source SHA: arm64 Dev.app built, accountless screenshot captured, graceful quit succeeded in CI."
+    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38370730581 succeeded for exact source 8274a5a: arm64 app built, accountless first-run screenshot, graceful quit.",
+    "current_head_site": "Site v104 public and active; deployment appgdep_6acdef85c1c08191b8c911ec27152556 succeeded. Anonymous GET /devlog/ verified 105440 bytes and expected milestone source/limitation."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 103,
-    "source_commit": "b173aeb03b920fd2b5df805654f16f4a7ae55019",
-    "deployment_id": "appgdep_6acdec9638448191a32e9fe6dac00d74",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_4290ac3d8aa48191b08277009f7f48c9",
+    "latest_version": 104,
+    "source_commit": "55c3c039045f6b45f68ea89315afb1aa74019a7d",
+    "deployment_id": "appgdep_6acdef85c1c08191b8c911ec27152556",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_bb45156cac6c8191993a3957acbc3b27",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "/devlog/ HTTPS GET 200; 104045 bytes; milestone text, source link and no-download statement present",
-    "archive_local_sha256": "1ebfbef5aa680f9e3d805ac34d7c97d762e14df26a622613c9bbcab0b3f11920",
-    "archive_sites_sha256": "9ec0ae165fbdec7379aee69dbea77b3d6251469c062e5a9df092bbc85a7a000f"
+    "public_route_verified": "/devlog/ anonymous HTTPS GET 200; 105440 bytes; milestone, source link and accountless limitation present",
+    "archive_local_sha256": "bd6a9279206bb3fce59e161df7a869fbd656004b72cda2d6173fc1bbd732d8b6",
+    "archive_sites_sha256": "dbb9c09b63814f0b88ba5264df4e5e6b219ceb1522f8d2433df0a447e2840e37"
   },
   "open_gates": [
     "Store the supplied Telegram api_hash in Keychain using the hidden-input helper; the item is currently absent or unreadable.",
@@ -68,6 +69,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Deploy Site devlog entry for source 8274a5a; keep single local 8098e82 Dev.app process, do not replace while it is running; wait for user to use/close before the next local bundle replacement.",
+  "next_action": "Continue implementation and acceptance work; no real account, 20 runtime, Developer ID, notarization, Gatekeeper, updater or download release verified.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
