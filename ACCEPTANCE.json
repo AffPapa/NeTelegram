@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; current app source is 36e73242246e5729d9818a2e76c1d2de2628eb17. Local serial suite 135/135 and exact-SHA GitHub CI plus pinned TDLib/arm64 Dev.app first-run smoke passed. Brand is NeTelegram. No real login or account coverage is claimed. Public Site v115 remains live pending branded v116; no app download.",
+  "status": "implementation_in_progress; app source 36e73242246e5729d9818a2e76c1d2de2628eb17, local serial 135/135, exact-SHA macOS CI and pinned TDLib/Dev.app smoke passed. Product brand NeTelegram is public; API title gate remains open. Site v116 is public and anonymous routes/feed verified. No real login, 20-account coverage, or app release.",
   "current_evidence": {
     "app_source_commit": "36e73242246e5729d9818a2e76c1d2de2628eb17",
     "app_tests": "135/135 serial Swift tests passed on Xcode 27.0 / Swift 6.4 / macOS 27 SDK.",
@@ -13,7 +13,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic fanout tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v115 remains current until v116 deploy. Site title metadata updated to NeTelegram; new bilingual content awaits publication."
+    "site": "Public Site v116, source c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc, deployment appgdep_6ace1e5aa3e48191958f3aaed3b43932; anonymous HTTPS verified /, /features/, /downloads/, /devlog/, /privacy/, /source/ (200 text/html), stable and alpha feeds (200 text/xml, valid empty RSS)."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -460,24 +460,23 @@
     "scope": "Synthetic source/build verification only. No real login, no 20-account runtime coverage, no Developer ID/notarization, and no public app download.",
     "branding": "NeTelegram restored as public product/repository name in app UI, GitHub README, and Site copy. Telegram API Terms §2.3 title condition remains open; the non-affiliation note does not waive it.",
     "seo": "Live search-result wording reviewed for RU/EN alternatives and unofficial macOS Telegram client phrases; volumes/rankings not measured.",
-    "publication": "GitHub source commit pushed successfully. Site v115 is still current; branded bilingual v116 prepared for one source-helper publish/deploy and anonymous verification."
+    "publication": "GitHub source 36e7324 and docs/checkpoint b6baba0 pushed. Public Site v116 saved and deployed from source c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc; anonymous HTTPS verified six HTML routes and both valid empty updater feeds. App downloads remain absent."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 111,
-    "source_commit": "5381871f57bd5c7a1ea95463d19209429e76b001",
-    "deployment_id": "appgdep_6ace098a8e8081918c192f238ce9b8a7",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d08200710ec81918801290488abdcaf",
+    "version": 116,
+    "source_commit": "c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc",
+    "deployment_id": "appgdep_6ace1e5aa3e48191958f3aaed3b43932",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_f9c832ceb6548191aea37fb70fbfe809",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "718061dc258547f1011a807b157a81a52eef80b57ea48d4543c0dbb5b938449d",
-    "sites_archive_content_hash": "sha256:5814834e04f6dc43f8fd69f0208d4c276a56ac71926dd7d76083671f8bc5baf3",
-    "archive_bytes": 450560,
+    "archive_sha256": "37a16ef56d86b9291e56fc5359834de1b51640b9757d8b07c01b61978c154f1f",
+    "sites_archive_content_hash": "sha256:2f1b5bebbc220e1cbd3a923904411b22da1b1ed88af97e550f1cd117e749283e",
+    "archive_bytes": 272546,
     "archive_file_count": 14,
-    "github_mirror_commit": "5381871f57bd5c7a1ea95463d19209429e76b001",
-    "description": "Neridian Development v111 documents secure API hash configuration. No binary or download is offered; actual Keychain persistence and Telegram login remain unverified.",
-    "public_verification": "Anonymous HTTPS returned 200 text/html for /devlog/ and 200 image/png for the exact-source screenshot; hosted PNG SHA-256 matches the CI artifact: cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. Exact app SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 appears in the devlog. /downloads/ still shows NO RELEASE."
+    "description": "NeTelegram bilingual public development pages. The download route clearly says there is no app release; empty alpha/stable RSS feeds remain valid. No binary was uploaded.",
+    "public_verification": "Anonymous HTTPS: /, /features/, /downloads/, /devlog/, /privacy/, /source/ returned 200 text/html with expected titles. Homepage contains RU+EN independent/non-affiliation wording; current brand entry is visible. Stable/alpha feeds returned 200 text/xml and parsed as valid RSS with no items."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
