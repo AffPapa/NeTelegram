@@ -2262,6 +2262,50 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(!ranOnMainThread)
 }
 
+@Test func injectedKeychainReadFailurePropagatesWithoutFallback() async {
+    await #expect(throws: SecretsStoreError.keychain(errSecInteractionNotAllowed)) {
+        try await SecretsStore.performKeychainRead { () throws -> String in
+            throw SecretsStoreError.keychain(errSecInteractionNotAllowed)
+        }
+    }
+}
+
+@Test func stalledKeychainReadDoesNotBlockOtherProfileStartupAttempts() async {
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let keychainEntered = LockedTestValue(false)
+    let completedProfiles = LockedTestValue(0)
+    let releaseKeychain = DispatchSemaphore(value: 0)
+
+    let stalledProfile = Task {
+        try await scheduler.withPermit {
+            try await SecretsStore.performKeychainRead {
+                keychainEntered.set(true)
+                releaseKeychain.wait()
+                return true
+            }
+        }
+    }
+    defer { releaseKeychain.signal() }
+
+    #expect(await waitForTrue(keychainEntered, timeout: .seconds(2)))
+    let otherProfiles = (0..<19).map { _ in
+        Task {
+            await scheduler.withPermit {
+                completedProfiles.mutate { $0 += 1 }
+            }
+        }
+    }
+
+    #expect(await waitForCount(completedProfiles, atLeast: 19, timeout: .seconds(2)))
+    #expect(keychainEntered.get(), "The injected Keychain stall should still be active while other profiles start")
+
+    releaseKeychain.signal()
+    #expect((try? await stalledProfile.value) == true)
+    for profile in otherProfiles { await profile.value }
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func quittingInvalidatesAProfileRestoreThatMayResumeLate() {
     var gate = ProfileRestoreGenerationGate()
     let firstRestore = gate.begin()
