@@ -1,4 +1,5 @@
 import Foundation
+import LocalAuthentication
 import Security
 
 protocol KeychainItemBackend: Sendable {
@@ -10,7 +11,7 @@ protocol KeychainItemBackend: Sendable {
 
 private struct SecurityKeychainItemBackend: KeychainItemBackend {
     func read(account: String, service: String) -> (status: OSStatus, data: Data?) {
-        var query = SecretsStore.itemQuery(account: account, service: service)
+        var query = SecretsStore.keychainReadQuery(account: account, service: service)
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
@@ -43,6 +44,13 @@ public enum SecretsStoreError: Error, Equatable {
 
 /// Keychain access for local project credentials and per-account encryption keys.
 public struct SecretsStore: Sendable {
+    private static let keychainReadQueueKey = DispatchSpecificKey<Bool>()
+    private static let keychainReadQueue: DispatchQueue = {
+        let queue = DispatchQueue(label: "org.affpapa.netelegram.keychain-read", qos: .utility)
+        queue.setSpecific(key: keychainReadQueueKey, value: true)
+        return queue
+    }()
+
     private let backend: any KeychainItemBackend
 
     enum KeyLookupDecision: Equatable {
@@ -60,12 +68,25 @@ public struct SecretsStore: Sendable {
         self.backend = backend
     }
 
-    /// SecItem calls are synchronous and may wait on Keychain services or a
-    /// user-visible access decision. Run them away from AppKit's main actor.
-    public static func performKeychainRead<Value: Sendable>(
+    /// SecItem calls are synchronous and may block while Keychain resolves
+    /// access. Keep that work on a dedicated serial queue, outside both the
+    /// AppKit main thread and Swift's cooperative executor.
+    public static func performKeychainOperation<Value: Sendable>(
         _ operation: @escaping @Sendable () throws -> Value
     ) async throws -> Value {
-        try await Task.detached(priority: .utility, operation: operation).value
+        try await withCheckedThrowingContinuation { continuation in
+            keychainReadQueue.async {
+                do {
+                    continuation.resume(returning: try operation())
+                } catch {
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+
+    static var isExecutingOnKeychainReadQueue: Bool {
+        DispatchQueue.getSpecific(key: keychainReadQueueKey) == true
     }
 
     public func telegramAPIHash() throws -> String {
@@ -196,5 +217,16 @@ public struct SecretsStore: Sendable {
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
         ]
+    }
+
+    static func keychainReadQuery(
+        account: String,
+        service: String
+    ) -> [String: Any] {
+        let context = LAContext()
+        context.interactionNotAllowed = true
+        var query = itemQuery(account: account, service: service)
+        query[kSecUseAuthenticationContext as String] = context
+        return query
     }
 }

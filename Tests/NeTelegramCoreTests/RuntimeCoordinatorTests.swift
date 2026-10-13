@@ -1,6 +1,7 @@
 import Foundation
 import CoreGraphics
 import ImageIO
+import LocalAuthentication
 import Security
 import Testing
 @testable import NeTelegramCore
@@ -953,6 +954,16 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(query[kSecAttrService as String] as? String == "test-service")
     #expect(query[kSecUseDataProtectionKeychain as String] == nil)
     #expect(query[kSecAttrAccessible as String] == nil)
+}
+
+@Test func secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI() {
+    let query = SecretsStore.keychainReadQuery(account: "test-account", service: "test-service")
+    let context = query[kSecUseAuthenticationContext as String] as? LAContext
+
+    #expect(query[kSecAttrAccount as String] as? String == "test-account")
+    #expect(query[kSecAttrService as String] as? String == "test-service")
+    #expect(context != nil)
+    #expect(context?.interactionNotAllowed == true)
 }
 
 @Test func telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters() {
@@ -2880,13 +2891,41 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 }
 
 @Test func keychainReadsRunOutsideTheMainThread() async throws {
-    let ranOnMainThread = try await SecretsStore.performKeychainRead { Thread.isMainThread }
-    #expect(!ranOnMainThread)
+    let executionContext = try await SecretsStore.performKeychainOperation {
+        (Thread.isMainThread, SecretsStore.isExecutingOnKeychainReadQueue)
+    }
+    #expect(!executionContext.0)
+    #expect(executionContext.1)
+}
+
+@Test func blockedKeychainOperationDoesNotBlockSwiftCooperativeTasks() async throws {
+    let keychainEntered = LockedTestValue(false)
+    let releaseKeychain = DispatchSemaphore(value: 0)
+    let blockedOperation = Task {
+        try await SecretsStore.performKeychainOperation {
+            keychainEntered.set(true)
+            releaseKeychain.wait()
+            return true
+        }
+    }
+    defer { releaseKeychain.signal() }
+    let didEnterKeychain = await waitForTrue(keychainEntered, timeout: .seconds(2))
+    #expect(didEnterKeychain)
+
+    let unrelatedTaskCompleted = LockedTestValue(false)
+    let unrelatedTask = Task.detached {
+        unrelatedTaskCompleted.set(true)
+    }
+    let didCompleteUnrelatedTask = await waitForTrue(unrelatedTaskCompleted, timeout: .seconds(1))
+    #expect(didCompleteUnrelatedTask)
+    releaseKeychain.signal()
+    #expect(try await blockedOperation.value)
+    await unrelatedTask.value
 }
 
 @Test func injectedKeychainReadFailurePropagatesWithoutFallback() async {
     await #expect(throws: SecretsStoreError.keychain(errSecInteractionNotAllowed)) {
-        try await SecretsStore.performKeychainRead { () throws -> String in
+        try await SecretsStore.performKeychainOperation { () throws -> String in
             throw SecretsStoreError.keychain(errSecInteractionNotAllowed)
         }
     }
@@ -2900,7 +2939,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 
     let stalledProfile = Task {
         try await scheduler.withPermit {
-            try await SecretsStore.performKeychainRead {
+            try await SecretsStore.performKeychainOperation {
                 keychainEntered.set(true)
                 releaseKeychain.wait()
                 return true
@@ -2955,7 +2994,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
                     ])
                 }
                 do {
-                    _ = try await SecretsStore.performKeychainRead {
+                    _ = try await SecretsStore.performKeychainOperation {
                         try ProfileStoragePreparer.prepare(
                             account: account,
                             rootURL: root,

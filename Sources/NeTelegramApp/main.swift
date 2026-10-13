@@ -1010,7 +1010,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         setStatus("Сохраняю API hash в Связку ключей macOS…")
         Task { @MainActor [weak self] in
             do {
-                try await SecretsStore.performKeychainRead {
+                try await SecretsStore.performKeychainOperation {
                     try SecretsStore().storeTelegramAPIHash(value)
                 }
                 self?.setStatus("API hash сохранён в Связке ключей. Введите номер и нажмите «Продолжить», чтобы начать новый вход.")
@@ -1282,7 +1282,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 self.refreshStatusMenu()
             }
             do {
-                let apiHash = try await SecretsStore.performKeychainRead {
+                let apiHash = try await SecretsStore.performKeychainOperation {
                     try SecretsStore().telegramAPIHash()
                 }
                 if let startup = self.scheduleProfileStartup(profile, apiHash: apiHash, select: true) {
@@ -1486,9 +1486,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             expectedTelegramUserID: expectedTelegramUserID,
             catalogue: catalogue,
             removeKeys: { account in
-                try await Task.detached(priority: .utility) {
+                try await SecretsStore.performKeychainOperation {
                     try SecretsStore().removeAccountKeys(for: account)
-                }.value
+                }
             },
             removeFiles: { account in
                 let accountRoot = storageRoot
@@ -1512,9 +1512,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             account: account,
             catalogue: catalogue,
             removeKeys: { account in
-                try await Task.detached(priority: .utility) {
+                try await SecretsStore.performKeychainOperation {
                     try SecretsStore().removeAccountKeys(for: account)
-                }.value
+                }
             },
             removeFiles: { account in
                 let accountRoot = storageRoot
@@ -1876,7 +1876,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 refreshStatusMenu()
                 return
             }
-            let apiHash = try await SecretsStore.performKeychainRead {
+            setStatus("Проверяю доступ к Связке ключей macOS для восстановления сохранённых профилей…")
+            let apiHash = try await SecretsStore.performKeychainOperation {
                 try SecretsStore().telegramAPIHash()
             }
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
@@ -1960,6 +1961,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
                 setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+        } catch SecretsStoreError.keychain(errSecInteractionNotAllowed) {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
+            setStatus("Связка ключей macOS требует подтверждения доступа. Проверьте системный запрос; данные профилей не изменены.")
+        } catch SecretsStoreError.keychain {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
+            setStatus("Не удалось безопасно прочитать Связку ключей macOS. Данные профилей не изменены.")
         } catch {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
@@ -2017,7 +2028,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         do {
             guard !closingForTermination else { return }
             _ = try prepareAccountStorage()
-            let apiHash = try await SecretsStore.performKeychainRead {
+            let apiHash = try await SecretsStore.performKeychainOperation {
                 try SecretsStore().telegramAPIHash()
             }
             let catalogue = try accountCatalogue()
@@ -2085,7 +2096,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if gateway == nil { gateway = try TDLibGateway(libraryURL: library) }
             guard let gateway, let catalogue else { throw TDLibGatewayError.clientCreation }
             let root = try accountStorageRoot()
-            let prepared = try await SecretsStore.performKeychainRead { () throws -> PreparedProfileStorage in
+            let prepared = try await SecretsStore.performKeychainOperation { () throws -> PreparedProfileStorage in
                 try ProfileStoragePreparer.prepare(
                     account: profile.id,
                     rootURL: root,
