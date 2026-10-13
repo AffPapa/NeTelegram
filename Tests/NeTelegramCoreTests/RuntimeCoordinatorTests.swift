@@ -1321,10 +1321,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(buffer.count == 0)
 }
 
-@Test func updateBufferShutdownPreservesOneInFlightReceiveAndRejectsLaterInput() async {
+@Test func updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput() async {
     let buffer = TDLibUpdateBuffer(capacity: 1)
-    let accepted = Data("accepted".utf8)
-    let inFlight = Data("TDLib-final-receive".utf8)
+    let accepted = Data("{\"@client_id\":7,\"@type\":\"updateAuthorizationState\",\"sequence\":1}".utf8)
+    // TDLib delivers message expiry through the same deletion update used for
+    // other deletions. Keep a real-shaped payload here to exercise the last
+    // result already returned by td_receive while shutdown closes a full queue.
+    let inFlight = Data("{\"@client_id\":7,\"@type\":\"updateDeleteMessages\",\"message_ids\":[91],\"sequence\":2}".utf8)
     #expect(buffer.append(accepted))
     let appendResult = LockedTestValue<Bool?>(nil)
     let appendFinished = LockedTestValue(false)
