@@ -1,19 +1,19 @@
 {
   "schema_version": 1,
-  "phase": "Public Site v150 deployed and live-checked across all eight routes at mobile width; shared responsive design system. Latest app repository commit is site-only; app product source remains 86855e4599ae4dc9d00274c07331617ddc5b3684. Latest hosted serial CI evidence remains 151/151 at workflow commit 7eb1d292adc0d0f59d362c9eb925193d25128df6. Real login, 20 authorized runtimes, signing/notarization, and Telegram compatibility remain open.",
-  "verified_at": "2026-10-14T01:53:00+07:00",
+  "phase": "NeTelegram local-profile explanation added to the sidebar; app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51. Exact local Swift build passed using Xcode 27 / Swift 6.4. Real login, 20 authorized runtimes, signing/notarization, and Telegram compatibility remain open. Public Site remains v150.",
+  "verified_at": "2026-10-14T01:59:19+0700",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "86855e4599ae4dc9d00274c07331617ddc5b3684"
+    "app_source_commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "33147b0fff262db4825c5aa11b0782015d7485f1",
-    "working_tree_clean": true,
+    "commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
+    "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38447978740,
@@ -98,7 +98,13 @@
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
     "latest_exact_source_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38437898571 passed all 150 tests at 256caf4faea294cddf4dd4e168cc2b64bd18a3d8.",
-    "current_head_native_build": "Exact HEAD 86855e4599ae4dc9d00274c07331617ddc5b3684: `swift build --scratch-path /private/tmp/netelegram-swiftpm-cache` succeeded in 4.69 seconds on Xcode 27.0 / Swift 6.4. No Dev.app was launched, no local profiles were opened, and no Telegram login was attempted."
+    "current_head_native_build": "Exact HEAD 86855e4599ae4dc9d00274c07331617ddc5b3684: `swift build --scratch-path /private/tmp/netelegram-swiftpm-cache` succeeded in 4.69 seconds on Xcode 27.0 / Swift 6.4. No Dev.app was launched, no local profiles were opened, and no Telegram login was attempted.",
+    "latest_local_appkit_build": {
+      "result": "swift build passed for app-source commit 4e96a1556e6cd5f74d0cabeb651e21fa64793b51; SwiftPM scratch/cache redirected to /private/tmp after sandbox denied default user cache. Core tests not rerun because only AppKit layout/copy changed; GitHub CI is the follow-up source verification.",
+      "toolchain": "Xcode 27.0 / Swift 6.4",
+      "native_gui_smoke": "not run; no Dev.app launched",
+      "public_site": "unchanged at v150"
+    }
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",

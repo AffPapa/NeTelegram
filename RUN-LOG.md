@@ -271,3 +271,9 @@
 - Saved Site version `appgprj_6acba85192e08191acdf7011928848cf~appgver_50db2aac69548191bedc2057d6d3fcb5` and deployed successfully as `appgdep_6ace7e38f5d881918fa29d7fa0ebbd18` at https://netelegram.iryadom.chatgpt.site. Sites archive content hash `sha256:de3218cd58bdfef61848d4b7f6840aeb88c780b37761298374ee457eafa4c0c0` (15 files / 512,000 reported bytes).
 - `python3 build_site.py` and `python3 validate_site.py` passed; both zero-item stable/alpha RSS files parse. Live public browser checked all eight routes at 375px: one H1, correct canonical, no horizontal overflow. Home was visually checked at 1440px and 375px. Downloads has zero ZIP/DMG/release links; both appcasts return HTTP 200 and `text/xml` with valid XML.
 - Checkpoint was reconciled: previous nested Site v147 record now agrees with live v150, and latest repository HEAD is distinguished from unchanged product-code SHA `86855e4`. No native app code/build/release changed in this milestone.
+
+### 2026-10-14 — clarify local profile slots in the sidebar
+
+- App-source commit `4e96a1556e6cd5f74d0cabeb651e21fa64793b51` adds visible Russian copy below the account picker: these are local NeTelegram profiles on this Mac, and sessions from other apps are not imported. The sidebar search/chat list moved down to preserve spacing; picker identity/status behavior was not changed.
+- Exact-source `swift build` passed on local Xcode 27 / Swift 6.4. SwiftPM's scratch and module caches were redirected to `/private/tmp` because the default user cache was inaccessible in the sandbox. The 151 Core tests were not rerun because this change only edits AppKit labels and frames. No Dev.app was launched and no Telegram profile/session data was accessed.
+- Public Site remains v150; no download or release state changed. Native visual review, real login, 20 authorized runtime coverage, Developer ID/notarization and Telegram compatibility gates remain open.
