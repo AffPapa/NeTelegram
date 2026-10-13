@@ -188,8 +188,8 @@
       "expected": "Не обходятся ограничения; app caches/previews invalidated; voice card не отмечает прослушивание.",
       "method": "content fixtures+native",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "In the 110/110 local Swift suite, permanent-versus-cache deletion classification and bounded notification cleanup are covered. Deleted-message handling removes only matching account/chat/message notification routes and locked notification handoff, clears app-owned photo presentation state and preview cache, and suppresses late ImageIO callbacks. Per-message generations preserve unrelated visible decodes. AppKit target compiles. Real Telegram TTL/protected/paid content, notification-center behavior, and account-backed native flows remain unverified; status stays partial."
     },
     {
       "id": "APP22",

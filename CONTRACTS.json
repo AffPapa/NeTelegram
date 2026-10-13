@@ -112,6 +112,7 @@
   "media": {
     "decode_jobs_initial": 2,
     "cache": "global cost-based, account namespaced",
+    "deleted_or_expired_message_cleanup": "purge matching app-owned photo previews and cancel only matching account/chat/message decodes; clear matching notification routes and locked handoff",
     "background_gallery_prefetch": false,
     "full_resolution": "explicit action",
     "incoming_unhandled": "typed contextual card"

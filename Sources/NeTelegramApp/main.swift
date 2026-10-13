@@ -2262,6 +2262,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 isPermanent: (object["is_permanent"] as? NSNumber)?.boolValue,
                 fromCache: (object["from_cache"] as? NSNumber)?.boolValue
             )
+            purgeMessagePresentationState(account: target.account, chatID: chatID, messageIDs: deletedIDs)
+            let removedNotificationIDs = AccountNotificationCleanup.removeMessages(
+                account: target.account,
+                chatID: chatID,
+                messageIDs: deletedIDs,
+                identifiersByAccount: &notificationIDsByAccount,
+                targetsByIdentifier: &notificationTargets
+            )
+            notificationUnlockHandoff.clear(account: target.account, chatID: chatID, messageIDs: deletedIDs)
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removedNotificationIDs))
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removedNotificationIDs))
             if deletion == .permanent {
                 for messageID in deletedIDs where messageID < 0 {
                     let key = SendMessageKey(account: target.account, generation: target.generation, chatID: chatID, temporaryMessageID: messageID)
@@ -2296,6 +2307,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let messageID = (object["message_id"] as? NSNumber)?.int64Value,
                   let newContent = object["new_content"] as? [String: Any] {
+            purgeMessagePresentationState(account: target.account, chatID: chatID, messageIDs: [messageID])
+            let removedNotificationIDs = AccountNotificationCleanup.removeMessages(
+                account: target.account,
+                chatID: chatID,
+                messageIDs: [messageID],
+                identifiersByAccount: &notificationIDsByAccount,
+                targetsByIdentifier: &notificationTargets
+            )
+            notificationUnlockHandoff.clear(account: target.account, chatID: chatID, messageIDs: [messageID])
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removedNotificationIDs))
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removedNotificationIDs))
             let affected = messagesByConversation.keys.filter { $0.account == target.account && $0.chatID == chatID }
             for conversation in affected {
                 let cached = messagesByConversation[conversation] ?? []
@@ -4865,6 +4887,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    /// Drops app-owned previews and notification routes when TDLib reports a
+    /// message deletion/expiry or replaces its content. TDLib remains the sole
+    /// owner of its own database and downloaded-file lifecycle.
+    private func purgeMessagePresentationState(account: AccountUUID, chatID: Int64, messageIDs: Set<Int64>) {
+        guard !messageIDs.isEmpty else { return }
+        let matches: (PhotoPresentationKey) -> Bool = {
+            $0.account == account && $0.chatID == chatID && messageIDs.contains($0.messageID)
+        }
+        let keys = Set(photoViews.keys.filter(matches))
+        let fileIDs = Set(keys.compactMap { photoOriginalFileIDs[$0] })
+            .union(photoOriginalKeysByFileID[account]?.compactMap { fileID, keys in
+                keys.contains(where: matches) ? fileID : nil
+            } ?? [])
+
+        photoPipeline.removeCachedPreviews(for: account, chatID: chatID, messageIDs: messageIDs)
+        if let key = photoViewerKey, matches(key) { closePhotoViewer() }
+        for key in keys {
+            photoTokens.removeValue(forKey: key).map(photoPipeline.cancelPreview)
+            if let imageView = photoViews.removeValue(forKey: key) {
+                imageView.image = nil
+                imageView.removeFromSuperview()
+            }
+            photoButtons.removeValue(forKey: key)?.removeFromSuperview()
+            photoLocalURLs.removeValue(forKey: key)
+            photoOriginalFileIDs.removeValue(forKey: key)
+            photoOriginalCanBeDownloaded.removeValue(forKey: key)
+            photoOriginalLocalURLs.removeValue(forKey: key)
+        }
+        photoActionKeysByControlID = photoActionKeysByControlID.filter { !matches($0.value) }
+        if var originalKeys = photoOriginalKeysByFileID[account] {
+            for fileID in Array(originalKeys.keys) {
+                originalKeys[fileID] = originalKeys[fileID]?.filter { !matches($0) }
+                if originalKeys[fileID]?.isEmpty == true {
+                    originalKeys.removeValue(forKey: fileID)
+                }
+            }
+            if originalKeys.isEmpty { photoOriginalKeysByFileID.removeValue(forKey: account) }
+            else { photoOriginalKeysByFileID[account] = originalKeys }
+        }
+        pendingPhotoByExtra = pendingPhotoByExtra.filter { !matches($0.value) }
+        pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter { !matches($0.value) }
+        requestedOriginalPhotos = requestedOriginalPhotos.filter { !matches($0) }
+        photoDownloadsByConversation[ConversationKey(account: account, chatID: chatID)]?.subtract(fileIDs)
+        pendingSponsoredPhotoByExtra = pendingSponsoredPhotoByExtra.filter {
+            $0.value.account != account || $0.value.chatID != chatID || !messageIDs.contains($0.value.messageID)
+        }
+        sponsoredPhotoURLs = sponsoredPhotoURLs.filter {
+            $0.key.account != account || $0.key.chatID != chatID || !messageIDs.contains($0.key.messageID)
+        }
+    }
+
     private func appendPhotoMessage(_ message: [String: Any], content: [String: Any], into destination: NSStackView, width: CGFloat) {
         guard let runtime, let chatID = (message["chat_id"] as? NSNumber)?.int64Value,
               let messageID = (message["id"] as? NSNumber)?.int64Value,
@@ -5034,6 +5107,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         photoButtons[key]?.title = "Открываю фотографию…"
         let token = photoPipeline.requestPreview(
             account: key.account,
+            chatID: key.chatID,
             messageID: key.messageID,
             fileID: photoOriginalFileIDs[key] ?? key.fileID,
             fileURL: fileURL,
@@ -5155,6 +5229,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let privacyEpoch = privacyDispatchBarrier.currentEpoch()
         let token = photoPipeline.requestPreview(
             account: key.account,
+            chatID: key.chatID,
             messageID: key.messageID,
             fileID: key.fileID,
             fileURL: fileURL,

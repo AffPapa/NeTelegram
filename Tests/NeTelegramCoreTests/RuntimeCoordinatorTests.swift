@@ -52,6 +52,49 @@ import Testing
     #expect(targetsByIdentifier[activeNotification.systemIdentifier] == activeNotification)
 }
 
+@Test func accountNotificationCleanupRemovesOnlyExactDeletedMessages() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    func notification(account: AccountUUID, chatID: Int64, messageID: Int64, groupID: Int32) -> RoutedTDLibNotification {
+        RoutedTDLibNotification(
+            account: account,
+            groupID: groupID,
+            notificationID: Int32(messageID),
+            conversation: ConversationKey(account: account, chatID: chatID, topic: .forum(topicID: 3)),
+            messageID: messageID,
+            date: 1,
+            isSilent: true,
+            showsPreview: true,
+            preview: "private preview"
+        )
+    }
+    let deleted = notification(account: accountA, chatID: 90, messageID: 4, groupID: 1)
+    let sameChatOtherMessage = notification(account: accountA, chatID: 90, messageID: 5, groupID: 1)
+    let otherChatSameID = notification(account: accountA, chatID: 91, messageID: 4, groupID: 2)
+    let otherAccountSameIDs = notification(account: accountB, chatID: 90, messageID: 4, groupID: 3)
+    var identifiersByAccount = [
+        accountA: Set([deleted.systemIdentifier, sameChatOtherMessage.systemIdentifier, otherChatSameID.systemIdentifier]),
+        accountB: Set([otherAccountSameIDs.systemIdentifier]),
+    ]
+    var targets = Dictionary(uniqueKeysWithValues: [deleted, sameChatOtherMessage, otherChatSameID, otherAccountSameIDs].map { ($0.systemIdentifier, $0) })
+
+    let removed = AccountNotificationCleanup.removeMessages(
+        account: accountA,
+        chatID: 90,
+        messageIDs: [4],
+        identifiersByAccount: &identifiersByAccount,
+        targetsByIdentifier: &targets
+    )
+
+    #expect(removed == [deleted.systemIdentifier])
+    #expect(targets[deleted.systemIdentifier] == nil)
+    #expect(targets[sameChatOtherMessage.systemIdentifier] == sameChatOtherMessage)
+    #expect(targets[otherChatSameID.systemIdentifier] == otherChatSameID)
+    #expect(targets[otherAccountSameIDs.systemIdentifier] == otherAccountSameIDs)
+    #expect(identifiersByAccount[accountA] == [sameChatOtherMessage.systemIdentifier, otherChatSameID.systemIdentifier])
+    #expect(identifiersByAccount[accountB] == [otherAccountSameIDs.systemIdentifier])
+}
+
 @Test func privacyLockPurgesPresentationDraftsButRetainsDirtyRecoveryUntilUnlock() {
     let dirtyAccount = AccountUUID()
     let persistedAccount = AccountUUID()
@@ -398,6 +441,16 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         try? await Task.sleep(for: .milliseconds(1))
     }
     return value.get()
+}
+
+private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, timeout: Duration) async -> Bool {
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: timeout)
+    while clock.now < deadline {
+        if value.get() >= target { return true }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    return value.get() >= target
 }
 
 @Test func accountPresentationNeverExposesLocalOrUnverifiedProfileNames() {
@@ -2075,6 +2128,72 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(pipeline.maxConcurrentDecodes == 2)
 }
 
+@Test func photoPipelinePurgesDeletedMessagePreviewWithoutEvictingOtherMessages() async {
+    let account = AccountUUID()
+    let decoderCalls = LockedTestValue(0)
+    let completions = LockedTestValue(0)
+    let pipeline = PhotoPipeline(maxConcurrentDecodes: 1, maxQueuedDecodes: 2, decoder: { _, _ in
+        decoderCalls.set(decoderCalls.get() + 1)
+        return Data([0x31])
+    })
+    let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
+    let completion: @Sendable (PhotoPreviewToken, Data?) -> Void = { _, data in
+        if data != nil { completions.set(completions.get() + 1) }
+    }
+
+    _ = pipeline.requestPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForCount(completions, atLeast: 1, timeout: .seconds(2)))
+    _ = pipeline.requestPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForCount(completions, atLeast: 2, timeout: .seconds(2)))
+
+    pipeline.removeCachedPreviews(for: account, chatID: 7, messageIDs: [10])
+    _ = pipeline.requestPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForCount(completions, atLeast: 3, timeout: .seconds(2)))
+    _ = pipeline.requestPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForCount(completions, atLeast: 4, timeout: .seconds(2)))
+
+    #expect(decoderCalls.get() == 3)
+}
+
+@Test func photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview() async {
+    let account = AccountUUID()
+    let decoderCalls = LockedTestValue(0)
+    let firstDecodeStarted = LockedTestValue(false)
+    let completedCallbacks = LockedTestValue(0)
+    let releaseFirstDecode = DispatchSemaphore(value: 0)
+    defer { releaseFirstDecode.signal() }
+    let pipeline = PhotoPipeline(maxConcurrentDecodes: 1, maxQueuedDecodes: 1, decoder: { _, _ in
+        let call = decoderCalls.get() + 1
+        decoderCalls.set(call)
+        if call == 1 {
+            firstDecodeStarted.set(true)
+            releaseFirstDecode.wait()
+        }
+        return Data([UInt8(call)])
+    })
+    let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
+    let completion: @Sendable (PhotoPreviewToken, Data?) -> Void = { _, data in
+        if data != nil { completedCallbacks.set(completedCallbacks.get() + 1) }
+    }
+
+    _ = pipeline.requestPreview(account: account, messageID: 44, fileID: 8, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForTrue(firstDecodeStarted, timeout: .seconds(2)))
+    pipeline.removeCachedPreviews(for: account, chatID: 0, messageIDs: [44])
+    releaseFirstDecode.signal()
+
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while pipeline.outstandingDecodeCount(for: account) != 0, clock.now < deadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(pipeline.outstandingDecodeCount(for: account) == 0)
+    #expect(completedCallbacks.get() == 0)
+
+    _ = pipeline.requestPreview(account: account, messageID: 44, fileID: 8, fileURL: url, maxPixelSize: 64, completion: completion)
+    #expect(await waitForCount(completedCallbacks, atLeast: 1, timeout: .seconds(2)))
+    #expect(decoderCalls.get() == 2)
+}
+
 @Test func outgoingPhotoManifestSurvivesRestartAndReleasesOnlyOwnedFiles() throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }
@@ -2518,6 +2637,27 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
 
     handoff.stage(notification, runtimeGeneration: RuntimeGeneration(4), expectedTelegramUserID: 701)
     handoff.clear(account: account)
+    #expect(handoff.pending == nil)
+}
+
+@Test func lockedNotificationHandoffClearsOnlyWhenItsMessageIsDeleted() {
+    let account = AccountUUID()
+    let notification = RoutedTDLibNotification(
+        account: account,
+        groupID: 1,
+        notificationID: 2,
+        conversation: ConversationKey(account: account, chatID: 55, topic: .forum(topicID: 8)),
+        messageID: 77,
+        date: 123,
+        isSilent: true,
+        showsPreview: false,
+        preview: nil
+    )
+    var handoff = NotificationUnlockHandoff()
+    handoff.stage(notification, runtimeGeneration: RuntimeGeneration(1), expectedTelegramUserID: 9)
+    handoff.clear(account: account, chatID: 55, messageIDs: [78])
+    #expect(handoff.pending?.notification == notification)
+    handoff.clear(account: account, chatID: 55, messageIDs: [77])
     #expect(handoff.pending == nil)
 }
 

@@ -7,6 +7,12 @@ public struct PhotoPreviewToken: Hashable, Sendable {
     fileprivate let id: UUID
 }
 
+private struct PhotoMessageKey: Hashable {
+    let account: AccountUUID
+    let chatID: Int64
+    let messageID: Int64
+}
+
 /// Bounded, account-namespaced ImageIO previews. Download policy stays with
 /// the visible conversation UI; this pipeline only decodes explicitly requested
 /// local files and never walks TDLib's account directories.
@@ -17,8 +23,11 @@ public final class PhotoPipeline: @unchecked Sendable {
     private let decoder: @Sendable (URL, Int) -> Data?
     private var operations: [UUID: Operation] = [:]
     private var accountByOperation: [UUID: AccountUUID] = [:]
+    private var chatIDByOperation: [UUID: Int64] = [:]
+    private var messageIDByOperation: [UUID: Int64] = [:]
     private var keysByAccount: [AccountUUID: Set<String>] = [:]
     private var generationByAccount: [AccountUUID: UInt64] = [:]
+    private var generationByMessage: [PhotoMessageKey: UInt64] = [:]
     private var queuedDecodeCount = 0
     private var queuedDecodeCountByAccount: [AccountUUID: Int] = [:]
 
@@ -59,6 +68,7 @@ public final class PhotoPipeline: @unchecked Sendable {
     @discardableResult
     public func requestPreview(
         account: AccountUUID,
+        chatID: Int64 = 0,
         messageID: Int64,
         fileID: Int32,
         fileURL: URL,
@@ -67,9 +77,10 @@ public final class PhotoPipeline: @unchecked Sendable {
     ) -> PhotoPreviewToken {
         let token = PhotoPreviewToken(id: UUID())
         let pixelSize = max(1, maxPixelSize)
-        let cacheKey = key(account: account, messageID: messageID, fileID: fileID, fileURL: fileURL, maxPixelSize: pixelSize)
-        let cachedData = cache.object(forKey: cacheKey as NSString).map(Data.init(referencing:))
+        let cacheKey = key(account: account, chatID: chatID, messageID: messageID, fileID: fileID, fileURL: fileURL, maxPixelSize: pixelSize)
+        let messageKey = PhotoMessageKey(account: account, chatID: chatID, messageID: messageID)
         lock.lock()
+        let cachedData = cache.object(forKey: cacheKey as NSString).map(Data.init(referencing:))
         if cachedData == nil,
            (queuedDecodeCount >= maxConcurrentDecodes + maxQueuedDecodes
                 || queuedDecodeCountByAccount[account, default: 0] >= maxOutstandingDecodesPerAccount) {
@@ -82,16 +93,24 @@ public final class PhotoPipeline: @unchecked Sendable {
             queuedDecodeCountByAccount[account, default: 0] += 1
         }
         let requestGeneration = generationByAccount[account, default: 0]
+        let requestMessageGeneration = generationByMessage[messageKey, default: 0]
         lock.unlock()
 
         let operation = BlockOperation()
         operation.addExecutionBlock { [weak self, weak operation] in
             guard let self, let operation, !operation.isCancelled else { return }
+            self.lock.lock()
+            let generationIsCurrent = self.generationByAccount[account, default: 0] == requestGeneration
+                && self.generationByMessage[messageKey, default: 0] == requestMessageGeneration
+            self.lock.unlock()
+            guard generationIsCurrent, !operation.isCancelled else { return }
             let data = cachedData ?? self.decoder(fileURL, pixelSize)
             guard !operation.isCancelled, let data else { return }
             if cachedData == nil {
                 self.lock.lock()
-                if self.generationByAccount[account, default: 0] == requestGeneration, !operation.isCancelled {
+                if self.generationByAccount[account, default: 0] == requestGeneration,
+                   self.generationByMessage[messageKey, default: 0] == requestMessageGeneration,
+                   !operation.isCancelled {
                     self.cache.setObject(data as NSData, forKey: cacheKey as NSString, cost: data.count)
                     self.keysByAccount[account, default: []].insert(cacheKey)
                     if let keys = self.keysByAccount[account], keys.count > 2048 {
@@ -105,6 +124,11 @@ public final class PhotoPipeline: @unchecked Sendable {
             }
             DispatchQueue.main.async {
                 guard !operation.isCancelled else { return }
+                self.lock.lock()
+                let generationIsCurrent = self.generationByAccount[account, default: 0] == requestGeneration
+                    && self.generationByMessage[messageKey, default: 0] == requestMessageGeneration
+                self.lock.unlock()
+                guard generationIsCurrent else { return }
                 completion(token, data)
             }
         }
@@ -113,6 +137,8 @@ public final class PhotoPipeline: @unchecked Sendable {
             self.lock.lock()
             self.operations.removeValue(forKey: token.id)
             self.accountByOperation.removeValue(forKey: token.id)
+            self.chatIDByOperation.removeValue(forKey: token.id)
+            self.messageIDByOperation.removeValue(forKey: token.id)
             if cachedData == nil {
                 self.queuedDecodeCount = max(0, self.queuedDecodeCount - 1)
                 let remainingForAccount = max(0, self.queuedDecodeCountByAccount[account, default: 0] - 1)
@@ -127,6 +153,8 @@ public final class PhotoPipeline: @unchecked Sendable {
         lock.lock()
         operations[token.id] = operation
         accountByOperation[token.id] = account
+        chatIDByOperation[token.id] = chatID
+        messageIDByOperation[token.id] = messageID
         lock.unlock()
         queue.addOperation(operation)
         return token
@@ -136,6 +164,8 @@ public final class PhotoPipeline: @unchecked Sendable {
         lock.lock()
         let operation = operations.removeValue(forKey: token.id)
         accountByOperation.removeValue(forKey: token.id)
+        chatIDByOperation.removeValue(forKey: token.id)
+        messageIDByOperation.removeValue(forKey: token.id)
         lock.unlock()
         operation?.cancel()
     }
@@ -146,6 +176,8 @@ public final class PhotoPipeline: @unchecked Sendable {
         let ids = accountByOperation.compactMap { $0.value == account ? $0.key : nil }
         let cancelled = ids.compactMap { id -> Operation? in
             accountByOperation.removeValue(forKey: id)
+            chatIDByOperation.removeValue(forKey: id)
+            messageIDByOperation.removeValue(forKey: id)
             return operations.removeValue(forKey: id)
         }
         lock.unlock()
@@ -158,6 +190,8 @@ public final class PhotoPipeline: @unchecked Sendable {
         let pending = Array(operations.values)
         operations.removeAll()
         accountByOperation.removeAll()
+        chatIDByOperation.removeAll()
+        messageIDByOperation.removeAll()
         lock.unlock()
         pending.forEach { $0.cancel() }
     }
@@ -168,6 +202,36 @@ public final class PhotoPipeline: @unchecked Sendable {
         let keys = keysByAccount.removeValue(forKey: account) ?? []
         for key in keys { cache.removeObject(forKey: key as NSString) }
         lock.unlock()
+    }
+
+    /// Purges previews and in-flight decodes for deleted or expired messages
+    /// without invalidating visible work in other conversations.
+    public func removeCachedPreviews(for account: AccountUUID, chatID: Int64, messageIDs: Set<Int64>) {
+        guard !messageIDs.isEmpty else { return }
+        lock.lock()
+        for messageID in messageIDs {
+            let key = PhotoMessageKey(account: account, chatID: chatID, messageID: messageID)
+            generationByMessage[key, default: 0] &+= 1
+        }
+        let prefixes = messageIDs.map { "\(account.id.uuidString.lowercased())/\(chatID)/\($0)/" }
+        let keys = keysByAccount[account] ?? []
+        for key in keys where prefixes.contains(where: { key.hasPrefix($0) }) {
+            cache.removeObject(forKey: key as NSString)
+            keysByAccount[account]?.remove(key)
+        }
+        if keysByAccount[account]?.isEmpty == true { keysByAccount.removeValue(forKey: account) }
+
+        let ids = messageIDByOperation.compactMap { id, value in
+            accountByOperation[id] == account && chatIDByOperation[id] == chatID && messageIDs.contains(value) ? id : nil
+        }
+        let cancelled = ids.compactMap { id -> Operation? in
+            accountByOperation.removeValue(forKey: id)
+            chatIDByOperation.removeValue(forKey: id)
+            messageIDByOperation.removeValue(forKey: id)
+            return operations.removeValue(forKey: id)
+        }
+        lock.unlock()
+        cancelled.forEach { $0.cancel() }
     }
 
     func outstandingDecodeCount(for account: AccountUUID) -> Int {
@@ -193,8 +257,8 @@ public final class PhotoPipeline: @unchecked Sendable {
         return output as Data
     }
 
-    private func key(account: AccountUUID, messageID: Int64, fileID: Int32, fileURL: URL, maxPixelSize: Int) -> String {
+    private func key(account: AccountUUID, chatID: Int64, messageID: Int64, fileID: Int32, fileURL: URL, maxPixelSize: Int) -> String {
         let pathHash = SHA256.hash(data: Data(fileURL.standardizedFileURL.path.utf8)).map { String(format: "%02x", $0) }.joined()
-        return "\(account.id.uuidString.lowercased())/\(messageID)/\(fileID)/\(maxPixelSize)/\(pathHash)"
+        return "\(account.id.uuidString.lowercased())/\(chatID)/\(messageID)/\(fileID)/\(maxPixelSize)/\(pathHash)"
     }
 }

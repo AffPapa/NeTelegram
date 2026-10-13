@@ -68,4 +68,12 @@ public struct NotificationUnlockHandoff: Sendable {
         guard pending?.notification.account == account else { return }
         pending = nil
     }
+
+    public mutating func clear(account: AccountUUID, chatID: Int64, messageIDs: Set<Int64>) {
+        guard let route = pending?.notification,
+              route.account == account,
+              route.conversation.chatID == chatID,
+              messageIDs.contains(route.messageID) else { return }
+        pending = nil
+    }
 }
