@@ -3,6 +3,22 @@ import Foundation
 /// Separates drafts that could not be persisted from presentation memory while
 /// the privacy lock is active. Recovery values are restored only after unlock.
 public enum DraftPrivacyCache {
+    /// Builds the durable snapshot from both visible drafts and the private
+    /// recovery cache used while locked. A failed lock-time write must not let
+    /// a later quit overwrite the last durable copy with an empty presentation
+    /// cache.
+    public static func draftsForPersistence(
+        account: AccountUUID,
+        presentationDrafts: [ConversationKey: String],
+        lockedDirtyDrafts: [ConversationKey: String]
+    ) -> [ConversationKey: String] {
+        var result = presentationDrafts.filter { $0.key.account == account }
+        for (conversation, text) in lockedDirtyDrafts where conversation.account == account {
+            result[conversation] = text
+        }
+        return result
+    }
+
     @discardableResult
     public static func lock(
         presentationDrafts: inout [ConversationKey: String],

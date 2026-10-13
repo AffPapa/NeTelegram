@@ -32,6 +32,23 @@ import Testing
     #expect(lockedDirtyDrafts.isEmpty)
 }
 
+@Test func dirtyDraftRecoveryRemainsInQuitSnapshotAfterLockClearsPresentationCache() {
+    let account = AccountUUID()
+    let otherAccount = AccountUUID()
+    let conversation = ConversationKey(account: account, chatID: 10)
+    let otherConversation = ConversationKey(account: otherAccount, chatID: 20)
+    var presentationDrafts = [conversation: "last unsaved copy", otherConversation: "other account"]
+    let recovery = DraftPrivacyCache.lock(presentationDrafts: &presentationDrafts, dirtyAccounts: [account])
+
+    #expect(presentationDrafts.isEmpty)
+    #expect(recovery == [conversation: "last unsaved copy"])
+    #expect(DraftPrivacyCache.draftsForPersistence(
+        account: account,
+        presentationDrafts: presentationDrafts,
+        lockedDirtyDrafts: recovery
+    ) == [conversation: "last unsaved copy"])
+}
+
 @Test func sponsoredMessagesCacheExpiresAtFiveMinutesAndRejectsFutureTimestamp() {
     let now = Date(timeIntervalSince1970: 10_000)
     #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: nil, now: now))

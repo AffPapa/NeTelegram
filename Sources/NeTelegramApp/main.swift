@@ -3513,7 +3513,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 return false
             }
             do {
-                try store.save(draftsByConversation.filter { $0.key.account == account })
+                let durableSnapshot = DraftPrivacyCache.draftsForPersistence(
+                    account: account,
+                    presentationDrafts: draftsByConversation,
+                    lockedDirtyDrafts: lockedDirtyDraftRecovery
+                )
+                try store.save(durableSnapshot)
                 dirtyDraftAccounts.remove(account)
             } catch {
                 setStatus("Выход остановлен: черновик не удалось сохранить на диск.")
