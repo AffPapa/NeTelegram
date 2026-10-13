@@ -11,6 +11,13 @@
 - Route diagnosis: default local shell could not resolve the Sites Git hostname or public Site host; official helper succeeded with approved network access. Do not change Site origin or route publication through browser uploads.
 - Limits: no app binary release, no actual Telegram login/profile close, no 20-account certification, no Developer ID/notarization, and no updater release.
 
+## 2026-10-13 — Acceptance evidence and checkpoint routing corrected
+
+- Updated the top-level acceptance summary to current app-source `d57d569c08ca5273435fdb2e95a51629e1527df5`, 134/134 local serial tests, exact-SHA CI and accountless native smoke.
+- Marked older case evidence as commit-scoped historical snapshots. This prevents older test counts or local candidates from being mistaken for proof of the current source; all real-account and twenty-account claims remain open.
+- Corrected the ambiguous stale repository-head field to `repo_head_before_checkpoint`; app-source, documentation, Site-source, saved version and deployment identities remain distinct.
+- No Swift source changed; no app tests or rebuild were repeated for this documentation-only correction.
+
 ## 2026-10-13 — VoiceOver authorization-step announcements
 
 - App source commit: `4478f967654b270cd78f71a5afe69f625491d38d`.

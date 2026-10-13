@@ -1,6 +1,20 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source d57d569 implements safe removal of unverified local login profiles. Local serial suite 134/134 and exact-SHA GitHub CI/native Dev.app first-run smoke passed. New removal UI path and TDLib close are not yet exercised with an account; no real login or account coverage claim.",
+  "status": "implementation_in_progress; current app source is d57d569c08ca5273435fdb2e95a51629e1527df5. Local serial suite 134/134 and exact-SHA GitHub CI plus accountless arm64 Dev.app first-run smoke passed. The unfinished-login removal UI and live TDLib close are untested with an account. No real login or account coverage is claimed. Public development Site v115 is live; it has no app download.",
+  "current_evidence": {
+    "app_source_commit": "d57d569c08ca5273435fdb2e95a51629e1527df5",
+    "app_tests": "134/134 serial Swift tests passed on Xcode 27.0 / Swift 6.4 / macOS 27 SDK.",
+    "github_workflows": [
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38390951012",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38390951049"
+    ],
+    "native_smoke": "Pinned TDLib and arm64 Dev.app built, launched accountless first-run UI, screenshot captured, app quit. Removal item/TDLib profile close not exercised.",
+    "site": "Public Site v115, source 7447d22eaf613b9c008734e1e883dbc480a8a934, deployment appgdep_6ace186c4bc08191914b2f9361e1dd4e. Anonymous browser verified new devlog and no-download page; both empty updater feeds fetched and confirmed valid RSS.",
+    "real_account_coverage": "none; user deferred login",
+    "twenty_authorized_runtime_coverage": "none; synthetic fanout tests do not count as real accounts",
+    "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified"
+  },
+  "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
     {
       "id": "APP01",

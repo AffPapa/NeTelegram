@@ -116,7 +116,7 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_commit": "c36ba2640bc320515d4f65cce54b3b8c2a2e7bbd",
+    "repo_head_before_checkpoint": "65537b78b4663a93852bc3cb87ef83f63b00b1bd",
     "app_source_commit_authority": "source.commit",
     "app_source_commit": "d57d569c08ca5273435fdb2e95a51629e1527df5"
   },
