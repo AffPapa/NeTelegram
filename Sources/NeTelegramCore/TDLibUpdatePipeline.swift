@@ -223,7 +223,10 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         self.buffer = TDLibUpdateBuffer(capacity: capacity, byteCapacity: byteCapacity)
     }
 
-    public func start(onEvent: @escaping @Sendable (TDLibPipelineEvent) async -> Void) {
+    public func start(
+        onEvent: @escaping @Sendable (TDLibPipelineEvent) async -> Void,
+        onReceiveFailure: @escaping @Sendable (TDLibGatewayError) async -> Void = { _ in }
+    ) {
         lock.lock()
         precondition(!started, "TDLib update pipeline may only be started once")
         started = true
@@ -254,9 +257,21 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         reducer.name = "NeTelegram.TDLib.reducer"
         reducer.start()
 
-        gateway.startSingleReceiveWorker { [buffer] update in
-            buffer.append(update)
-        }
+        gateway.startSingleReceiveWorker(
+            onUpdate: { [buffer] update in
+                buffer.append(update)
+            },
+            onFailure: { [buffer, reducerExited] failure in
+                // The receive worker has returned from td_receive and cannot
+                // append another item. Close input, drain every accepted update,
+                // then surface the terminal failure to the application.
+                buffer.close()
+                DispatchQueue.global(qos: .userInitiated).async {
+                    reducerExited.wait()
+                    Task { await onReceiveFailure(failure) }
+                }
+            }
+        )
     }
 
     /// Stops TDLib input and closes admission immediately. Closing the buffer

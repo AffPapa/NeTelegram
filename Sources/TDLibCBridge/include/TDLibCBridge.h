@@ -7,7 +7,13 @@
 int nt_tdlib_load(const char *library_path, char *error_buffer, size_t error_capacity);
 int32_t nt_tdlib_create_client_id(void);
 int nt_tdlib_send(int32_t client_id, const char *request);
-char *nt_tdlib_receive_copy(double timeout_seconds);
+typedef enum nt_tdlib_receive_status {
+    NT_TDLIB_RECEIVE_ERROR = -1,
+    NT_TDLIB_RECEIVE_TIMEOUT = 0,
+    NT_TDLIB_RECEIVE_UPDATE = 1
+} nt_tdlib_receive_status;
+
+nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, char **output);
 void nt_tdlib_free(void *buffer);
 
 #endif

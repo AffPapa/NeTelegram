@@ -1,10 +1,17 @@
 import Foundation
 import TDLibCBridge
 
-public enum TDLibGatewayError: Error, Equatable {
+public enum TDLibGatewayError: Error, Equatable, Sendable {
     case libraryLoad(String)
     case clientCreation
     case requestRejected
+    case receiveCopyFailed
+}
+
+enum TDLibReceivePollResult: Sendable {
+    case timeout
+    case update(Data)
+    case copyFailure
 }
 
 /// Thin adapter for the pinned TDLib JSON C API. The single receive loop runs
@@ -15,8 +22,10 @@ public final class TDLibGateway: @unchecked Sendable {
     private let sendLock = NSLock()
     private let receiveLock = NSLock()
     private let stopLock = NSLock()
+    private let receivePoll: @Sendable (Double) -> TDLibReceivePollResult
     private var receiveThread: Thread?
     private var stopping = false
+    private var receiveFailure: TDLibGatewayError?
 
     public init(libraryURL: URL) throws {
         var buffer = [CChar](repeating: 0, count: 1024)
@@ -29,18 +38,40 @@ public final class TDLibGateway: @unchecked Sendable {
             let message = String(decoding: buffer.prefix { $0 != 0 }.map(UInt8.init(bitPattern:)), as: UTF8.self)
             throw TDLibGatewayError.libraryLoad(message)
         }
+        receivePoll = { timeoutSeconds in
+            var pointer: UnsafeMutablePointer<CChar>?
+            let status = nt_tdlib_receive_copy(timeoutSeconds, &pointer)
+            switch status {
+            case NT_TDLIB_RECEIVE_TIMEOUT:
+                return .timeout
+            case NT_TDLIB_RECEIVE_UPDATE:
+                guard let pointer else { return .copyFailure }
+                defer { nt_tdlib_free(pointer) }
+                return .update(Data(bytes: pointer, count: strlen(pointer)))
+            default:
+                return .copyFailure
+            }
+        }
+    }
+
+    init(receivePoll: @escaping @Sendable (Double) -> TDLibReceivePollResult) {
+        self.receivePoll = receivePoll
     }
 
     public func createClientID() throws -> ClientID {
+        sendLock.lock()
+        defer { sendLock.unlock() }
+        if let failure = currentReceiveFailure() { throw failure }
         let value = nt_tdlib_create_client_id()
         guard value != Int32.min else { throw TDLibGatewayError.clientCreation }
         return ClientID(value)
     }
 
     public func send(_ json: String, to clientID: ClientID) throws {
+        sendLock.lock()
+        defer { sendLock.unlock() }
+        if let failure = currentReceiveFailure() { throw failure }
         let accepted = json.withCString { request in
-            sendLock.lock()
-            defer { sendLock.unlock() }
             return nt_tdlib_send(clientID.value, request)
         }
         guard accepted == 1 else { throw TDLibGatewayError.requestRejected }
@@ -48,7 +79,8 @@ public final class TDLibGateway: @unchecked Sendable {
 
     public func startSingleReceiveWorker(
         timeoutSeconds: Double = 1,
-        onUpdate: @escaping UpdateHandler
+        onUpdate: @escaping UpdateHandler,
+        onFailure: @escaping @Sendable (TDLibGatewayError) -> Void = { _ in }
     ) {
         stopLock.lock()
         precondition(receiveThread == nil, "TDLib permits exactly one concurrent td_receive worker")
@@ -56,13 +88,18 @@ public final class TDLibGateway: @unchecked Sendable {
             guard let self else { return }
             while !self.shouldStop {
                 self.receiveLock.lock()
-                let result = nt_tdlib_receive_copy(timeoutSeconds)
-                let data = result.map { pointer -> Data in
-                    defer { nt_tdlib_free(pointer) }
-                    return Data(bytes: pointer, count: strlen(pointer))
-                }
+                let result = self.receivePoll(timeoutSeconds)
                 self.receiveLock.unlock()
-                if let data { onUpdate(data) }
+                switch result {
+                case .timeout:
+                    continue
+                case .update(let data):
+                    onUpdate(data)
+                case .copyFailure:
+                    let failure = self.markReceiveFailed()
+                    onFailure(failure)
+                    return
+                }
             }
         }
         worker.name = "NeTelegram.TDLib.receive"
@@ -89,5 +126,24 @@ public final class TDLibGateway: @unchecked Sendable {
         stopLock.lock()
         defer { stopLock.unlock() }
         return stopping
+    }
+
+    private func currentReceiveFailure() -> TDLibGatewayError? {
+        stopLock.lock()
+        defer { stopLock.unlock() }
+        return receiveFailure
+    }
+
+    private func markReceiveFailed() -> TDLibGatewayError {
+        // Serialize the fail-stop state with user sends. Once the failure is
+        // visible, no further TDLib command may be accepted by this gateway.
+        sendLock.lock()
+        stopLock.lock()
+        let failure = receiveFailure ?? TDLibGatewayError.receiveCopyFailed
+        receiveFailure = failure
+        stopping = true
+        stopLock.unlock()
+        sendLock.unlock()
+        return failure
     }
 }

@@ -300,6 +300,47 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     ) == .authorization)
 }
 
+@Test func tdlibReceiveCopyFailureDrainsAcceptedEventsThenFailsClosed() async throws {
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    let account = AccountUUID()
+    let route = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(17))
+    try await coordinator.registerBeforeFirstRequest(route)
+
+    let pollCount = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let current = pollCount.get()
+        pollCount.set(current + 1)
+        if current == 0 {
+            return .update(Data(#"{"@client_id":17,"@type":"updateConnectionState"}"#.utf8))
+        }
+        return .copyFailure
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator)
+    let events = LockedTestValue<[String]>([])
+    let failed = LockedTestValue(false)
+    pipeline.start(
+        onEvent: { event in
+            if case .routed = event { events.mutate { $0.append("update") } }
+        },
+        onReceiveFailure: { error in
+            if error == .receiveCopyFailed { events.mutate { $0.append("failure") } }
+            failed.set(true)
+        }
+    )
+
+    #expect(await waitForTrue(failed, timeout: .seconds(2)))
+    #expect(events.get() == ["update", "failure"])
+    #expect(gateway.receiveWorkerHasExited)
+    do {
+        try gateway.send("{}", to: route.client)
+        Issue.record("Gateway must reject sends after receive-copy failure")
+    } catch let error as TDLibGatewayError {
+        #expect(error == .receiveCopyFailed)
+    } catch {
+        Issue.record("Unexpected gateway error: \(error)")
+    }
+}
+
 @Test func accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus() {
     let firstPending = AccountPresentation.pickerTitle(
         localOrdinal: 1,

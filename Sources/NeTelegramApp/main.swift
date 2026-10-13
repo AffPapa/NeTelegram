@@ -39,6 +39,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var runtime: LocalAccountRuntime?
     private var gateway: TDLibGateway?
     private var updatePipeline: TDLibUpdatePipeline?
+    private var tdlibReceiveFailed = false
     private let runtimeCoordinator = RuntimeCoordinator(startupParallelism: 2)
     private let startupScheduler = RuntimeStartupScheduler(parallelism: 2)
     private var catalogue: AccountCatalogue?
@@ -1500,12 +1501,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if updatePipeline == nil {
                 let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)
                 updatePipeline = pipeline
-                pipeline.start { [weak self] event in
-                    // Each client has an ordered async delivery lane. Awaiting
-                    // MainActor here preserves that client's order without
-                    // holding the shared TDLib reducer behind another account.
-                    await self?.receive(event)
-                }
+                pipeline.start(
+                    onEvent: { [weak self] event in
+                        // Each client has an ordered async delivery lane. Awaiting
+                        // MainActor here preserves that client's order without
+                        // holding the shared TDLib reducer behind another account.
+                        await self?.receive(event)
+                    },
+                    onReceiveFailure: { [weak self] _ in
+                        await self?.handleTDLibReceiveFailure()
+                    }
+                )
             }
             await runtimeCoordinator.setState(.waitingForAuthorization, for: profile.id)
             try runtime.send(parametersRequest(for: runtime))
@@ -1624,6 +1630,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             await handle(update.json, from: target)
             refreshStatusMenu()
         }
+    }
+
+    private func handleTDLibReceiveFailure() {
+        tdlibReceiveFailed = true
+        refreshComposerState()
+        setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите NeTelegram после освобождения памяти.")
     }
 
     private func handle(_ update: Data, from target: LocalAccountRuntime) async {
@@ -2985,7 +2997,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func sendText() {
-        guard !lockState, let runtime, let userID = runtime.telegramUserID,
+        guard !lockState, !tdlibReceiveFailed, let runtime, let userID = runtime.telegramUserID,
               let chatID = selectedChatByAccount[runtime.account] else { return }
         let text = composer.string
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
@@ -3063,7 +3075,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func selectAndSendPhoto() {
-        guard !lockState, let runtime, let userID = runtime.telegramUserID,
+        guard !lockState, !tdlibReceiveFailed, let runtime, let userID = runtime.telegramUserID,
               let chatID = selectedChatByAccount[runtime.account],
               let permission = sendEligibilityByAccount[runtime.account]?[chatID],
               permission.permitsTextSend(as: userID, topic: currentConversationKey(for: runtime.account, chatID: chatID).topic, paidStars: SendIntent.maximumPaidStars),
@@ -3420,8 +3432,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                   forumChatsByAccount[selectedRuntime.account, default: []].contains(chatID) else { return true }
             return selectedForumTopicIDsByAccount[selectedRuntime.account]?[chatID] != nil
         } ?? false
-        composer.isEditable = !lockState && topicIsReady && runtime.map { !unavailableDraftAccounts.contains($0.account) } == true
-        guard !lockState, let runtime, let userID = runtime.telegramUserID,
+        composer.isEditable = !lockState && !tdlibReceiveFailed && topicIsReady && runtime.map { !unavailableDraftAccounts.contains($0.account) } == true
+        guard !lockState, !tdlibReceiveFailed, let runtime, let userID = runtime.telegramUserID,
               let chatID = selectedChatByAccount[runtime.account],
               let eligibility = sendEligibilityByAccount[runtime.account]?[chatID] else {
             sendButton.isEnabled = false

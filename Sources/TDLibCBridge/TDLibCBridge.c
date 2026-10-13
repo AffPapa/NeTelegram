@@ -87,14 +87,19 @@ int nt_tdlib_send(int32_t client_id, const char *request) {
     return 1;
 }
 
-char *nt_tdlib_receive_copy(double timeout_seconds) {
+nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, char **output) {
+    if (output == NULL) return NT_TDLIB_RECEIVE_ERROR;
+    *output = NULL;
     pthread_mutex_lock(&load_mutex);
     receive_fn function = receive_update;
     pthread_mutex_unlock(&load_mutex);
-    if (function == NULL) return NULL;
+    if (function == NULL) return NT_TDLIB_RECEIVE_ERROR;
     const char *borrowed = function(timeout_seconds);
-    if (borrowed == NULL) return NULL;
-    return strdup(borrowed);
+    if (borrowed == NULL) return NT_TDLIB_RECEIVE_TIMEOUT;
+    char *copy = strdup(borrowed);
+    if (copy == NULL) return NT_TDLIB_RECEIVE_ERROR;
+    *output = copy;
+    return NT_TDLIB_RECEIVE_UPDATE;
 }
 
 void nt_tdlib_free(void *buffer) {
