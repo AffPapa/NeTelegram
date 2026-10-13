@@ -158,7 +158,7 @@
     "App API identity is not user session"
   ],
   "implementation_status": {
-    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 (local, not yet pushed)",
+    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 (pushed to public main; followed by documentation commit 74763937567283412de62487732ebf835f2fa7a0)",
     "evidence": "Exact local Swift suite 103/103 passed and the AppKit executable compiled. This does not certify real Telegram accounts, 20-runtime performance, native accessibility, or release readiness.",
     "public_release": "none; public Site is still development-only and has no application download",
     "remaining_gates": [

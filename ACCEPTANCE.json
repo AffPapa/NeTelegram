@@ -413,16 +413,16 @@
     "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
     "local_result": "103/103 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
-    "hosted_ci": "Not run for fd4586d. Existing credential helper push attempt failed before authentication because github.com did not resolve.",
-    "hosted_result": "No hosted CI, Dev.app replacement, or public Site update claimed for fd4586d.",
+    "hosted_ci": "Not yet verified for fd4586d or 7476393; inspect the GitHub Actions run triggered by the successful main push.",
+    "hosted_result": "Source and verification-record commits are on public main. No Dev.app replacement or public Site update claimed for this milestone.",
     "artifact": {
       "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
       "status": "local development source only; no new Dev.app, release, installer, or public binary",
       "signature": "not a release"
     },
     "scope": "Two deterministic incoming entity regressions cover UTF-16 offsets, web and textUrl destinations, invalid ranges and disallowed file URLs. Unknown/future authorization states fail closed even when a previous TelegramUserID exists. AppKit code compiles. Native link clicking/accessibility, login/read/send/logout, 20 real accounts, performance matrix, sleep/wake, Developer ID/notarization, Gatekeeper, updater and Telegram compatibility decisions remain open. The running canonical Dev.app was not touched.",
-    "publication": "Local main has source commit fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1. The last verified public GitHub main is f4505b329db5b72d023211af4ffc8fdcd21bac0c; a push attempt failed before authentication because github.com did not resolve. Site remains at v90; no app release or download exists.",
-    "next_action": "Retry Git push using the existing credential helper after github.com DNS works. Then verify exact-source CI, update Site devlog/mirror once, and obtain the build artifact without launching a second local Dev.app."
+    "publication": "Source commit fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 and docs commit 74763937567283412de62487732ebf835f2fa7a0 are pushed to public GitHub main. The push used the existing credential helper; no PAT was created. Site remains at v90; no app release or download exists.",
+    "next_action": "Verify GitHub Actions for the exact pushed commits, then update Site devlog/mirror once and obtain the CI build artifact without launching a second local Dev.app."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
