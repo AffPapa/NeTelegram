@@ -6,7 +6,7 @@
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
     "local_validation": "Ruby YAML parse, JSON parse, and git diff --check passed. No Swift source changed, so no local Swift suite or Dev.app rebuild was run.",
-    "hosted_validation": "pending publication; cache-hit, filtered-probe, full-suite result, and elapsed-time improvement are not yet verified",
+    "hosted_validation": "Run 38481765351 reached the filtered probe after cache restore but remained in progress more than one minute later; cache hit/miss and step logs were unavailable while running. It will be superseded by a checkpoint adding a two-minute step ceiling. No full-suite result or hosted PASS yet.",
     "prior_baseline": "Hosted run 38478591456: test binary build 31.65s, then no test output for 272s before cancellation; no test-level root cause or hosted PASS.",
     "next_action": "Publish this workflow checkpoint when Git transport is available; inspect the exact Actions run once for cache hit and probe/full-suite outcome."
   },

@@ -578,3 +578,9 @@
 - Updated `.github/workflows/ci.yml` with a SwiftPM `.build` cache keyed by macOS, architecture, Swift/Xcode versions, `Package.swift`, and `TDLIB.lock.json`. Added a known-fast filtered runner probe before the existing serial full suite. This keeps the concurrency-sensitive test suite serial while distinguishing runner startup from a later suite stall.
 - Local validation passed: Ruby YAML parse, both checkpoint JSON parses, and `git diff --check`. No Swift source changed, so no Swift tests, app rebuild, or Site deployment were run.
 - The optimization is not proven faster yet. First hosted run must report cache status, probe output, full-suite result and elapsed time. Baseline run 38478591456 compiled in 31.65s, then emitted no test output for 272s before cancellation; hosted PASS remains absent.
+
+
+### 2026-10-14 — bound the hosted runner probe
+
+- The filtered probe passed locally: `publicDisplayNameMatchesRepositoryName` passed 1/1 (9.10s build, 0.001s test execution) on local Xcode 27.0 / Swift 6.4 / arm64e. The first pushed workflow run 38481765351 restored the cache step successfully but was still executing the probe after more than one minute; its cache hit/miss detail and active logs were not yet available.
+- Added `timeout-minutes: 2` to the isolated probe so a hosted runner startup stall cannot consume the full five-minute job budget. The follow-up push will supersede/cancel the first in-progress run. This is a diagnostic ceiling, not a product test PASS; the full serial suite remains required after a passing probe.

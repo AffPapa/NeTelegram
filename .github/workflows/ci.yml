@@ -61,6 +61,7 @@ jobs:
       - name: Probe Swift Testing runner
         # A known-fast deterministic test distinguishes runner startup hangs
         # from a stall later in the full suite without parallelizing tests.
+        timeout-minutes: 2
         run: swift test --no-parallel --verbose --filter publicDisplayNameMatchesRepositoryName
 
       - name: Run core test suite
