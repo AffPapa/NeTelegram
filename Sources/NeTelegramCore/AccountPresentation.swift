@@ -189,7 +189,8 @@ public enum AccountPresentation {
         runtimeIsOpen: Bool,
         hasError: Bool,
         logoutCleanupPending: Bool = false,
-        unverifiedRemovalPending: Bool = false
+        unverifiedRemovalPending: Bool = false,
+        networkUpdatePending: Bool = false
     ) -> String {
         let ordinal = max(1, localOrdinal)
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate)
@@ -202,7 +203,8 @@ public enum AccountPresentation {
             logoutCleanupPending: logoutCleanupPending,
             unverifiedRemovalPending: unverifiedRemovalPending
         ).label
-        return "\(identity) — \(status)"
+        let networkStatus = networkUpdatePending ? " · ожидает обновление сети" : ""
+        return "\(identity) — \(status)\(networkStatus)"
     }
 
     public static func pickerStatus(

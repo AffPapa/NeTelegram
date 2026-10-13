@@ -63,9 +63,43 @@ public struct NetworkPathRevisionGate: Sendable {
 @MainActor
 public struct NetworkTypeFanoutCoordinator {
     private var revisionGate = NetworkPathRevisionGate()
-    private var appliedRevision: UInt64 = 0
+    private var appliedRevisionByAccount: [AccountUUID: UInt64] = [:]
+    private var pendingByAccount: [AccountUUID: PendingNetworkTypeUpdate] = [:]
+
+    public struct PendingNetworkTypeUpdate: Sendable, Equatable {
+        public let type: String
+        public let revision: UInt64
+
+        public init(type: String, revision: UInt64) {
+            self.type = type
+            self.revision = revision
+        }
+    }
 
     public init() {}
+
+    public var latestAcceptedRevision: UInt64 { revisionGate.latestRevision }
+
+    public var pendingAccounts: Set<AccountUUID> { Set(pendingByAccount.keys) }
+
+    public func pendingUpdate(for account: AccountUUID) -> PendingNetworkTypeUpdate? {
+        pendingByAccount[account]
+    }
+
+    /// Retains the latest desired type when a newly opened runtime cannot queue
+    /// its initial setter. A later path or wake observation retries it through
+    /// the same per-account fanout; it does not recreate the runtime.
+    @discardableResult
+    public mutating func recordPending(account: AccountUUID, type: String, revision: UInt64) -> Bool {
+        guard revisionGate.isLatest(revision) else { return false }
+        pendingByAccount[account] = PendingNetworkTypeUpdate(type: type, revision: revision)
+        return true
+    }
+
+    public mutating func forget(account: AccountUUID) {
+        appliedRevisionByAccount.removeValue(forKey: account)
+        pendingByAccount.removeValue(forKey: account)
+    }
 
     /// Accepts a new observation or a wake reapplication of the current one.
     @discardableResult
@@ -75,25 +109,30 @@ public struct NetworkTypeFanoutCoordinator {
     }
 
     /// Applies only the latest accepted observation, in stable account order.
-    /// Returns false when the work was duplicated or superseded.
+    /// A failed account keeps its own latest desired observation; successful
+    /// accounts are not repeated for a duplicate observation. Returns false
+    /// only when the work was duplicated or superseded.
     @discardableResult
     public mutating func applyIfCurrent(
         type: String,
         revision: UInt64,
         force: Bool = false,
         accounts: [AccountUUID],
-        apply: (AccountUUID, String) -> Void
+        apply: (AccountUUID, String) -> Bool
     ) -> Bool {
-        guard revisionGate.isLatest(revision),
-              NetworkTypeUpdatePolicy.shouldApply(
-                currentRevision: appliedRevision,
-                nextRevision: revision,
-                force: force
-              ) else { return false }
-
-        appliedRevision = revision
+        guard revisionGate.isLatest(revision) else { return false }
         for account in accounts.sorted(by: { $0.id.uuidString < $1.id.uuidString }) {
-            apply(account, type)
+            let previousRevision = appliedRevisionByAccount[account] ?? 0
+            guard force || NetworkTypeUpdatePolicy.shouldApply(
+                currentRevision: previousRevision,
+                nextRevision: revision
+            ) else { continue }
+            if apply(account, type) {
+                appliedRevisionByAccount[account] = revision
+                pendingByAccount.removeValue(forKey: account)
+            } else {
+                pendingByAccount[account] = PendingNetworkTypeUpdate(type: type, revision: revision)
+            }
         }
         return true
     }

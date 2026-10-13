@@ -823,6 +823,15 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         runtimeIsOpen: true,
         hasError: false
     )
+    let networkUpdatePending = AccountPresentation.pickerTitle(
+        localOrdinal: 3,
+        telegramUserID: 123,
+        candidate: "Test User",
+        authorizationState: "authorizationStateReady",
+        runtimeIsOpen: true,
+        hasError: false,
+        networkUpdatePending: true
+    )
     let closedBackgroundProfile = AccountPresentation.pickerTitle(
         localOrdinal: 3,
         telegramUserID: 123,
@@ -853,6 +862,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(firstPending == "Профиль NeTelegram 1 — ожидает номер")
     #expect(secondPending == "Профиль NeTelegram 2 — ожидает код")
     #expect(verified == "Test User · профиль 3 — подключён")
+    #expect(networkUpdatePending == "Test User · профиль 3 — подключён · ожидает обновление сети")
     #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
     #expect(logoutCleanup == "Test User · профиль 4 — очистка после выхода ожидает")
     #expect(removalCleanup == "Профиль NeTelegram 5 — удаление незавершённого входа ожидает")
@@ -1653,6 +1663,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let acceptedPathA = coordinator.accept(revision: 1) // Initial path A.
     let appliedPathA = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) {
         applied[$0, default: []].append($1)
+        return true
     }
     #expect(acceptedPathA)
     #expect(appliedPathA)
@@ -1660,9 +1671,11 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let acceptedPathB = coordinator.accept(revision: 2) // Route B, still Wi-Fi.
     let rejectedSupersededPathA = !coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) {
         applied[$0, default: []].append($1)
+        return true
     } // Debounced path A was superseded.
     let appliedPathB = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 2, accounts: accounts) {
         applied[$0, default: []].append($1)
+        return true
     }
     let rejectedDuplicate = !coordinator.accept(revision: 2) // Duplicate observation.
     let rejectedLatePath = !coordinator.accept(revision: 1) // Late older observation.
@@ -1675,6 +1688,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let acceptedWake = coordinator.accept(revision: 3, force: true) // Wake: reapply current path.
     let appliedWake = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 3, force: true, accounts: accounts) {
         applied[$0, default: []].append($1)
+        return true
     }
     #expect(acceptedWake)
     #expect(appliedWake)
@@ -1683,6 +1697,50 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(applied.values.allSatisfy { $0 == ["networkTypeWiFi", "networkTypeWiFi", "networkTypeWiFi"] })
     #expect(generations.count == 20)
     #expect(generations.values.allSatisfy { $0 == RuntimeGeneration(7) })
+}
+
+@MainActor
+@Test func networkTypeFanoutKeepsLatestFailedAccountUpdateAndRecoversWithoutOtherAccountRetries() {
+    let accounts = (1...20).map { index in
+        AccountUUID(UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", index))!)
+    }
+    let failedAccount = accounts[6]
+    var coordinator = NetworkTypeFanoutCoordinator()
+    var applied: [AccountUUID: [String]] = [:]
+
+    let acceptedFirst = coordinator.accept(revision: 1)
+    #expect(acceptedFirst)
+    let appliedFirst = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) { account, type in
+        applied[account, default: []].append(type)
+        return account != failedAccount
+    }
+    #expect(appliedFirst)
+    #expect(coordinator.pendingAccounts == Set([failedAccount]))
+    #expect(coordinator.pendingUpdate(for: failedAccount) == .init(type: "networkTypeWiFi", revision: 1))
+    #expect(applied.count == 20)
+
+    // A newer path observation replaces the failed account's desired state.
+    let acceptedSecond = coordinator.accept(revision: 2)
+    #expect(acceptedSecond)
+    let appliedSecond = coordinator.applyIfCurrent(type: "networkTypeMobile", revision: 2, accounts: accounts) { account, type in
+        applied[account, default: []].append(type)
+        return account != failedAccount
+    }
+    #expect(appliedSecond)
+    #expect(coordinator.pendingUpdate(for: failedAccount) == .init(type: "networkTypeMobile", revision: 2))
+
+    // A later wake retries every live account once, using only the latest state.
+    let acceptedWake = coordinator.accept(revision: 3, force: true)
+    #expect(acceptedWake)
+    let appliedWake = coordinator.applyIfCurrent(type: "networkTypeOther", revision: 3, force: true, accounts: accounts) { account, type in
+        applied[account, default: []].append(type)
+        return true
+    }
+    #expect(appliedWake)
+    #expect(coordinator.pendingAccounts.isEmpty)
+    #expect(coordinator.pendingUpdate(for: failedAccount) == nil)
+    #expect(applied[failedAccount] == ["networkTypeWiFi", "networkTypeMobile", "networkTypeOther"])
+    #expect(applied.count == 20)
 }
 
 @Test func typingActionIsRateLimitedAndStoppedWhenComposerClears() {

@@ -787,12 +787,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 force: force,
                 accounts: Array(self.runtimesByAccount.keys)
             ) { account, type in
-                guard let accountRuntime = self.runtimesByAccount[account] else { return }
-                do { try accountRuntime.applyNetworkType(type) }
-                catch where accountRuntime === self.runtime { self.setStatus("Не удалось обновить сетевое состояние TDLib для выбранного аккаунта.") }
-                catch { }
+                guard let accountRuntime = self.runtimesByAccount[account] else { return true }
+                do {
+                    try accountRuntime.applyNetworkType(type)
+                    return true
+                } catch {
+                    if accountRuntime === self.runtime {
+                        self.setStatus("TDLib пока не принял сетевое обновление этого аккаунта; повтор будет при следующем изменении сети или пробуждении.")
+                    }
+                    return false
+                }
             }
-            if applied { self.currentTDLibNetworkType = type }
+            if applied {
+                self.currentTDLibNetworkType = type
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+            }
         }
     }
 
@@ -827,13 +837,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             },
             startupFailures: profileStartupFailures
         )
+        let pendingNetworkUpdates = networkTypeFanoutCoordinator.pendingAccounts.count
+        let networkWarning = pendingNetworkUpdates > 0
+            ? " · сетевое обновление ожидает повтора: \(pendingNetworkUpdates)"
+            : ""
         let storageWarning = pendingProfileStorageWarnings > 0
             ? " · \(pendingProfileStorageWarnings) локальных профилей не проверены"
             : ""
         if accounts.isEmpty, knownProfilesByAccount.isEmpty {
-            statusMenuItem.title = "Аккаунтов пока нет\(storageWarning)"
+            statusMenuItem.title = "Аккаунтов пока нет\(storageWarning)\(networkWarning)"
         } else {
-            statusMenuItem.title = "Аккаунты: \(summary.authorizedCount) авторизованы · \(summary.awaitingInputCount) требуют входа · \(summary.failedCount) с ошибкой\(storageWarning)"
+            statusMenuItem.title = "Аккаунты: \(summary.authorizedCount) авторизованы · \(summary.awaitingInputCount) требуют входа · \(summary.failedCount) с ошибкой\(storageWarning)\(networkWarning)"
         }
         logoutAccountMenuItem?.isEnabled = !lockState
             && runtime?.telegramUserID != nil
@@ -1230,7 +1244,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 runtimeIsOpen: runtime != nil || profileStartupTasks[id] != nil,
                 hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil,
                 logoutCleanupPending: profile.logoutCleanupPending == true,
-                unverifiedRemovalPending: profile.unverifiedRemovalPending == true
+                unverifiedRemovalPending: profile.unverifiedRemovalPending == true,
+                networkUpdatePending: networkTypeFanoutCoordinator.pendingUpdate(for: id) != nil
             ))
         }
         accountPicker.isHidden = accountPickerAccounts.isEmpty
@@ -2144,9 +2159,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             await runtimeCoordinator.setState(.waitingForAuthorization, for: profile.id)
             guard !Task.isCancelled, !closingForTermination else { return }
             try runtime.send(parametersRequest(for: runtime))
-            try runtime.applyNetworkType(currentTDLibNetworkType)
+            do {
+                try runtime.applyNetworkType(currentTDLibNetworkType)
+            } catch {
+                let revision = networkTypeFanoutCoordinator.latestAcceptedRevision
+                if revision > 0 {
+                    _ = networkTypeFanoutCoordinator.recordPending(
+                        account: profile.id,
+                        type: currentTDLibNetworkType,
+                        revision: revision
+                    )
+                }
+                // This setter is recoverable; its failure must not mark the
+                // whole account startup as failed or close its TDLib client.
+            }
             if presentsThisRuntime { try runtime.send(["@type": "getCountries"]) }
             profileStartupFailures.remove(profile.id)
+            refreshAccountPicker()
+            refreshStatusMenu()
         } catch {
             if didRegisterStartupRoute, let startupRuntime {
                 if !startupRuntime.initializationRequestWasQueued, let route = startupRuntime.route {
@@ -2158,6 +2188,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                         if runtimesByAccount[profile.id] === startupRuntime {
                             runtimesByAccount.removeValue(forKey: profile.id)
                         }
+                        networkTypeFanoutCoordinator.forget(account: profile.id)
                         if self.runtime === startupRuntime {
                             self.runtime = runtimesByAccount.values.first
                             pendingAuthorizationType = nil
@@ -2602,6 +2633,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)
+                networkTypeFanoutCoordinator.forget(account: target.account)
                 visibleReadReceiptRegistry.remove(account: target.account)
                 if !confirmedLogout {
                     // A closed runtime cannot reconcile its old notification
