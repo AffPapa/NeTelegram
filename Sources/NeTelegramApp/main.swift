@@ -376,6 +376,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         qrImageView = NSImageView(frame: .zero)
         qrImageView.imageScaling = .scaleProportionallyUpOrDown
         qrImageView.isHidden = true
+        qrImageView.setAccessibilityLabel("QR-код подтверждения входа в Telegram")
+        qrImageView.setAccessibilityHelp("Откройте Telegram на телефоне, перейдите в Настройки → Устройства → Подключить устройство и отсканируйте код.")
 
         actionButton = NSButton(title: "Продолжить", target: self, action: #selector(primaryAction))
         actionButton.bezelStyle = .rounded
@@ -5388,12 +5390,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         firstNameField.isHidden = true
         lastNameField.isHidden = true
         registrationConsent.isHidden = true
-        qrImageView.isHidden = false
         if let link = auth["link"] as? String {
-            qrImageView.image = qrImage(for: link)
-            setStatus("Подтвердите вход на своём телефоне.")
+            if let image = qrImage(for: link) {
+                qrImageView.image = image
+                qrImageView.isHidden = false
+                setStatus("Подтвердите вход на своём телефоне.")
+            } else {
+                qrImageView.image = nil
+                qrImageView.isHidden = true
+                setStatus("Не удалось сформировать QR-код. Попробуйте позже.")
+            }
         } else {
             qrImageView.image = nil
+            qrImageView.isHidden = true
             setStatus("Ожидаю обновлённую ссылку для входа по QR-коду.")
         }
         actionButton.isHidden = true
