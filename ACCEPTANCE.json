@@ -3,7 +3,7 @@
   "status": "implementation_in_progress; app source 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. Latest APP16 targeted queue test and exact-SHA CI passed. Release signing identities: 0; no public app release. Public Site v123 is live with downloads correctly unavailable. Real-account and 20-runtime coverage remain unverified.",
   "current_evidence": {
     "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
-    "app_tests": "Targeted APP16 queue shutdown test updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput passed locally 1/1; exact-SHA macOS CI run 38409529115 succeeded for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a. Synthetic buffered JSON only; no real TDLib, TTL expiry, 20-client overload or real-account certification. New test: twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1; hosted CI pending for the current test commit.",
+    "app_tests": "Targeted APP16 queue shutdown test updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput passed locally 1/1; exact-SHA macOS CI run 38409529115 succeeded for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a. Synthetic buffered JSON only; no real TDLib, TTL expiry, 20-client overload or real-account certification. New test: twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1; exact-SHA macOS CI 38412386934 passed for test commit 5879143cc420cb0047606d099aa49810a609060e.",
     "github_workflows": [
       "https://github.com/AffPapa/NeTelegram/actions/runs/38407467618",
       "https://github.com/AffPapa/NeTelegram/actions/runs/38407466662"
@@ -29,7 +29,7 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial."
+      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial."
     },
     {
       "id": "APP02",
@@ -460,12 +460,12 @@
     "source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-restore-composition --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
     "local_result": "New 20-profile Core composition regression passed 1/1 locally on Xcode 27.0 / Swift 6.4. Synthetic Core-only test; APP01 stays partial pending hosted CI and real-account certification.",
-    "hosted_ci": "Exact-source macOS CI 38407467618 succeeded for 816bbb4ab2a61817cc3da0780f47219b1f8f52e9; pinned TDLib/Dev.app workflow 38407466662 succeeded.",
+    "hosted_ci": "Exact-SHA macOS CI 38412386934 passed for test commit 5879143cc420cb0047606d099aa49810a609060e.",
     "native_dev_app_smoke": "Exact-source workflow 38407466662 launched app-source 816bbb4...; same-PID window close/reopen and Cmd+Q passed. Screenshot captured but not visually reviewed. No account login.",
     "scope": "Synthetic status/action policy test only. Real OS registration persistence/removal, disposable-user login-item smoke, Telegram login, and account coverage remain unverified.",
     "branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "seo": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
-    "publication": "Public Site v123 source bbfa7c7df93f9bf2974291109a71f11ccaad80a4, deployment appgdep_6ace3a2734c881918019aefea91f33ee; anonymous routes verified. GitHub release API currently returns an empty list.",
+    "publication": "Public Site v123 source bbfa7c7df93f9bf2974291109a71f11ccaad80a4, deployment appgdep_6ace3a2734c881918019aefea91f33ee; anonymous routes verified. GitHub release API currently returns an empty list. Site v123 remains live pending the APP01 development-log sync.",
     "release_preflight": "2026-10-13 security identity count is 0 valid / 0 Developer ID Application. GitHub releases API returned []. Release remains unavailable."
   },
   "latest_site_deployment": {

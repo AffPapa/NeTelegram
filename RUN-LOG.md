@@ -137,4 +137,4 @@
 
 - Change: added `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges`, combining the restore plan, two-at-a-time startup scheduler, runtime route registration, a stalled open, a rejected first request, fresh-generation retry, 20 routed update identities, and A→B→A presentation selection.
 - Verification: focused local Swift test passed 1/1 on Xcode 27.0 / Swift 6.4.
-- Limits: synthetic Core-only contracts; it does not invoke AppDelegate restore/startup functions, TDLib, real Telegram accounts, all-20 network sessions, or performance measurement. APP01 remains partial. Hosted CI is pending.
+- Limits: synthetic Core-only contracts; it does not invoke AppDelegate restore/startup functions, TDLib, real Telegram accounts, all-20 network sessions, or performance measurement. APP01 remains partial. Hosted validation: exact-SHA macOS CI 38412386934 passed on commit `5879143cc420cb0047606d099aa49810a609060e`.
