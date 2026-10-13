@@ -1,6 +1,6 @@
-# NeTelegram
+# Neridian
 
-A native macOS messaging client built with Swift, AppKit, and pinned TDLib. This repository is public source for a project in active development; there is no stable app download.
+Neridian is a native macOS messaging client built with Swift, AppKit, and pinned TDLib. NeTelegram remains the repository codename. This repository is public source for a project in active development; there is no stable app download.
 
 ## Status
 

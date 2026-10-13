@@ -25,7 +25,7 @@ public enum IncomingMessagePresentation {
         case "messagePoll":
             "Опрос · интерактивный просмотр не поддерживается"
         case "messageInvoice", "messagePaidMedia":
-            "Платный контент · NeTelegram не выполняет оплату"
+            "Платный контент · \(ProductIdentity.displayName) не выполняет оплату"
         case "messageStory":
             "История · просмотр не поддерживается"
         default:

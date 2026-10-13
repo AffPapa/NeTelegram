@@ -2566,7 +2566,7 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     let locked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: true, chatTitle: "Private chat", isReconciliation: true)
     let unlocked = TDLibNotificationRouter.presentation(for: routed, isPrivacyLocked: false, chatTitle: "Alice")
 
-    #expect(locked == TDLibNotificationPresentation(title: "NeTelegram", body: "Новое сообщение", playsSound: false))
+    #expect(locked == TDLibNotificationPresentation(title: ProductIdentity.displayName, body: "Новое сообщение", playsSound: false))
     #expect(!locked.title.contains("Private chat"))
     #expect(!locked.body.contains("Sensitive message text"))
     #expect(unlocked == TDLibNotificationPresentation(title: "Alice", body: "Sensitive message text", playsSound: true))

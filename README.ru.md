@@ -1,6 +1,6 @@
-# NeTelegram
+# Neridian
 
-NeTelegram — нативный клиент для macOS на Swift и AppKit с TDLib. Проект находится в разработке; публичного установщика пока нет.
+Neridian — публичное имя нативного клиента для macOS на Swift и AppKit с TDLib. NeTelegram остаётся codename репозитория. Проект находится в разработке; публичного установщика пока нет.
 
 ## Состояние
 

@@ -55,7 +55,7 @@ public enum TDLibNotificationRouter {
     ) -> TDLibNotificationPresentation {
         let playsSound = !isReconciliation && !notification.isSilent
         guard !isPrivacyLocked else {
-            return TDLibNotificationPresentation(title: "NeTelegram", body: "Новое сообщение", playsSound: playsSound)
+            return TDLibNotificationPresentation(title: ProductIdentity.displayName, body: "Новое сообщение", playsSound: playsSound)
         }
         return TDLibNotificationPresentation(
             title: chatTitle ?? "Новое сообщение",

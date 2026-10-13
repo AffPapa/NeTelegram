@@ -547,7 +547,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         lockedView.wantsLayer = true
         lockedView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
         lockedView.isHidden = true
-        let lockedTitle = NSTextField(labelWithString: "NeTelegram заблокирован")
+        let lockedTitle = NSTextField(labelWithString: "\(ProductIdentity.displayName) заблокирован")
         lockedTitle.identifier = NSUserInterfaceItemIdentifier("lockedTitle")
         lockedTitle.font = .systemFont(ofSize: 24, weight: .semibold)
         lockedTitle.alignment = .center
@@ -566,7 +566,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         content.addSubview(lockedView)
 
         let window = NSWindow(contentRect: content.frame, styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
-        window.title = identifiedWindowTitle("NeTelegram")
+        window.title = identifiedWindowTitle(ProductIdentity.displayName)
         window.contentView = content
         // NSWindow owns the content view's frame. The auth stack is centered
         // by Auto Layout inside that coordinate space, independent of window size.
@@ -767,7 +767,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let appMenuItem = NSMenuItem()
         main.addItem(appMenuItem)
         let appMenu = NSMenu()
-        appMenu.addItem(withTitle: "О NeTelegram", action: nil, keyEquivalent: "")
+        appMenu.addItem(withTitle: "О \(ProductIdentity.displayName)", action: nil, keyEquivalent: "")
         appMenu.addItem(.separator())
         let loginSettings = NSMenuItem(
             title: "Запускать при входе в macOS…",
@@ -810,20 +810,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let service = SMAppService.mainApp
         guard service.status != .notFound else {
             let error = NSAlert()
-            error.messageText = "macOS не нашла службу автозапуска NeTelegram"
+            error.messageText = "macOS не нашла службу автозапуска \(ProductIdentity.displayName)"
             error.informativeText = "Откройте приложение из установленного пакета и повторите попытку."
             error.runModal()
             return
         }
 
         let enabled = service.status == .enabled || service.status == .requiresApproval
-        let toggle = NSButton(checkboxWithTitle: "Запускать NeTelegram при входе в macOS", target: nil, action: nil)
+        let toggle = NSButton(checkboxWithTitle: "Запускать \(ProductIdentity.displayName) при входе в macOS", target: nil, action: nil)
         toggle.state = enabled ? .on : .off
 
         let alert = NSAlert()
-        alert.messageText = "Автозапуск NeTelegram"
+        alert.messageText = "Автозапуск \(ProductIdentity.displayName)"
         alert.informativeText = service.status == .requiresApproval
-            ? "Подтвердите NeTelegram в Системных настройках → Основные → Объекты входа. Выключите переключатель здесь, чтобы отменить регистрацию."
+            ? "Подтвердите \(ProductIdentity.displayName) в Системных настройках → Основные → Объекты входа. Выключите переключатель здесь, чтобы отменить регистрацию."
             : "Настройка использует встроенную службу входа macOS. По умолчанию автозапуск выключен."
         alert.accessoryView = toggle
         alert.addButton(withTitle: "Применить")
@@ -842,11 +842,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     setStatus("Автозапуск ожидает разрешения в Системных настройках.")
                     SMAppService.openSystemSettingsLoginItems()
                 } else {
-                    setStatus("Автозапуск NeTelegram при входе включён.")
+                    setStatus("Автозапуск \(ProductIdentity.displayName) при входе включён.")
                 }
             } else {
                 if service.status != .notRegistered { try service.unregister() }
-                setStatus("Автозапуск NeTelegram при входе выключен.")
+                setStatus("Автозапуск \(ProductIdentity.displayName) при входе выключен.")
             }
         } catch {
             setStatus("macOS не изменила настройку автозапуска. Проверьте объекты входа в Системных настройках.")
@@ -1078,7 +1078,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
-                self.setStatus("Не найден API hash самого NeTelegram в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
+                self.setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
             } catch {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
@@ -1149,7 +1149,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         actionButton.isEnabled = !profileRestoreInProgress && !closingForTermination
         actionButton.isHidden = false
         setStatus("Профиль закрыт. Локальные данные сохранены; повторный вход в другой аккаунт не выполняется.")
-        window.title = identifiedWindowTitle("Профиль временно закрыт — NeTelegram")
+        window.title = identifiedWindowTitle("Профиль временно закрыт — \(ProductIdentity.displayName)")
     }
 
     /// Clears the previous account's visible conversation before opening a
@@ -1189,7 +1189,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading.stringValue = "Локальный профиль"
         loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные предыдущего профиля скрыты."
         statusLabel.stringValue = "Открываю профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…"
-        window.title = identifiedWindowTitle("NeTelegram")
+        window.title = identifiedWindowTitle(ProductIdentity.displayName)
     }
 
     private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
@@ -1545,7 +1545,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         } catch SecretsStoreError.missing {
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
-            setStatus("Не найден API hash самого NeTelegram в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
+                setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
         } catch {
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
@@ -1614,7 +1614,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-            setStatus("Не найден API hash самого NeTelegram в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+                setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
         } catch let error as AccountStorageLeaseError {
             setStatus(error.localizedDescription)
         } catch let error as AccountStorageUpgradeError {
@@ -1869,7 +1869,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func handleTDLibReceiveFailure() {
         tdlibReceiveFailed = true
         refreshComposerState()
-        setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите NeTelegram после освобождения памяти.")
+        setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите \(ProductIdentity.displayName) после освобождения памяти.")
     }
 
     private func handle(_ object: [String: Any], from target: LocalAccountRuntime) async {
@@ -5333,7 +5333,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard targetIsAuthorizedSelected() else { return }
         authStack.isHidden = true
         chatPane.isHidden = false
-        window.title = identifiedWindowTitle(runtime.flatMap(safeAccountName).map { "\($0) — NeTelegram" } ?? "NeTelegram")
+        window.title = identifiedWindowTitle(runtime.flatMap(safeAccountName).map { "\($0) — \(ProductIdentity.displayName)" } ?? ProductIdentity.displayName)
     }
 
     private func targetIsAuthorizedSelected() -> Bool { runtime?.telegramUserID != nil }
@@ -5519,7 +5519,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         showAuthorizationProgress(
             title: purchaseRequired ? "Для входа требуется покупка" : "Шаг входа не поддерживается",
             subtitle: purchaseRequired
-                ? "Telegram запрашивает покупку Premium. NeTelegram не проводит покупки; для этого профиля вход остановлен."
+                ? "Telegram запрашивает покупку Premium. \(ProductIdentity.displayName) не проводит покупки; для этого профиля вход остановлен."
                 : "Telegram сообщил неизвестный шаг авторизации. Ввод временно выключен, сохранённые данные профиля не изменены."
         )
     }
@@ -5674,7 +5674,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             title: "Выходим из аккаунта",
             subtitle: "Ожидаю подтверждения Telegram. Остальные аккаунты продолжают работать."
         )
-        window.title = identifiedWindowTitle("Выход из аккаунта — NeTelegram")
+        window.title = identifiedWindowTitle("Выход из аккаунта — \(ProductIdentity.displayName)")
         setStatus("Telegram завершает сеанс и удаляет локальные данные аккаунта…")
     }
 
@@ -5859,7 +5859,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         setComposerText("")
         refreshComposerState()
         lockedView.isHidden = false
-        window.title = identifiedWindowTitle("Заблокировано — NeTelegram")
+        window.title = identifiedWindowTitle("Заблокировано — \(ProductIdentity.displayName)")
         // Reject queued or late UI intent before requesting system authentication.
         unlock()
     }
@@ -5874,7 +5874,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         unlockInProgress = true
-        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Разблокировать NeTelegram") { [weak self] success, _ in
+        context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: "Разблокировать \(ProductIdentity.displayName)") { [weak self] success, _ in
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.unlockInProgress = false
@@ -5918,7 +5918,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.showAuthenticatedChatUI()
                     self.refreshChatList()
                     self.displaySelectedConversation()
-                    self.window.title = self.identifiedWindowTitle(self.safeAccountName(selected).map { "\($0) — NeTelegram" } ?? "NeTelegram")
+                    self.window.title = self.identifiedWindowTitle(self.safeAccountName(selected).map { "\($0) — \(ProductIdentity.displayName)" } ?? ProductIdentity.displayName)
                 } else if let selected = self.runtime {
                     self.presentAuthorizationState(self.pendingAuthorizationType, info: self.authPresentationInfoByAccount[selected.account] ?? [:])
                 } else if let closedProfile = self.closedProfileToRetry {

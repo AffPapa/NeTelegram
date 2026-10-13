@@ -9,9 +9,9 @@ public enum AccountStorageLeaseError: Error, Equatable, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .alreadyInUse:
-            return "Данные NeTelegram уже используются другим процессом. Закройте второй экземпляр и повторите запуск."
+            return "Данные \(ProductIdentity.displayName) уже используются другим процессом. Закройте второй экземпляр и повторите запуск."
         case .system:
-            return "Не удалось безопасно зарезервировать каталог данных NeTelegram. Данные не открыты и не изменены."
+            return "Не удалось безопасно зарезервировать каталог данных \(ProductIdentity.displayName). Данные не открыты и не изменены."
         }
     }
 }
@@ -64,13 +64,13 @@ public enum AccountStorageUpgradeError: Error, Equatable, LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .invalidBuildNumber:
-            return "Сборка NeTelegram не содержит корректный монотонный номер. Каталоги аккаунтов не открыты."
+            return "Сборка \(ProductIdentity.displayName) не содержит корректный монотонный номер. Каталоги аккаунтов не открыты."
         case .corruptState:
-            return "Не удалось проверить версию формата данных NeTelegram. Каталоги аккаунтов не открыты и не сброшены."
+            return "Не удалось проверить версию формата данных \(ProductIdentity.displayName). Каталоги аккаунтов не открыты и не сброшены."
         case .unsupportedStateSchema:
-            return "Версия NeTelegram не понимает метаданные данных аккаунтов. Установите более новую версию; данные сохранены."
+            return "Версия \(ProductIdentity.displayName) не понимает метаданные данных аккаунтов. Установите более новую версию; данные сохранены."
         case let .downgrade(current, highestOpened):
-            return "Запуск старой сборки NeTelegram (\(current)) заблокирован после использования сборки \(highestOpened). Установите последнюю версию; данные сохранены."
+            return "Запуск старой сборки \(ProductIdentity.displayName) (\(current)) заблокирован после использования сборки \(highestOpened). Установите последнюю версию; данные сохранены."
         }
     }
 }
