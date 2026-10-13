@@ -47,6 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var profileOrder: [AccountUUID] = []
     private var profileStartupFailures: Set<AccountUUID> = []
     private var profileOpenRequests: Set<AccountUUID> = []
+    private var profileStartupTasks: [AccountUUID: (id: UUID, task: Task<Void, Never>)] = [:]
     private var closedProfileToRetry: AccountUUID?
     private var catalogueRoot: URL?
     private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
@@ -220,6 +221,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             setStatus("Ожидаю подтверждения TDLib перед повторной попыткой выхода.")
             return .terminateCancel
         }
+        let cancelledProfileStarts = cancelPendingProfileStartsForTermination()
         if runtimesByClient.isEmpty {
             guard let gateway, !gateway.receiveWorkerHasExited else { return .terminateNow }
             terminationBarrier.begin()
@@ -241,9 +243,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // whose previous TDLib clients have fully closed.
             terminationBarrier.cancel()
             pendingClosures.subtract(rejected)
-            resumeProfilesAfterAbortedTermination = !pendingClosures.isEmpty
+            resumeProfilesAfterAbortedTermination = !pendingClosures.isEmpty || cancelledProfileStarts
             setStatus("TDLib не принял закрытие одного или нескольких аккаунтов. Приложение осталось открытым; повторный выход будет доступен после восстановления runtime.")
-            if pendingClosures.isEmpty { resumeProfilesAfterAbortedTermination = false }
+            if pendingClosures.isEmpty, cancelledProfileStarts {
+                scheduleProfileRecoveryAfterAbortedTermination()
+            }
             return .terminateCancel
         }
         terminationReply = { [weak self] allow in
@@ -999,7 +1003,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 telegramUserID: runtime?.telegramUserID ?? profile.telegramUserID,
                 candidate: runtime?.displayName ?? profile.displayName,
                 authorizationState: runtime?.authorizationState,
-                runtimeIsOpen: runtime != nil,
+                runtimeIsOpen: runtime != nil || profileStartupTasks[id] != nil,
                 hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil,
                 logoutCleanupPending: profile.logoutCleanupPending == true
             ))
@@ -1026,6 +1030,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func retryOpeningProfile(_ account: AccountUUID) {
         guard !lockState, !profileRestoreInProgress, !closingForTermination,
               !profileOpenRequests.contains(account),
+              profileStartupTasks[account] == nil,
               let profile = knownProfilesByAccount[account] else { return }
         prepareToSelectUnopenedProfile(account)
         if profile.logoutCleanupPending == true {
@@ -1039,7 +1044,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             defer { self.profileOpenRequests.remove(account) }
             do {
                 let apiHash = try SecretsStore().telegramAPIHash()
-                await self.openProfile(profile, apiHash: apiHash, select: true)
+                if let startup = self.scheduleProfileStartup(profile, apiHash: apiHash, select: true) {
+                    await startup.value
+                }
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не найден API hash самого NeTelegram в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
@@ -1448,7 +1455,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 pending: pending,
                 pendingWithStoredDatabase: pendingWithStoredDatabase
             )
-            let toRestore = candidates.filter { runtimesByAccount[$0.id] == nil }
+            let toRestore = candidates.filter {
+                runtimesByAccount[$0.id] == nil && profileStartupTasks[$0.id] == nil
+            }
             if toRestore.isEmpty {
                 if profiles.isEmpty {
                     pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
@@ -1465,10 +1474,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // Start every authorized profile through the bounded scheduler.
             // openProfile releases its permit after the first TDLib request,
             // before any phone/code/2FA network wait can begin.
-            let starts = toRestore.map { profile in
-                Task { @MainActor in await openProfile(profile, apiHash: apiHash) }
+            for profile in toRestore {
+                _ = scheduleProfileStartup(profile, apiHash: apiHash)
             }
-            for start in starts { await start.value }
             refreshAccountPicker()
             refreshOutgoingPhotoRecoveryStatus()
             if authorized.isEmpty {
@@ -1525,8 +1533,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    private func cancelPendingProfileStartsForTermination() -> Bool {
+        let tasks = profileStartupTasks.values.map { $0.task }
+        profileStartupTasks.removeAll()
+        tasks.forEach { $0.cancel() }
+        return !tasks.isEmpty
+    }
+
     private func addAccountProfile() async {
         do {
+            guard !closingForTermination else { return }
             let apiHash = try SecretsStore().telegramAPIHash()
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
@@ -1534,7 +1550,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if !profileOrder.contains(profile.id) { profileOrder.append(profile.id) }
             profileStartupFailures.remove(profile.id)
             refreshAccountPicker(select: profile.id)
-            await openProfile(profile, apiHash: apiHash, select: true)
+            if let startup = scheduleProfileStartup(profile, apiHash: apiHash, select: true) {
+                await startup.value
+            }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
             setStatus("Не найден API hash самого NeTelegram в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
@@ -1543,14 +1561,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func openProfile(_ profile: AccountProfile, apiHash: String, select: Bool = false) async {
-        await startupScheduler.withPermit { [weak self] in
+    @discardableResult
+    private func scheduleProfileStartup(
+        _ profile: AccountProfile,
+        apiHash: String,
+        select: Bool = false
+    ) -> Task<Void, Never>? {
+        guard !closingForTermination, runtimesByAccount[profile.id] == nil else { return nil }
+        if let pending = profileStartupTasks[profile.id] { return pending.task }
+        let taskID = UUID()
+        let task = Task { @MainActor [weak self] in
             guard let self else { return }
+            defer {
+                if self.profileStartupTasks[profile.id]?.id == taskID {
+                    self.profileStartupTasks.removeValue(forKey: profile.id)
+                    self.refreshAccountPicker(select: self.runtime?.account == profile.id ? profile.id : nil)
+                    self.refreshStatusMenu()
+                }
+            }
+            await self.openProfile(profile, apiHash: apiHash, select: select)
+        }
+        profileStartupTasks[profile.id] = (taskID, task)
+        refreshAccountPicker(select: runtime?.account == profile.id ? profile.id : nil)
+        return task
+    }
+
+    private func openProfile(_ profile: AccountProfile, apiHash: String, select: Bool = false) async {
+        guard !Task.isCancelled, !closingForTermination,
+              runtimesByAccount[profile.id] == nil else { return }
+        await startupScheduler.withPermit { [weak self] in
+            guard let self, !Task.isCancelled else { return }
             await self.openProfileWhileHoldingStartupPermit(profile, apiHash: apiHash, select: select)
         }
     }
 
     private func openProfileWhileHoldingStartupPermit(_ profile: AccountProfile, apiHash: String, select: Bool) async {
+        guard !Task.isCancelled, !closingForTermination,
+              runtimesByAccount[profile.id] == nil else { return }
         var startupRuntime: LocalAccountRuntime?
         var didRegisterStartupRoute = false
         do {
@@ -1564,6 +1611,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 let key = try SecretsStore().databaseKey(for: profile.id, createIfMissing: !hasDatabaseFiles)
                 return (paths, key)
             }.value
+            guard !Task.isCancelled, !closingForTermination else { return }
             do {
                 let draftsURL = prepared.0.appState.appendingPathComponent("drafts.aesgcm")
                 let appStateKey = try SecretsStore().appStateKey(
@@ -1595,11 +1643,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("Не удалось прочитать очередь фотографий аккаунта. Данные отправки сохранены.")
             }
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
+            guard !Task.isCancelled, !closingForTermination else { return }
             let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.0, databaseKey: prepared.1, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
             startupRuntime = runtime
             let route = try runtime.registerRoute()
             try await runtimeCoordinator.registerBeforeFirstRequest(route)
             didRegisterStartupRoute = true
+            guard !Task.isCancelled, !closingForTermination else {
+                _ = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
+                return
+            }
             runtimesByClient[route.client.value] = runtime
             runtimesByAccount[profile.id] = runtime
             refreshStatusMenu()
@@ -1627,6 +1680,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 )
             }
             await runtimeCoordinator.setState(.waitingForAuthorization, for: profile.id)
+            guard !Task.isCancelled, !closingForTermination else { return }
             try runtime.send(parametersRequest(for: runtime))
             try runtime.applyNetworkType(currentTDLibNetworkType)
             if presentsThisRuntime { try runtime.send(["@type": "getCountries"]) }

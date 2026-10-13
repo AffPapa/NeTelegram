@@ -780,6 +780,46 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable() async {
+    let scheduler = RuntimeStartupScheduler(parallelism: 1)
+    let activeStartup = AsyncTestGate()
+    let activeHasPermit = LockedTestValue(false)
+    let cancelledOperationRan = LockedTestValue(false)
+
+    let active = Task {
+        await scheduler.withPermit {
+            activeHasPermit.set(true)
+            await activeStartup.wait()
+        }
+    }
+    #expect(await waitForTrue(activeHasPermit, timeout: .seconds(2)))
+
+    let queued = Task {
+        await scheduler.withPermit {
+            guard !Task.isCancelled else { return }
+            cancelledOperationRan.set(true)
+        }
+    }
+    var isQueued = false
+    for _ in 0..<2_000 {
+        if await scheduler.queuedStarts() == 1 {
+            isQueued = true
+            break
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(isQueued)
+
+    queued.cancel()
+    await activeStartup.open()
+    await active.value
+    await queued.value
+
+    #expect(!cancelledOperationRan.get())
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func criticalEventsAreNotCoalescedAway() async {
     let coordinator = RuntimeCoordinator()
     #expect(await coordinator.mayCoalesce(.ordinaryState))
