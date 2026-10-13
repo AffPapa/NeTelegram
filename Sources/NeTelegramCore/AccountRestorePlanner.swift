@@ -1,4 +1,14 @@
 public enum AccountRestorePlanner {
+    public struct EnqueueResult: Equatable, Sendable {
+        public let queued: [AccountUUID]
+        public let rejected: [AccountUUID]
+
+        public init(queued: [AccountUUID], rejected: [AccountUUID]) {
+            self.queued = queued
+            self.rejected = rejected
+        }
+    }
+
     /// Keeps every planned account eligible for startup while excluding only
     /// runtimes that already exist or have an account-specific startup task.
     /// The input order is preserved for deterministic startup scheduling.
@@ -18,17 +28,23 @@ public enum AccountRestorePlanner {
         candidates: [AccountProfile],
         running: Set<AccountUUID>,
         starting: Set<AccountUUID>,
-        enqueue: (AccountProfile) -> Void
-    ) -> [AccountUUID] {
+        enqueue: (AccountProfile) -> Bool
+    ) -> EnqueueResult {
         let pending = pendingStartupProfiles(
             candidates: candidates,
             running: running,
             starting: starting
         )
+        var queued: [AccountUUID] = []
+        var rejected: [AccountUUID] = []
         for profile in pending {
-            enqueue(profile)
+            if enqueue(profile) {
+                queued.append(profile.id)
+            } else {
+                rejected.append(profile.id)
+            }
         }
-        return pending.map(\.id)
+        return EnqueueResult(queued: queued, rejected: rejected)
     }
 
     /// Restores every verified identity plus any unverified profile whose

@@ -1198,9 +1198,11 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
                 await gate.wait()
             })
         }
+        return true
     }
 
-    #expect(enqueuedIDs == enqueued)
+    #expect(enqueuedIDs.queued == enqueued)
+    #expect(enqueuedIDs.rejected.isEmpty)
     #expect(enqueued.count == 18)
     #expect(!enqueued.contains(running))
     #expect(!enqueued.contains(starting))
@@ -1211,6 +1213,36 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 
     await gate.open()
     await stalledStartup.get()?.value
+}
+
+@Test func restoreEnqueueReportsOneRejectedProfileWithoutDroppingOtherEligibleProfiles() {
+    let profiles = (1...20).map { n in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "72000000-0000-0000-0000-%012d", n))!),
+            telegramUserID: Int64(72_000 + n)
+        )
+    }
+    let alreadyRunning = profiles[1].id
+    let alreadyStarting = profiles[3].id
+    let rejected = profiles[12].id
+    var accepted: [AccountUUID] = []
+
+    let result = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: profiles,
+        running: [alreadyRunning],
+        starting: [alreadyStarting]
+    ) { profile in
+        guard profile.id != rejected else { return false }
+        accepted.append(profile.id)
+        return true
+    }
+
+    #expect(result.rejected == [rejected])
+    #expect(result.queued == accepted)
+    #expect(result.queued.count == 17)
+    #expect(!result.queued.contains(alreadyRunning))
+    #expect(!result.queued.contains(alreadyStarting))
+    #expect(result.queued.contains(profiles[19].id))
 }
 
 @Test func runtimeGenerationChangesForEveryClientOfAnAccount() async {

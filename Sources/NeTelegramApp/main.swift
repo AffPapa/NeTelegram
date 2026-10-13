@@ -1908,35 +1908,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 pending: pending,
                 pendingWithStoredDatabase: pendingWithStoredDatabase
             )
-            let queuedAccountIDs = AccountRestorePlanner.enqueueStartupProfiles(
+            let enqueueResult = AccountRestorePlanner.enqueueStartupProfiles(
                 candidates: candidates,
                 running: Set(runtimesByAccount.keys),
                 starting: Set(profileStartupTasks.keys),
                 enqueue: { profile in
-                    _ = scheduleProfileStartup(profile, apiHash: apiHash)
+                    scheduleProfileStartup(profile, apiHash: apiHash) != nil
                 }
             )
-            if queuedAccountIDs.isEmpty {
+            profileStartupFailures.formUnion(enqueueResult.rejected)
+            if enqueueResult.queued.isEmpty {
                 if profiles.contains(where: { $0.logoutCleanupPending == true }) {
                     setStatus("Очистка после подтверждённого выхода ожидает. Выберите этот профиль, чтобы безопасно продолжить.")
                 } else if profiles.contains(where: { $0.unverifiedRemovalPending == true }) {
                     setStatus("Удаление незавершённого входа ожидает. Выберите этот профиль, чтобы безопасно повторить.")
+                } else if !enqueueResult.rejected.isEmpty {
+                    setStatus("Не удалось поставить в очередь запуск \(enqueueResult.rejected.count) профилей. Выберите профиль, чтобы повторить запуск.")
                 }
                 refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()
                 return
             }
-            setStatus(authorized.isEmpty ? "Подключаю вход…" : "Восстанавливаю аккаунты…")
+            let startupStatus: String
+            if !enqueueResult.rejected.isEmpty {
+                startupStatus = "Не удалось поставить в очередь \(enqueueResult.rejected.count) профилей; остальные запускаются."
+            } else if authorized.isEmpty {
+                startupStatus = phoneCountries.isEmpty
+                    ? "Введите полный номер с + и кодом страны. Список стран загружается."
+                    : "Выберите страну и введите номер телефона."
+            } else {
+                startupStatus = "Восстанавливаю аккаунты…"
+            }
+            setStatus(startupStatus)
             // Start every authorized profile through the bounded scheduler.
             // openProfile releases its permit after the first TDLib request,
             // before any phone/code/2FA network wait can begin.
             refreshAccountPicker()
             refreshOutgoingPhotoRecoveryStatus()
-            if authorized.isEmpty {
-                setStatus(phoneCountries.isEmpty
-                    ? "Введите полный номер с + и кодом страны. Список стран загружается."
-                    : "Выберите страну и введите номер телефона.")
-            }
         } catch let error as AccountStorageLeaseError {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
