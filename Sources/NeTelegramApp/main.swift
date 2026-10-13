@@ -43,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private let runtimeCoordinator = RuntimeCoordinator(startupParallelism: 2)
     private let startupScheduler = RuntimeStartupScheduler(parallelism: 2)
     private var catalogue: AccountCatalogue?
+    private var accountStorageLease: AccountStorageLease?
     private var knownProfilesByAccount: [AccountUUID: AccountProfile] = [:]
     private var profileOrder: [AccountUUID] = []
     private var profileStartupFailures: Set<AccountUUID> = []
@@ -1431,11 +1432,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         return value
     }
 
+    private func prepareAccountStorage() throws -> URL {
+        let root = try accountStorageRoot()
+        if accountStorageLease == nil {
+            accountStorageLease = try AccountStorageLease(rootURL: root)
+        }
+        _ = try AccountStorageUpgradeGate.prepare(
+            rootURL: root,
+            bundleBuildNumber: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        )
+        return root
+    }
+
     private func restoreProfiles(recoveryAfterCancelledTermination: Bool = false) async {
         guard !profileRestoreInProgress || recoveryAfterCancelledTermination else { return }
         profileRestoreInProgress = true
         defer { profileRestoreInProgress = false }
         do {
+            let storageRoot = try prepareAccountStorage()
             let catalogue = try accountCatalogue()
             var profiles = await catalogue.allProfiles()
             let cleanupProfiles = profiles.filter { $0.logoutCleanupPending == true }
@@ -1461,7 +1475,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let pending = profiles.filter { $0.telegramUserID == nil }.sorted { $0.createdAt < $1.createdAt }
             var pendingWithStoredDatabase = Set<AccountUUID>()
             pendingProfileStorageWarnings = 0
-            let storageRoot = try accountStorageRoot()
             for profile in pending {
                 let databaseURL = storageRoot
                     .appendingPathComponent(profile.id.id.uuidString.lowercased(), isDirectory: true)
@@ -1515,6 +1528,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     ? "Введите полный номер с + и кодом страны. Список стран загружается."
                     : "Выберите страну и введите номер телефона.")
             }
+        } catch let error as AccountStorageLeaseError {
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
+            setStatus(error.localizedDescription)
+        } catch let error as AccountStorageUpgradeError {
+            profileStartupFailures.formUnion(profileOrder)
+            refreshAccountPicker()
+            setStatus(error.localizedDescription)
         } catch SecretsStoreError.missing {
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
@@ -1574,6 +1595,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func addAccountProfile() async {
         do {
             guard !closingForTermination else { return }
+            _ = try prepareAccountStorage()
             let apiHash = try SecretsStore().telegramAPIHash()
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
@@ -1587,6 +1609,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
             setStatus("Не найден API hash самого NeTelegram в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+        } catch let error as AccountStorageLeaseError {
+            setStatus(error.localizedDescription)
+        } catch let error as AccountStorageUpgradeError {
+            setStatus(error.localizedDescription)
         } catch {
             setStatus("Не удалось создать профиль. Проверьте хранилище и Keychain.")
         }

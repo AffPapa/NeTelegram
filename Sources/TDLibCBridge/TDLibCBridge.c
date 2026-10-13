@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 
 typedef int (*create_client_id_fn)(void);
 typedef void (*send_fn)(int, const char *);
@@ -16,6 +17,14 @@ static char *loaded_path;
 static create_client_id_fn create_client_id;
 static send_fn send_request;
 static receive_fn receive_update;
+
+int nt_lock_file_exclusive(int file_descriptor) {
+    return flock(file_descriptor, LOCK_EX | LOCK_NB);
+}
+
+void nt_unlock_file(int file_descriptor) {
+    (void)flock(file_descriptor, LOCK_UN);
+}
 
 static void set_error(char *buffer, size_t capacity, const char *message) {
     if (buffer != NULL && capacity > 0) {

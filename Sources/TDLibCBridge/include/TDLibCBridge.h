@@ -16,4 +16,7 @@ typedef enum nt_tdlib_receive_status {
 nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, char **output);
 void nt_tdlib_free(void *buffer);
 
+int nt_lock_file_exclusive(int file_descriptor);
+void nt_unlock_file(int file_descriptor);
+
 #endif
