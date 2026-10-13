@@ -42,6 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var qrImageView: NSImageView!
     private var loginHeading: NSTextField!
     private var loginSubtitle: NSTextField!
+    private var authCard: AuthenticationCardView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
     private var gateway: TDLibGateway?
@@ -411,10 +412,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         authStack.distribution = .fill
         authStack.spacing = 14
         authStack.translatesAutoresizingMaskIntoConstraints = false
-        content.addSubview(authStack)
+        authCard = AuthenticationCardView(frame: .zero)
+        authCard.translatesAutoresizingMaskIntoConstraints = false
+        content.addSubview(authCard)
+        authCard.addSubview(authStack)
         NSLayoutConstraint.activate([
-            authStack.centerXAnchor.constraint(equalTo: content.centerXAnchor),
-            authStack.centerYAnchor.constraint(equalTo: content.centerYAnchor),
+            authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
+            authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
+            authCard.widthAnchor.constraint(equalToConstant: 568),
+            authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
+            authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
+            authStack.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 32),
+            authStack.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -32),
+            authStack.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 28),
+            authStack.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -28),
             mark.widthAnchor.constraint(equalToConstant: 64), mark.heightAnchor.constraint(equalToConstant: 64),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
@@ -610,6 +621,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     func windowDidBecomeKey(_ notification: Notification) {
         guard (notification.object as? NSWindow) === window else { return }
         scheduleVisibleReadReceiptEvaluation()
+    }
+
+    private func setAuthCardVisible(_ visible: Bool) {
+        authCard.isHidden = !visible
     }
 
     @objc private func messageViewportBoundsDidChange(_ notification: Notification) {
@@ -1151,7 +1166,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         closedProfileToRetry = account
         closePhotoViewer()
         clearStack(messageList)
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         chatPane.isHidden = true
         loginHeading.stringValue = "Профиль временно закрыт"
         loginSubtitle.stringValue = "Связь с Telegram для этого локального профиля закрылась. Профиль и база не удалены; можно повторно открыть именно этот профиль. Остальные аккаунты продолжают работу в фоне."
@@ -1192,7 +1207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingAuthorizationType = nil
         pendingInitialAuthorizationAction = nil
         chatPane.isHidden = true
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
         countryPicker.isHidden = true
         phoneField.isHidden = true
@@ -2218,7 +2233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     Task { @MainActor [weak self] in await self?.addAccountProfile() }
                 } else if wasSelected, confirmedLogout, runtimesByAccount.isEmpty {
                     chatPane.isHidden = true
-                    authStack.isHidden = false
+                    setAuthCardVisible(true)
                     loginHeading.stringValue = "Очистка профиля не завершена"
                     loginSubtitle.stringValue = "Telegram подтвердил выход. Локальная запись сохранена из-за ошибки очистки; добавьте другой аккаунт через меню «Аккаунт» после устранения ошибки Keychain или диска."
                     phoneField.isHidden = true
@@ -5464,7 +5479,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func showAuthenticatedChatUI() {
         guard targetIsAuthorizedSelected() else { return }
-        authStack.isHidden = true
+        setAuthCardVisible(false)
         chatPane.isHidden = false
         window.title = identifiedWindowTitle(runtime.flatMap(safeAccountName).map { "\($0) — \(ProductIdentity.displayName)" } ?? ProductIdentity.displayName)
     }
@@ -5508,7 +5523,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func showAuthInput(_ message: String, placeholder: String, button: String) {
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         phoneField.stringValue = ""
         setStatus(message)
         loginHeading.stringValue = pendingAuthorizationType == "authorizationStateWaitCode" ? "Введите код" : "Подтверждение входа"
@@ -5539,7 +5554,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func showQRConfirmation(_ auth: [String: Any]) {
         showingQR = true
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         loginHeading.stringValue = "Вход по QR-коду"
         loginSubtitle.stringValue = "Откройте Telegram на телефоне → Настройки → Устройства → Подключить устройство и отсканируйте код."
         registrationTermsScroll.isHidden = true
@@ -5576,7 +5591,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func presentAuthorizationState(_ authorizationType: String?, info: [String: Any]) {
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         chatPane.isHidden = true
         if authorizationType != nil,
            authorizationType != "authorizationStateWaitTdlibParameters",
@@ -5616,7 +5631,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func showAuthorizationProgress(title: String, subtitle: String) {
         showingQR = false
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         chatPane.isHidden = true
         loginHeading.stringValue = title
         loginSubtitle.stringValue = subtitle
@@ -5658,7 +5673,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func showEmailEntry() {
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
         phoneField.stringValue = ""
         inputField.stringValue = ""
@@ -5694,7 +5709,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func showRegistration(_ auth: [String: Any]) {
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         phoneField.stringValue = ""
         emailField.stringValue = ""
         inputField.stringValue = ""
@@ -5771,7 +5786,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func showPhoneEntry() {
-        authStack.isHidden = false
+        setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
         emailField.stringValue = ""
         emailField.isHidden = true
@@ -6368,6 +6383,26 @@ private final class LocalAccountRuntime {
     }
 
     func finishClose() {}
+}
+
+private final class AuthenticationCardView: NSView {
+    override var wantsUpdateLayer: Bool { true }
+
+    override func updateLayer() {
+        super.updateLayer()
+        guard let layer else { return }
+        effectiveAppearance.performAsCurrentDrawingAppearance {
+            layer.backgroundColor = NSColor.controlBackgroundColor.cgColor
+            layer.borderColor = NSColor.separatorColor.cgColor
+        }
+        layer.borderWidth = 1 / max(window?.backingScaleFactor ?? 2, 1)
+        layer.cornerRadius = 18
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        updateLayer()
+    }
 }
 
 let app = NSApplication.shared
