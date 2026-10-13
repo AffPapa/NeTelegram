@@ -36,7 +36,7 @@
       "method": "native AppKit",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "On canonical accountless /private/tmp/NeTelegram-Dev.app (build c6bd4e47), native AX close-button action closed the empty phone-entry window while macOS app inventory continued to report Neridian Dev as running. A subsequent app-state query exposed the phone-entry window again. No phone number or code was entered. This covers only empty-window close/process-resident/reopen UI; no authorized account existed, so continued background update processing and Dock-specific activation remain unverified."
+      "evidence": "On canonical accountless /private/tmp/NeTelegram-Dev.app (build c6bd4e47), invoked the native AX close button on the empty phone-entry window. macOS app inventory still reported Neridian Dev running. The next accessibility observation returned the window again, so the interval without a window and any Dock-specific reopen could not be independently observed. No phone number or code was entered. This does not prove continued background update processing; no authorized account existed."
     },
     {
       "id": "APP05",
