@@ -215,8 +215,8 @@
       "expected": "Все runtime закрыты перед replacement, drafts/accounts восстановлены; unsafe downgrade заблокирован.",
       "method": "isolated test DB/native",
       "required_for": "updates",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "AccountStorageLease acquires an exclusive advisory file lock before catalogue/profile reads and remains held while the app process owns the account root; the kernel releases it when the owner exits. AccountStorageUpgradeGate atomically records the highest numeric CFBundleVersion before TDLib can open account DBs; production requires a positive build number, while only the isolated .dev debug bundle may use zero. Lower builds, invalid build metadata and corrupt/future markers fail closed without deleting the marker or account data. Lease/reopen, advance/same-build/downgrade, corrupt-marker and build-number policy tests pass; full local suite is 116/116 at 6b085f194941393db5aaa9dd761648b8e809bcd8. Exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38359578679 and pinned TDLib/isolated Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38359578673 succeeded for this SHA; Dev.app smoke was accountless and used the CI isolated support root. No real multi-process install race, TDLib schema migration, backup/restore of account DBs, or real-account upgrade/reopen was exercised; status remains partial."
     },
     {
       "id": "APP25",
