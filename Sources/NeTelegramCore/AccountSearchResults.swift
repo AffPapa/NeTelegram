@@ -1,5 +1,60 @@
 import Foundation
 
+public struct AccountSearchRequestContext: Hashable, Sendable {
+    public let account: AccountUUID
+    public let runtimeGeneration: RuntimeGeneration
+    public let searchGeneration: UInt64
+
+    public init(account: AccountUUID, runtimeGeneration: RuntimeGeneration, searchGeneration: UInt64) {
+        self.account = account
+        self.runtimeGeneration = runtimeGeneration
+        self.searchGeneration = searchGeneration
+    }
+
+    public func acceptsResponse(
+        from account: AccountUUID,
+        runtimeGeneration: RuntimeGeneration,
+        searchGeneration: UInt64,
+        isLocked: Bool
+    ) -> Bool {
+        !isLocked
+            && self.account == account
+            && self.runtimeGeneration == runtimeGeneration
+            && self.searchGeneration == searchGeneration
+    }
+}
+
+public struct AccountSearchRequestRegistry: Sendable {
+    private var requests: [String: AccountSearchRequestContext] = [:]
+
+    public init() {}
+
+    public var isEmpty: Bool { requests.isEmpty }
+
+    public mutating func register(_ context: AccountSearchRequestContext, for extra: String) {
+        requests[extra] = context
+    }
+
+    public mutating func take(for extra: String) -> AccountSearchRequestContext? {
+        requests.removeValue(forKey: extra)
+    }
+
+    @discardableResult
+    public mutating func remove(account: AccountUUID, runtimeGeneration: RuntimeGeneration? = nil) -> Int {
+        let keys = requests.compactMap { key, context in
+            context.account == account
+                && (runtimeGeneration == nil || context.runtimeGeneration == runtimeGeneration)
+                ? key : nil
+        }
+        for key in keys { requests.removeValue(forKey: key) }
+        return keys.count
+    }
+
+    public mutating func removeAll() {
+        requests.removeAll(keepingCapacity: true)
+    }
+}
+
 public struct AccountSearchResultKey: Hashable, Sendable {
     public let account: AccountUUID
     public let conversation: ConversationKey?
@@ -64,5 +119,13 @@ public struct AccountSearchResults: Sendable {
         order.removeAll(keepingCapacity: true)
         rows.removeAll(keepingCapacity: true)
         counts.removeAll(keepingCapacity: true)
+    }
+
+    public mutating func removeAll(for account: AccountUUID) {
+        let removed = Set(order.filter { $0.account == account })
+        guard !removed.isEmpty else { return }
+        order.removeAll { removed.contains($0) }
+        for key in removed { rows.removeValue(forKey: key) }
+        counts.removeValue(forKey: account)
     }
 }

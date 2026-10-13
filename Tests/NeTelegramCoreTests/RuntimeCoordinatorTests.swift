@@ -1656,6 +1656,45 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(results.values.map(\.account) == [first, first, second])
 }
 
+@Test func accountSearchResultsAndPendingRequestsAreScopedToRuntimeGeneration() {
+    let first = AccountUUID()
+    let second = AccountUUID()
+    let oldGeneration = RuntimeGeneration(1)
+    let newGeneration = RuntimeGeneration(2)
+    let oldContext = AccountSearchRequestContext(account: first, runtimeGeneration: oldGeneration, searchGeneration: 9)
+    #expect(oldContext.acceptsResponse(from: first, runtimeGeneration: oldGeneration, searchGeneration: 9, isLocked: false))
+    #expect(!oldContext.acceptsResponse(from: first, runtimeGeneration: newGeneration, searchGeneration: 9, isLocked: false))
+    #expect(!oldContext.acceptsResponse(from: first, runtimeGeneration: oldGeneration, searchGeneration: 10, isLocked: false))
+    #expect(!oldContext.acceptsResponse(from: first, runtimeGeneration: oldGeneration, searchGeneration: 9, isLocked: true))
+
+    var pending = AccountSearchRequestRegistry()
+    pending.register(oldContext, for: "search-old")
+    pending.register(AccountSearchRequestContext(account: first, runtimeGeneration: newGeneration, searchGeneration: 9), for: "search-new")
+    pending.register(AccountSearchRequestContext(account: second, runtimeGeneration: RuntimeGeneration(1), searchGeneration: 9), for: "search-other")
+    let removedOld = pending.remove(account: first, runtimeGeneration: oldGeneration)
+    let staleRequest = pending.take(for: "search-old")
+    let currentRequest = pending.take(for: "search-new")
+    let otherRequest = pending.take(for: "search-other")
+    #expect(removedOld == 1)
+    #expect(staleRequest == nil)
+    #expect(currentRequest?.runtimeGeneration == newGeneration)
+    #expect(otherRequest?.account == second)
+    #expect(pending.isEmpty)
+
+    var results = AccountSearchResults()
+    let firstResult = AccountSearchResult(account: first, conversation: ConversationKey(account: first, chatID: 5), title: "Чат", excerpt: "A")
+    let secondResult = AccountSearchResult(account: second, conversation: ConversationKey(account: second, chatID: 5), title: "Чат", excerpt: "B")
+    let firstAccepted = results.append(firstResult)
+    let secondAccepted = results.append(secondResult)
+    results.removeAll(for: first)
+    #expect(firstAccepted)
+    #expect(secondAccepted)
+    #expect(results.values.map(\.account) == [second])
+    let firstReaccepted = results.append(firstResult)
+    #expect(firstReaccepted)
+    #expect(results.values.map(\.account) == [second, first])
+}
+
 @Test func messageActionsUseOnlyServerReportedPermissions() {
     let permissions = MessageActionPermissions(tdlibObject: [
         "can_be_edited": true,

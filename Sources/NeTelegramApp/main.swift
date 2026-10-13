@@ -83,7 +83,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var searchGeneration: UInt64 = 0
     private var searchResults = AccountSearchResults(maximumPerAccount: 21)
     private var searchResultByControlID: [String: AccountSearchResult] = [:]
-    private var pendingSearchByExtra: [String: PendingSearchRequest] = [:]
+    private var pendingSearchRequests = AccountSearchRequestRegistry()
     private var deferredSearch: DeferredSearch?
     private var historyAnchorByConversation: [ConversationKey: Int64] = [:]
     private var messageList: NSStackView!
@@ -1286,7 +1286,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         failedSponsoredPhotos = Set(failedSponsoredPhotos.filter { $0.account != account })
         sponsoredPhotoRetryByControlID = sponsoredPhotoRetryByControlID.filter { $0.value.key.account != account }
         pendingForumTopicsByExtra.removeAll()
-        pendingSearchByExtra = pendingSearchByExtra.filter { $0.value.account != account }
+        _ = pendingSearchRequests.remove(account: account)
         searchResults.removeAll()
         searchResultByControlID.removeAll()
         activeSearchQuery = ""
@@ -1877,8 +1877,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         if let extra = object["@extra"] as? String,
            extra.hasPrefix("search-") {
-            guard let pending = pendingSearchByExtra.removeValue(forKey: extra) else { return }
-            guard pending.generation == searchGeneration, !lockState else {
+            guard let pending = pendingSearchRequests.take(for: extra) else { return }
+            guard pending.acceptsResponse(
+                from: target.account,
+                runtimeGeneration: target.generation,
+                searchGeneration: searchGeneration,
+                isLocked: lockState
+            ) else {
                 startDeferredSearchIfReady()
                 return
             }
@@ -1987,6 +1992,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
+                _ = pendingSearchRequests.remove(account: target.account, runtimeGeneration: target.generation)
+                searchResults.removeAll(for: target.account)
+                searchResultByControlID = searchResultByControlID.filter { $0.value.account != target.account }
+                startDeferredSearchIfReady()
                 // An unexpected close must not silently change the UI to another
                 // Telegram identity. A user-requested logout may return to an
                 // already-authorized account, as that transition was explicit.
@@ -2789,7 +2798,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         clearStack(chatList)
         if !activeSearchQuery.isEmpty {
             if searchResults.isEmpty {
-                let state = pendingSearchByExtra.isEmpty ? "Совпадений пока нет" : "Ищу в подключённых аккаунтах…"
+                let state = pendingSearchRequests.isEmpty ? "Совпадений пока нет" : "Ищу в подключённых аккаунтах…"
                 chatList.addArrangedSubview(NSTextField(wrappingLabelWithString: state))
             }
             for result in searchResults.values.prefix(420) {
@@ -2845,7 +2854,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func startSearch(_ query: String, generation: UInt64) {
-        guard pendingSearchByExtra.isEmpty else {
+        guard pendingSearchRequests.isEmpty else {
             deferredSearch = DeferredSearch(query: query, generation: generation)
             return
         }
@@ -2865,15 +2874,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             historyRequestCounter &+= 1
             let chatsExtra = "search-chats-\(generation)-\(historyRequestCounter)"
-            pendingSearchByExtra[chatsExtra] = PendingSearchRequest(account: accountRuntime.account, generation: generation)
+            let searchContext = AccountSearchRequestContext(
+                account: accountRuntime.account,
+                runtimeGeneration: accountRuntime.generation,
+                searchGeneration: generation
+            )
+            pendingSearchRequests.register(searchContext, for: chatsExtra)
             do {
                 try accountRuntime.send(["@type": "searchChats", "query": query, "type_filter": NSNull(), "limit": 10, "@extra": chatsExtra])
             } catch {
-                pendingSearchByExtra.removeValue(forKey: chatsExtra)
+                _ = pendingSearchRequests.take(for: chatsExtra)
             }
             historyRequestCounter &+= 1
             let messagesExtra = "search-messages-\(generation)-\(historyRequestCounter)"
-            pendingSearchByExtra[messagesExtra] = PendingSearchRequest(account: accountRuntime.account, generation: generation)
+            pendingSearchRequests.register(searchContext, for: messagesExtra)
             do {
                 try accountRuntime.send([
                     "@type": "searchMessages", "chat_list": NSNull(), "query": query,
@@ -2883,14 +2897,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     "@extra": messagesExtra,
                 ])
             } catch {
-                pendingSearchByExtra.removeValue(forKey: messagesExtra)
+                _ = pendingSearchRequests.take(for: messagesExtra)
             }
         }
         refreshChatList()
     }
 
     private func startDeferredSearchIfReady() {
-        guard pendingSearchByExtra.isEmpty, let deferredSearch else { return }
+        guard pendingSearchRequests.isEmpty, let deferredSearch else { return }
         self.deferredSearch = nil
         guard deferredSearch.generation == searchGeneration,
               deferredSearch.query == activeSearchQuery, !lockState else { return }
@@ -5274,7 +5288,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         searchField.stringValue = ""
         searchResults.removeAll()
         searchResultByControlID.removeAll()
-        pendingSearchByExtra.removeAll()
+        pendingSearchRequests.removeAll()
         historyAnchorByConversation.removeAll()
         pendingMessagePropertiesByExtra.removeAll()
         pendingMessageMutationsByExtra.removeAll()
@@ -5481,11 +5495,6 @@ private struct PendingSend: Sendable {
 private enum InitialAuthorizationAction {
     case phoneNumber(String)
     case qrCode
-}
-
-private struct PendingSearchRequest {
-    let account: AccountUUID
-    let generation: UInt64
 }
 
 private struct DeferredSearch {
