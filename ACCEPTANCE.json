@@ -1,22 +1,22 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 1de5720 hosted CI 157/157. New auth disclosure slice 209be94 passed local serial Swift 157/157 and one canonical accountless UI smoke; exact-source hosted CI pending. Normal Quit left the process live and needs diagnosis. No real auth/20-runtime, Developer ID/notarization, updater, or app downloads.",
+  "status": "implementation_in_progress; app source 209be94 passed exact-source local and hosted serial Swift suites 157/157. CI checkpoint d8055a1 added and verified a cache restore and filtered runner probe; hosted suite completed in 42s overall. Canonical accountless phone/QR UI and normal app-menu Quit process exit are confirmed; Cmd+Q remains unverified. No real login/20-runtime, Developer ID/notarization, updater, or app downloads.",
   "current_evidence": {
     "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-    "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 157/157 passed for 1de572048aec9ecb6fa04f2f7c6ed786473888df (run 38475546446). Three focused local Keychain tests passed. An initial focused run exposed a deadlock in the newly written test semaphore ordering; that test bug was fixed before the passing reruns. No real Telegram account or 20-runtime certification.",
+    "app_tests": "Exact app source 209be94 passed local serial Swift tests 157/157 and hosted run 38481987804 157/157 on macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2. The CI workflow commit d8055a1 is docs/workflow only; it restored a 51 MB cache, passed the deterministic filtered probe 1/1, compiled in 17.50s, and completed the full suite in 0.504s. No real Telegram account or 20-runtime certification.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38475546446,
-        "workflow_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
-        "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+        "run_id": 38481987804,
+        "workflow_commit": "d8055a1967e029b27e2db427939d5220f48dc0d8",
+        "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
         "result": "success",
-        "scope": "Exact-source macOS 15 Apple Silicon serial Swift suite passed 157/157."
+        "scope": "Exact unchanged app source 209be94; filtered probe 1/1 and full serial Swift suite 157/157 on macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2. The warm SwiftPM cache restored 51 MB and the workflow completed in 42s."
       },
       "current_checkpoint_metadata": {
-        "run_id": 38473446842,
-        "workflow_commit": "c9ef6f728e1e999ef311e726709f8f7753839d7e",
+        "run_id": 38481987832,
+        "workflow_commit": "d8055a1967e029b27e2db427939d5220f48dc0d8",
         "result": "success",
-        "scope": "metadata.yml parsed checked-in JSON successfully for checkpoint c9ef6f7."
+        "scope": "metadata.yml parsed checked-in JSON successfully for checkpoint d8055a1."
       },
       "previous_native_bundle_baseline": {
         "run_id": 38457814416,
@@ -33,7 +33,7 @@
         "scope": "Pinned TDLib arm64 Dev.app build, accountless window close/reopen/quit smoke."
       }
     },
-    "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
+    "native_smoke": "PASS at checkpoint 7f95e03 / app source 209be94: canonical arm64 Dev.app accountless phone/QR UI and normal app-menu Quit process exit verified. Reopened this same bundle this turn; it still shows the first-run phone screen and no profile/credentials. Cmd+Q remains unverified.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; login remains deferred",
     "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
@@ -495,29 +495,38 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "source_commit": "d8055a1967e029b27e2db427939d5220f48dc0d8",
     "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-auth-disclosure-validation",
     "local_result": "Full serial Swift suite passed 157/157 in 0.212s test execution after 17.89s build. Initial sandbox attempt was denied during manifest setup before tests; same suite passed on approved host execution. No account or auth test.",
-    "hosted_ci": "Cancelled: exact-source run 38478591456 built the test binary in 31.65s, then emitted no test output for 272s before cancellation; decoded job logs show swiftpm-testing terminated during cleanup. Test-level root cause unknown. Rerun via connector returned 403 Resource not accessible by integration. No hosted result/PASS.",
-    "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
-    "scope": "AppKit login disclosure source; local serial suite 157/157 for 209be94; exact hosted run cancelled with no result; canonical clean Dev.app build from 7f95e03, accountless phone/QR AX smoke, app-menu Quit exit. No real auth, no Cmd+Q claim, no 20-runtime proof, no distribution.",
+    "hosted_ci": "PASS: exact unchanged app source 209be94 was tested by workflow run 38481987804 on macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2. The filtered deterministic probe passed 1/1; the full serial suite passed 157/157 in 0.504s. Cache restored (51 MB) and saved. The workflow commit d8055a1 contains only workflow/checkpoint documentation changes.",
+    "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app from checkpoint 7f95e03, app source 209be94, ad-hoc signature verified; AX confirms phone/QR/disclosure. This turn reopened the same app and saw the same first-run screen. No phone, code or profile. App-menu Quit process exit was previously verified; Cmd+Q remains unverified.",
+    "scope": "CI fast-path validation and existing app source 209be94: filtered probe and full serial suite passed. No Swift app code, Dev.app bundle, Site deployment, auth state, or distribution asset changed.",
     "checkpoint_commit": "9dc8cc9eb0433731e1d54ed1e9a156914578a20d",
     "site_deployment": {
-      "version": 162,
-      "source_commit": "6e1d7be28feb32c651f60e352971a3f8d493a1ad",
-      "deployment_id": "appgdep_6aceb5a92a448191a0f3cf120850b40c",
+      "version": 163,
+      "source_commit": "73bdefad3368d9ed6d65d0e15745303e138db127",
+      "deployment_id": "appgdep_6acebad482b88191b71d3ba495b4ba9b",
       "url": "https://netelegram.iryadom.chatgpt.site",
-      "public_routes": "All eight routes returned HTTP 200 text/html; devlog records clean app smoke and corrected Quit evidence; downloads has no binary URL."
+      "audience": "public",
+      "site_archive_sha256": "183568ef690995b5e3047a9da2b26314b4fb9e3566f39bd5a5693378d2b0b2e0",
+      "site_archive_size_bytes": 296477,
+      "saved_archive_content_hash": "sha256:97d555f676cc5e463e93f66bc6791ab719d3176fde98486d2d80659accc60f02",
+      "public_routes": "Sites reported successful public deployment. Anonymous /devlog returned 200 text/html; archive validation confirms all eight static pages, both feeds and assets. New devlog records run 38481987804, app source 209be94 and the measured cache comparison. Downloads still has no binary URL."
     },
     "hosted_job_diagnosis": {
-      "run_id": 38478591456,
-      "job_id": 115575330981,
-      "runner": "macOS 15.7.9 arm64 / Xcode 16.4 / SwiftPM test runner",
-      "build_seconds": 31.65,
-      "silent_test_seconds": 272,
-      "termination": "workflow cancelled; swiftpm-testing terminated during cleanup",
-      "conclusion": "compiled successfully; test execution stalled or produced no observable output; exact hanging test remains unknown"
+      "run_id": 38481987804,
+      "job_id": 115586500150,
+      "runner": "macOS 15.7.9 arm64 / Xcode 16.4 / Swift 6.1.2",
+      "cache": "Restored 51 MB from the prior checkpoint restore-key and saved a new checkpoint cache.",
+      "filtered_probe": "publicDisplayNameMatchesRepositoryName passed 1/1 in 0.001s.",
+      "build_seconds": 17.5,
+      "full_suite": "157/157 passed in 0.504s; incremental full-suite build 0.33s.",
+      "workflow_seconds": 42,
+      "comparison": "Prior uncached run built the test binary in 31.65s then produced no test output for 272s before cancellation. This run reduced the compile step by about 45%; old run has no suite result, so end-to-end duration comparison is not an apples-to-apples PASS.",
+      "cold_cache_run": "38481765351: cache miss; probe 1/1, suite 157/157; build 48.43s; saved 51 MB cache.",
+      "warm_cache_run": "38481987804: restored prior 51 MB cache; probe 1/1; suite 157/157 in 0.504s; build 17.50s; full workflow 42s.",
+      "measured_change": "Warm-cache compile took about 64% less time than the cold-cache run. This is evidence from these two CI runs, not a guarantee for every future run."
     }
   },
   "latest_site_deployment": {
@@ -545,19 +554,20 @@
     "checkpoint_commit": "7f95e03c12457d522f2e7e50b3baa497db6e731d",
     "source_fingerprint_sha256": "b954e21469bfc42bf0c98e05867f2b107857255d84b9daecda010033e35b97bc",
     "local_tests": "157/157 local full serial suite on source 209be94; not rerun because source/harness unchanged.",
-    "hosted_ci": "Exact-source run 38478591456 cancelled during tests after five minutes; connector rerun denied 403; no hosted PASS.",
-    "native_app": "Built and launched once from clean checkpoint 7f95e03. AX confirmed accountless phone/QR screen and disclosure. No phone/code entered. App menu NeTelegram → Quit completed; CUA process inventory subsequently showed not running. Cmd+Q keyboard simulation did not provide reliable evidence; shortcut remains unverified.",
+    "hosted_ci": "Exact app-source 209be94 hosted run 38481987804 passed filtered 1/1 and full suite 157/157; warm cache restored. Older run 38478591456 was cancelled before test output but is superseded by the newer successful exact-source run.",
+    "native_app": "Built and launched once from checkpoint 7f95e03; AX confirmed accountless phone/QR/disclosure, no credentials. App-menu Quit process exit verified. This turn reopened the same bundle, still on first-run phone UI. Cmd+Q remains unverified.",
     "app_executable_sha256": "5ab67ec7a147680421930e57112573438c4edb8f3164b1fdfed689a369a8d8d0",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app"
   },
   "latest_source_audit": {
     "date": "2026-10-14",
-    "source_commit": "8a0ecb5dc5d8dc7eddad606edbf4432605bbac70",
-    "change": "Fixed case-sensitive native-app workflow path filters and added workflow self-trigger; preserved source-only fast CI policy.",
-    "local_checks": "Ruby YAML syntax, exact path existence and both event filters, git diff --check passed.",
-    "hosted_checks": "Native TDLib/Dev.app workflow 38471657127 completed success for exact workflow checkpoint.",
-    "site_check": "No Site changes; public Site v157 remains verified."
+    "source_commit": "d8055a1967e029b27e2db427939d5220f48dc0d8",
+    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "change": "Added a toolchain/pin-scoped SwiftPM cache and a bounded deterministic runner probe; recorded accurate app-source and hosted-CI status.",
+    "local_checks": "Ruby YAML parse, checkpoint JSON parses, and git diff --check passed. Local filtered test passed 1/1. No app-source change or Dev.app rebuild.",
+    "hosted_checks": "macOS CI 38481987804 passed filtered 1/1 and full 157/157; metadata validation 38481987832 passed.",
+    "site_check": "Public Site v163 source 73bdefa deployed successfully; anonymous /devlog HTTP 200 text/html; archive/static checks pass; Downloads contains no installer URL."
   },
   "latest_access_audit": {
     "date": "2026-10-13",
@@ -568,5 +578,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Proceed to the next implementation slice from the current acceptance gaps without changing account/session boundaries. Keep real login deferred until the user enters credentials. Prioritize a feature slice that is testable without live Telegram accounts, run one full local serial suite after that slice, and use the next exact-source CI run to diagnose the hosted cancellation. Do not treat short UI-automation delays as a quit failure; verify app process state. Developer ID/notarization, real account flows, 20 runtime, updater and user release remain open."
+  "next_action": "Implement only a reproduced accountless AUTH03 registration-layout issue at 900x700; then one focused native UI check, one full local serial suite for the new Swift SHA, and one exact-source hosted run. Preserve real-login deferral and existing release gates."
 }
