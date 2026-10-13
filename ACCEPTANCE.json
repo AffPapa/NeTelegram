@@ -413,53 +413,39 @@
     "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
     "local_result": "103/103 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
-    "hosted_ci": "Not yet verified for fd4586d or 7476393; inspect the GitHub Actions run triggered by the successful main push.",
-    "hosted_result": "Source and verification-record commits are on public main. No Dev.app replacement or public Site update claimed for this milestone.",
+    "hosted_ci": "GitHub Actions run 38352840920 succeeded on docs commit 74763937567283412de62487732ebf835f2fa7a0, which contains app-source fd4586d; run 38352970473 also succeeded on checkpoint commit 0c447f49000e4969d8ff396630470a9d9a34f7bb.",
+    "hosted_result": "Swift tests (Apple Silicon) passed. No new Dev.app artifact/smoke for this code slice; no release binary.",
     "artifact": {
       "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
       "status": "local development source only; no new Dev.app, release, installer, or public binary",
       "signature": "not a release"
     },
     "scope": "Two deterministic incoming entity regressions cover UTF-16 offsets, web and textUrl destinations, invalid ranges and disallowed file URLs. Unknown/future authorization states fail closed even when a previous TelegramUserID exists. AppKit code compiles. Native link clicking/accessibility, login/read/send/logout, 20 real accounts, performance matrix, sleep/wake, Developer ID/notarization, Gatekeeper, updater and Telegram compatibility decisions remain open. The running canonical Dev.app was not touched.",
-    "publication": "Source commit fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 and docs commit 74763937567283412de62487732ebf835f2fa7a0 are pushed to public GitHub main. The push used the existing credential helper; no PAT was created. Site remains at v90; no app release or download exists.",
-    "next_action": "Verify GitHub Actions for the exact pushed commits, then update Site devlog/mirror once and obtain the CI build artifact without launching a second local Dev.app."
+    "publication": "App-source fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 is on public main. Documentation/checkpoint commits 74763937567283412de62487732ebf835f2fa7a0 and 0c447f49000e4969d8ff396630470a9d9a34f7bb passed GitHub Actions. Public Site v91 at https://netelegram.iryadom.chatgpt.site now reflects the source and test evidence; no app release or download exists.",
+    "next_action": "Continue implementation with the next protocol-visible runtime slice; keep native Dev.app smoke separate from CI and never launch a second local copy."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 90,
-    "source_commit": "2f8e5c195006c43db486640aa75bc4033b3eb735",
-    "deployment_id": "appgdep_6acdc0a71f0c8191ad141663d632a78f",
+    "version": 91,
+    "source_commit": "7831d8f740beaab27588e6119da89de3d64a90b8",
+    "deployment_id": "appgdep_6acdc669ee948191b1f170f953944414",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "a7125607a481e2dac000ce601b705e2117374daee2199f1832368c3d774d8ba4",
-    "sites_archive_content_hash": "sha256:cfcad2adf91d2aec7d149a2c196edfce3d896322a683540e9d8c99327a976020",
-    "description": "Devlog records successful exact-source macOS CI and pinned TDLib/Dev.app accountless smoke. Downloads explicitly says NO RELEASE. Site v90 is public; full dist mirror is on GitHub main at ca2788a. No app release, signed binary, or real account verification.",
-    "github_mirror_commit": "ca2788a6afb21f1ea3cd4c77e8ddf81a207e1657",
-    "github_blob_sha1": {
-      "website/dist/devlog/index.html": "d5d19c6b1e0525879baafdf678147ac9f1b42f2c",
-      "website/dist/roadmap/index.html": "13060829cb6e4e5994d31813a3f1c7e4369065cb",
-      "website/dist/source/index.html": "7958a25cfa05ae7ebb2491d9606b86251dc02a29"
-    },
-    "normalized_content_sha256": {
-      "/": "608e1d036f15d8519799989b36b1f859528da2f155ae3baf164850f70ff911ec",
-      "/features/": "63ebcdc9eca9132b4815ecbc10b43afb03fce567fcb2b9ab85e3fc73c5423a8b",
-      "/devlog/": "f4c547cb78ae2362d69c97c3b2aa592e671455025c3692856028e45ec38b12bc",
-      "/downloads/": "695bbd36cb08e8d30b07cdc9d00908d41792f07d3774190b68141ceca1c33cc5",
-      "/roadmap/": "3213e0232db2e415b7bcd7880ccdd32f4780a11f93d2392a027f8607c7e06487",
-      "/source/": "94cc62bcc5f47a6778399aec8fd7b62de079bba5e342318592c3abb32d4987a4",
-      "/updates/alpha.xml": "23cced0c8efd2d323d6b1ed32258999b285d153b94c1f907f3fa0334404008ec",
-      "/updates/stable.xml": "f4a2bfb6f913dce21dc63590fad66ae926189a8e8beda1cf871fa1fd03e91555"
-    },
-    "public_verification": "All eight anonymous HTTPS routes returned 200. Both XML feeds parsed and matched package byte-for-byte. Six HTML responses matched their packaged files after removing a dynamically appended Cloudflare edge-verification script; therefore raw HTTP-body hashes are not stable release fingerprints. GitHub API blob IDs for changed devlog/roadmap/source mirror files matched git hash-object at mirror commit ca2788a."
+    "archive_sha256": "5371bdb2f1c31b9ef601e8fdd823417cdebfc6416d80da7776364e47f02d0890",
+    "sites_archive_content_hash": "sha256:6fb156e703a05800a2232bfdede8676bc5c2115f1e92406bf788d92df0963bb1",
+    "description": "Development Site v91 states current app-source fd4586d and exact CI evidence, documents the 103/103 local suite and limits, and keeps downloads at NO RELEASE.",
+    "github_mirror_commit": "This ACCEPTANCE.json update and website/dist mirror are included together in the current NeTelegram main push.",
+    "public_verification": "Sites reports public audience; anonymous HTTPS curl returned 200 text/html for /, /features/, /devlog/, /downloads/. Live body includes fd4586d, 7476393, CI 38352840920, and 103/103; download page says NO RELEASE and no app download exists."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "base_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
-    "tests": "101/101 Swift Testing tests passed; NeTelegram executable/test products compiled; git diff --check passed.",
-    "hosted_ci": "Exact-source workflows passed: https://github.com/AffPapa/NeTelegram/actions/runs/38348346825 and https://github.com/AffPapa/NeTelegram/actions/runs/38348346880.",
-    "site": "Public Site v88 and GitHub website mirror 66ff0df describe 24c1f31 and 101/101.",
-    "scope": "Closed-runtime notification cleanup is unit-tested and CI Dev.app clean-launch smoke passed; real Notification Center/account lifecycle and all-20 runtime coverage remain unverified. No local sign/notarize or public installer."
+    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
+    "docs_commit": "74763937567283412de62487732ebf835f2fa7a0",
+    "tests": "103/103 Swift Testing tests passed locally; AppKit target and tests compiled; git diff --check passed.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38352840920 succeeded for docs commit containing this source; checkpoint documentation run https://github.com/AffPapa/NeTelegram/actions/runs/38352970473 also succeeded.",
+    "site": "Public Site v91 at https://netelegram.iryadom.chatgpt.site records source, test evidence, and limitations; no application download.",
+    "scope": "Incoming TDLib entities render with safe links; unknown authorization states fail closed. Native link/VoiceOver, real Telegram sessions, 20 real account coverage and distribution remain unverified."
   },
   "latest_source_audit": {
     "date": "2026-10-13",
