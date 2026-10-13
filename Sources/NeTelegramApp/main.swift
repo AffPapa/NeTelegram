@@ -1176,12 +1176,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // Persisted cleanup state precedes destructive work. Key and directory
         // removal are idempotent, so failures can resume without reopening a
         // partially erased database as the previous Telegram identity.
-        try SecretsStore().removeAccountKeys(for: account)
         let accountRoot = try accountStorageRoot()
             .appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
-        if FileManager.default.fileExists(atPath: accountRoot.path) {
-            try FileManager.default.removeItem(at: accountRoot)
-        }
+        try await Task.detached(priority: .utility) {
+            try SecretsStore().removeAccountKeys(for: account)
+            if FileManager.default.fileExists(atPath: accountRoot.path) {
+                try FileManager.default.removeItem(at: accountRoot)
+            }
+        }.value
         try await catalogue.removeProfile(account, expectedTelegramUserID: expectedTelegramUserID)
         knownProfilesByAccount.removeValue(forKey: account)
         profileOrder.removeAll { $0 == account }
