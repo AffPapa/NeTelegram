@@ -12,8 +12,8 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
-    "working_tree_clean": false,
+    "commit": "e032b497d4e9d2eb12718dfb4f0c500b7acbaffc",
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38447978740,
