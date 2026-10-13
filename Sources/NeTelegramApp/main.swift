@@ -302,7 +302,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
         loginHeading.font = .systemFont(ofSize: 25, weight: .semibold)
         loginHeading.alignment = .center
-        loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
+        loginSubtitle = NSTextField(wrappingLabelWithString: "Войдите по номеру телефона. Профиль создаётся отдельно в Neridian; сессии из Telegram Desktop и других клиентов не импортируются.")
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
@@ -312,6 +312,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
         accountPicker.setAccessibilityLabel("Локальный профиль и статус входа")
+        accountPicker.setAccessibilityHelp("Это профили, созданные внутри Neridian на этом Mac. Сессии и файлы других Telegram-приложений не импортируются.")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.isHidden = true

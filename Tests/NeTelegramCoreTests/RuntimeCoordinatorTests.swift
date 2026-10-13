@@ -611,12 +611,12 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         unverifiedRemovalPending: true
     )
 
-    #expect(firstPending == "Локальный вход 1 — ожидает номер")
-    #expect(secondPending == "Локальный вход 2 — ожидает код")
+    #expect(firstPending == "Профиль Neridian 1 — ожидает номер")
+    #expect(secondPending == "Профиль Neridian 2 — ожидает код")
     #expect(verified == "Test User · профиль 3 — подключён")
     #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
     #expect(logoutCleanup == "Test User · профиль 4 — очистка после выхода ожидает")
-    #expect(removalCleanup == "Локальный вход 5 — удаление незавершённого входа ожидает")
+    #expect(removalCleanup == "Профиль Neridian 5 — удаление незавершённого входа ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(

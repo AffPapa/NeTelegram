@@ -138,7 +138,7 @@ public enum AccountPresentation {
     ) -> String {
         let ordinal = max(1, localOrdinal)
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate)
-        let identity = name.map { "\($0) · профиль \(ordinal)" } ?? "Локальный вход \(ordinal)"
+        let identity = name.map { "\($0) · профиль \(ordinal)" } ?? "Профиль Neridian \(ordinal)"
         let status = pickerStatus(
             telegramUserID: telegramUserID,
             authorizationState: authorizationState,

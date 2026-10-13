@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import NeTelegramCore
 
@@ -6,5 +7,25 @@ struct ProductIdentityTests {
         #expect(ProductIdentity.displayName == "Neridian")
         #expect(!ProductIdentity.displayName.localizedCaseInsensitiveContains("telegram"))
         #expect(ProductIdentity.repositoryCodename == "NeTelegram")
+    }
+
+    @Test func accountStorageUsesOnlyTheApplicationsOwnSupportDirectory() {
+        let support = URL(fileURLWithPath: "/tmp/netelegram-storage-test/Library/Application Support", isDirectory: true)
+        let release = AccountStorageRoot.resolve(
+            applicationSupportDirectory: support,
+            bundleIdentifier: "org.affpapa.neridian",
+            isDevelopmentBuild: false
+        )
+        let development = AccountStorageRoot.resolve(
+            applicationSupportDirectory: support,
+            bundleIdentifier: "org.affpapa.netelegram.dev",
+            isDevelopmentBuild: true
+        )
+
+        #expect(release.path == support.appendingPathComponent("NeTelegram", isDirectory: true).path)
+        #expect(development.path.hasPrefix(support.appendingPathComponent("NeTelegram/Development", isDirectory: true).path))
+        #expect(development != release)
+        #expect(!release.path.localizedCaseInsensitiveContains("Telegram Desktop"))
+        #expect(!release.path.localizedCaseInsensitiveContains("org.telegram"))
     }
 }
