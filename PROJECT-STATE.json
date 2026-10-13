@@ -11,13 +11,13 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "9b1c7590c958a7c7f98b5352ada16e770df32f58",
+    "commit": "fd17f8d540f1613245e41f70d2bc3ca027b476e9",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38375587119,
+      "run_id": 38377671877,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38375587119"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38377671877"
     },
     "published_application_releases": [],
     "github_access": {
@@ -36,6 +36,11 @@
       },
       "credential_material_recorded": false,
       "note": "Use existing authenticated gh/Git and installed GitHub connector. No new PAT/OAuth or browser authorization required. Collaborator-permission endpoint 403 is not a repository access failure."
+    },
+    "latest_exact_commit_native_workflow": {
+      "run_id": 38377671932,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38377671932"
     }
   },
   "local_development_candidate": {
@@ -53,15 +58,17 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 125,
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/clang SWIFT_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/swift swift test --cache-path /private/tmp/netelegram-swift-cache/spm --scratch-path /private/tmp/netelegram-swift-cache/build --disable-build-manifest-caching"
+      "count": 126,
+      "command": "swift test --scratch-path /private/tmp/netelegram-swift-cache-dirty-draft --disable-build-manifest-caching",
+      "xcode": "Xcode 27.0 (27A5228h)",
+      "scope": "One encrypted-draft storage failure test plus full existing suite; synthetic persistence fault, not physical disk exhaustion."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned workflow 38375587035 passed exact app commit 9b1c759; built pinned TDLib and assembled/verified an isolated arm64 Dev.app. This is CI bundle validation, not a real-account login or local GUI interaction. The one canonical local Dev.app remains on ff3da44 to avoid launching a second version.",
-    "current_head_site": "Site v106 active/public, deployment appgdep_6acdf8ea9c94819193a1cdc053936dd4 succeeded. TLS-validated curl returned 200 for home, devlog, downloads, changelog, features, roadmap, privacy, source and both appcasts; devlog contains the 9b1c759 source and CI evidence.",
+    "current_head_native_smoke": "Pinned TDLib app workflow 38377671932 passed exact application commit fd17f8d; built pinned TDLib and assembled/verified isolated arm64 Dev.app. This is CI bundle validation, not a real-account login or local GUI interaction. The one canonical local Dev.app remains on ff3da44 to avoid launching a second version.",
+    "current_head_site": "Site v107 active/public, deployment appgdep_6acdfcb897008191835addc1284bc2d4 succeeded. TLS curl returned 200 for /devlog/ and /downloads/; new devlog entry matches fd17f8d and both exact-source CI workflows. No application download or release exists.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
   },
   "site": {
@@ -69,15 +76,15 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 106,
-    "source_commit": "026c3e4971261358b5fd5cfd375ea1ee0f4e2521",
-    "deployment_id": "appgdep_6acdf8ea9c94819193a1cdc053936dd4",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_306b4679bed88191aca82f275fa28f9b",
+    "latest_version": 107,
+    "source_commit": "7cf77c52aef576cadcbf9bdd51613e4fd7223063",
+    "deployment_id": "appgdep_6acdfcb897008191835addc1284bc2d4",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_5f1a01e1ce18819187831c97ded093d6",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "TLS-validated curl: 200 for /, /devlog/, /downloads/, /changelog/, /features/, /roadmap/, /privacy/, /source/, /updates/stable.xml and /updates/alpha.xml; internal devlog links resolve and both appcasts parse as XML.",
-    "archive_local_sha256": "e770db5cd15f3267833b195ae33308122bbf6792b18a29c032af4a25b75ac0dd",
-    "archive_sites_reported_content_hash": "sha256:b02b9c7051a6325040904b3b0dc9cab20322cf0f82f42474cbaa4a3d4fd29e61"
+    "public_route_verified": "TLS-validated curl: 200 for /devlog/ and /downloads/; factual new devlog entry and no-download status verified.",
+    "archive_local_sha256": "aaff4d1e66ecefc42123d97ef75f980d4d5e2d10abba561bb354a871b6e34843",
+    "archive_sites_reported_content_hash": "sha256:0e06bc12643a14f68dd6663691df0b176f81776779fd49b5d74a8bdb2ee51677"
   },
   "open_gates": [
     "Telegram API hash was not stored: the earlier hidden-input PTY attempt echoed the supplied value and the Keychain write failed. Do not reuse that exposed value; replace it if possible, then enter a replacement only through a verified non-echoing local UI. The Keychain item remains absent.",
@@ -87,6 +94,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue real authentication and all-active runtime implementation/verification; user has deferred entering phone/code. No signed app release/download.",
+  "next_action": "Continue native/auth and all-active runtime implementation against a single canonical source build; user login remains deferred. Do not publish an app binary until real account evidence, all-active coverage, Telegram compatibility gates, and Developer ID/notarization/update signing are addressed.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
