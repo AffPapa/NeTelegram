@@ -1,18 +1,19 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source/test commit 2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01; two targeted synthetic APP02 fault tests passed locally and exact-SHA macOS CI succeeded. APP02 remains partial because no real system Keychain or authorized account was used. NeTelegram branding and bilingual SEO copy are live; public Site v119 routes verified. No app release.",
+  "status": "implementation_in_progress; app source 9a984aeb74ff84d54c9e4c23d64db43c6434882e. APP03 account-scoped conversation snapshot and one targeted A→B→A synthetic test passed locally; exact-SHA macOS CI 38402873737 and pinned TDLib/Dev.app build 38402873559 succeeded. Site v120 is public and APP03 devlog is live. GUI account switching, real login, 20 authorized runtimes, and app release remain unverified.",
   "current_evidence": {
-    "app_source_commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01",
-    "app_tests": "Two new targeted tests passed locally on Xcode 27.0 / Swift 6.4: injected Keychain error propagation without fallback and a stalled synthetic Keychain read while 19 other profile startup attempts complete. Exact-SHA macOS CI 38401445104 passed. The full local suite was not rerun.",
+    "app_source_commit": "9a984aeb74ff84d54c9e4c23d64db43c6434882e",
+    "app_tests": "One targeted synthetic A→B→A snapshot regression passed locally on Xcode 27.0 / Swift 6.4; exact-SHA macOS CI 38402873737 succeeded. Pinned TDLib/Dev.app build 38402873559 assembled and verified the app bundle but did not launch it. No GUI account switch or authorized session was used.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38401445104"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38402873737",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38402873559"
     ],
     "native_smoke": "Runtime/AppKit source did not change in the test-only commit; latest native lifecycle smoke remains pinned TDLib/Dev.app workflow 38399172724 on app-source 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3. Accountless close/reopen/Cmd+Q only; no account updates tested.",
     "product_branding": "NeTelegram; GitHub README has detailed Russian and English content with independent/no-direct-connection disclosure. Public Site v119 is NeTelegram branded. GitHub About metadata remains a separate short English description; connector has no repository-description edit operation, and local gh auth is not usable.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v119 from 825b9aa8d5bb8d72a69fc31ff676954bcc9825bd, deployment appgdep_6ace2c7af07c8191a65a2c9002324461, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_d184ab2af43c81919cdeea209adf53d3; all eight public pages and stable/alpha XML returned 200 with expected MIME and valid feeds; downloads say NO RELEASE."
+    "site": "Public Site v120 from b4b9de7fde9f59d1ff850c49759413afc9ed5dd4, deployment appgdep_6ace2e966b4c8191ac152ca6ed24b509, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_60ae63b9fa948191b4399d20f40c1951. Anonymous /devlog/ returned 200 text/html with exact app SHA and CI IDs; downloads say NO RELEASE."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -41,7 +42,7 @@
       "method": "deterministic+native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Commit a90ab3da92ee97ff8f74413beae222fb2ad81908 restores a remembered authorized chat through TDLib openChat when returning to an account; the new AccountPresentation routing test passes in the 84/84 exact-source Swift suite. GitHub macOS CI 38334933662 and pinned TDLib/Dev.app workflow 38334933666 passed on exact SHA. This does not execute 1000 switches or native A→B→A, and does not prove runtime generation stability, per-account drafts/history/topics, or real-account behavior; acceptance remains partial."
+      "evidence": "At app-source SHA 9a984aeb74ff84d54c9e4c23d64db43c6434882e, presentRuntime captures an AccountConversationSnapshot bound to AccountUUID and RuntimeGeneration, including typed ConversationKey and draft; the reopen path passes it into openChat, which uses its draft only when account/generation/conversation all match. Targeted synthetic A→B→A test passed locally with the same numeric chat ID in two accounts, distinct forum topics/drafts, unchanged generations, and a mismatched-generation rejection. Exact-SHA macOS CI 38402873737 and pinned TDLib/Dev.app build 38402873559 passed; the latter assembled and verified but did not launch Dev.app. No 1000-transition run, GUI account switch, or authorized account was tested. APP03 remains partial."
     },
     {
       "id": "APP04",
