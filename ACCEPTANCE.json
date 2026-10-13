@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; Neridian public name, NeTelegram codename; source 8098e82: 121/121 local tests and exact-source CI passed; accountless Dev.app only; user deferred Telegram login; Site v103; no app release/download.",
+  "status": "implementation_in_progress; latest source 8274a5a ensures macOS notification authorization is requested once per process, with per-account TDLib options; 122/122 local Swift tests and exact-source CI/native accountless smoke passed. One local Dev.app remains on source 8098e82; no real authorized accounts, release, or download.",
   "cases": [
     {
       "id": "APP01",
@@ -63,7 +63,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "TDLib notification routing preserves account/chat/typed-topic identity. Exact-source 101/101 suite passed; app commit 24c1f31 passed macOS CI 38348346825 and pinned TDLib/isolated Dev.app workflow 38348346880. Native Notification Center clicks, real notifications, OS permission behavior and duplicate sounds remain unverified."
+      "evidence": "Notification authorization is gated once per app process while TDLib notification options remain per-account. Test notificationPermissionIsRequestedOnceAcrossAccountStartup passes in the 122/122 local Swift suite; exact-source macOS CI 38370730565 and pinned TDLib/isolated Dev.app workflow 38370730581 succeeded for commit 8274a5ad3344bfdad54e5462e3aec761345a5fbd. CI smoke is accountless. Real Notification Center permission changes, account notifications, clicks, and duplicate-sound behavior remain unverified; status stays partial."
     },
     {
       "id": "APP08",
@@ -428,12 +428,12 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
-    "local_result": "121/121 Swift tests. Canonical arm64 Dev.app built/launched accountless; local UI automation could not attach, screenshot evidence is from pinned TDLib CI.",
-    "hosted_ci": "Exact-source macOS CI 38368612207 and pinned TDLib/Dev.app 38368612251 succeeded.",
-    "scope": "Typing action is selected account/chat/topic only, throttled to 4 seconds, cancelled on clear/switch/send/picker/lock. No real Telegram login or 20-runtime evidence. User deferred login and declined sponsored-video playback; channels and stable remain gated.",
-    "publication": "Public Site v103 deployed successfully at https://netelegram.iryadom.chatgpt.site; project appgprj_6acba85192e08191acdf7011928848cf; Site source commit b173aeb03b920fd2b5df805654f16f4a7ae55019; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_4290ac3d8aa48191b08277009f7f48c9; deployment appgdep_6acdec9638448191a32e9fe6dac00d74 succeeded. Anonymous HTTPS GET /devlog/ returned 104045 bytes and contained the 8098e82 milestone, source link, and explicit no-release/download statement. Archive local SHA-256 1ebfbef5aa680f9e3d805ac34d7c97d762e14df26a622613c9bbcab0b3f11920; Sites stored normalized hash sha256:9ec0ae165fbdec7379aee69dbea77b3d6251469c062e5a9df092bbc85a7a000f, 194560 bytes, 12 files. Site remains public. No app release/download.",
-    "next_action": "Commit source-mirrored factual devlog/checkpoint, publish via existing Sites source helper, verify public route."
+    "source_commit": "8274a5ad3344bfdad54e5462e3aec761345a5fbd",
+    "local_result": "122/122 Swift tests passed; AppKit target built. Existing canonical Dev.app remains open on 8098e82; it was not replaced or duplicated.",
+    "hosted_ci": "Exact-source macOS CI 38370730565 and pinned TDLib/Dev.app workflow 38370730581 succeeded.",
+    "scope": "macOS notification permission requested only once per app process; each runtime keeps TDLib notification options. Accountless smoke only; real notification setting changes, alerts/clicks, real login, 20 accounts, performance, signing, notarization and release remain unverified.",
+    "publication": "Prior public Site v103 remains live; this milestone devlog entry is prepared locally and not yet deployed. No app release/download.",
+    "next_action": "Commit and push factual notification milestone/checkpoint; publish once to existing public Site and verify live route."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -454,10 +454,10 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
-    "tests": "121/121 local Swift tests passed.",
-    "hosted_ci": "38368612207 and 38368612251 succeeded for the same SHA; pinned TDLib arm64 Dev.app accountless smoke.",
-    "scope": "No real auth, actual typing update, 20-account certification, performance, signing/notarization or release. Channels and stable remain gated."
+    "source_commit": "8274a5ad3344bfdad54e5462e3aec761345a5fbd",
+    "tests": "122/122 local Swift tests passed; AppKit target compiled.",
+    "hosted_ci": "Exact-source macOS CI 38370730565 and pinned TDLib/isolated Dev.app workflow 38370730581 succeeded for the same SHA.",
+    "scope": "Accountless native smoke only. Local canonical Dev.app process remains open on 8098e82 and was not replaced. System permission prompt, real notifications/accounts, 20-account certification, performance, Developer ID, notarization and release remain unverified."
   },
   "latest_source_audit": {
     "date": "2026-10-13",

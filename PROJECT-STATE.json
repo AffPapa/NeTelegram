@@ -11,13 +11,13 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "21732b0",
+    "commit": "8274a5ad3344bfdad54e5462e3aec761345a5fbd",
     "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38368612207,
+      "run_id": 38370730565,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38368612207"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38370730565"
     },
     "published_application_releases": []
   },
@@ -30,19 +30,20 @@
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development signature",
-    "distribution_ready": false
+    "distribution_ready": false,
+    "process_state": "One canonical Dev.app process remains open; graceful Quit did not terminate it. Bundle not replaced; no second app launched."
   },
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 121,
-      "command": "swift test --scratch-path /private/tmp/nettelegram-spm-test-run"
+      "count": 122,
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/nettelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/nettelegram-swift-cache swift test --scratch-path /private/tmp/nettelegram-spm-test-run"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38368612251: arm64 Dev.app built, first-run screenshot and graceful quit; accountless only."
+    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38370730581 passed for exact source SHA: arm64 Dev.app built, accountless screenshot captured, graceful quit succeeded in CI."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -67,6 +68,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue next implementation milestone from main commit 8098e82; do not rebuild/relaunch app unless changed source requires it. Real login remains deferred.",
+  "next_action": "Deploy Site devlog entry for source 8274a5a; keep single local 8098e82 Dev.app process, do not replace while it is running; wait for user to use/close before the next local bundle replacement.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
