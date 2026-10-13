@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; Neridian public name, NeTelegram codename; source 8098e82: 121/121 local tests and exact-source CI passed; accountless Dev.app only; user deferred Telegram login; Site v102; no app release/download.",
+  "status": "implementation_in_progress; Neridian public name, NeTelegram codename; source 8098e82: 121/121 local tests and exact-source CI passed; accountless Dev.app only; user deferred Telegram login; Site v103; no app release/download.",
   "cases": [
     {
       "id": "APP01",
@@ -432,7 +432,7 @@
     "local_result": "121/121 Swift tests. Canonical arm64 Dev.app built/launched accountless; local UI automation could not attach, screenshot evidence is from pinned TDLib CI.",
     "hosted_ci": "Exact-source macOS CI 38368612207 and pinned TDLib/Dev.app 38368612251 succeeded.",
     "scope": "Typing action is selected account/chat/topic only, throttled to 4 seconds, cancelled on clear/switch/send/picker/lock. No real Telegram login or 20-runtime evidence. User deferred login and declined sponsored-video playback; channels and stable remain gated.",
-    "publication": "Site v102 public before this devlog update; update pending. No app release/download.",
+    "publication": "Public Site v103 deployed successfully at https://netelegram.iryadom.chatgpt.site; project appgprj_6acba85192e08191acdf7011928848cf; Site source commit b173aeb03b920fd2b5df805654f16f4a7ae55019; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_4290ac3d8aa48191b08277009f7f48c9; deployment appgdep_6acdec9638448191a32e9fe6dac00d74 succeeded. Anonymous HTTPS GET /devlog/ returned 104045 bytes and contained the 8098e82 milestone, source link, and explicit no-release/download statement. Archive local SHA-256 1ebfbef5aa680f9e3d805ac34d7c97d762e14df26a622613c9bbcab0b3f11920; Sites stored normalized hash sha256:9ec0ae165fbdec7379aee69dbea77b3d6251469c062e5a9df092bbc85a7a000f, 194560 bytes, 12 files. Site remains public. No app release/download.",
     "next_action": "Commit source-mirrored factual devlog/checkpoint, publish via existing Sites source helper, verify public route."
   },
   "latest_site_deployment": {

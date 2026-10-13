@@ -11,7 +11,7 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "commit": "21732b0",
     "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
@@ -49,12 +49,15 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 102,
-    "source_commit": "eb6972ace4b5c2b9a5c45805eee1de91e332b109",
-    "deployment_id": "appgdep_6acde3a0a8608191bc941d4b6892cfcc",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_828ccb8d6d008191aa79ea3fbc3e59b1",
+    "latest_version": 103,
+    "source_commit": "b173aeb03b920fd2b5df805654f16f4a7ae55019",
+    "deployment_id": "appgdep_6acdec9638448191a32e9fe6dac00d74",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_4290ac3d8aa48191b08277009f7f48c9",
     "public_application_download": false,
-    "updater_feeds": "empty valid stable and alpha feeds"
+    "updater_feeds": "empty valid stable and alpha feeds",
+    "public_route_verified": "/devlog/ HTTPS GET 200; 104045 bytes; milestone text, source link and no-download statement present",
+    "archive_local_sha256": "1ebfbef5aa680f9e3d805ac34d7c97d762e14df26a622613c9bbcab0b3f11920",
+    "archive_sites_sha256": "9ec0ae165fbdec7379aee69dbea77b3d6251469c062e5a9df092bbc85a7a000f"
   },
   "open_gates": [
     "Store the supplied Telegram api_hash in Keychain using the hidden-input helper; the item is currently absent or unreadable.",
@@ -64,6 +67,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Commit/push factual milestone and checkpoint, then publish same Site source.",
+  "next_action": "Continue next implementation milestone from main commit 8098e82; do not rebuild/relaunch app unless changed source requires it. Real login remains deferred.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
