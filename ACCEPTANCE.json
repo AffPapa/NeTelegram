@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 4478f967654b270cd78f71a5afe69f625491d38d passes 130/130 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. Authorization-step announcements use static state-only copy and account/generation/step deduplication; real VoiceOver and account workflows remain unverified.",
+  "status": "implementation_in_progress; app source dd11b9f38978870bf80509c239070d2570c7d8d4 passes 130/130 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. TDLib active-notification snapshots are silently reconciled into Notification Center; real account delivery remains unverified.",
   "cases": [
     {
       "id": "APP01",
@@ -63,7 +63,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Notification authorization is gated once per app process while TDLib notification options remain per-account. Test notificationPermissionIsRequestedOnceAcrossAccountStartup passes in the 122/122 local Swift suite; exact-source macOS CI 38370730565 and pinned TDLib/isolated Dev.app workflow 38370730581 succeeded for commit 8274a5ad3344bfdad54e5462e3aec761345a5fbd. CI smoke is accountless. Real Notification Center permission changes, account notifications, clicks, and duplicate-sound behavior remain unverified; status stays partial."
+      "evidence": "At app-source commit dd11b9f38978870bf80509c239070d2570c7d8d4, updateActiveNotifications snapshots now re-enqueue current routeable items as silent reconciliation after replacing per-account route state; the existing privacy barrier and stale-target checks still gate publication. Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Real Notification Center permission, restore, account click routing, and 20 real accounts remain unverified; status stays partial."
     },
     {
       "id": "APP08",
@@ -72,7 +72,7 @@
       "method": "fault+native Notification Center",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Notification publication remains serialized with the privacy barrier. New AccountNotificationCleanup removes only the closed account IDs/routes; accountNotificationCleanupRemovesOnlyClosedAccountsRoutes passes in exact-source 101/101 suite at 24c1f31. Native Notification Center removal/reconcile races and a real account close remain unverified."
+      "evidence": "Privacy-barrier publication check plus account/chat/message cleanup remain in place. Active TDLib snapshots now re-enqueue eligible routes using generic content when locked and silent reconciliation when unlocked, with stale-target checks before scheduling (commit dd11b9f). Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Notification Center completion-order races and real-account close/reconcile remain unverified; status stays partial."
     },
     {
       "id": "APP09",
