@@ -3367,8 +3367,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 canBeViewed: selfDestruct <= 0 && paidStars == 0 && !restrictedPhoto
             )
         }
+        var allCandidates = candidates
+        if let chatID = selectedChatByAccount[selected.account] {
+            let key = SponsoredMessagesKey(account: selected.account, generation: selected.generation, chatID: chatID)
+            let sponsoredIDs = SponsoredMessagesPolicy.viewableMessageIDs(
+                cards: sponsoredMessagesByKey[key] ?? [],
+                fullyVisibleIDs: visibleIDs
+            )
+            for id in sponsoredIDs {
+                allCandidates.append(VisibleMessageReadCandidate(messageID: id, isIncoming: true))
+            }
+        }
         let ids = visibleReadReceiptRegistry.candidateIDs(
-            messages: candidates,
+            messages: allCandidates,
             fullyVisibleMessageIDs: visibleIDs,
             conversation: conversation,
             runtimeGeneration: selected.generation
@@ -4200,22 +4211,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
         }
 
+        let trackedText = NSStackView()
+        trackedText.orientation = .vertical
+        trackedText.alignment = .leading
+        trackedText.spacing = 7
+        trackedText.translatesAutoresizingMaskIntoConstraints = false
+
         let badge = NSTextField(labelWithString: card.recommended ? "Рекомендовано" : "Реклама")
         badge.font = .systemFont(ofSize: 11, weight: .semibold)
         badge.textColor = .controlAccentColor
         badge.setAccessibilityLabel(card.recommended ? "Рекомендованная публикация" : "Спонсируемая публикация")
-        cardView.addArrangedSubview(badge)
+        trackedText.addArrangedSubview(badge)
 
         let title = NSTextField(wrappingLabelWithString: card.title)
         title.font = .systemFont(ofSize: 15, weight: .semibold)
         title.maximumNumberOfLines = 0
-        cardView.addArrangedSubview(title)
+        trackedText.addArrangedSubview(title)
 
         if !card.text.isEmpty {
             let body = NSTextField(wrappingLabelWithString: card.text)
             body.font = .systemFont(ofSize: 14)
             body.maximumNumberOfLines = 0
-            cardView.addArrangedSubview(body)
+            trackedText.addArrangedSubview(body)
         }
         if let photoKey = sponsoredPhotoPresentation, let fileURL = sponsoredPhotoURL {
             let imageView = NSImageView(frame: NSRect(x: 0, y: 0, width: 320, height: 240))
@@ -4244,7 +4261,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             info.font = .systemFont(ofSize: 11)
             info.textColor = .secondaryLabelColor
             info.maximumNumberOfLines = 0
-            cardView.addArrangedSubview(info)
+            trackedText.addArrangedSubview(info)
+        }
+
+        cardView.addArrangedSubview(trackedText)
+        if card.contentType == "messageText" || card.contentType == "messagePhoto" {
+            messageReadViewsByID[card.messageID] = trackedText
         }
 
         let button = NSButton(title: card.buttonText.isEmpty ? "Подробнее" : card.buttonText, target: self, action: #selector(openSponsoredLink(_:)))

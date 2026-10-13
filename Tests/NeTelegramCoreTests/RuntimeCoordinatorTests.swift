@@ -270,6 +270,25 @@ import Testing
     #expect(report["@extra"] as? String == "report-1")
 }
 
+@Test func sponsoredMessageViewsRequireFullyVisibleSupportedCards() {
+    func card(_ id: Int64, _ type: String) -> SponsoredMessageCard {
+        SponsoredMessageCard(tdlibObject: [
+            "message_id": id,
+            "title": "Ad",
+            "content": ["@type": type, "text": ["text": "Ad text"]],
+            "sponsor": ["url": "https://example.org/"],
+        ])!
+    }
+    let cards = [
+        card(17, "messageText"),
+        card(18, "messagePhoto"),
+        card(19, "messageVideo"),
+        card(17, "messageText"),
+    ]
+    #expect(SponsoredMessagesPolicy.viewableMessageIDs(cards: cards, fullyVisibleIDs: [17, 18, 19]) == [17, 18])
+    #expect(SponsoredMessagesPolicy.viewableMessageIDs(cards: cards, fullyVisibleIDs: [18, 19]) == [18])
+}
+
 @Test func sponsoredReportOptionsKeepOpaqueTDLibByteIDsAndLocalizedLabels() {
     let options = SponsoredReportResult.options(from: [
         "@type": "reportSponsoredResultOptionRequired",

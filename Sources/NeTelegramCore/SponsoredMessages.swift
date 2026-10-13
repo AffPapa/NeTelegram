@@ -103,6 +103,19 @@ public enum SponsoredMessagesPolicy {
         ["@type": "clickChatSponsoredMessage", "chat_id": chatID, "message_id": messageID, "is_media_click": media, "from_fullscreen": fullscreen]
     }
 
+    /// Only text and fully downloaded photo cards are currently presented as complete ads.
+    /// Animation/video cards need their excluded playback path before they can be marked viewed.
+    public static func viewableMessageIDs(cards: [SponsoredMessageCard], fullyVisibleIDs: Set<Int64>) -> [Int64] {
+        var seen = Set<Int64>()
+        return cards.compactMap { card in
+            guard (card.contentType == "messageText" || card.contentType == "messagePhoto"),
+                  card.messageID > 0,
+                  fullyVisibleIDs.contains(card.messageID),
+                  seen.insert(card.messageID).inserted else { return nil }
+            return card.messageID
+        }
+    }
+
     public static func report(chatID: Int64, messageID: Int64, optionID: String = "", extra: String? = nil) -> [String: Any] {
         var request: [String: Any] = ["@type": "reportChatSponsoredMessage", "chat_id": chatID, "message_id": messageID, "option_id": optionID]
         if let extra { request["@extra"] = extra }
