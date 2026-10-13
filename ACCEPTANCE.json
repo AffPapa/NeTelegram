@@ -1,20 +1,20 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 86855e4599ae4dc9d00274c07331617ddc5b3684 has a successful explicit serial hosted Swift suite (151 tests) at repository/workflow commit 7eb1d292adc0d0f59d362c9eb925193d25128df6. Public Site v149 records the CI result. Real accounts, 20-runtime certification, signed distribution and Telegram compatibility gates remain open.",
+  "status": "implementation_in_progress; product source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51. Workflow baseline 40ca82e5065456b1ab98f675963682bf846da9a4 passed 151 serial Swift tests; separate metadata validation passed. Pinned TDLib/arm64 Dev.app lifecycle smoke passed accountlessly on the same product source. Public Site v150. Real accounts, 20-runtime certification, signed distribution and Telegram compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "86855e4599ae4dc9d00274c07331617ddc5b3684",
-    "app_tests": "Exact-source GitHub macOS CI run 38447978740 at repo/workflow commit 7eb1d292adc0d0f59d362c9eb925193d25128df6 passed all 151 Swift tests in serial mode and validated checked-in JSON on macOS 15 / Xcode 16.4 / Swift 6.1.2. Local full serial run also passed 151/151 in 1.27 seconds on Xcode 27. The previous parallel hosted runs canceled after a startup cancellation test remained unfinished; CI now uses --no-parallel.",
+    "app_source_commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
+    "app_tests": "Exact repository/workflow commit 40ca82e5065456b1ab98f675963682bf846da9a4 passed 151/151 serial Swift tests in GitHub Actions run 38452464811 in 47 seconds (macOS 15 / Xcode 16.4 / Swift 6.1.2). Dedicated metadata run 38452464851 validated JSON. Local serial 151/151 in 1.27 seconds on Xcode 27 / Swift 6.4 remains valid for its recorded source. Docs-only updates are excluded from Swift CI.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38447978740",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38444116358",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38444116182"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38452464811",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38452464851",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38451242039"
     ],
-    "native_smoke": "Exact-SHA pinned TDLib/Dev.app workflow 38440068795 was cancelled before any steps; it provides no build/smoke evidence for HEAD. Prior accountless GUI lifecycle smoke 38437335165 passed for product-code commit 15cb93b63c1654f256403b793ff05995a4907a09.",
+    "native_smoke": "Pinned TDLib/arm64 Dev.app run 38451242039 succeeded for app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51 at workflow commit e032b497d4e9d2eb12718dfb4f0c500b7acbaffc. Dependency build, isolated bundle assembly, close/reopen/quit smoke and artifact upload passed; accountless only.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
-    "site": "Public Site v149 at https://netelegram.iryadom.chatgpt.site; Site source c7c551dc5ddbd021cec894539e281c7d27cc3aae; deployment appgdep_6ace7b3e44148191b1b9848cca2fd031. The devlog records the passing serial CI run. Anonymous public /devlog/?v=149 confirmed the run and commit; /downloads/?v=149 confirmed no ZIP/DMG release links while no verified app release exists.",
+    "site": "Public Site v150 at https://netelegram.iryadom.chatgpt.site; Site source 92fdb0289165157b5f9ee8939dc96767c2915490; deployment appgdep_6ace7e38f5d881918fa29d7fa0ebbd18. Anonymous checks of all eight routes and valid empty appcasts are recorded in PROJECT-STATE.json. Downloads remain empty pending a verified app release.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -461,31 +461,27 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "7eb1d292adc0d0f59d362c9eb925193d25128df6",
-    "app_source_commit": "86855e4599ae4dc9d00274c07331617ddc5b3684",
+    "source_commit": "40ca82e5065456b1ab98f675963682bf846da9a4",
+    "app_source_commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
     "local_command": "env SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --no-parallel --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "Full serial suite passed 151/151 on Xcode 27.0 / Swift 6.4 in 1.27 seconds.",
-    "hosted_ci": "Exact repository/workflow commit 7eb1d292adc0d0f59d362c9eb925193d25128df6 run 38447978740 succeeded: all 151 Swift tests passed in serial mode and checked-in JSON validation passed on macOS 15 / Xcode 16.4 / Swift 6.1.2.",
-    "native_dev_app_smoke": "Pinned TDLib/arm64 Dev.app run 38444116358 succeeded on app-source 86855e4599ae4dc9d00274c07331617ddc5b3684; isolated dependency and Dev.app assembly/verification passed.",
-    "scope": "CI parallelization correction and Site devlog publication. No real Telegram login, local profile access, 20-account certification, or release validation."
+    "local_result": "Previously recorded exact base serial suite passed 151/151 in 1.27 seconds on Xcode 27 / Swift 6.4; not rerun for workflow-only changes.",
+    "hosted_ci": "Exact repository/workflow commit 40ca82e5065456b1ab98f675963682bf846da9a4 passed all 151 Swift tests in serial mode in run 38452464811; job duration 47 seconds.",
+    "metadata_validation": "Dedicated JSON-only workflow run 38452464851 passed all configured JSON syntax checks.",
+    "native_dev_app_smoke": "Pinned TDLib/arm64 Dev.app run 38451242039 passed for app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51 at workflow commit e032b497d4e9d2eb12718dfb4f0c500b7acbaffc; accountless close/reopen/quit.",
+    "scope": "Workflow trigger optimization and checkpoint reconciliation only. No app code, profile data, login credentials, Site, or release assets changed."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 149,
-    "source_commit": "c7c551dc5ddbd021cec894539e281c7d27cc3aae",
-    "app_repository_commit": "7eb1d292adc0d0f59d362c9eb925193d25128df6",
-    "deployment_id": "appgdep_6ace7b3e44148191b1b9848cca2fd031",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_fe401e8fbf848191ac535d721b3f7629",
+    "version": 150,
+    "source_commit": "92fdb0289165157b5f9ee8939dc96767c2915490",
+    "app_repository_commit": "33147b0fff262db4825c5aa11b0782015d7485f1",
+    "deployment_id": "appgdep_6ace7e38f5d881918fa29d7fa0ebbd18",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_50db2aac69548191bedc2057d6d3fcb5",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "sha256:c9dc05bad1f314f5bc8b950b9139f616deeb799aa90a89db4e06f2e507d456ee",
-    "archive_bytes": 287610,
-    "sites_archive_content_hash": "sha256:820c84b847c8b67a8ae9074bc13f761c9d6e69e0cd736b7fce3d1d2c3cfdbaf3",
-    "sites_reported_archive_size_bytes": 512000,
-    "archive_file_count": 15,
-    "description": "Factual bilingual development log for serial CI verification; no application binaries or download links.",
-    "public_verification": "Anonymous public /devlog/?v=149 at 390px viewport rendered at 375px document width and showed run 38447978740, commit 7eb1d29, and 151 tests. /downloads/?v=149 rendered at 375px document width, stated no verified release, and had zero ZIP/DMG/release-download links."
+    "description": "Shared responsive design system across eight routes; no binaries or download links while no verified app release exists.",
+    "public_verification": "Recorded v150 public route and appcast checks; no Site content changed in this workflow optimization."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -511,5 +507,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Poll exact runs 38444116182 and 38444116358 to terminal status. Continue from a distinct P0 runtime acceptance gap; do not rerun full Swift suite for this copy-only change or repeat Site v147 checks. User deferred real login; 20 authorized runtimes, signing/notarization and Telegram compatibility remain open."
+  "next_action": "Continue a distinct P0 application acceptance gap from app source 4e96a155. CI/native smoke/Site checks just completed and must not be repeated without changed inputs. Real login remains user-deferred; continue accountless work and preserve the precise 20-account, Developer ID/notarization and Telegram compatibility blockers."
 }
