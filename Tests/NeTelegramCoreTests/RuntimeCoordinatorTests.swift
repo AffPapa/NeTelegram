@@ -1625,6 +1625,43 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(sends == 1)
 }
 
+@Test func sendIntentDispatchStaysOnAccountAAfterSelectionSwitchesToB() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let barrier = PrivacyDispatchBarrier()
+    let intent = SendIntent(
+        account: accountA,
+        expectedTelegramUserID: 101,
+        runtimeGeneration: RuntimeGeneration(4),
+        conversation: ConversationKey(account: accountA, chatID: 9001, topic: .forum(topicID: 7)),
+        replyToMessageID: 42,
+        text: "captured for A",
+        privacyEpoch: barrier.currentEpoch()
+    )
+
+    // The UI may change while a send is queued. The dispatch authority is the
+    // captured runtime identity, not the subsequently selected account.
+    var selectedAccount = accountA
+    selectedAccount = accountB
+    var sentAccounts: [AccountUUID] = []
+    let accepted = barrier.dispatch(
+        intent,
+        currentAccount: accountA,
+        currentTelegramUserID: 101,
+        currentGeneration: RuntimeGeneration(4)
+    ) {
+        sentAccounts.append(intent.account)
+    }
+
+    #expect(selectedAccount == accountB)
+    #expect(accepted)
+    #expect(sentAccounts == [accountA])
+    #expect(intent.conversation.account == accountA)
+    #expect(intent.conversation.chatID == 9001)
+    #expect(intent.conversation.topic == .forum(topicID: 7))
+    #expect(intent.replyToMessageID == 42)
+}
+
 @Test func runtimeCommandGateOrdersAcceptedCommandsBeforeCloseAndRejectsLateDispatch() {
     let gate = RuntimeCommandGate()
     let commandEntered = DispatchSemaphore(value: 0)
