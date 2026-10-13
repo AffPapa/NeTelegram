@@ -33,7 +33,7 @@
         "scope": "Pinned TDLib arm64 Dev.app build, accountless window close/reopen/quit smoke."
       }
     },
-    "native_smoke": "Canonical /private/tmp/NeTelegram-Dev.app; content source commit 209be94fde904d0b666ab5c28f588d78610b05bf, embedded build identity 87c92570+dirty. Incremental app build 8.57s; ad-hoc nested code signature passed. Source fingerprint b954e21469bfc42bf0c98e05867f2b107857255d84b9daecda010033e35b97bc; executable SHA-256 f31409c71cb07c6b8568adbfbe4a444cc149475b3c6ca4918465ae2a9cb9d844; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. AX and screenshot show updated independent-client/non-affiliation/no-session-import disclosure, country +66, phone entry, Continue, QR and neutral status. No phone or code. On selecting normal Quit, process remained live and UI unchanged >2 seconds; no force quit or replacement performed. This is a development smoke, not release verification.",
+    "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; login remains deferred",
     "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
@@ -44,7 +44,7 @@
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
     "code_signing_preflight": "Read-only check on 2026-10-13: security find-identity -v -p codesigning exited 0 and reported 0 valid code-signing identities, including 0 Developer ID Application identities. This supersedes the stale REL03 assertion of four identities/two Developer ID identities. No private keys or credentials were read.",
     "github_release_inventory": "GitHub REST GET https://api.github.com/repos/AffPapa/NeTelegram/releases?per_page=100 returned an empty release list. No public application release exists.",
-    "native_dev_app_smoke": "Current canonical arm64 Dev.app built from e7ee13a87275140615da8328244964b1b5faad48 in 9.20s; source fingerprint 0d26a0d079dc72136b29f31f72079329c73238c488c315fae493434e0bdabca0; executable SHA-256 580aa2cec16857a043381660bd331424129f8b9cb880b476cf55ad36ffb613a5; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc signature verifies. AX shows welcome, phone, Continue, QR and no UUID profile. No credentials entered. After >=5s startup status remains connecting; sample observes restoreProfiles waiting in Security SecItemCopyMatching. Cause unconfirmed, so GUI smoke is partial.",
+    "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
     "previous_native_smoke_correction": "Workflow 38431733910 did run Scripts/window-lifecycle-smoke.sh: its logs report last-window close, LaunchServices reopen in the same PID, one-window state and quit. This is accountless only.",
     "app_build": "Exact app-source SHA 6145b0156068f784e1eea3bf70df77a8b834bf83 built locally with swift build using /private/tmp/netelegram-swiftpm-cache on Xcode 27.0 / Swift 6.4 (5.27 seconds). No account or keychain data was accessed.",
     "telegram_api_compatibility": "Primary current Terms and exact pinned TDLib schema rechecked 2026-10-14. App intro now says it uses Telegram API/TDLib and belongs to the Telegram ecosystem, while stating no direct affiliation. Terms §2.3 title conflict remains; §3.3 sponsored video is required for channel access, and user declined a video player; stable channel access is deferred. Terms §§1.3/1.4 basic functionality review remains open."
@@ -500,43 +500,47 @@
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-auth-disclosure-validation",
     "local_result": "Full serial Swift suite passed 157/157 in 0.212s test execution after 17.89s build. Initial sandbox attempt was denied during manifest setup before tests; same suite passed on approved host execution. No account or auth test.",
     "hosted_ci": "Cancelled: exact-source run 38478591456 built tests but workflow cancelled after five minutes during test execution; no result. Rerun via connected GitHub API returned 403 Resource not accessible by integration. Not PASS.",
-    "native_dev_app_smoke": "One canonical Dev.app shows the phone-entry screen with updated disclosure. No phone/code entered. Normal Quit was selected; process remained live >2s with unchanged UI. Do not replace this bundle until process exit is confirmed. AX/screenshot verifies disclosure text. Ad-hoc development code only.",
-    "scope": "One AppKit login disclosure/copy readability change; local full serial suite and one canonical accountless Dev.app smoke. Real login, 20 runtimes, graceful quit, native VoiceOver/IME/dark/light, signing/notarization, updater and release remain unverified.",
+    "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
+    "scope": "AppKit login disclosure source; local serial suite 157/157 for 209be94; exact hosted run cancelled with no result; canonical clean Dev.app build from 7f95e03, accountless phone/QR AX smoke, app-menu Quit exit. No real auth, no Cmd+Q claim, no 20-runtime proof, no distribution.",
     "checkpoint_commit": "9dc8cc9eb0433731e1d54ed1e9a156914578a20d",
     "site_deployment": {
-      "version": 161,
-      "source_commit": "69f99f815da78275650cae1324545f2e70392883",
-      "deployment_id": "appgdep_6aceb40c64cc81918919940bc8772ca4",
+      "version": 162,
+      "source_commit": "6e1d7be28feb32c651f60e352971a3f8d493a1ad",
+      "deployment_id": "appgdep_6aceb5a92a448191a0f3cf120850b40c",
       "url": "https://netelegram.iryadom.chatgpt.site",
-      "public_routes": "All eight routes returned HTTP 200 text/html; devlog evidence matches 209be94/local 157/157/hosted cancelled; downloads has no binary URL."
+      "public_routes": "All eight routes returned HTTP 200 text/html; devlog records clean app smoke and corrected Quit evidence; downloads has no binary URL."
     }
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 161,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_356c9c33a0cc8191a6fe2b322a7e83b8",
-    "source_commit": "69f99f815da78275650cae1324545f2e70392883",
-    "app_repository_commit": null,
+    "version": 162,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9487e710ff248191b1f497281a7797ff",
+    "source_commit": "6e1d7be28feb32c651f60e352971a3f8d493a1ad",
+    "app_repository_commit": "7f95e03c12457d522f2e7e50b3baa497db6e731d",
     "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-    "deployment_id": "appgdep_6aceb40c64cc81918919940bc8772ca4",
+    "deployment_id": "appgdep_6aceb5a92a448191a0f3cf120850b40c",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "local_archive_path": "/private/tmp/NeTelegram-site-v161.tar.gz",
-    "local_archive_sha256": "8472f0346a9617ea90d47731d5647fcbe6431608574676607cf5c7b3ad2a7024",
-    "local_archive_size_bytes": 295698,
-    "saved_archive_content_hash": "sha256:844ed8b274bb0b37b5d74d7ee5e6c565b6a451a6399266c7a9f8052ac74e3164",
+    "local_archive_path": "/private/tmp/NeTelegram-site-v162.tar.gz",
+    "local_archive_sha256": "4d01f8f646db834a84ddc6160deea4fc9e91facb78d30223f342207a77293b80",
+    "local_archive_size_bytes": 295795,
+    "saved_archive_content_hash": "sha256:d02427da812a53a2d2eceb6f3d70960311edcf2617a808b7e59225e35234acc2",
     "saved_archive_size_bytes": 542720,
     "archive_file_count": 15,
-    "public_verification": "Anonymous HTTPS: all eight routes returned HTTP 200 text/html. Devlog includes exact app SHA 209be94, local suite 157/157 and cancelled hosted run 38478591456; Downloads has no binary URL."
+    "public_verification": "Deployment succeeded; anonymous HTTPS returned 200 text/html on all eight routes. Devlog corrects quit evidence for 7f95e03 and distinguishes unverified Cmd+Q. Downloads has no binary URL."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
     "source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "checkpoint_commit": "7f95e03c12457d522f2e7e50b3baa497db6e731d",
     "source_fingerprint_sha256": "b954e21469bfc42bf0c98e05867f2b107857255d84b9daecda010033e35b97bc",
-    "local_tests": "157/157 full serial Swift suite passed; Xcode 27 / Swift 6.4 / arm64e.",
-    "hosted_ci": "pending exact-source push",
-    "native_app": "Canonical Dev.app smoke; accountless, ad-hoc. Quit observation unresolved; bundle identity shows parent +dirty."
+    "local_tests": "157/157 local full serial suite on source 209be94; not rerun because source/harness unchanged.",
+    "hosted_ci": "Exact-source run 38478591456 cancelled during tests after five minutes; connector rerun denied 403; no hosted PASS.",
+    "native_app": "Built and launched once from clean checkpoint 7f95e03. AX confirmed accountless phone/QR screen and disclosure. No phone/code entered. App menu NeTelegram → Quit completed; CUA process inventory subsequently showed not running. Cmd+Q keyboard simulation did not provide reliable evidence; shortcut remains unverified.",
+    "app_executable_sha256": "5ab67ec7a147680421930e57112573438c4edb8f3164b1fdfed689a369a8d8d0",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app"
   },
   "latest_source_audit": {
     "date": "2026-10-14",
@@ -555,5 +559,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Publish source/checkpoint once and verify exact-source CI. Diagnose the normal Quit wait from app-owned runtime evidence; do not force-kill or overwrite the canonical bundle. Update the existing public Site devlog once after CI. Real login is deferred; all-20, release signing/notary, updater and downloadable binaries remain open."
+  "next_action": "Proceed to the next implementation slice from the current acceptance gaps without changing account/session boundaries. Keep real login deferred until the user enters credentials. Prioritize a feature slice that is testable without live Telegram accounts, run one full local serial suite after that slice, and use the next exact-source CI run to diagnose the hosted cancellation. Do not treat short UI-automation delays as a quit failure; verify app process state. Developer ID/notarization, real account flows, 20 runtime, updater and user release remain open."
 }
