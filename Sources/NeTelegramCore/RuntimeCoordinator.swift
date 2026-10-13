@@ -58,9 +58,11 @@ public struct BufferedTDLibUpdate: Sendable {
     public let json: Data
     public let clientID: ClientID?
     public let routingError: TDLibRoutingError?
+    let usesReservedLaneCapacity: Bool
 
-    public init(json: Data) {
+    public init(json: Data, usesReservedLaneCapacity: Bool = false) {
         self.json = json
+        self.usesReservedLaneCapacity = usesReservedLaneCapacity
         guard let object = try? JSONSerialization.jsonObject(with: json),
               let fields = object as? [String: Any] else {
             clientID = nil

@@ -7,9 +7,9 @@ public enum TDLibPipelineEvent: Sendable {
 
 /// A bounded fair queue between the one blocking td_receive worker and the
 /// reducer. Each client keeps FIFO order; ready clients take turns so a busy
-/// account cannot indefinitely starve sparse accounts. Capacity and byte
-/// budgets are shared across every lane. When full, the producer blocks and
-/// stops calling td_receive; it never drops updates.
+/// account cannot indefinitely starve sparse accounts. A small, byte-limited
+/// reserve admits one event for otherwise idle lanes after the shared budget
+/// fills. Further overflow applies backpressure; no updates are dropped.
 public final class TDLibUpdateBuffer: @unchecked Sendable {
     private enum Lane: Hashable {
         case client(ClientID)
@@ -38,6 +38,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private let condition = NSCondition()
     private let capacity: Int
     private let byteCapacity: Int
+    private let reservedByteCapacity: Int
     private var storage: [Lane: LaneQueue] = [:]
     /// Contains only non-empty lanes. A lane moves to the tail after each take.
     private var readyLanes: [Lane] = []
@@ -45,6 +46,12 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private var storedByteCount = 0
     private var inFlightItemCount = 0
     private var inFlightByteCount = 0
+    private var inFlightByLane: [Lane: Int] = [:]
+    /// A saturated shared budget may hold one event for each otherwise idle
+    /// lane. This bounded reserve lets the sole receive worker discover other
+    /// accounts behind a hot account without dropping events.
+    private var reservedLanes: Set<Lane> = []
+    private var reservedBytes = 0
     private var waitingAppends = 0
     private var closed = false
     private var allowFinalInFlightAppend = false
@@ -53,6 +60,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     public init(capacity: Int = 2_048, byteCapacity: Int = 64 * 1_024 * 1_024) {
         self.capacity = max(1, capacity)
         self.byteCapacity = max(1, byteCapacity)
+        self.reservedByteCapacity = max(1, byteCapacity / 4)
     }
 
     public var count: Int {
@@ -70,8 +78,8 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         return waitingAppends
     }
 
-    /// Bytes queued or being reduced. The byte budget covers the whole pipeline,
-    /// so asynchronous delivery cannot turn backpressure into an unbounded task queue.
+    /// Bytes queued or being reduced, including the bounded cross-lane reserve.
+    /// Asynchronous delivery cannot turn backpressure into an unbounded task queue.
     public var queuedByteCount: Int {
         condition.lock()
         defer { condition.unlock() }
@@ -89,9 +97,10 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     /// Blocks until capacity is available. Returns false once shutdown starts.
     @discardableResult
     public func append(_ json: Data) -> Bool {
-        let update = BufferedTDLibUpdate(json: json)
+        let incoming = BufferedTDLibUpdate(json: json)
+        let lane = lane(for: incoming)
         condition.lock()
-        while !closed && isFull(for: update.json.count) {
+        while !closed && isFull(for: incoming, lane: lane) {
             waitingAppends += 1
             condition.wait()
             waitingAppends -= 1
@@ -107,7 +116,13 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         // exceed the normal budget by at most one update, then all later appends
         // are rejected.
         if closed { finalInFlightAppendUsed = true }
-        let lane = lane(for: update)
+        let useReservedCapacity = storedItemCount + inFlightItemCount > 0
+            && !hasMainCapacity(for: incoming.json.count)
+        let update = BufferedTDLibUpdate(json: json, usesReservedLaneCapacity: useReservedCapacity)
+        if useReservedCapacity {
+            reservedLanes.insert(lane)
+            reservedBytes += json.count
+        }
         if storage[lane] == nil {
             storage[lane] = LaneQueue()
             readyLanes.append(lane)
@@ -138,6 +153,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         storedByteCount -= update.json.count
         inFlightItemCount += 1
         inFlightByteCount += update.json.count
+        inFlightByLane[lane, default: 0] += 1
         if laneQueue.count == 0 {
             storage.removeValue(forKey: lane)
         } else {
@@ -156,6 +172,15 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         precondition(inFlightItemCount > 0 && inFlightByteCount >= update.json.count)
         inFlightItemCount -= 1
         inFlightByteCount -= update.json.count
+        let lane = lane(for: update)
+        let laneCount = inFlightByLane[lane, default: 0]
+        precondition(laneCount > 0)
+        if laneCount == 1 { inFlightByLane.removeValue(forKey: lane) }
+        else { inFlightByLane[lane] = laneCount - 1 }
+        if update.usesReservedLaneCapacity {
+            reservedLanes.remove(lane)
+            reservedBytes -= update.json.count
+        }
         condition.broadcast()
         condition.unlock()
     }
@@ -177,18 +202,34 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         condition.unlock()
     }
 
-    private func isFull(for nextItemBytes: Int) -> Bool {
+    private func isFull(for update: BufferedTDLibUpdate, lane: Lane) -> Bool {
+        let outstandingItems = storedItemCount + inFlightItemCount
+        if outstandingItems == 0 { return false }
+        if hasMainCapacity(for: update.json.count) { return false }
+        return !canUseReservedCapacity(for: update, lane: lane)
+    }
+
+    private func hasMainCapacity(for nextItemBytes: Int) -> Bool {
         let outstandingItems = storedItemCount + inFlightItemCount
         let outstandingBytes = storedByteCount + inFlightByteCount
-        if outstandingItems >= capacity { return true }
-        if outstandingItems == 0 { return false }
-        if outstandingBytes <= byteCapacity, nextItemBytes <= byteCapacity - outstandingBytes {
-            return false
+        return outstandingItems < capacity
+            && outstandingBytes <= byteCapacity
+            && nextItemBytes <= byteCapacity - outstandingBytes
+    }
+
+    private func canUseReservedCapacity(for update: BufferedTDLibUpdate, lane: Lane) -> Bool {
+        guard !reservedLanes.contains(lane),
+              (storage[lane]?.count ?? 0) + inFlightByLane[lane, default: 0] == 0,
+              reservedBytes <= reservedByteCapacity,
+              update.json.count <= reservedByteCapacity - reservedBytes else { return false }
+        switch lane {
+        case .client:
+            return reservedLanes.reduce(into: 0) { count, reservedLane in
+                if case .client = reservedLane { count += 1 }
+            } < 20
+        case .unrouteable:
+            return true
         }
-        // Never drop a TDLib update just because a single response exceeds the
-        // normal budget. Admit it only into an empty queue, which prevents any
-        // other item from being retained beside it until it has been consumed.
-        return true
     }
 
     private func lane(for update: BufferedTDLibUpdate) -> Lane {

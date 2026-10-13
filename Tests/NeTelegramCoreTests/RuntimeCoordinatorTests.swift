@@ -1279,6 +1279,76 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(buffer.queuedClientCount(for: ClientID(2)) == 0)
 }
 
+@Test func saturatedHotLaneReservesBoundedProgressForAnotherAccount() async {
+    let buffer = TDLibUpdateBuffer(capacity: 8, byteCapacity: 4_096)
+    let criticalTypes = [
+        2: "updateAuthorizationState",
+        4: "updateDeleteMessages",
+        6: "updateMessageContent",
+    ]
+    func update(client: Int, sequence: Int, type: String) -> Data {
+        Data("{\"@client_id\":\(client),\"@type\":\"\(type)\",\"sequence\":\(sequence)}".utf8)
+    }
+    var hotSequences = [Int]()
+    var observedCriticalTypes = Set<String>()
+    func recordHot(_ item: BufferedTDLibUpdate?) {
+        guard let item, item.clientID == ClientID(1),
+              let object = (try? JSONSerialization.jsonObject(with: item.json)) as? [String: Any] else { return }
+        hotSequences.append((object["sequence"] as? NSNumber)?.intValue ?? -1)
+        if let type = object["@type"] as? String, criticalTypes.values.contains(type) {
+            observedCriticalTypes.insert(type)
+        }
+    }
+    for sequence in 1...8 {
+        #expect(buffer.append(update(
+            client: 1,
+            sequence: sequence,
+            type: criticalTypes[sequence] ?? "updateConnectionState"
+        )))
+    }
+
+    // Simulate the hot account's first callback still being in flight while
+    // the shared queue is full. Other account lanes receive only one bounded
+    // reserved event at a time and can complete it to release their credit.
+    let firstHot = buffer.take()
+    #expect(firstHot?.clientID == ClientID(1))
+    recordHot(firstHot)
+    let otherOne = Task.detached { buffer.append(update(client: 2, sequence: 1, type: "updateConnectionState")) }
+    #expect(await otherOne.value)
+    #expect(buffer.count == 9)
+    #expect(buffer.queuedByteCount <= 4_096 + 1_024)
+
+    let secondHot = buffer.take()
+    #expect(secondHot?.clientID == ClientID(1))
+    recordHot(secondHot)
+    let otherFirst = buffer.take()
+    #expect(otherFirst?.clientID == ClientID(2))
+    if let otherFirst { buffer.complete(otherFirst) }
+
+    let otherTwo = Task.detached { buffer.append(update(client: 2, sequence: 2, type: "updateDeleteMessages")) }
+    #expect(await otherTwo.value)
+    let thirdHot = buffer.take()
+    #expect(thirdHot?.clientID == ClientID(1))
+    recordHot(thirdHot)
+    let otherSecond = buffer.take()
+    #expect(otherSecond?.clientID == ClientID(2))
+    if let otherSecond { buffer.complete(otherSecond) }
+    if let firstHot { buffer.complete(firstHot) }
+    if let secondHot { buffer.complete(secondHot) }
+    if let thirdHot { buffer.complete(thirdHot) }
+
+    buffer.close()
+    while let item = buffer.take() {
+        recordHot(item)
+        buffer.complete(item)
+    }
+
+    #expect(hotSequences == Array(1...8))
+    #expect(observedCriticalTypes == Set(criticalTypes.values))
+    #expect(buffer.count == 0)
+    #expect(buffer.queuedByteCount == 0)
+}
+
 @Test func updateBufferGivesSparseClientsProgressBesideOneHotClient() {
     let buffer = TDLibUpdateBuffer(capacity: 64)
     func update(_ client: Int, _ sequence: Int) -> Data {
