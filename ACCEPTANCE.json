@@ -35,8 +35,8 @@
       "expected": "Все аккаунты продолжают обработку; Dock/menu возвращают окно.",
       "method": "native AppKit",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "On canonical accountless /private/tmp/NeTelegram-Dev.app (build c6bd4e47), native AX close-button action closed the empty phone-entry window while macOS app inventory continued to report Neridian Dev as running. A subsequent app-state query exposed the phone-entry window again. No phone number or code was entered. This covers only empty-window close/process-resident/reopen UI; no authorized account existed, so continued background update processing and Dock-specific activation remain unverified."
     },
     {
       "id": "APP05",
