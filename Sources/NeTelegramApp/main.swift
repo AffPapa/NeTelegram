@@ -713,20 +713,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func refreshStatusMenu() {
         guard statusMenuItem != nil else { return }
         let accounts = Array(runtimesByAccount.values)
-        let authorized = accounts.filter { $0.telegramUserID != nil }.count
-        let awaitingInput = accounts.filter { AuthorizationStep(tdlibType: $0.authorizationState).awaitsUserInput }.count
-        var failedAccounts = profileStartupFailures
-        failedAccounts.formUnion(accounts.filter {
-            $0.authorizationState == "authorizationStateClosed" || $0.lastTDLibError != nil
-        }.map(\.account))
-        let failed = failedAccounts.count
+        let summary = AccountStatusMenuSummary.make(
+            runtimes: accounts.map {
+                AccountStatusMenuRuntime(
+                    account: $0.account,
+                    telegramUserID: $0.telegramUserID,
+                    authorizationState: $0.authorizationState,
+                    hasError: $0.lastTDLibError != nil
+                )
+            },
+            startupFailures: profileStartupFailures
+        )
         let storageWarning = pendingProfileStorageWarnings > 0
             ? " · \(pendingProfileStorageWarnings) локальных профилей не проверены"
             : ""
-        if accounts.isEmpty {
+        if accounts.isEmpty, knownProfilesByAccount.isEmpty {
             statusMenuItem.title = "Аккаунтов пока нет\(storageWarning)"
         } else {
-            statusMenuItem.title = "Аккаунты: \(authorized) авторизованы · \(awaitingInput) требуют входа · \(failed) с ошибкой\(storageWarning)"
+            statusMenuItem.title = "Аккаунты: \(summary.authorizedCount) авторизованы · \(summary.awaitingInputCount) требуют входа · \(summary.failedCount) с ошибкой\(storageWarning)"
         }
         logoutAccountMenuItem?.isEnabled = !lockState
             && runtime?.telegramUserID != nil
@@ -2095,6 +2099,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     actionButton.isHidden = true
                 }
                 refreshAccountPicker()
+                refreshStatusMenu()
                 if closingForTermination && pendingClosures.isEmpty {
                     if let gateway { stopReceiverAndReplyWhenExited(gateway) }
                     else {

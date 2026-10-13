@@ -462,6 +462,33 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     ) == .unsupported)
 }
 
+@Test func statusMenuKeepsClosedBackgroundProfileInFailureCount() {
+    let active = AccountUUID()
+    let waiting = AccountUUID()
+    let closedBackground = AccountUUID()
+    let summary = AccountStatusMenuSummary.make(
+        runtimes: [
+            AccountStatusMenuRuntime(
+                account: active,
+                telegramUserID: 441,
+                authorizationState: "authorizationStateReady",
+                hasError: false
+            ),
+            AccountStatusMenuRuntime(
+                account: waiting,
+                telegramUserID: nil,
+                authorizationState: "authorizationStateWaitCode",
+                hasError: false
+            ),
+        ],
+        startupFailures: [closedBackground]
+    )
+
+    #expect(summary.authorizedCount == 1)
+    #expect(summary.awaitingInputCount == 1)
+    #expect(summary.failedCount == 1)
+}
+
 @Test func unsupportedIncomingContentKeepsHumanReadableContextWithoutLeakingConstructors() {
     #expect(IncomingMessagePresentation.cardText(for: "messageVoiceNote") == "Голосовое сообщение · воспроизведение не поддерживается")
     #expect(IncomingMessagePresentation.chatPreview(for: "messagePaidMedia") == "Платный контент")

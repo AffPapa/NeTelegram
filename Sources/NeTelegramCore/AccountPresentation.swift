@@ -38,6 +38,44 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
     }
 }
 
+public struct AccountStatusMenuRuntime: Sendable, Equatable {
+    public let account: AccountUUID
+    public let telegramUserID: Int64?
+    public let authorizationState: String?
+    public let hasError: Bool
+
+    public init(account: AccountUUID, telegramUserID: Int64?, authorizationState: String?, hasError: Bool) {
+        self.account = account
+        self.telegramUserID = telegramUserID
+        self.authorizationState = authorizationState
+        self.hasError = hasError
+    }
+}
+
+public struct AccountStatusMenuSummary: Sendable, Equatable {
+    public let authorizedCount: Int
+    public let awaitingInputCount: Int
+    public let failedCount: Int
+
+    public static func make(
+        runtimes: [AccountStatusMenuRuntime],
+        startupFailures: Set<AccountUUID>
+    ) -> Self {
+        var failedAccounts = startupFailures
+        failedAccounts.formUnion(runtimes.filter {
+            $0.authorizationState == "authorizationStateClosed" || $0.hasError
+        }.map(\.account))
+
+        return Self(
+            authorizedCount: runtimes.filter { $0.telegramUserID != nil }.count,
+            awaitingInputCount: runtimes.filter {
+                AuthorizationStep(tdlibType: $0.authorizationState).awaitsUserInput
+            }.count,
+            failedCount: failedAccounts.count
+        )
+    }
+}
+
 public enum AccountConversationRestoration: Sendable, Equatable {
     case authorization
     case emptyConversation
