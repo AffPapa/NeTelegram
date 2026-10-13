@@ -104,8 +104,7 @@ public actor AccountCatalogue {
     private func persist() throws {
         do {
             let data = try JSONEncoder.neTelegram.encode(profiles)
-            try data.write(to: fileURL, options: .atomic)
-            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
+            try AtomicPrivateFile.replace(data, at: fileURL)
         } catch {
             throw AccountCatalogueError.persistence("Unable to save account catalogue")
         }

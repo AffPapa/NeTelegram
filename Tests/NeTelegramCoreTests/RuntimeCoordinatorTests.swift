@@ -1483,7 +1483,7 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     ConversationKey(account: account, chatID: 77)
 }
 
-@Test func atomicDraftReplacementPreservesPriorCiphertextUntilPrivateStagingSucceeds() throws {
+@Test func atomicPrivateReplacementPreservesPriorFileUntilPermissionSetupSucceeds() throws {
     enum InjectedFailure: Error { case permissionUpdate }
 
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -1495,14 +1495,14 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     try oldCiphertext.write(to: destination)
 
     #expect(throws: InjectedFailure.self) {
-        try AtomicDraftCiphertextFile.replace(newCiphertext, at: destination) { _ in
+        try AtomicPrivateFile.replace(newCiphertext, at: destination, prepareStagingFile: { _ in
             throw InjectedFailure.permissionUpdate
-        }
+        })
     }
     #expect(try Data(contentsOf: destination) == oldCiphertext)
     #expect(try FileManager.default.contentsOfDirectory(atPath: root.path) == ["drafts.aesgcm"])
 
-    try AtomicDraftCiphertextFile.replace(newCiphertext, at: destination)
+    try AtomicPrivateFile.replace(newCiphertext, at: destination)
     #expect(try Data(contentsOf: destination) == newCiphertext)
     let attributes = try FileManager.default.attributesOfItem(atPath: destination.path)
     #expect((attributes[.posixPermissions] as? NSNumber)?.intValue == 0o600)
