@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; current app source 658b3506d4adc3ec9c66ae60c880e095a836c6e1 builds and passes 127/127 synthetic Swift tests plus exact-SHA macOS and pinned TDLib/Dev.app CI. Real Telegram accounts, all-20 runtime coverage, signing/notarization, updater and release remain unverified.",
+  "status": "implementation_in_progress; app source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 passes 128/128 synthetic Swift tests and exact-SHA macOS and pinned TDLib/Dev.app CI. Secure API hash setup UI exists, but Keychain write and Telegram login remain untested. Real accounts, all-20 runtimes, signing/notarization, updater and release remain incomplete.",
   "cases": [
     {
       "id": "APP01",
@@ -423,7 +423,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App source commit 658b3506d4adc3ec9c66ae60c880e095a836c6e1 introduces a centered adaptive AppKit authentication card around the existing phone/code/2FA/QR/registration states. Local AppKit build and full suite passed 127/127. Exact-source macOS CI 38382785566 and pinned TDLib/Dev.app workflow 38382785558 succeeded for the same SHA. The latter captured a clean 1024x768 first-run screenshot; SHA-256 d0bf4fa8a6bd0512330b5897d9efc679c86a9c83579fcd50028423ee5bf9668e; it was reviewed and published at /assets/auth-first-run-658b350.png. The screenshot shows no profiles or user account data. Only the phone-entry state was visually reviewed; the test build reports API credentials unavailable and no login was attempted. Minimum-size, code/2FA/QR/registration states, dark appearance, high contrast, VoiceOver and IME remain unverified."
+      "evidence": "App source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 adds a centered adaptive AppKit card around phone/code/2FA/QR/registration and a Keychain-backed API hash setup entry point. Local Swift suite 128/128 passed. Exact-source CI 38384029589 and pinned TDLib/Dev.app workflow 38384029582 passed; the CI first-run screen was visually reviewed and published with SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. It contains no profile UUID or user account. API hash entry is secure-field based and input validation is unit tested; actual macOS Keychain persistence and login are not tested. Dark appearance, minimum window, code/2FA/QR/registration, high contrast, VoiceOver and IME remain unverified."
     }
   ],
   "last_verification": {
@@ -439,19 +439,19 @@
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 110,
-    "source_commit": "7f4fe1b57dff39c9f7f176427b00c78c54d16c81",
-    "deployment_id": "appgdep_6ace075ab7788191a4f7a6c0a0f8d3c8",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9b90c14f41b48191b3cb55b48a35301d",
+    "version": 111,
+    "source_commit": "5381871f57bd5c7a1ea95463d19209429e76b001",
+    "deployment_id": "appgdep_6ace098a8e8081918c192f238ce9b8a7",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d08200710ec81918801290488abdcaf",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "2a479ada0b35b26158f1c32809467f7be6f850263a3294385960591f29e16c9e",
-    "sites_archive_content_hash": "sha256:03c14fdd034f8c87af8867edf4f9614895be175ac97e6c0f0066b13ed2d70afb",
-    "archive_bytes": 327680,
-    "archive_file_count": 13,
-    "github_mirror_commit": "7f4fe1b57dff39c9f7f176427b00c78c54d16c81",
-    "description": "Neridian Development v110 records the AppKit authentication card and exact-source CI screenshot. No binary is offered; the sign-in flow was not exercised.",
-    "public_verification": "Anonymous HTTPS returned 200 text/html for /devlog/ and /downloads/, 200 image/png for the first-run screenshot. Devlog contains exact app-source SHA 658b3506d4adc3ec9c66ae60c880e095a836c6e1. Public screenshot SHA-256 matches the CI artifact: d0bf4fa8a6bd0512330b5897d9efc679c86a9c83579fcd50028423ee5bf9668e. Downloads continues to show NO RELEASE."
+    "archive_sha256": "718061dc258547f1011a807b157a81a52eef80b57ea48d4543c0dbb5b938449d",
+    "sites_archive_content_hash": "sha256:5814834e04f6dc43f8fd69f0208d4c276a56ac71926dd7d76083671f8bc5baf3",
+    "archive_bytes": 450560,
+    "archive_file_count": 14,
+    "github_mirror_commit": "5381871f57bd5c7a1ea95463d19209429e76b001",
+    "description": "Neridian Development v111 documents secure API hash configuration. No binary or download is offered; actual Keychain persistence and Telegram login remain unverified.",
+    "public_verification": "Anonymous HTTPS returned 200 text/html for /devlog/ and 200 image/png for the exact-source screenshot; hosted PNG SHA-256 matches the CI artifact: cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. Exact app SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 appears in the devlog. /downloads/ still shows NO RELEASE."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -462,20 +462,20 @@
   },
   "latest_source_audit": {
     "date": "2026-10-13",
-    "source_commit": "658b3506d4adc3ec9c66ae60c880e095a836c6e1",
-    "change": "Wrapped existing AppKit authorization states in a centered adaptive authentication card. No Telegram profile/session data was imported or displayed.",
-    "local_checks": "swift test on Xcode 27.0 / Swift 6.4 / macOS 27 SDK: 127/127 passed; git diff --check passed.",
+    "source_commit": "1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462",
+    "change": "Added secure native API hash configuration using NSSecureTextField and macOS Keychain; validates 32 ASCII hex characters before saving off the main thread. No profile/session import.",
+    "local_checks": "swift test on Xcode 27.0 / Swift 6.4 / macOS 27 SDK: 128/128 passed; git diff --check passed. Validation tests cover accepted/rejected API hash formats.",
     "macos_ci": {
-      "run_id": 38382785566,
+      "run_id": 38384029589,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38382785566"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029589"
     },
     "pinned_tdlib_devapp": {
-      "run_id": 38382785558,
-      "status": "success for exact SHA; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured; accountless only",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38382785558"
+      "run_id": 38384029582,
+      "status": "success for exact SHA; pinned TDLib built and isolated arm64 Dev.app verified; accountless first-run screenshot captured",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029582"
     },
-    "scope": "First-run layout only. Real login, other auth states and appearances, minimum window, VoiceOver, real accounts, 20-runtime operation, performance, Developer ID, notarization, Gatekeeper and updater were not verified."
+    "scope": "CI screenshot reviewed; no actual Keychain write or login was performed. No real account, 20-runtime, performance or distribution-signing evidence."
   },
   "latest_access_audit": {
     "date": "2026-10-13",
