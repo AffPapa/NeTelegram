@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "Exact app source 209be94 retains local serial suite PASS 157/157; exact hosted macOS run 38478591456 was cancelled after compiling and its tests did not report a result. Canonical Dev.app was rebuilt from clean checkpoint 7f95e03, accountless phone/QR AX smoke passed, and the app-menu Quit process exit was confirmed. Public Site v162 corrects the prior quit observation; all eight routes verified.",
+  "phase": "Exact app source 209be94 retains local serial suite PASS 157/157; decoded logs for hosted macOS run 38478591456 confirm the test binary built in 31.65s, then emitted no test output for 272s before cancellation. Root cause is not identified; do not rerun unchanged full suite. Canonical Dev.app accountless phone/QR smoke and normal app-menu Quit process exit are confirmed. Public Site v162 remains current.",
   "verified_at": "2026-10-14T05:51:23+07:00",
   "product": {
     "public_name": "NeTelegram",
@@ -86,7 +86,7 @@
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Local serial Swift suite 157/157 passed for app source 209be94. Exact-source hosted run 38478591456 compiled but was cancelled after five minutes during tests; connector rerun returned 403, so hosted result is not PASS.",
+      "result": "Local serial Swift suite 157/157 passed for app source 209be94. Exact-source hosted run 38478591456 built the test binary in 31.65s, then produced no test output for 272s before cancellation; decoded logs show swiftpm-testing was terminated during cleanup. Test-level root cause is unknown. Connector rerun returned 403, so hosted result is not PASS.",
       "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-auth-disclosure-validation",
       "toolchain": "Local Xcode 27.0 / Swift 6.4 / arm64e, macOS 27 SDK.",
       "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
@@ -246,7 +246,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Proceed to the next implementation slice from the current acceptance gaps without changing account/session boundaries. Keep real login deferred until the user enters credentials. Prioritize a feature slice that is testable without live Telegram accounts, run one full local serial suite after that slice, and use the next exact-source CI run to diagnose the hosted cancellation. Do not treat short UI-automation delays as a quit failure; verify app process state. Developer ID/notarization, real account flows, 20 runtime, updater and user release remain open.",
+  "next_action": "Choose one accountless feature slice from current acceptance gaps. Before its single full hosted macOS test run, inspect and diagnose run 38478591456: logs show build success followed by 272s of silent test execution, not a compile failure. At that next Swift-source milestone, add a filtered deterministic runner probe before the one full serial suite; use the result to isolate runner startup from test-specific stalls. Run the local suite once after the slice. Do not rerun unchanged full test input or rebuild the same Dev.app. Keep real login deferred until user input; no real 20-runtime proof, Developer ID/notary, updater, or release yet.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",

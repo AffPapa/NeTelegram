@@ -499,7 +499,7 @@
     "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-auth-disclosure-validation",
     "local_result": "Full serial Swift suite passed 157/157 in 0.212s test execution after 17.89s build. Initial sandbox attempt was denied during manifest setup before tests; same suite passed on approved host execution. No account or auth test.",
-    "hosted_ci": "Cancelled: exact-source run 38478591456 built tests but workflow cancelled after five minutes during test execution; no result. Rerun via connected GitHub API returned 403 Resource not accessible by integration. Not PASS.",
+    "hosted_ci": "Cancelled: exact-source run 38478591456 built the test binary in 31.65s, then emitted no test output for 272s before cancellation; decoded job logs show swiftpm-testing terminated during cleanup. Test-level root cause unknown. Rerun via connector returned 403 Resource not accessible by integration. No hosted result/PASS.",
     "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
     "scope": "AppKit login disclosure source; local serial suite 157/157 for 209be94; exact hosted run cancelled with no result; canonical clean Dev.app build from 7f95e03, accountless phone/QR AX smoke, app-menu Quit exit. No real auth, no Cmd+Q claim, no 20-runtime proof, no distribution.",
     "checkpoint_commit": "9dc8cc9eb0433731e1d54ed1e9a156914578a20d",
@@ -509,6 +509,15 @@
       "deployment_id": "appgdep_6aceb5a92a448191a0f3cf120850b40c",
       "url": "https://netelegram.iryadom.chatgpt.site",
       "public_routes": "All eight routes returned HTTP 200 text/html; devlog records clean app smoke and corrected Quit evidence; downloads has no binary URL."
+    },
+    "hosted_job_diagnosis": {
+      "run_id": 38478591456,
+      "job_id": 115575330981,
+      "runner": "macOS 15.7.9 arm64 / Xcode 16.4 / SwiftPM test runner",
+      "build_seconds": 31.65,
+      "silent_test_seconds": 272,
+      "termination": "workflow cancelled; swiftpm-testing terminated during cleanup",
+      "conclusion": "compiled successfully; test execution stalled or produced no observable output; exact hanging test remains unknown"
     }
   },
   "latest_site_deployment": {
