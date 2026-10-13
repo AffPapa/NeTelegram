@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 passes 128/128 synthetic Swift tests and exact-SHA macOS and pinned TDLib/Dev.app CI. Secure API hash setup UI exists, but Keychain write and Telegram login remain untested. Real accounts, all-20 runtimes, signing/notarization, updater and release remain incomplete.",
+  "status": "implementation_in_progress; app source 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a passes 129/129 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. Synthetic network/wake fanout covers 20 runtime sinks; native sleep/wake, real login, real 20-account sessions, signing/notarization and release remain incomplete.",
   "cases": [
     {
       "id": "APP01",
@@ -116,8 +116,8 @@
       "expected": "Нет обещания sync во сне; recovery всех без duplicated send/notification.",
       "method": "native hardware",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "App source 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a passes the 129/129 Swift suite and exact-SHA CI. A deterministic synthetic test sends path A, path B and wake reapply to 20 runtime sinks; duplicate and stale debounce work is rejected, and RuntimeGeneration values remain unchanged. Exact-source CI built and verified the isolated arm64 Dev.app. Native macOS sleep/wake, real Telegram sessions, server-side duplicate sends/notifications, and recovery on hardware remain unverified; status stays partial."
     },
     {
       "id": "APP14",

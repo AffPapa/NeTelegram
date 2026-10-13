@@ -11,13 +11,13 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462",
+    "commit": "9ae1f4a0c77f03ca65e3048b084238e0923bbf0a",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38384029589,
+      "run_id": 38385559924,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029589"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38385559924"
     },
     "published_application_releases": [],
     "github_access": {
@@ -38,10 +38,11 @@
       "note": "Git push for the app-source commit succeeded through the existing Git transport. gh auth status was checked and both stored CLI credentials are invalid. Do not run gh auth login or create a token as a retry; Git transport and GitHub connector are separate. No credential material is recorded."
     },
     "latest_exact_commit_native_workflow": {
-      "run_id": 38384029582,
+      "run_id": 38385559865,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029582"
-    }
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38385559865"
+    },
+    "checkout_path": "/private/tmp/netelegram-cli-work"
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
@@ -58,46 +59,61 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 128,
-      "command": "swift test",
-      "focused_test": "telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters",
+      "count": 129,
+      "command": "swift test --scratch-path /private/tmp/netelegram-swift-cache/spm -Xswiftc -module-cache-path -Xswiftc /private/tmp/netelegram-swift-cache/module",
+      "focused_test": "networkTypeFanoutReconcilesAllTwentyRuntimesAndRejectsStaleWork",
       "xcode": "Xcode 27.0 / Swift 6.4 / macOS 27 SDK",
-      "source_commit": "1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462",
-      "scope": "Synthetic validation and compile; no live Keychain write or Telegram login."
+      "source_commit": "9ae1f4a0c77f03ca65e3048b084238e0923bbf0a",
+      "scope": "Synthetic 20-runtime fanout and existing tests; no real sessions, native sleep/wake, Keychain write or Telegram login."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
     "current_head_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless.",
-    "current_head_site": "Public Site v111 deployment appgdep_6ace098a8e8081918c192f238ce9b8a7 succeeded. Anonymous HTTPS returned 200 for devlog (text/html), screenshot (image/png), and downloads (text/html). Hosted screenshot SHA-256 matches CI artifact cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; app source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 is on devlog; downloads still shows NO RELEASE.",
-    "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
+    "current_head_site": "Public Site v112 deployment appgdep_6ace0c82e6ec8191a279b3d906026d6e succeeded from Site source commit 8393a2611f18df2be80770e4b7ab8a9211424f2f. Anonymous HTTPS returned 200 text/html for /devlog/ and /downloads/; the devlog includes app source SHA 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a and 129/129 synthetic tests, and downloads still shows NO RELEASE.",
+    "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection.",
+    "current_head_native_workflow": "Pinned TDLib workflow 38385559865 succeeded for exact app-source SHA 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a; pinned TDLib built and isolated arm64 Dev.app was assembled and verified. The run did not launch the app or enter account data; this is not a native sleep/wake or account smoke."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 111,
-    "source_commit": "5381871f57bd5c7a1ea95463d19209429e76b001",
-    "deployment_id": "appgdep_6ace098a8e8081918c192f238ce9b8a7",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d08200710ec81918801290488abdcaf",
+    "latest_version": 112,
+    "source_commit": "8393a2611f18df2be80770e4b7ab8a9211424f2f",
+    "deployment_id": "appgdep_6ace0c82e6ec8191a279b3d906026d6e",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_2929abf9336881919a822f6ba2a6032c",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous HTTPS verified v111 devlog/downloads as 200 text/html and screenshot as 200 image/png; screenshot byte hash matches CI: cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. Exact source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 present. Downloads says NO RELEASE.",
-    "archive_local_sha256": "718061dc258547f1011a807b157a81a52eef80b57ea48d4543c0dbb5b938449d",
-    "archive_sites_reported_content_hash": "sha256:5814834e04f6dc43f8fd69f0208d4c276a56ac71926dd7d76083671f8bc5baf3",
-    "archive_size_bytes": 450560,
+    "public_route_verified": "Anonymous HTTPS verified v112 /devlog/ and /downloads/ as 200 text/html. The devlog names exact app SHA 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a and leaves native sleep/wake, real sessions, and duplicate server effects unverified. Downloads says NO RELEASE.",
+    "archive_local_sha256": "3683336b13184bc1f83e4d2bf6d961404a13126a170d5cf5cf05c12951f6949d",
+    "archive_sites_reported_content_hash": "sha256:72237752eb73605ea5487ca06f388e2111d17baa5a86f303b6e8042b1910ac53",
+    "archive_size_bytes": 460800,
     "archive_file_count": 14
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
     "User login and real single-account read/send/logout smoke; do not start until the user chooses to enter credentials in Neridian.",
-    "All-active twenty-account, wake/network recovery, notification, storage-fault and performance measurements.",
+    "Synthetic APP13 fanout now covers 20 runtime sinks; native sleep/wake, all-active real account recovery, notifications, storage faults and performance measurements remain open.",
     "Developer ID identity, notarization credentials, stapling, Gatekeeper and update-signing key.",
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue from app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; keep the one existing canonical local Dev.app untouched. User may later enter a replacement API hash in Neridian’s secure settings and perform the first authorized login; meanwhile continue independent acceptance gaps.",
-  "secrets": "No credentials, tokens, account data, or profile paths are stored here."
+  "next_action": "Continue from app-source SHA 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a; exact-SHA Swift CI and pinned TDLib/Dev.app build passed. Keep the one existing canonical local Dev.app untouched. Next, address the smallest independent acceptance gap; real Telegram login still waits for the user to enter credentials in Neridian.",
+  "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
+  "workspace": {
+    "canonical_checkout": "/private/tmp/netelegram-cli-work",
+    "branch": "main",
+    "app_source_commit": "9ae1f4a0c77f03ca65e3048b084238e0923bbf0a",
+    "alternate_checkout": {
+      "path": "/Users/dumay/rumors-wtf/netelegram",
+      "branch": "main",
+      "head": "6447a86a761a4ae097063fe62d937d77d3daad5b",
+      "remote_main_after_fetch": "9ae1f4a0c77f03ca65e3048b084238e0923bbf0a",
+      "relationship": "3 local commits ahead and 212 behind origin/main",
+      "working_tree": "14 modified tracked paths and 26 untracked paths",
+      "handling": "preserve without reset, clean, stash, merge, build or launch until a separate file-level reconciliation is planned"
+    }
+  }
 }
