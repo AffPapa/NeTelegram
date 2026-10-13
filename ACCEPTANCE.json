@@ -98,8 +98,8 @@
       "expected": "Burst не создаёт бесконечные UI/tasks/фото queues и не теряет edit/delete/auth/TTL; foreground B остаётся отзывчивым.",
       "method": "load fixtures+Instruments",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "At app-source commit e89265c0dda7dc88a7d7a7f75abd5010c25a48c9, TDLibUpdateBuffer adds a hard-bounded overflow reserve: at most one event for each of 20 client lanes, one unrouteable lane, and additional reserved bytes capped at 25% of the primary byte budget. When those reserves are occupied, receive backpressure blocks; no events are dropped. Deterministic saturatedHotLaneReservesBoundedProgressForAnotherAccount holds hot-account callbacks in flight, proves another lane can progress repeatedly, preserves per-account FIFO and authorization/delete/content events, and checks the byte bound. Focused test passed and full local suite passed 127/127. Exact-source macOS CI 38381351793 and pinned TDLib/isolated Dev.app workflow 38381351711 succeeded. Instruments, real 20-account burst, queue/task/RSS behavior under load, and native foreground responsiveness remain unverified; acceptance stays partial."
     },
     {
       "id": "APP12",

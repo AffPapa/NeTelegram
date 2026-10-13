@@ -11,13 +11,13 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "0fe2a13ecd7f227e10a2c1fa6773069c53f83e52",
+    "commit": "e89265c0dda7dc88a7d7a7f75abd5010c25a48c9",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38379269975,
+      "run_id": 38381351793,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38379269975"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38381351793"
     },
     "published_application_releases": [],
     "github_access": {
@@ -38,9 +38,9 @@
       "note": "Git push for the app-source commit succeeded through the existing Git transport. gh auth status was checked and both stored CLI credentials are invalid. Do not run gh auth login or create a token as a retry; Git transport and GitHub connector are separate. No credential material is recorded."
     },
     "latest_exact_commit_native_workflow": {
-      "run_id": 38379269906,
+      "run_id": 38381351711,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38379269906"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38381351711"
     }
   },
   "local_development_candidate": {
@@ -58,18 +58,19 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 126,
+      "count": 127,
       "command": "swift test",
+      "focused_test": "swift test --filter saturatedHotLaneReservesBoundedProgressForAnotherAccount",
       "xcode": "Xcode 27.0 (27A5228h)",
-      "source_commit": "0fe2a13ecd7f227e10a2c1fa6773069c53f83e52",
-      "scope": "Full local Swift suite, including atomic privacy dispatch/lock ordering and queued auth invalidation tests."
+      "source_commit": "e89265c0dda7dc88a7d7a7f75abd5010c25a48c9",
+      "scope": "Full local suite plus a deterministic bounded hot-lane reservation fixture; synthetic queues, not real Telegram or Instruments."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib app workflow 38379269906 succeeded for exact app-source SHA 0fe2a13ecd7f227e10a2c1fa6773069c53f83e52; built pinned TDLib and assembled/verified isolated arm64 Dev.app. CI smoke is accountless and does not exercise native lock during real reauth. The canonical local Dev.app was not relaunched or switched.",
-    "current_head_site": "Public Site v108 deployment appgdep_6ace00c6d96481919a7c6d3d0ec23afe succeeded. Anonymous HTTPS returned 200 text/html for /devlog/ and /downloads/; devlog contains exact app SHA 0fe2a13 and passing CI links, downloads still shows NO RELEASE. No application download or release exists.",
+    "current_head_native_smoke": "Pinned TDLib app workflow 38381351711 succeeded for exact app-source SHA e89265c0dda7dc88a7d7a7f75abd5010c25a48c9; built pinned TDLib and assembled/verified isolated arm64 Dev.app. CI smoke is accountless and does not measure live UI responsiveness or real 20-account operation. The canonical local Dev.app was not relaunched or switched.",
+    "current_head_site": "Public Site v109 deployment appgdep_6ace0421a5cc8191ad6faa681bcee6c2 succeeded. Anonymous HTTPS returned 200 text/html for /devlog/ and /downloads/; exact app-source SHA e89265c is present in devlog; downloads still shows NO RELEASE. No application download or release exists.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
   },
   "site": {
@@ -77,16 +78,16 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 108,
-    "source_commit": "9699168fe6b8d7a73a86ecab1c751b58fbe4fe1c",
-    "deployment_id": "appgdep_6ace00c6d96481919a7c6d3d0ec23afe",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_c8f8dbc9710881919dbe3118a18b62d7",
+    "latest_version": 109,
+    "source_commit": "68fee1c6824352eeddae796a4b3e393136014fb6",
+    "deployment_id": "appgdep_6ace0421a5cc8191ad6faa681bcee6c2",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_2be90fb410cc81918f325e53c6145045",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous TLS curl: /devlog/ and /downloads/ both 200 text/html; exact new entry present; downloads shows NO RELEASE.",
-    "archive_local_sha256": "8e1c0ba819276b616b43a02f14022028fb8536b70bf61fcd3cef1212379eb24d",
-    "archive_sites_reported_content_hash": "sha256:86a4664e58b15d0524036392a6431703fc5c9aa3731f797a9bca018fa61067c5",
-    "archive_size_bytes": 47609,
+    "public_route_verified": "Anonymous TLS curl: /devlog/ and /downloads/ both 200 text/html; exact e89265c milestone present; downloads shows NO RELEASE.",
+    "archive_local_sha256": "60c9b4a3d8c928b734850251d9fe331b34a6dfdd867c15ff7b51e3012d5868be",
+    "archive_sites_reported_content_hash": "sha256:fc444647098efd31d8b12a78846d45a1ea0a3408aed804aaafd72d22a52c284f",
+    "archive_size_bytes": 47938,
     "archive_file_count": 12
   },
   "open_gates": [
@@ -97,6 +98,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue from app-source SHA 0fe2a13. For code pushes use the already verified Git transport; do not use gh CLI/API while its stored credentials are invalid or initiate another token flow. Next inspect a concrete unclosed runtime acceptance gap and implement one bounded slice. Keep canonical local Dev.app unchanged; login remains user-deferred.",
+  "next_action": "Continue from app-source SHA e89265c. Use the verified Git transport for source pushes; gh CLI credentials are invalid and must not trigger another login/token loop. Select the next concrete high-impact acceptance gap. Preserve the single canonical local Dev.app; real login remains user-deferred.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
