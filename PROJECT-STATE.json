@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "Photo-open TDLib reporting is implemented. Exact-source local 151/151, hosted macOS 151/151, metadata validation, and pinned TDLib/arm64 Dev.app lifecycle smoke passed. CI verbose output and a 5-minute timeout now expose startup failures and bound stalled feedback. Public Site v150. Telegram title/sponsored video/basic-functionality gates, real accounts/20-runtime certification and signed distribution remain open.",
-  "verified_at": "2026-10-14T03:04:45+0700",
+  "verified_at": "2026-10-14T03:08:00+0700",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
@@ -12,7 +12,7 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "3664214a842913ed03c5413a18beb39b95cc817e",
+    "commit": "010ddbc43b7f99acb4adcfa7439140cb09d3852a",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
@@ -153,7 +153,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue one concrete P0 app slice from exact app source 6145b015. Do not repeat successful local/hosted/native gates without changed inputs. Public Site v151 is live and has no download links because no verified signed app release exists. Keep real-account, all-20, Developer ID/notarization, Telegram title, sponsored video and basic-functionality gates open.",
+  "next_action": "Continue one concrete P0 app slice from exact app source 6145b015. Core Swift CI remains the automatic source gate; invoke the expensive pinned TDLib/Dev.app workflow only when integration/build inputs or a frozen release candidate need bundled evidence. Public Site v151 is live and has no download links because no verified signed app release exists. Keep real-account/all-20, Developer ID/notarization, Telegram title, sponsored video and basic-functionality gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
@@ -178,7 +178,8 @@
     "Run Sites helper only from the dedicated Site checkout returned by its opening result, never from the app repository; on DNS denial, keep the same helper/remote and retry with authorized network access.",
     "The APP04 CI smoke initially counted the status-bar service window as a user window and recorded launch before AppKit presentation. The final verified metric counts only visible titled app windows and records launch after visibility; keep those semantics in the CI artifact and devlog. Do not treat failed diagnostic runs as passes.",
     "For a site-wide layout change, use one shared build-time shell and route content source, then validate all route structure/links and visually inspect the homepage plus one dense route before publishing. If public rendering exposes a layout defect, correct the existing source and publish a new immutable Site version; final evidence must name the exact current version.",
-    "Current-run source of truth is git HEAD/origin/main; do not launch historical Dev.app artifacts. CI tests run only for app/test/workflow inputs; JSON checks use metadata-only workflow. Reuse evidence only for matching SHA and harness."
+    "Current-run source of truth is git HEAD/origin/main; do not launch historical Dev.app artifacts. CI tests run only for app/test/workflow inputs; JSON checks use metadata-only workflow. Reuse evidence only for matching SHA and harness.",
+    "The pinned TDLib/Dev.app workflow no longer runs automatically for source-only Swift changes; core Swift CI covers those changes. Use workflow_dispatch for a native bundle check when TDLib/runtime integration or a frozen release candidate needs it. Dependency pins and native build/lifecycle scripts still trigger the expensive workflow automatically."
   ],
   "latest_access_audit": {
     "date": "2026-10-13",

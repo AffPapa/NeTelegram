@@ -342,3 +342,9 @@
 - The devlog links app source `6145b0156068f784e1eea3bf70df77a8b834bf83`, hosted CI [38457814445](https://github.com/AffPapa/NeTelegram/actions/runs/38457814445), and pinned TDLib/Dev.app smoke [38457814416](https://github.com/AffPapa/NeTelegram/actions/runs/38457814416); it states the 151-test pass, the same-SHA runner timeout/rerun, the accountless scope and the low-contrast disclosure observation. It does not claim a live login or release.
 - Anonymous HTTPS checks returned HTTP/2 200 and `text/html` for `/devlog/` and `/downloads/`. Live content matches the source. Downloads says no verified macOS build exists and contains zero ZIP/DMG/release URLs.
 - Local archive `/private/tmp/netelegram-site-v151.tar.gz`: SHA-256 `644bfe466d0557f269c645f36a0744f74bbc3f1eabb75d30775dbf999cc7d21b`, 288543 bytes. Sites saved archive receipt: `sha256:4a651fc1aa376c021101ee64ccc46ab7976fe5cd4ba20d8157d468c757dbc001`, 512000 bytes, 15 files. Checkpoint commit `3664214a842913ed03c5413a18beb39b95cc817e` passed metadata validation run 38459557354; this Site receipt is recorded in the subsequent checkpoint edit.
+
+
+### 2026-10-14 — avoid rebuilding pinned TDLib for source-only edits
+
+- Removed `Sources/**` and the workflow-file self-trigger from automatic push/PR paths for `native-app.yml`. Swift source and tests remain covered by the macOS serial CI; pinned TDLib/Dev.app still runs automatically for SwiftPM, TDLib lock and native build/lifecycle script changes, and remains available through `workflow_dispatch` for runtime integration or a frozen release candidate.
+- Updated `DEV-WORKFLOW.md` to match. Ruby YAML parse and `git diff --check` passed. No app code changed; no application build or test suite was repeated for this trigger/documentation-only change. The prior exact-source native run 38457814416 remains valid for app source 6145b015.
