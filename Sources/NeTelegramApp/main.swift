@@ -1423,7 +1423,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func openProfile(_ profile: AccountProfile, apiHash: String, select: Bool = false) async {
-        await startupScheduler.acquire()
+        await startupScheduler.withPermit { [weak self] in
+            guard let self else { return }
+            await self.openProfileWhileHoldingStartupPermit(profile, apiHash: apiHash, select: select)
+        }
+    }
+
+    private func openProfileWhileHoldingStartupPermit(_ profile: AccountProfile, apiHash: String, select: Bool) async {
         var startupRuntime: LocalAccountRuntime?
         var didRegisterStartupRoute = false
         do {
@@ -1493,7 +1499,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             try runtime.applyNetworkType(currentTDLibNetworkType)
             if presentsThisRuntime { try runtime.send(["@type": "getCountries"]) }
             profileStartupFailures.remove(profile.id)
-            await startupScheduler.release()
         } catch {
             if didRegisterStartupRoute, let startupRuntime {
                 if !startupRuntime.initializationRequestWasQueued, let route = startupRuntime.route {
@@ -1538,7 +1543,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 await runtimeCoordinator.setState(.failed("Profile startup failed before TDLib initialization"), for: profile.id)
                 setStatus("Не удалось подготовить профиль до запуска TDLib. Сохранённые данные не удалены.")
             }
-            await startupScheduler.release()
             profileStartupFailures.insert(profile.id)
             refreshAccountPicker(select: profile.id)
             refreshStatusMenu()

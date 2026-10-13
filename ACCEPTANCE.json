@@ -9,7 +9,7 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic restore planner includes all 20 authorized profiles and startup queue drains; 80/80 exact-source suite passed. Real simultaneous sessions, runtime identity and same-Mac performance remain unverified, so status stays partial."
+      "evidence": "Synthetic startup scheduler test covers 20 profile opens with parallelism=2 and one failed open; all 19 others complete and permits/waiters drain. Current local suite is 83/83. Real simultaneous sessions, identity and same-Mac performance remain unverified; status stays partial."
     },
     {
       "id": "APP02",
@@ -18,7 +18,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "80/80 exact-source suite includes startup queue scheduling, failed-first-request route cleanup, and restoration of stored unverified sessions without placeholder profiles. No injected hung TDLib auth/startup soak; status stays partial."
+      "evidence": "Current local 83/83 suite includes startup scheduler permit release after failure while continuing all 20 synthetic profile opens. No injected hung TDLib auth/startup soak; status stays partial."
     },
     {
       "id": "APP03",
@@ -324,7 +324,7 @@
       "method": "native tool receipts",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Existing separate public Site project appgprj_6acba85192e08191acdf7011928848cf at https://netelegram.iryadom.chatgpt.site; latest version 66 points to source commit 6ce81698ec3124f03fd7e01e7c8ef46c309123cd."
+      "evidence": "Existing separate public Site project appgprj_6acba85192e08191acdf7011928848cf at https://netelegram.iryadom.chatgpt.site; latest version 67 points to source commit 6348e13aabedeade35cf407e1f8656ca4f809825."
     },
     {
       "id": "SITE02",
@@ -333,7 +333,7 @@
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Site v66 deployment appgdep_6acd888db7a881918b0412223d1811bc succeeded; Sites reports public audience and anonymous TLS-verified root/devlog/downloads/CSS all returned 200."
+      "evidence": "Site v67 deployment appgdep_6acd8c3cb6108191a23b9adf3877d2b5 succeeded; Sites reports public audience and anonymous TLS-verified root/devlog/downloads returned 200 text/html."
     },
     {
       "id": "SITE03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public v66 still shows previous app commit fe39bc1 and 80/80 tests; current public app main is 0bca2e42c7970709435e72525333f172c698b64b with 82/82 and exact CI runs 38332820495/38332820502. Site synchronization is pending; no app binary CTA exists."
+      "evidence": "Public v67 describes app source 0bca2e42c7970709435e72525333f172c698b64b and 82/82 tests; current local candidate adds the all-20 synthetic failure-continuation test but is not yet public. No app binary CTA exists."
     },
     {
       "id": "SITE04",
@@ -351,7 +351,7 @@
       "method": "local build+browser",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v66 is public and healthy, but its current app status predates source 0bca2e42c7970709435e72525333f172c698b64b; publish and live-check the next Site version before claiming current source/test consistency."
+      "evidence": "Site v67 is public and anonymous root/devlog/downloads return 200; its app evidence is 0bca2e4 and 82/82. Local 83-test candidate remains unpublished pending source commit/CI."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public Site v66 still references app fe39bc1 while public app main is 0bca2e42c7970709435e72525333f172c698b64b; no binary is offered. Version coherence remains partial until a new Site version references current source and tests."
+      "evidence": "Public Site v67 identifies app source 0bca2e42c7970709435e72525333f172c698b64b; no binary is offered. Unified app release manifest/feed coherence remains incomplete."
     },
     {
       "id": "OPS01",
@@ -411,8 +411,8 @@
   "last_verification": {
     "date": "2026-10-13",
     "source_commit": "0bca2e42c7970709435e72525333f172c698b64b",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/module-cache swift test --scratch-path /private/tmp/netelegram-swift-cache/build",
-    "local_result": "82/82 Swift Testing tests passed on arm64 macOS; app/core/test products built; bash -n Scripts/dev-app.sh and git diff --check passed. Includes phone normalization and Dev title identity policy.",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-swift-cache/build",
+    "local_result": "83/83 Swift Testing tests passed on arm64 macOS; current working tree contains the startup permit/failure continuation change and passes git diff --check. This is synthetic coverage; no app launched.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38332820495 ; https://github.com/AffPapa/NeTelegram/actions/runs/38332820502",
     "hosted_result": "Both workflows completed successfully for exact source commit 0bca2e42c7970709435e72525333f172c698b64b. macOS CI ran Swift tests and JSON validation. Pinned workflow built pinned TDLib and arm64 Dev.app; embedded source SHA matched GITHUB_SHA and dirty state was false. CI also launched/quitted the isolated review app. This is not a signed distribution.",
     "artifact": {
@@ -422,31 +422,31 @@
       "signature": "development CI; not a release"
     },
     "scope": "No real Telegram login/read/send/logout (user deferred login); no real 20-account lifecycle/resource matrix, separate visual inspection of title marker, sleep/wake soak, complete accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram naming, basic-functionality and sponsored-video compatibility remain open.",
-    "publication": "App source 0bca2e42c7970709435e72525333f172c698b64b is public on AffPapa/NeTelegram main. Existing public Site v66 still shows earlier app source fe39bc1; synchronization is pending. No app tag or public binary download exists.",
-    "next_action": "Synchronize the existing public Site to app source 0bca2e4 and exact 82-test/CI evidence; continue user-authorized native implementation without launching another local app build."
+    "publication": "App source 0bca2e42c7970709435e72525333f172c698b64b is public on AffPapa/NeTelegram main. Public Site v67 describes that source and 82/82 prior-source tests. Current 83-test local candidate is not yet committed/published. No app tag or public binary download exists.",
+    "next_action": "Commit and publish the tested all-20 startup permit change through existing GitHub authorization; verify exact-source CI; synchronize Site only after CI passes. Do not open browser auth settings or launch another local app build."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "source_commit": "6ce81698ec3124f03fd7e01e7c8ef46c309123cd",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_1e62ddc27cbc819182ac3a9eeca3876b",
-    "version_number": 66,
-    "deployment_id": "appgdep_6acd888db7a881918b0412223d1811bc",
+    "source_commit": "6348e13aabedeade35cf407e1f8656ca4f809825",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_0ca4a57e28bc8191a78dcf3dc90c6877",
+    "version_number": 67,
+    "deployment_id": "appgdep_6acd8c3cb6108191a23b9adf3877d2b5",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "status": "succeeded",
     "audience": "public",
-    "archive_sha256": "f0fb0e92981404b366454bc6ddddfef919128ae8426f73716f4575962642b03c",
-    "archive_storage_hash": "sha256:db5de172851ccda96c4a4a6a6fd218b49c6e487df3e6613958c022ba18ad4901",
-    "archive_size_bytes": 133120,
+    "archive_sha256": "582833df03991c8d1383d514dc1e85005b3c88f4e9e89d9d1f16f3165ded4731",
+    "archive_storage_hash": "sha256:9af75d22bfa3d095602132aabecc5b52acc3480abb805b1ba81f82324bb35ec5",
+    "archive_size_bytes": 143360,
     "file_count": 12,
-    "live_check": "Anonymous TLS-verified root, devlog and downloads return 200 text/html; CSS returns 200 text/css. Latest commit and 80/80 are present, no app download button."
+    "live_check": "Anonymous TLS-verified root, devlog and downloads return 200 text/html. Site describes source 0bca2e4 and 82/82; no app download button."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
     "base_commit": "0bca2e42c7970709435e72525333f172c698b64b",
-    "tests": "82/82 Swift Testing tests passed; SwiftPM built app/core/test products; bash -n Scripts/dev-app.sh and git diff --check passed.",
-    "hosted_ci": "Passed for exact source 0bca2e42c7970709435e72525333f172c698b64b: https://github.com/AffPapa/NeTelegram/actions/runs/38332820495; https://github.com/AffPapa/NeTelegram/actions/runs/38332820502.",
-    "site": "Public Site v66 still identifies earlier app source fe39bc1; site sync pending.",
-    "scope": "PhoneNumberInputPolicy rejects silent phone-number mutation. Dev window titles show first 8 source-SHA characters, dirty worktrees show +dirty, missing/invalid marker shows dev unknown, and release bundle IDs retain normal branding. Exact native run verified full embedded SHA equals GITHUB_SHA and clean state."
+    "tests": "83/83 Swift Testing tests passed on arm64 macOS; synthetic scheduler test proves all 20 opens continue with startup concurrency 2 after one failure; git diff --check passes.",
+    "hosted_ci": "Not run for current dirty candidate. Prior base CI: https://github.com/AffPapa/NeTelegram/actions/runs/38332820495; https://github.com/AffPapa/NeTelegram/actions/runs/38332820502.",
+    "site": "Public Site v67 identifies earlier app source 0bca2e4 and 82/82; current 83-test local candidate is not yet published.",
+    "scope": "Changed startup permit ownership so local open permits are released on both success and failure; auth/network waits are outside the permit. No local Dev.app launch."
   }
 }

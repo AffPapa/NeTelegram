@@ -223,6 +223,24 @@ public actor RuntimeStartupScheduler {
         }
     }
 
+    /// Runs the local open phase under one startup permit and returns the
+    /// permit on both success and failure. Callers should finish this phase
+    /// immediately after the first TDLib request is queued, before waiting for
+    /// phone, code, password, or other network-driven authorization updates.
+    public func withPermit<Value: Sendable>(
+        _ operation: @Sendable () async throws -> Value
+    ) async rethrows -> Value {
+        await acquire()
+        do {
+            let value = try await operation()
+            release()
+            return value
+        } catch {
+            release()
+            throw error
+        }
+    }
+
     public func activeStarts() -> Int { active }
     public func queuedStarts() -> Int { waiters.count }
 }

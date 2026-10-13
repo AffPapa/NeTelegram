@@ -576,6 +576,41 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(await scheduler.activeStarts() == 0)
 }
 
+@Test func startupSchedulerReleasesPermitsAfterFailureAndContinuesAllTwentyProfiles() async {
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let active = LockedTestValue(0)
+    let maximumActive = LockedTestValue(0)
+    let successes = LockedTestValue(0)
+    let failures = LockedTestValue(0)
+
+    let starts = (0..<20).map { index in
+        Task {
+            do {
+                try await scheduler.withPermit {
+                    active.mutate { count in
+                        count += 1
+                        maximumActive.mutate { $0 = max($0, count) }
+                    }
+                    defer { active.mutate { $0 -= 1 } }
+                    try await Task.sleep(for: .milliseconds(2))
+                    if index == 0 { throw CocoaError(.fileReadUnknown) }
+                    successes.mutate { $0 += 1 }
+                }
+            } catch {
+                failures.mutate { $0 += 1 }
+            }
+        }
+    }
+    for start in starts { await start.value }
+
+    #expect(successes.get() == 19)
+    #expect(failures.get() == 1)
+    #expect(maximumActive.get() == 2)
+    #expect(active.get() == 0)
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func criticalEventsAreNotCoalescedAway() async {
     let coordinator = RuntimeCoordinator()
     #expect(await coordinator.mayCoalesce(.ordinaryState))
