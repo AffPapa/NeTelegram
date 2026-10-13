@@ -3,40 +3,119 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark light">
-  <meta name="description" content="NeTelegram — разрабатываемый неофициальный клиент Telegram для macOS на Swift, AppKit и TDLib. Исходники, реальные возможности, ограничения и статус загрузки.">
-  <title>NeTelegram — неофициальный клиент Telegram для macOS</title>
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="NeTelegram — независимый и неофициальный клиент Telegram для Mac на Swift, AppKit и TDLib. Альтернативный клиент для macOS в разработке: исходный код, ограничения и загрузки.">
+  <meta property="og:title" content="NeTelegram — клиент для macOS в разработке">
+  <meta property="og:description" content="Независимый клиент для облачных чатов Telegram. Исходники открыты; проверенной сборки для скачивания пока нет.">
+  <meta property="og:type" content="website">
+  <title>NeTelegram — альтернативный клиент Telegram для Mac</title>
   <link rel="stylesheet" href="/site.css">
 </head>
-<body>
-  <header class="topbar"><a class="wordmark" href="#home" aria-label="NeTelegram — на главную"><span class="mark">N</span> NeTelegram</a>
-    <nav aria-label="Основная навигация"><a href="/features/">Возможности</a><a href="/downloads/">Загрузки</a><a href="/changelog/">Changelog</a><a href="/devlog/">Devlog</a><a href="/roadmap/">Roadmap</a><a href="/privacy/">Приватность</a><a href="/source/">Исходники</a></nav>
+<body class="home-page">
+  <a class="skip-link" href="#main">К основному содержимому</a>
+  <header class="topbar">
+    <a class="wordmark" href="/" aria-label="NeTelegram — главная"><span class="mark" aria-hidden="true">N</span> NeTelegram</a>
+    <nav aria-label="Основная навигация">
+      <a href="/features/">Возможности</a>
+      <a href="/downloads/">Загрузки</a>
+      <a href="/devlog/">Журнал</a>
+      <a href="/source/">Исходники</a>
+    </nav>
   </header>
-  <main>
-    <section class="hero" id="home">
-      <div class="eyebrow"><span class="pulse"></span> НЕОФИЦИАЛЬНЫЙ КЛИЕНТ · В РАЗРАБОТКЕ</div>
-      <h1>NeTelegram — клиент Telegram<br><span>для macOS.</span></h1>
-      <p class="lead">Нативное приложение на Swift и AppKit с TDLib. Если вы ищете альтернативный клиент Telegram для Mac или неофициальный Telegram-клиент для macOS, здесь можно проверить исходный код, планируемые функции и текущие ограничения.</p>
-      <div class="notice"><strong>Независимый проект.</strong> NeTelegram не является официальным приложением Telegram, не разработан Telegram и не имеет прямого отношения, аффилиации или связи с Telegram Messenger LLP. Приложение использует Telegram API/TDLib и предназначено для работы в экосистеме Telegram.</div>
-      <p class="fine">Ищете «Telegram для Mac скачать» или альтернативный клиент Telegram для macOS? Сейчас проверенной сборки для загрузки нет. NeTelegram — независимый сторонний клиент для macOS, использующий Telegram API; он не является официальным Telegram и не связан напрямую с Telegram Messenger LLP.</p>
-      <div class="notice"><strong>Публичной сборки для скачивания пока нет.</strong><br>Реальная авторизация и отправка, матрица из 20 аккаунтов, Developer ID и notarization не подтверждены. Ссылки ниже ведут на исходники и фактический журнал, а не на пустой установщик.</div>
-      <div class="hero-meta"><span>macOS 14+</span><span>Apple Silicon — первая цель</span><a href="https://github.com/AffPapa/NeTelegram">Исходный код на GitHub</a></div>
+
+  <main id="main">
+    <section class="home-hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-mark" aria-hidden="true"></span> НЕЗАВИСИМЫЙ ПРОЕКТ <span class="eyebrow-separator">·</span> В РАЗРАБОТКЕ</p>
+        <h1 id="hero-title">Облачные чаты Telegram —<br><span>в отдельном приложении macOS.</span></h1>
+        <p class="hero-lead"><strong>NeTelegram</strong> — независимый нативный клиент для Mac на Swift, AppKit и TDLib. Это сторонний проект: он не является официальным приложением Telegram и не имеет прямого отношения к Telegram Messenger LLP.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://github.com/AffPapa/NeTelegram">Открыть исходный код <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="#status">Статус проекта</a>
+        </div>
+        <ul class="hero-facts" aria-label="Платформенная цель">
+          <li>macOS 14+</li>
+          <li>Apple Silicon — первая цель</li>
+          <li>Открытая разработка</li>
+        </ul>
+      </div>
+
+      <figure class="hero-visual">
+        <div class="visual-label"><span aria-hidden="true">✳</span> ИДЕЯ ПРОДУКТА</div>
+        <svg class="runtime-illustration" viewBox="0 0 560 390" role="img" aria-labelledby="runtime-title runtime-desc">
+          <title id="runtime-title">Схема отдельных профилей NeTelegram</title>
+          <desc id="runtime-desc">Абстрактная оригинальная схема: несколько независимых профилей связаны с одним окном приложения. Это не скриншот приложения и не подтверждение работы двадцати реальных аккаунтов.</desc>
+          <defs>
+            <linearGradient id="window-fill" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#edf2f6"/></linearGradient>
+            <linearGradient id="accent-fill" x1="0" x2="1"><stop offset="0" stop-color="#d8f3ec"/><stop offset="1" stop-color="#e7edff"/></linearGradient>
+            <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="16" stdDeviation="15" flood-color="#283b50" flood-opacity=".12"/></filter>
+          </defs>
+          <path d="M113 103 C165 80 193 90 227 135 M112 194 C167 194 190 194 225 194 M113 286 C165 308 193 291 227 250" fill="none" stroke="#a8bac8" stroke-width="2" stroke-dasharray="5 7"/>
+          <g filter="url(#soft-shadow)">
+            <rect x="28" y="69" width="112" height="67" rx="15" fill="#fff" stroke="#d8e0e7"/>
+            <rect x="28" y="160" width="112" height="67" rx="15" fill="#fff" stroke="#d8e0e7"/>
+            <rect x="28" y="251" width="112" height="67" rx="15" fill="#fff" stroke="#d8e0e7"/>
+            <circle cx="54" cy="102" r="13" fill="#c8eae1"/><circle cx="54" cy="193" r="13" fill="#dce5fa"/><circle cx="54" cy="284" r="13" fill="#f1dfbf"/>
+            <path d="M76 96h43M76 106h31M76 187h43M76 197h31M76 278h43M76 288h31" stroke="#c0cad3" stroke-width="4" stroke-linecap="round"/>
+            <rect x="216" y="53" width="315" height="284" rx="22" fill="url(#window-fill)" stroke="#cfd9e2"/>
+            <path d="M216 77a24 24 0 0 1 24-24h267a24 24 0 0 1 24 24v27H216z" fill="#f4f7fa"/>
+            <circle cx="240" cy="78" r="5" fill="#ed9d92"/><circle cx="258" cy="78" r="5" fill="#eccb77"/><circle cx="276" cy="78" r="5" fill="#92cdb3"/>
+            <rect x="235" y="128" width="88" height="181" rx="11" fill="#f1f4f7"/>
+            <rect x="247" y="143" width="61" height="9" rx="4.5" fill="#ccd6df"/><rect x="247" y="166" width="61" height="30" rx="9" fill="#dcefe9"/><rect x="247" y="208" width="61" height="30" rx="9" fill="#fff" stroke="#e1e6eb"/><rect x="247" y="250" width="61" height="30" rx="9" fill="#fff" stroke="#e1e6eb"/>
+            <rect x="342" y="128" width="169" height="17" rx="8" fill="#e5eaef"/>
+            <rect x="342" y="165" width="118" height="47" rx="14" fill="#fff" stroke="#e1e6eb"/>
+            <rect x="373" y="223" width="138" height="49" rx="14" fill="url(#accent-fill)"/>
+            <rect x="342" y="286" width="169" height="24" rx="12" fill="#fff" stroke="#e1e6eb"/>
+            <circle cx="360" cy="177" r="4" fill="#b6c6d0"/><path d="M373 177h68M373 188h50" stroke="#c2cdd5" stroke-width="4" stroke-linecap="round"/>
+            <path d="M390 238h95M390 250h73" stroke="#89aa9f" stroke-width="4" stroke-linecap="round"/><circle cx="483" cy="247" r="8" fill="#7db8a5"/>
+            <circle cx="127" cy="80" r="17" fill="#283b50"/><text x="127" y="85" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">20</text>
+          </g>
+        </svg>
+        <figcaption>Оригинальная схема, не снимок интерфейса. Работа 20 реальных аккаунтов ещё не проверена.</figcaption>
+      </figure>
     </section>
 
-    <section class="section" id="status"><div class="section-kicker">01 / ПРОВЕРЯЕМЫЙ СТАТУС</div><div class="section-body"><h2>Один публичный источник кода</h2><p>Текущий app-source commit <a href="https://github.com/AffPapa/NeTelegram/commit/816bbb4ab2a61817cc3da0780f47219b1f8f52e9"><code>816bbb4</code></a> прошёл exact-SHA <a href="https://github.com/AffPapa/NeTelegram/actions/runs/38407467618">macOS CI</a> и <a href="https://github.com/AffPapa/NeTelegram/actions/runs/38407466662">сборку pinned TDLib и Dev.app</a>. Один локальный synthetic test проверяет 1000 чередующихся выборов аккаунта и раздельное восстановление темы и черновика. Это не проверка кликов AppKit, реального входа/отправки или 20 авторизованных аккаунтов; готовность к распространению не подтверждена.</p><div class="status-grid"><article><b class="status-dot gray"></b><h3>Исходники</h3><p>Публичный репозиторий AffPapa/NeTelegram</p></article><article><b class="status-dot gray"></b><h3>Аккаунты</h3><p>Реальный пользовательский вход отложен; существующие сессии не импортируются</p></article><article><b class="status-dot gray"></b><h3>Проверки</h3><p>Swift-тесты и сборка pinned TDLib/Dev.app прошли exact-SHA CI; приложение не запускалось в этом workflow</p></article><article><b class="status-dot gray"></b><h3>Загрузка</h3><p>Нет подписанного или notarized приложения</p></article></div></div></section>
+    <section class="truth-strip" id="status" aria-label="Проверяемый статус">
+      <div class="truth-item"><span class="truth-index">01</span><div><h2>Исходники открыты</h2><p>Код и история разработки доступны на GitHub.</p></div><a href="https://github.com/AffPapa/NeTelegram" aria-label="Открыть исходники NeTelegram на GitHub">↗</a></div>
+      <div class="truth-item"><span class="truth-index">02</span><div><h2>Приложение в разработке</h2><p>Accountless запуск Dev.app проверен в CI; вход не выполнялся.</p></div><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38407466662" aria-label="Посмотреть проверку запуска Dev.app">↗</a></div>
+      <div class="truth-item truth-download"><span class="truth-index">03</span><div><h2>Сборки для скачивания нет</h2><p>Подписанный и нотариально проверенный выпуск ещё не опубликован.</p></div><a href="/downloads/" aria-label="Посмотреть статус загрузок">↗</a></div>
+    </section>
 
-    <section class="section" id="product"><div class="section-kicker">02 / ФУНКЦИИ И ОГРАНИЧЕНИЯ</div><div class="section-body"><h2>Что планируется — и чего пока нет</h2><p>Планируются облачные личные и групповые чаты, текст и ссылки, ответы, темы, редактирование и удаление в пределах прав, отдельные черновики, фотографии и альбомы, поиск, уведомления для каждого аккаунта, стандартная повторная авторизация, блокировка интерфейса, клавиатура и VoiceOver. Цель — продолжать обработку доступных аккаунтов в фоне, пока NeTelegram работает, Mac не спит и есть сеть; проверка 20 реальных аккаунтов ещё не выполнена.</p><p>Чтение каналов отложено: не закрыты требования Telegram к sponsored messages/video и базовой функциональности. Пользователь исключил специальный полноэкранный проигрыватель рекламы из v1, поэтому каналы не включаются как готовая функция и stable-релиз не заявляется.</p><div class="two-col"><div><h3>В планах</h3><ul><li>Аккаунты работают одновременно в фоне; выбор одного чата не должен выгружать остальные.</li><li>Локальные данные и черновики раздельны для аккаунтов.</li><li>Неподдерживаемое входящее содержимое показывает доступный контекст.</li></ul></div><div><h3>Не входит в v1</h3><ul><li>Звонки, голосовые чаты/записи/проигрывание, обычный видеоплеер и GIF-анимация.</li><li>Sticker packs/picker, emoji picker, composer реакций, Stories, Mini Apps и AI.</li><li>Кошелёк, платежи, CRM, рассылки, автоответы и универсальная отправка документов.</li><li>Импорт tdata/StringSession или копирование сессий из другого клиента.</li></ul></div></div><p><a class="text-link" href="/features/">Все возможности и ограничения ↗</a></p></div></section>
+    <section class="intro-section section" aria-labelledby="features-title">
+      <div class="section-kicker">ЧТО МЫ СТРОИМ</div>
+      <div class="section-body">
+        <div class="section-heading"><div><h2 id="features-title">Отдельное окно.<br>Понятные границы.</h2><p>Неофициальный альтернативный клиент Telegram для Mac, который развивается открыто. Карточки ниже показывают текущий статус, а не обещание готовой функции.</p></div><a class="text-link" href="/features/">Возможности и ограничения <span aria-hidden="true">↗</span></a></div>
+        <div class="feature-grid">
+          <article class="feature-card"><span class="feature-number">A</span><div><span class="state-label state-code">СБОРКА ПРОВЕРЕНА</span><h3>Нативный macOS-интерфейс</h3><p>Swift и AppKit. Чистый запуск, закрытие окна и возврат из Dock проверены в accountless Dev.app.</p></div></article>
+          <article class="feature-card"><span class="feature-number">B</span><div><span class="state-label state-synthetic">СИНТЕТИЧЕСКИ ПРОВЕРЕНО</span><h3>Несколько профилей</h3><p>Архитектурная цель — все доступные аккаунты в фоне. Core-сценарий 20 профилей проверен синтетически; реальные сессии и ресурсы — нет.</p></div></article>
+          <article class="feature-card"><span class="feature-number">C</span><div><span class="state-label state-work">В РАЗРАБОТКЕ</span><h3>Облачные переписки</h3><p>Личные и групповые чаты, текст, темы, черновики, поиск и фотографии входят в объём проекта. Полный вход и обмен данными не проверены с аккаунтом.</p></div></article>
+          <article class="feature-card"><span class="feature-number">D</span><div><span class="state-label state-detail">ОГРАНИЧЕНИЯ ОПИСАНЫ</span><h3>Раздельные локальные данные</h3><p>Профили создаются в NeTelegram; сессии других клиентов не импортируются. UI privacy lock не означает стирание всех секретов из памяти.</p></div></article>
+        </div>
+      </div>
+    </section>
 
-    <section class="section" id="downloads"><div class="section-kicker">03 / ЗАГРУЗКИ</div><div class="section-body"><h2>Сборки для установки пока нет</h2><p>Мы не публикуем пустую кнопку «Скачать» и не называем development build готовым приложением. Загрузки появятся после закрытия совместимости и проверки подписи, notarization, установки и скачанных байтов.</p><div class="download-state"><span>Последняя стабильная версия: отсутствует</span><span class="tag">NO RELEASE</span></div><p><a class="text-link" href="/downloads/">Статус загрузок и требования к выпуску ↗</a></p></div></section>
+    <section class="download-panel" id="download-status" aria-labelledby="download-title">
+      <div class="download-copy"><p class="eyebrow">ПЕРЕД ПЕРВОЙ ЗАГРУЗКОЙ</p><h2 id="download-title">Сначала проверка.<br>Потом ссылка.</h2><p>Сейчас нет подписанной сборки для Mac. Мы опубликуем загрузку, когда будут готовы совместимость, Developer ID-подпись, Apple notarization и проверка установщика.</p></div>
+      <div class="download-card"><span class="download-icon" aria-hidden="true">↓</span><div><strong>Загрузка пока недоступна</strong><p>Версия и проверенные байты не опубликованы</p></div><span class="tag">В РАЗРАБОТКЕ</span><a href="/downloads/">Проверить статус и требования <span aria-hidden="true">↗</span></a></div>
+    </section>
 
-    <section class="section" id="privacy"><div class="section-kicker">04 / ПРИВАТНОСТЬ</div><div class="section-body"><h2>Отдельные профили приложения</h2><p>Вход выполняется стандартным потоком Telegram внутри NeTelegram. Профили создаются приложением в собственном каталоге; данные Telegram Desktop и других клиентов не читаются и не копируются. Пароли 2FA и одноразовые коды не сохраняются. Технические свойства Keychain, баз данных, локальных черновиков, блокировки экрана и медиа описаны с точными ограничениями на странице приватности.</p><p><a class="text-link" href="/privacy/">Прочитать политику приватности ↗</a></p></div></section>
+    <section class="section updates-section" aria-labelledby="updates-title">
+      <div class="section-kicker">ОТКРЫТАЯ РАЗРАБОТКА</div>
+      <div class="section-body updates-body">
+        <div class="section-heading"><div><h2 id="updates-title">Изменения с доказательствами</h2><p>Журнал связывает записи с исходным commit и проверкой. План, синтетический тест и реальный запуск отмечаются отдельно.</p></div><a class="text-link" href="/devlog/">Весь журнал <span aria-hidden="true">↗</span></a></div>
+        <article class="latest-entry"><time datetime="2026-10-13">13 октября 2026</time><div><h3>Перестроена главная страница проекта</h3><p>Добавлены короткая RU-first навигация, отдельный статус загрузки, карточки возможностей с уровнем проверки и авторская SVG-схема. Она обозначена как иллюстрация, а не снимок приложения или доказательство работы 20 реальных аккаунтов. Главная сохраняет ссылки на исходники, ограничения, приватность и журнал.</p><a href="/devlog/">Описание изменения и границы проверки ↗</a></div></article>
+      </div>
+    </section>
 
-    <section class="section english" id="english" lang="en"><div class="section-kicker">05 / ENGLISH</div><div class="section-body"><h2>Unofficial Telegram client for macOS — in development</h2><p><strong>NeTelegram</strong> is a separate native macOS app built with Swift, AppKit, and TDLib. It is intended for Telegram cloud chats. People searching for an unofficial Telegram client for macOS, a Telegram client for Mac, or an alternative Telegram client can inspect the source and see exactly what is planned and verified.</p><div class="notice"><strong>Independent project.</strong> NeTelegram is an independent third-party macOS client that uses the Telegram API. It is not the official Telegram app, is not developed or endorsed by Telegram, and has no direct relationship or affiliation with Telegram Messenger LLP. It uses the Telegram API/TDLib and is intended to work within the Telegram ecosystem.</div><p class="fine">Looking for an “alternative Telegram client for macOS” or a “Telegram for Mac download”? No verified NeTelegram build is available to download yet. NeTelegram is an independent third-party client that uses the Telegram API; it is not the official Telegram app and has no direct connection with Telegram Messenger LLP.</p><div class="notice"><strong>No app download is available.</strong> Real account login and sending, the twenty-account matrix, Developer ID signing, and Apple notarization remain unverified. There is no signed installer.</div><p>Current app-source commit <a href="https://github.com/AffPapa/NeTelegram/commit/816bbb4ab2a61817cc3da0780f47219b1f8f52e9"><code>816bbb4</code></a> passed exact-source <a href="https://github.com/AffPapa/NeTelegram/actions/runs/38407467618">macOS CI</a> and a separate <a href="https://github.com/AffPapa/NeTelegram/actions/runs/38407466662">pinned TDLib / Dev.app build</a>. One local synthetic test exercises 1,000 alternating account selections through the shared draft-restoration policy. This does not prove native UI switching, real-account workflows, or twenty authorized accounts.</p><p>Planned scope includes cloud private and group chats, text and links, replies, topics, permission-aware edits and deletes, separate drafts, photos, search, per-account notifications, privacy lock, keyboard access, and VoiceOver. Calls, voice, general video playback, GIFs, sticker/emoji pickers, reactions, Stories, Mini Apps, AI, payments, CRM, bulk messaging, and imported client sessions are excluded. Channel reading and stable release are deferred pending Telegram API compatibility requirements.</p><p>Observed search wording includes “unofficial Telegram client for macOS”, “Telegram client for Mac”, “Telegram alternative client for Mac”, «неофициальный клиент Telegram для macOS» and «альтернативный клиент Telegram для Mac». These phrases reflect current search-result wording; search volume and rankings have not been measured.</p></div></section>
+    <section class="independence-panel" aria-labelledby="independence-title">
+      <div class="independence-mark" aria-hidden="true">i</div><div><h2 id="independence-title">Независимый сторонний проект</h2><p>NeTelegram не является официальным приложением Telegram, не разработан и не одобрен Telegram, не имеет прямой связи с Telegram Messenger LLP. Приложение использует Telegram API/TDLib и предназначено для экосистемы Telegram. Соответствие названия и остальные требования API Terms ещё проверяются.</p></div><a href="https://core.telegram.org/api/terms">Условия API ↗</a>
+    </section>
 
-    <section class="section" id="api-terms"><div class="section-kicker">06 / СОВМЕСТИМОСТЬ</div><div class="section-body"><h2>Название приложения и условия API</h2><p>Условия <a href="https://core.telegram.org/api/terms">Telegram API §2.3</a> допускают слово “Telegram” в заголовке приложения только если перед ним в самом заголовке стоит “Unofficial”. Поэтому NeTelegram как точный display title остаётся открытым gate для совместимости и выпуска. Сноска о независимости выше помогает отличить проект, но сама по себе не отменяет это условие. §2.2 отдельно требует заметного сообщения, что приложение использует Telegram API и является частью экосистемы Telegram. Выпуск не будет обозначаться совместимым или стабильным, пока эти gates не разрешены.</p></div></section>
-
-    <section class="footer-card"><div><div class="section-kicker">OPEN DEVELOPMENT</div><h2>Проверяйте исходники и реальные этапы</h2><p>Репозиторий содержит код, тесты, лицензию, TDLib pins и инструкции. Changelog, журнал разработки и roadmap отделяют завершённые работы от планов и непроверенных сценариев.</p><a class="text-link" href="https://github.com/AffPapa/NeTelegram">Открыть исходный код на GitHub ↗</a></div><span class="tag">IN DEVELOPMENT</span></section>
+    <section class="english-summary" id="english" lang="en" aria-labelledby="english-title">
+      <p class="section-kicker">ENGLISH OVERVIEW</p><div><h2 id="english-title">A separate native macOS client for Telegram cloud chats.</h2><p><strong>NeTelegram</strong> is an independent open-source project built with Swift, AppKit, and TDLib. It is not the official Telegram app and has no direct relationship with Telegram Messenger LLP. The app is in development: real account login, twenty authorized background runtimes, and a signed download have not been verified.</p><div class="english-links"><a href="https://github.com/AffPapa/NeTelegram">Source code ↗</a><a href="/features/">Features and limits ↗</a><a href="/privacy/">Privacy ↗</a></div></div>
+    </section>
   </main>
-  <footer><a class="wordmark" href="#home"><span class="mark">N</span> NeTelegram</a><span>Независимый проект · Не связан с Telegram · 2026</span><a href="#privacy">Приватность</a></footer>
+
+  <footer class="site-footer"><a class="wordmark" href="/" aria-label="NeTelegram — главная"><span class="mark" aria-hidden="true">N</span> NeTelegram</a><span>Независимый проект · В разработке · 2026</span><nav aria-label="Ссылки в подвале"><a href="/privacy/">Приватность</a><a href="/roadmap/">Roadmap</a><a href="/source/">Исходники</a></nav></footer>
 </body>
 </html>
