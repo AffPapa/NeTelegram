@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "App source 209be94 passes local and hosted serial suites 157/157; warm CI cache reduced one measured compile from 48.43s to 17.50s. Public development Site v164 is live. Added a fail-closed candidate/receipt validator; 11 targeted tests pass locally. No app binary release.",
-  "verified_at": "2026-10-14T06:28:45+07:00",
+  "phase": "App source 209be94 passes local and hosted serial suites 157/157; warm CI cache reduced one measured compile from 48.43s to 17.50s. Public development Site v164 is live. Added a fail-closed candidate/receipt validator; 11 targeted tests pass locally. No app binary release. macOS CI trigger narrowed to its Swift test target; workflow-change verification passed.",
+  "verified_at": "2026-10-14T06:30:00+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -329,5 +329,16 @@
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
     "hosted_metadata_ci": "PASS: run 38484426400 for exact checkpoint 7104a87.",
     "hosted_macos_ci": "PASS: run 38484426522; unchanged app source 209be94 and full serial suite. Triggered by broad Tests/** path matching the Python release tests."
+  },
+  "ci_test_scope_change": {
+    "checkpoint_commit": "4ee0a210d36a9ca2b9c2bf0cc783b167f239d16e",
+    "change": "Scope macOS CI test triggers to Tests/NeTelegramCoreTests/**, the SwiftPM test target. Tests/release/** is covered by Ubuntu metadata.yml only.",
+    "hosted_validation": {
+      "run_id": 38484677460,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38484677460",
+      "scope": "Exact workflow checkpoint; filtered probe and full serial Swift suite passed. This one run was required because ci.yml itself changed."
+    },
+    "expected_saving": "Future release-metadata Python test edits will no longer trigger the macOS Swift suite."
   }
 }

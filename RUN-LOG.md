@@ -616,3 +616,9 @@
 - Added 11 targeted unit tests and wired them into the fast Ubuntu metadata workflow. Updated the manifest template with safe local asset paths and explicit empty coverage/open compatibility gates; documented the two commands in `DEV-WORKFLOW.md`.
 - Local verification: targeted Python suite 11/11; JSON parse; Python byte-compile; `git diff --check`. This does not prove release readiness or app behavior. No Swift source changed, so no Swift suite or Dev.app rebuild; no login, signing, notarization, publication, or Site deployment.
 - Reconciled checkpoint to public Site v164 deployment `appgdep_6acebc95df188191a0a76fe5b408adbc`; Site v164 remains development-only with no download asset.
+
+### 2026-10-14 — Scope macOS CI to Swift test sources
+
+- Changed both push and pull-request path filters from all of `Tests/**` to `Tests/NeTelegramCoreTests/**`, matching the SwiftPM test target. Python release-validator tests under `Tests/release/**` stay in the fast Ubuntu metadata workflow.
+- Hosted run [38484677460](https://github.com/AffPapa/NeTelegram/actions/runs/38484677460) passed for exact workflow checkpoint `4ee0a210d36a9ca2b9c2bf0cc783b167f239d16e`; the probe and full serial Swift suite passed. This single run was triggered by editing `ci.yml`.
+- Expected benefit: later metadata-only Python test changes no longer run the unrelated Swift suite.

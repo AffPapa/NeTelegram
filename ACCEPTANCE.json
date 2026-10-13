@@ -587,5 +587,12 @@
     "checks": "Local 11/11 targeted tests, JSON parse, Python byte-compile, Ruby YAML parse and git diff --check passed. Metadata workflow 38484426400 passed for exact commit.",
     "scope": "Release automation validation only; no app build, login, signing, notarization, release upload or Site deployment. Unchanged-source macOS CI 38484426522 also passed because Tests/** matched the new Python suite.",
     "release_readiness": "No app release. Real-account coverage, Developer ID/notarization, compatibility decisions, Gatekeeper install and updater smoke remain open."
+  },
+  "latest_ci_scope_change": {
+    "checkpoint_commit": "4ee0a210d36a9ca2b9c2bf0cc783b167f239d16e",
+    "workflow": "macOS CI",
+    "run_id": 38484677460,
+    "status": "passed",
+    "scope": "Filtered probe and full serial Swift suite passed. Trigger path is Tests/NeTelegramCoreTests/**; release Python tests remain in the Ubuntu metadata workflow."
   }
 }
