@@ -162,7 +162,7 @@
       "method": "C bridge/reducer tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Per-client FIFO, fairness/backpressure, critical event preservation and no selected-account fallback regressions pass in 80/80 for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. Real TDLib overload and 20-runtime stress remain unverified; status stays partial."
+      "evidence": "Current synthetic coverage: existing saturatedHotLane test fills the shared item budget and observes updateAuthorizationState, updateDeleteMessages, and updateMessageContent; the shutdown regression updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput fills capacity, blocks a final delete update from the same client, closes admission with the one-in-flight allowance, then asserts authorization-before-delete FIFO, preservation, and rejection of later input. The focused test passed 1/1 locally on 2026-10-13; exact-SHA macOS CI run 38409529115 succeeded for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a. This does not exercise a real TDLib receive worker, real TTL expiry, a 20-client saturated burst, or runtime overload; status stays partial."
     },
     {
       "id": "APP17",

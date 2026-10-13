@@ -1,5 +1,19 @@
 # NeTelegram run log
 
+## 2026-10-13 — Site v123 deployed and anonymously checked
+
+- Existing public Site project retained: `appgprj_6acba85192e08191acdf7011928848cf`; version 123 source `bbfa7c7df93f9bf2974291109a71f11ccaad80a4`, deployment `appgdep_6ace3a2734c881918019aefea91f33ee`, saved version `appgprj_6acba85192e08191acdf7011928848cf~appgver_4a7ee91928508191b97b4eb69d1e62ad`.
+- Exact saved archive SHA-256: `23f329caf27bf679b3863498fe27da8693c99bd9c35e913df45d7208a2707c5b`; Sites-reported content hash `sha256:fff05212b572d4aebe8f9f0e6f2b98780828fceeb00ced58589d49a49e9ccc1e`.
+- Anonymous TLS-verified checks: `/devlog/` 200 HTML with `04279b9`; `/downloads/` 200 HTML with `NO RELEASE` and no release-download URL; stable and alpha feeds 200 `text/xml` and parse as XML.
+- No app binary was built, signed, or released for this test-only milestone.
+
+## 2026-10-13 — APP16 critical update during queue shutdown
+
+- App Swift source is unchanged at `816bbb4ab2a61817cc3da0780f47219b1f8f52e9`; test/evidence commits `12114c5` and `04279b967c8296a8c73719ce79030286dfe4570a` are on `main`.
+- Extended the shutdown regression to fill the shared capacity, block a final `updateDeleteMessages` JSON update from the same client, allow the single already-received item through shutdown, and assert FIFO with the preceding authorization update plus rejection of later input. The test comment explicitly limits this to queue preservation; it is not a real expiry/TTL test.
+- Targeted local test passed 1/1. Exact-SHA macOS CI [run 38409529115](https://github.com/AffPapa/NeTelegram/actions/runs/38409529115) passed for test/evidence commit `04279b967c8296a8c73719ce79030286dfe4570a`. No app rebuild was needed because Swift app source did not change.
+- APP16 stays partial: no real TDLib receive worker, 20-client saturation, real TTL expiry, or runtime overload measurement. Site v122 remains live until v123 archive-backed deployment completes.
+
 ## 2026-10-13 — Oversized TDLib updates fail closed
 
 - App source commit: `6c6fff49d6c43746b3990de178b723d1eaf75172`.
