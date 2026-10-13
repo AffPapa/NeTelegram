@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source commit 8a33430674c4dc9d5dc0503f22a765c8566637c1 is public. Local Swift suite 71/71 and exact-source macOS CI 38324310011 passed. Pinned TDLib/Dev.app run 38324310012 is still in progress. Public Site v57 remains live with no app downloads. Real Telegram account tests, all-20 certification, product compatibility decisions, Developer ID/notarization, updater, and stable-release gates remain open.",
+  "status": "implementation_in_progress; app behavior commit 8a33430674c4dc9d5dc0503f22a765c8566637c1 and build-cache commit bfdcedf05fdf75a6a4b893cdefa8540b277263f3 are public. Local Swift 71/71, macOS CI 38324310011, docs CI 38325282957, and pinned TDLib/Dev.app workflow 38325282960 passed. The build workflow reused pinned TDLib/OpenSSL source checkouts and produced an arm64 ad-hoc development review artifact; no app download. Real account and all-20 tests, product compatibility decisions, Developer ID/notarization, updater, and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -387,7 +387,7 @@
       "method": "unit+native UI",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "AuthenticationCodePrompt uses authenticationCodeInfo.phone_number and the TDLib delivery type; local tests verify the destination mask and that the full digits are absent. 71/71 Swift tests and exact-source CI run 38324310011 passed for commit 8a33430674c4dc9d5dc0503f22a765c8566637c1. Native prompt rendering has not been visually verified; pinned TDLib/Dev.app run 38324310012 is still in progress."
+      "evidence": "AuthenticationCodePrompt uses authenticationCodeInfo.phone_number and TDLib delivery type; local tests verify the two-digit mask and absence of full digits. 71/71 Swift tests and macOS CI run 38324310011 passed for app behavior commit 8a33430674c4dc9d5dc0503f22a765c8566637c1. Pinned native workflow 38325282960 built and launched a clean unauthenticated Dev.app from repository commit bfdcedf05fdf75a6a4b893cdefa8540b277263f3 (the app code is unchanged from 8a33430, with a subsequent build-script-only cache optimization). It captured a nonempty first-run screenshot and quit cleanly. The code-entry prompt itself cannot be visually reached without an account login, which the user deferred."
     }
   ],
   "last_verification": {
