@@ -1324,10 +1324,10 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 @Test func updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput() async {
     let buffer = TDLibUpdateBuffer(capacity: 1)
     let accepted = Data("{\"@client_id\":7,\"@type\":\"updateAuthorizationState\",\"sequence\":1}".utf8)
-    // TDLib delivers message expiry through the same deletion update used for
-    // other deletions. Keep a real-shaped payload here to exercise the last
+    // Exercise a delete update with TDLib's documented fields as the final
     // result already returned by td_receive while shutdown closes a full queue.
-    let inFlight = Data("{\"@client_id\":7,\"@type\":\"updateDeleteMessages\",\"message_ids\":[91],\"sequence\":2}".utf8)
+    // This is queue-preservation coverage, not an expiry/TTL integration test.
+    let inFlight = Data("{\"@client_id\":7,\"@type\":\"updateDeleteMessages\",\"chat_id\":42,\"message_ids\":[91],\"is_permanent\":true,\"from_cache\":false}".utf8)
     #expect(buffer.append(accepted))
     let appendResult = LockedTestValue<Bool?>(nil)
     let appendFinished = LockedTestValue(false)
