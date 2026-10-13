@@ -5,17 +5,23 @@ public struct AccountProfile: Codable, Sendable, Equatable, Identifiable {
     public let createdAt: Date
     public private(set) var telegramUserID: Int64?
     public private(set) var displayName: String?
+    public private(set) var logoutCleanupPending: Bool?
 
-    public init(id: AccountUUID = AccountUUID(), createdAt: Date = Date(), telegramUserID: Int64? = nil, displayName: String? = nil) {
+    public init(id: AccountUUID = AccountUUID(), createdAt: Date = Date(), telegramUserID: Int64? = nil, displayName: String? = nil, logoutCleanupPending: Bool? = nil) {
         self.id = id
         self.createdAt = createdAt
         self.telegramUserID = telegramUserID
         self.displayName = displayName
+        self.logoutCleanupPending = logoutCleanupPending
     }
 
     public mutating func associateVerifiedIdentity(_ userID: Int64, displayName: String? = nil) {
         telegramUserID = userID
         self.displayName = displayName
+    }
+
+    public mutating func markLogoutCleanupPending() {
+        logoutCleanupPending = true
     }
 }
 
@@ -78,6 +84,24 @@ public actor AccountCatalogue {
         }
         let old = profiles[index]
         profiles[index].associateVerifiedIdentity(userID, displayName: displayName)
+        do { try persist() } catch {
+            profiles[index] = old
+            throw error
+        }
+    }
+
+    /// Persists a cleanup barrier before deleting any local account data after
+    /// Telegram has confirmed logout. A restart must not reopen this profile as
+    /// the previous identity if cleanup stops partway through.
+    public func markLogoutCleanupPending(_ account: AccountUUID, expectedTelegramUserID: Int64) throws {
+        guard let index = profiles.firstIndex(where: { $0.id == account }) else {
+            throw AccountCatalogueError.accountNotFound
+        }
+        guard profiles[index].telegramUserID == expectedTelegramUserID else {
+            throw AccountCatalogueError.identityMismatch
+        }
+        let old = profiles[index]
+        profiles[index].markLogoutCleanupPending()
         do { try persist() } catch {
             profiles[index] = old
             throw error

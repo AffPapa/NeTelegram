@@ -418,11 +418,21 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         runtimeIsOpen: false,
         hasError: true
     )
+    let logoutCleanup = AccountPresentation.pickerTitle(
+        localOrdinal: 4,
+        telegramUserID: 123,
+        candidate: "Test User",
+        authorizationState: nil,
+        runtimeIsOpen: false,
+        hasError: true,
+        logoutCleanupPending: true
+    )
 
     #expect(firstPending == "Локальный вход 1 — ожидает номер")
     #expect(secondPending == "Локальный вход 2 — ожидает код")
     #expect(verified == "Test User · профиль 3 — подключён")
     #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
+    #expect(logoutCleanup == "Test User · профиль 4 — очистка после выхода ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
@@ -1110,6 +1120,7 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     let catalogue = try AccountCatalogue(rootURL: root)
     _ = try await catalogue.addProfile(id: account)
     try await catalogue.associateVerifiedIdentity(123456789, displayName: "Test User", with: account)
+    try await catalogue.markLogoutCleanupPending(account, expectedTelegramUserID: 123456789)
 
     let reopened = try AccountCatalogue(rootURL: root)
     let profiles = await reopened.allProfiles()
@@ -1117,8 +1128,30 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(profiles[0].id == account)
     #expect(profiles[0].telegramUserID == 123456789)
     #expect(profiles[0].displayName == "Test User")
+    #expect(profiles[0].logoutCleanupPending == true)
     let mode = try FileManager.default.attributesOfItem(atPath: root.appendingPathComponent("accounts.json").path)[.posixPermissions] as? NSNumber
     #expect(mode?.intValue == 0o600)
+}
+
+@Test func restorePlannerNeverReopensProfileWithPendingLogoutCleanup() {
+    let cleanupPending = AccountProfile(
+        id: AccountUUID(),
+        telegramUserID: 777,
+        displayName: "Former User",
+        logoutCleanupPending: true
+    )
+    let ordinaryPending = AccountProfile(id: AccountUUID())
+    let plan = AccountRestorePlanner.profilesToRestore(
+        authorized: [cleanupPending],
+        pending: [cleanupPending, ordinaryPending],
+        pendingWithStoredDatabase: [cleanupPending.id, ordinaryPending.id]
+    )
+    #expect(plan == [ordinaryPending])
+    #expect(AccountRestorePlanner.profilesToRestore(
+        authorized: [],
+        pending: [cleanupPending],
+        pendingWithStoredDatabase: [cleanupPending.id]
+    ).isEmpty)
 }
 
 @Test func accountCatalogueRefusesToReassignAnExistingTelegramIdentity() async throws {

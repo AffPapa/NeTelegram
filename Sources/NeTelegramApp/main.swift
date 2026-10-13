@@ -984,7 +984,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 candidate: runtime?.displayName ?? profile.displayName,
                 authorizationState: runtime?.authorizationState,
                 runtimeIsOpen: runtime != nil,
-                hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil
+                hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil,
+                logoutCleanupPending: profile.logoutCleanupPending == true
             ))
         }
         accountPicker.isHidden = accountPickerAccounts.isEmpty
@@ -1011,6 +1012,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               !profileOpenRequests.contains(account),
               let profile = knownProfilesByAccount[account] else { return }
         prepareToSelectUnopenedProfile(account)
+        if profile.logoutCleanupPending == true {
+            retryPendingLogoutCleanup(profile)
+            return
+        }
         profileOpenRequests.insert(account)
         setStatus("Повторно открываю локальный профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…")
         Task { @MainActor [weak self] in
@@ -1033,6 +1038,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     @objc private func retryClosedProfile() {
         guard let account = closedProfileToRetry, !lockState else { return }
         retryOpeningProfile(account)
+    }
+
+    private func retryPendingLogoutCleanup(_ profile: AccountProfile) {
+        guard !profileRestoreInProgress, !closingForTermination,
+              !profileOpenRequests.contains(profile.id),
+              profile.logoutCleanupPending == true,
+              let expectedTelegramUserID = profile.telegramUserID else { return }
+        profileOpenRequests.insert(profile.id)
+        setStatus("Продолжаю очистку профиля после подтверждённого выхода…")
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.profileOpenRequests.remove(profile.id) }
+            do {
+                try await self.completePendingLogoutCleanup(
+                    profile.id,
+                    expectedTelegramUserID: expectedTelegramUserID
+                )
+                self.profileStartupFailures.remove(profile.id)
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+                self.setStatus("Локальная очистка профиля после выхода завершена.")
+                if self.runtimesByAccount.isEmpty, self.knownProfilesByAccount.isEmpty {
+                    Task { @MainActor [weak self] in await self?.addAccountProfile() }
+                }
+            } catch {
+                self.profileStartupFailures.insert(profile.id)
+                self.refreshAccountPicker(select: profile.id)
+                self.refreshStatusMenu()
+                self.setStatus("Очистка после выхода не завершена. Профиль не будет запущен и не сможет принять другую identity; выберите его позже, чтобы повторить очистку.")
+            }
+        }
     }
 
     private func showClosedProfileRecovery(_ account: AccountUUID) {
@@ -1107,16 +1143,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
         do {
             guard let catalogue else { return false }
-            try await Task.detached(priority: .utility) {
-                if FileManager.default.fileExists(atPath: target.paths.accountRoot.path) {
-                    try FileManager.default.removeItem(at: target.paths.accountRoot)
-                }
-            }.value
-            try SecretsStore().removeAccountKeys(for: target.account)
-            try await catalogue.removeProfile(target.account, expectedTelegramUserID: expectedTelegramUserID)
-            knownProfilesByAccount.removeValue(forKey: target.account)
-            profileOrder.removeAll { $0 == target.account }
-            profileStartupFailures.remove(target.account)
+            try await catalogue.markLogoutCleanupPending(
+                target.account,
+                expectedTelegramUserID: expectedTelegramUserID
+            )
+            if let updated = await catalogue.allProfiles().first(where: { $0.id == target.account }) {
+                knownProfilesByAccount[target.account] = updated
+            }
+            try await completePendingLogoutCleanup(
+                target.account,
+                expectedTelegramUserID: expectedTelegramUserID
+            )
             refreshAccountPicker()
             return true
         } catch {
@@ -1124,6 +1161,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshAccountPicker()
             return false
         }
+    }
+
+    private func completePendingLogoutCleanup(
+        _ account: AccountUUID,
+        expectedTelegramUserID: Int64
+    ) async throws {
+        guard let catalogue,
+              let profile = await catalogue.allProfiles().first(where: { $0.id == account }),
+              profile.telegramUserID == expectedTelegramUserID,
+              profile.logoutCleanupPending == true else {
+            throw AccountCatalogueError.identityMismatch
+        }
+        // Persisted cleanup state precedes destructive work. Key and directory
+        // removal are idempotent, so failures can resume without reopening a
+        // partially erased database as the previous Telegram identity.
+        try SecretsStore().removeAccountKeys(for: account)
+        let accountRoot = try accountStorageRoot()
+            .appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+        if FileManager.default.fileExists(atPath: accountRoot.path) {
+            try FileManager.default.removeItem(at: accountRoot)
+        }
+        try await catalogue.removeProfile(account, expectedTelegramUserID: expectedTelegramUserID)
+        knownProfilesByAccount.removeValue(forKey: account)
+        profileOrder.removeAll { $0 == account }
+        profileStartupFailures.remove(account)
     }
 
     private func purgeInMemoryAccountState(_ account: AccountUUID) {
@@ -1315,11 +1377,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         defer { profileRestoreInProgress = false }
         do {
             let catalogue = try accountCatalogue()
-            let profiles = await catalogue.allProfiles()
+            var profiles = await catalogue.allProfiles()
+            let cleanupProfiles = profiles.filter { $0.logoutCleanupPending == true }
+            for profile in cleanupProfiles {
+                guard let expectedTelegramUserID = profile.telegramUserID else {
+                    profileStartupFailures.insert(profile.id)
+                    continue
+                }
+                do {
+                    try await completePendingLogoutCleanup(
+                        profile.id,
+                        expectedTelegramUserID: expectedTelegramUserID
+                    )
+                } catch {
+                    profileStartupFailures.insert(profile.id)
+                }
+            }
+            profiles = await catalogue.allProfiles()
             rememberProfiles(profiles)
             refreshAccountPicker()
             let apiHash = try SecretsStore().telegramAPIHash()
-            let authorized = profiles.filter { $0.telegramUserID != nil }
+            let authorized = profiles.filter { $0.telegramUserID != nil && $0.logoutCleanupPending != true }
             let pending = profiles.filter { $0.telegramUserID == nil }.sorted { $0.createdAt < $1.createdAt }
             var pendingWithStoredDatabase = Set<AccountUUID>()
             pendingProfileStorageWarnings = 0
@@ -1354,6 +1432,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
                     showPhoneEntry()
                     setStatus("Введите номер и нажмите «Продолжить», чтобы начать вход.")
+                } else if profiles.contains(where: { $0.logoutCleanupPending == true }) {
+                    setStatus("Очистка после подтверждённого выхода ожидает. Выберите этот профиль, чтобы безопасно продолжить.")
                 }
                 refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()

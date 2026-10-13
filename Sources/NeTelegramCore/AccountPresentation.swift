@@ -14,6 +14,7 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
     case unsupported
     case authorized
     case verifyingIdentity
+    case logoutCleanupPending
     case failed
 
     public var label: String {
@@ -31,6 +32,7 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
         case .unsupported: "шаг не поддерживается"
         case .authorized: "подключён"
         case .verifyingIdentity: "проверяет identity"
+        case .logoutCleanupPending: "очистка после выхода ожидает"
         case .failed: "ошибка"
         }
     }
@@ -90,7 +92,8 @@ public enum AccountPresentation {
         candidate: String?,
         authorizationState: String?,
         runtimeIsOpen: Bool,
-        hasError: Bool
+        hasError: Bool,
+        logoutCleanupPending: Bool = false
     ) -> String {
         let ordinal = max(1, localOrdinal)
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate)
@@ -99,7 +102,8 @@ public enum AccountPresentation {
             telegramUserID: telegramUserID,
             authorizationState: authorizationState,
             runtimeIsOpen: runtimeIsOpen,
-            hasError: hasError
+            hasError: hasError,
+            logoutCleanupPending: logoutCleanupPending
         ).label
         return "\(identity) — \(status)"
     }
@@ -108,8 +112,10 @@ public enum AccountPresentation {
         telegramUserID: Int64?,
         authorizationState: String?,
         runtimeIsOpen: Bool,
-        hasError: Bool
+        hasError: Bool,
+        logoutCleanupPending: Bool = false
     ) -> AccountProfilePickerStatus {
+        if logoutCleanupPending { return .logoutCleanupPending }
         let step = AuthorizationStep(tdlibType: authorizationState)
         if hasError || step == .closed { return .failed }
         switch step {
