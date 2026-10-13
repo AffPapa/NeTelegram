@@ -688,6 +688,19 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(query[kSecAttrAccessible as String] == nil)
 }
 
+@Test func secretsStoreCreatesKeysOnlyAfterExplicitKeychainNotFound() {
+    #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: true) == .create)
+    #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: false) == .missing)
+    #expect(SecretsStore.keyLookupDecision(status: errSecInteractionNotAllowed, data: nil, createIfMissing: true) == .failure(errSecInteractionNotAllowed))
+    #expect(SecretsStore.keyLookupDecision(status: errSecAuthFailed, data: nil, createIfMissing: true) == .failure(errSecAuthFailed))
+}
+
+@Test func secretsStoreRejectsMalformedExistingKeyWithoutReplacement() {
+    #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: Data(repeating: 7, count: 32), createIfMissing: true) == .use(Data(repeating: 7, count: 32)))
+    #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: Data(repeating: 7, count: 31), createIfMissing: true) == .failure(errSecDecode))
+    #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: nil, createIfMissing: true) == .failure(errSecDecode))
+}
+
 @Test func startupLimitDoesNotBecomeResidentAccountLimit() async throws {
     let coordinator = RuntimeCoordinator(startupParallelism: 2)
     #expect(await coordinator.acquireStartupPermit())

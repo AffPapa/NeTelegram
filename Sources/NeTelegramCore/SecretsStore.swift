@@ -8,6 +8,13 @@ public enum SecretsStoreError: Error, Equatable {
 
 /// Keychain access for local project credentials and per-account encryption keys.
 public struct SecretsStore: Sendable {
+    enum KeyLookupDecision: Equatable {
+        case use(Data)
+        case create
+        case missing
+        case failure(OSStatus)
+    }
+
     public init() {}
 
     public func telegramAPIHash() throws -> String {
@@ -64,14 +71,15 @@ public struct SecretsStore: Sendable {
         readQuery[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
         let readStatus = SecItemCopyMatching(readQuery as CFDictionary, &result)
-        if readStatus == errSecSuccess, let data = result as? Data, data.count == 32 {
+        switch Self.keyLookupDecision(status: readStatus, data: result as? Data, createIfMissing: createIfMissing) {
+        case let .use(data):
             return data
-        }
-        if readStatus == errSecItemNotFound, !createIfMissing {
+        case .missing:
             throw SecretsStoreError.missing("Existing key for \(service)")
-        }
-        guard readStatus == errSecItemNotFound else {
-            throw SecretsStoreError.keychain(readStatus == errSecSuccess ? errSecDecode : readStatus)
+        case let .failure(status):
+            throw SecretsStoreError.keychain(status)
+        case .create:
+            break
         }
 
         var generated = Data(count: 32)
@@ -96,6 +104,20 @@ public struct SecretsStore: Sendable {
             return existing
         }
         throw SecretsStoreError.keychain(addStatus)
+    }
+
+    /// Key generation is allowed only for an explicit not-found response.
+    /// Locked, unavailable, malformed, and all other Keychain responses fail
+    /// closed so existing ciphertext can never be stranded under a replacement key.
+    static func keyLookupDecision(status: OSStatus, data: Data?, createIfMissing: Bool) -> KeyLookupDecision {
+        if status == errSecSuccess {
+            guard let data, data.count == 32 else { return .failure(errSecDecode) }
+            return .use(data)
+        }
+        if status == errSecItemNotFound {
+            return createIfMissing ? .create : .missing
+        }
+        return .failure(status)
     }
 
     /// Uses the user's standard macOS login Keychain. Accessibility attributes
