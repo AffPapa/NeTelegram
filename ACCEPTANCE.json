@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public product display name is Neridian (repo codename NeTelegram). User deferred channel access/stable release until sponsored-video obligations are resolved; no compatible stable release is claimed.",
+  "status": "implementation_in_progress; app source 84ce261 sets public display name Neridian and defers channel access/stable release pending sponsored-video compatibility. No signed release or download exists.",
   "cases": [
     {
       "id": "APP01",
@@ -419,19 +419,14 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "110/110 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
-    "hosted_ci": "Exact-source macOS CI 38356823153 and pinned TDLib/Dev.app workflow 38356822970 both completed successfully for 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c.",
-    "hosted_result": "Apple Silicon Swift tests passed. Pinned TDLib built; isolated arm64 Dev.app assembled, verified, launched, screenshot captured, and quit in CI. Accountless development smoke only; not a release.",
-    "artifact": {
-      "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
-      "status": "local development source only; no release artifact or public binary",
-      "signature": "not a release"
-    },
-    "scope": "VoiceOver name/help are assigned to the QR image and it is hidden when absent. Native VoiceOver traversal, actual QR auth and keyboard interaction remain unverified. No real accounts, 20-runtime certification, Developer ID/notarization, Gatekeeper or updater tests are claimed; existing local canonical Dev.app was not touched.",
-    "publication": "Factual Site v94 devlog is public at https://netelegram.iryadom.chatgpt.site; Site source 48d2ab8d626fc67dcdbac791ca14baf1093109e6, deployment appgdep_6acdd03397f08191bbdc706bcea61901. Public routes and exact devlog content were checked; no app release or download exists.",
-    "next_action": "Wait for exact-SHA macOS CI and pinned TDLib/Dev.app workflow. If green, publish factual APP22 devlog on the existing Site; if failed, fix the source issue and rerun before claiming completion."
+    "source_commit": "84ce26148dfd9623c35d579fcb2dae8db413a94e",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/clang SWIFT_MODULECACHE_PATH=/private/tmp/netelegram-swift-cache/modules swift test --disable-sandbox --manifest-cache local --cache-path .build/cache --disable-dependency-cache",
+    "local_result": "117/117 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable. ACCEPTANCE.json parsed and git diff --check passed.",
+    "hosted_ci": "Exact-source macOS CI 38360568318 and pinned TDLib/isolated Dev.app workflow 38360568267 both succeeded for 84ce26148dfd9623c35d579fcb2dae8db413a94e.",
+    "hosted_result": "macOS CI passed. Pinned TDLib workflow built and verified the isolated Apple Silicon development bundle. No real account login, notarization, or release is represented.",
+    "scope": "Public UI strings, notifications and Dev.app display name use Neridian. ProductIdentity regression test enforces the public title without Telegram and preserves NeTelegram as codename. The quick name collision scan is not trademark clearance. Channel reading and stable release remain blocked under the user approved policy until sponsored-media obligations and Telegram Terms §1.3/1.4 are resolved. No real Telegram accounts or 20-runtime coverage were tested.",
+    "publication": "Pending the matching public development Site sync; existing public Site remains v97 until the new source version is saved and deployed.",
+    "next_action": "Publish the prepared Site content via its own source helper and verify anonymous routes. Continue source/runtime work; no signed downloads until compatibility and release gates close."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -449,11 +444,10 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
-    "tests": "110/110 Swift Testing tests passed locally; AppKit target compiled; git diff --check passed.",
-    "hosted_ci": "Exact-source macOS CI 38356823153 and pinned TDLib/Dev.app workflow 38356822970 both succeeded for SHA 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c.",
-    "site": "Public Site v94 source 48d2ab8d626fc67dcdbac791ca14baf1093109e6; deployment appgdep_6acdd03397f08191bbdc706bcea61901; local archive sha256 b4ee9878268a2a9a46844384131f28c20dc6a022c5b841fa9838818b010ac66f; Sites content hash d46c43badcb48f736ab9877e684673bf2652129ed7166bc4fb7b0639cd3aabbb. Anonymous route checks and normalized exact GitHub/live devlog match passed; download page remains NO RELEASE.",
-    "scope": "VoiceOver label/help on QR image; missing/generated-no-image states hide the image and report status. No native assistive-technology or real QR login proof."
+    "source_commit": "84ce26148dfd9623c35d579fcb2dae8db413a94e",
+    "tests": "117/117 Swift Testing tests passed locally; AppKit target compiled; JSON and git diff --check passed.",
+    "hosted_ci": "Exact-source macOS CI 38360568318 and pinned TDLib/isolated Dev.app workflow 38360568267 succeeded for the same full SHA.",
+    "scope": "Product identity aligned with the user decision: Neridian public display name, NeTelegram repository codename. Channel reading and stable release remain release-blocked pending required sponsored-video handling and base-functionality review. No release binary or account coverage."
   },
   "latest_source_audit": {
     "date": "2026-10-13",
