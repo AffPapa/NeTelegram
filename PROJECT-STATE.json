@@ -93,7 +93,8 @@
     "brand_audit": "Canonical app, GitHub README/About and public Site v123 use NeTelegram. Historical Neridian references remain only in history/superseded state notes.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
     "current_head_app16_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38409529115 passed for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a; app-source SHA remains 816bbb4ab2a61817cc3da0780f47219b1f8f52e9.",
-    "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published."
+    "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
+    "twenty_profile_core_composition": "Local 1/1 pass on Xcode 27.0 / Swift 6.4. Test combines restore planner, startup scheduler parallelism=2, runtime coordinator route registration, stalled open, first-request rejection, generation-2 retry, 20 routed updates and selected-account A→B→A. Synthetic Core contracts only; does not invoke AppDelegate restore/open methods, TDLib, real accounts or measure performance."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -126,7 +127,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Highest-value code gap: synthetic production-composition test for 20-profile restore/startup/route registration with one stalled and one failed profile, then routed updates and account selection. Keep it accountless and label synthetic. Do not rerun APP16 or rebuild unchanged app source 816bbb4.",
+  "next_action": "Push the new APP01 Core-composition regression and confirm its exact-SHA CI. Keep APP01 partial; next, close the gap between these Core contracts and the production AppDelegate restore/startup path, then proceed to real account coverage when the user completes the in-app login.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
@@ -135,7 +136,7 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "2a7f01a3c15082d7169e60fb79fd4fd55823a717",
+    "repo_head_before_checkpoint": "80d596cccb6f1efd81eed32b2b2d7344f3e350f9",
     "app_source_commit_authority": "source.commit",
     "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9"
   },

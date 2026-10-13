@@ -1098,6 +1098,115 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges() async throws {
+    let profiles = (1...20).map { n in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "50000000-0000-0000-0000-%012d", n))!),
+            telegramUserID: Int64(20_000 + n)
+        )
+    }
+    let plan = AccountRestorePlanner.profilesToRestore(
+        authorized: profiles,
+        pending: [],
+        pendingWithStoredDatabase: []
+    )
+    #expect(plan == profiles)
+
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let stalledOpen = AsyncTestGate()
+    let stalledOpenEntered = LockedTestValue(false)
+    let routesByProfile = LockedTestValue<[AccountUUID: RuntimeRoute]>([:])
+    let failedProfiles = LockedTestValue<Set<AccountUUID>>([])
+
+    let registerAndQueueFirstRequest: @Sendable (AccountProfile, RuntimeGeneration) async -> Void = { profile, generation in
+        let suffix = Int32(profile.telegramUserID! - 20_000)
+        let client = ClientID(suffix + Int32(generation.value - 1) * 100)
+        let route = RuntimeRoute(account: profile.id, generation: generation, client: client)
+        do {
+            try await coordinator.registerBeforeFirstRequest(route)
+            if profile.telegramUserID == 20_002, generation == RuntimeGeneration(1) {
+                // The injected TDLib first-request rejection removes only this
+                // uninitialized route; it does not strand the startup permit.
+                if await coordinator.removeRouteAfterInitializationRequestRejected(route) {
+                    failedProfiles.mutate { $0.insert(profile.id) }
+                }
+                return
+            }
+            await coordinator.setState(.waitingForAuthorization, for: profile.id)
+            routesByProfile.mutate { $0[profile.id] = route }
+        } catch {
+            Issue.record("Synthetic runtime route registration unexpectedly failed: \(error)")
+        }
+    }
+
+    let starts = plan.enumerated().map { index, profile in
+        Task {
+            await scheduler.withPermit {
+                if index == 0 {
+                    stalledOpenEntered.set(true)
+                    await stalledOpen.wait()
+                }
+                let generation = await coordinator.nextGeneration(for: profile.id)
+                await registerAndQueueFirstRequest(profile, generation)
+            }
+        }
+    }
+
+    #expect(await waitForTrue(stalledOpenEntered, timeout: .seconds(2)))
+    for start in starts.dropFirst() { await start.value }
+    #expect(await coordinator.startupParallelism == 2)
+    #expect(await scheduler.activeStarts() == 1)
+    #expect(await scheduler.queuedStarts() == 0)
+    #expect(routesByProfile.get().count == 18)
+    #expect(failedProfiles.get() == [profiles[1].id])
+
+    // The stalled profile completes after the other startup attempts have
+    // made progress. The failed profile is retried with a fresh generation.
+    await stalledOpen.open()
+    await starts[0].value
+    #expect(routesByProfile.get().count == 19)
+    await scheduler.withPermit {
+        let generation = await coordinator.nextGeneration(for: profiles[1].id)
+        await registerAndQueueFirstRequest(profiles[1], generation)
+    }
+    #expect(routesByProfile.get().count == 20)
+    #expect(failedProfiles.get() == [profiles[1].id])
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+
+    let routes = profiles.compactMap { routesByProfile.get()[$0.id] }
+    #expect(routes.count == 20)
+    for (index, route) in routes.enumerated() {
+        let expectedIdentity = profiles[index].telegramUserID!
+        #expect(await coordinator.applyAuthorizationState(
+            "authorizationStateReady",
+            telegramUserID: expectedIdentity,
+            from: route
+        ))
+        #expect(await coordinator.state(for: route.account) == .active(telegramUserID: expectedIdentity))
+    }
+
+    let first = routes[0]
+    let second = routes[1]
+    var selectedAccount = first.account
+    selectedAccount = second.account
+    let updateA = Data("{\"@client_id\":\(first.client.value),\"@type\":\"updateDeleteMessages\"}".utf8)
+    #expect(try await coordinator.routeUpdate(updateA).route == first,
+            "An update for A must stay routed to A while B is selected")
+    selectedAccount = first.account
+    #expect(selectedAccount == first.account, "Selection may return to A without replacing runtime identity")
+
+    for route in routes {
+        let update = Data("{\"@client_id\":\(route.client.value),\"@type\":\"updateConnectionState\"}".utf8)
+        #expect(try await coordinator.routeUpdate(update).route == route)
+    }
+    let rejectedFirstClient = ClientID(2)
+    await #expect(throws: TDLibRoutingError.unregisteredClientID(rejectedFirstClient)) {
+        try await coordinator.routeUpdate(Data("{\"@client_id\":2,\"@type\":\"updateAuthorizationState\"}".utf8))
+    }
+}
+
 @Test func cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable() async {
     let scheduler = RuntimeStartupScheduler(parallelism: 1)
     let activeStartup = AsyncTestGate()

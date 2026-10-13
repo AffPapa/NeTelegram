@@ -132,3 +132,9 @@
 - Correction: supersedes the stale REL03 statement that four identities (including two Developer ID identities) were available. No key material or notary credentials were read.
 - Result: release remains unavailable; no signed/notarized build, Gatekeeper result, or public application download is claimed.
 - Also reconciled public Site state to v123; its download page still correctly says NO RELEASE.
+
+## 2026-10-13 — APP01 restore/startup Core composition regression
+
+- Change: added `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges`, combining the restore plan, two-at-a-time startup scheduler, runtime route registration, a stalled open, a rejected first request, fresh-generation retry, 20 routed update identities, and A→B→A presentation selection.
+- Verification: focused local Swift test passed 1/1 on Xcode 27.0 / Swift 6.4.
+- Limits: synthetic Core-only contracts; it does not invoke AppDelegate restore/startup functions, TDLib, real Telegram accounts, all-20 network sessions, or performance measurement. APP01 remains partial. Hosted CI is pending.
