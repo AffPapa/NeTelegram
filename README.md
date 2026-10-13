@@ -6,6 +6,10 @@
 
 > **Status:** development continues. There is no signed installer to download. Real account login, account-based message sending, and twenty simultaneously authorized accounts have not been verified. See the [development site](https://netelegram.iryadom.chatgpt.site/) for downloads, changelog, development log, roadmap, privacy, and source links.
 
+### Looking for an alternative Telegram client for Mac or a Telegram for Mac download?
+
+NeTelegram is an independent native client project for macOS. It is not the official Telegram for Mac and it is not a separate messaging service. The repository documents the source, current verification status, and planned scope. There is no ready-to-download app yet because no signed, verified installer has been released. Phrases such as “unofficial Telegram client for macOS”, “alternative Telegram client for Mac”, and “open-source Telegram client for macOS” describe the project topic; they do not imply Telegram endorsement or measured search demand.
+
 ## Intended scope
 
 The project uses Swift, AppKit, and TDLib 1.8.68 with pinned source and schema. The source includes account-scoped profiles and storage, standard Telegram authorization, multi-account runtime code, chat and message presentation, text, photo, local draft, notification, and UI privacy-lock paths. These are source-level implementation notes, not proof that user workflows are complete.

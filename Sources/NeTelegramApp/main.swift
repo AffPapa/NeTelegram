@@ -201,6 +201,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var notificationTargets: [String: RoutedTDLibNotification] = [:]
     private var notificationUnlockHandoff = NotificationUnlockHandoff()
     private var notificationAuthorizationRequestGate = NotificationAuthorizationRequestGate()
+#if DEBUG
+    private var windowLifecycleSmokeRecorder: WindowLifecycleSmokeRecorder?
+#endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
@@ -211,6 +214,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         startConnectionObservers()
         NSApp.activate(ignoringOtherApps: true)
         Task { @MainActor in await restoreProfiles() }
+#if DEBUG
+        configureWindowLifecycleSmokeIfRequested()
+#endif
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -220,7 +226,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        if !flag { showWindow() }
+        if !flag {
+            showWindow()
+#if DEBUG
+            windowLifecycleSmokeRecorder?.record("reopened", visibleWindowCount: visibleApplicationWindowCount)
+#endif
+        }
         return true
     }
 
@@ -636,8 +647,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     func windowWillClose(_ notification: Notification) {
-        guard let closingWindow = notification.object as? NSWindow,
-              closingWindow === photoViewerWindow else { return }
+        guard let closingWindow = notification.object as? NSWindow else { return }
+#if DEBUG
+        if closingWindow === window, windowLifecycleSmokeRecorder != nil {
+            Task { @MainActor [weak self] in
+                await Task.yield()
+                guard let self else { return }
+                self.windowLifecycleSmokeRecorder?.record("closed", visibleWindowCount: self.visibleApplicationWindowCount)
+            }
+        }
+#endif
+        guard closingWindow === photoViewerWindow else { return }
         if let key = photoViewerKey { requestedOriginalPhotos.remove(key) }
         if let key = photoViewerKey, let button = photoButtons[key] {
             button.isEnabled = true
@@ -6227,6 +6247,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         window.makeKeyAndOrderFront(nil)
         if lockState { unlock() }
     }
+#if DEBUG
+    private var visibleApplicationWindowCount: Int {
+        NSApp.windows.filter(\.isVisible).count
+    }
+
+    private func configureWindowLifecycleSmokeIfRequested() {
+        let arguments = CommandLine.arguments
+        guard let index = arguments.firstIndex(of: "--ci-lifecycle-smoke-file"),
+              arguments.indices.contains(index + 1),
+              !arguments[index + 1].isEmpty else { return }
+        let recorder = WindowLifecycleSmokeRecorder(fileURL: URL(fileURLWithPath: arguments[index + 1]))
+        windowLifecycleSmokeRecorder = recorder
+        recorder.record("launched", visibleWindowCount: visibleApplicationWindowCount)
+        Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(6))
+            guard let self, let window = self.window, window.isVisible else { return }
+            window.performClose(nil)
+        }
+    }
+#endif
     @objc private func openWindow() { showWindow() }
     @objc private func closeWindow() { window.performClose(nil) }
     @objc private func lock() {
@@ -6723,6 +6763,27 @@ private final class LocalAccountRuntime {
 
     func finishClose() {}
 }
+
+#if DEBUG
+@MainActor
+private final class WindowLifecycleSmokeRecorder {
+    private let fileURL: URL
+    private var events: [[String: Any]] = []
+
+    init(fileURL: URL) { self.fileURL = fileURL }
+
+    func record(_ phase: String, visibleWindowCount: Int) {
+        events.append([
+            "phase": phase,
+            "pid": ProcessInfo.processInfo.processIdentifier,
+            "visibleWindowCount": visibleWindowCount,
+        ])
+        guard let data = try? JSONSerialization.data(withJSONObject: events, options: [.sortedKeys]) else { return }
+        try? FileManager.default.createDirectory(at: fileURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try? data.write(to: fileURL, options: .atomic)
+    }
+}
+#endif
 
 private final class AuthenticationCardView: NSView {
     override var wantsUpdateLayer: Bool { true }
