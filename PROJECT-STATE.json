@@ -12,7 +12,7 @@
     "repository_id": 1415421574,
     "branch": "main",
     "commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
-    "working_tree_clean": false,
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38372557522,
@@ -31,7 +31,7 @@
     "minimum_macos": "14.0",
     "signing": "ad-hoc development signature",
     "distribution_ready": false,
-    "process_state": "PID 34517; sole canonical Dev.app; arm64; ad-hoc development signature; empty phone-entry screen; no phone/code entered."
+    "process_state": "PID 34517; single canonical Dev.app open on clean phone-entry screen; no number/code entered."
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -43,8 +43,8 @@
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38372557539 passed for exact source ff3da44. Local canonical Dev.app from exact SHA passed codesign verify and CUA shows empty phone-entry form.",
-    "current_head_site": "Site v104 public and active; deployment appgdep_6acdef85c1c08191b8c911ec27152556 succeeded. Anonymous GET /devlog/ verified 105440 bytes and expected milestone source/limitation.",
+    "current_head_native_smoke": "Pinned workflow 38372557539 passed exact SHA; local canonical bundle at exact SHA arm64, ad-hoc signature verified by codesign --verify --deep --strict. CUA sees the expected empty phone-entry screen, one window, no user input.",
+    "current_head_site": "Site v105 active/public. Deployment appgdep_6acdf35049a881918cafd1afa4e9179f succeeded. Anonymous GET /devlog/ returned 107238 bytes and contains the ff3da44 entry/source link/limitation.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
   },
   "site": {
@@ -52,15 +52,15 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 104,
-    "source_commit": "55c3c039045f6b45f68ea89315afb1aa74019a7d",
-    "deployment_id": "appgdep_6acdef85c1c08191b8c911ec27152556",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_bb45156cac6c8191993a3957acbc3b27",
+    "latest_version": 105,
+    "source_commit": "afe7ad56a9c5fe5c8e64db7d038f1c7266054ae2",
+    "deployment_id": "appgdep_6acdf35049a881918cafd1afa4e9179f",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_1d7fda6a6ef88191bab55b53a041c3cb",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "/devlog/ anonymous HTTPS GET 200; 105440 bytes; milestone, source link and accountless limitation present",
-    "archive_local_sha256": "bd6a9279206bb3fce59e161df7a869fbd656004b72cda2d6173fc1bbd732d8b6",
-    "archive_sites_sha256": "dbb9c09b63814f0b88ba5264df4e5e6b219ceb1522f8d2433df0a447e2840e37"
+    "public_route_verified": "/devlog/ anonymous HTTPS GET 200; 107238 bytes; milestone, source SHA and limits present",
+    "archive_local_sha256": "b8904fefa8c88e6f10c338f54b849baf88111e89c226844246c55e3b8e1c8284",
+    "archive_sites_sha256": "374689ede74a52674305cefa2ec9bc03374713d89502cb2949f2eaad86dd9902"
   },
   "open_gates": [
     "Store the supplied Telegram api_hash in Keychain using the hidden-input helper; the item is currently absent or unreadable.",
@@ -70,6 +70,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Publish factual devlog and checkpoint. Continue native lifecycle and data flows; do not launch a second app or replace ff3da44 unless source changes and this sole process is safely closed.",
+  "next_action": "Continue real authentication and all-active runtime implementation/verification; user has deferred entering phone/code. No signed app release/download.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; source ff3da44 moves Keychain reads off main and invalidates stale profile restore on quit. 124/124 tests, exact-source macOS CI and pinned TDLib/Dev.app smoke passed. One current arm64 local Dev.app shows clean phone entry, no user number/code entered. Site v104 remains current pending devlog publish; real accounts and release gates remain open.",
+  "status": "implementation_in_progress; source ff3da44 fixes main-thread Keychain access and late restore after quit; 124/124 tests, exact-source macOS CI, pinned native smoke and one local accountless Dev.app passed. Public Site v105 live-verified. No real authorized accounts, 20-runtime coverage, signing/notarization or app release.",
   "cases": [
     {
       "id": "APP01",
@@ -433,8 +433,8 @@
     "local_result": "124/124 Swift tests passed. Canonical /private/tmp/NeTelegram-Dev.app built from exact source ff3da44, arm64, macOS 14 baseline, ad-hoc dev signature; codesign --verify --deep --strict passed. CUA found one window titled Neridian · dev ff3da446 showing the empty phone-entry form. No number or code entered.",
     "hosted_ci": "Exact-source macOS CI 38372557522 and pinned TDLib/Dev.app workflow 38372557539 succeeded for full source SHA ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf.",
     "scope": "Read-only sample of old Dev.app PID 28662 showed synchronous SecretsStore.telegramAPIHash at SecItemCopyMatching on AppKit main thread. New source moves API hash and per-account DB/draft key reads off main and invalidates stale restore generation on quit. Regression tests pass; a controlled Keychain stall, real Telegram login, real notifications, all 20 accounts, performance and data recovery remain unverified. User deferred login and declined sponsored-video playback; channel access and stable release remain gated.",
-    "publication": "Existing public Site v104 remains live at https://netelegram.iryadom.chatgpt.site; new factual devlog entry is prepared locally and not yet deployed. No app release/download.",
-    "next_action": "Commit source/checkpoint and publish the Keychain lifecycle devlog once; preserve one canonical Dev.app at ff3da44 and await real account entry when user is ready."
+    "publication": "Public Site v105 deployed at https://netelegram.iryadom.chatgpt.site; project appgprj_6acba85192e08191acdf7011928848cf; source commit afe7ad56a9c5fe5c8e64db7d038f1c7266054ae2; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_1d7fda6a6ef88191bab55b53a041c3cb; deployment appgdep_6acdf35049a881918cafd1afa4e9179f succeeded; audience public. Anonymous HTTPS GET /devlog/ returned 107238 bytes and contained the Keychain entry, exact source link, and explicit no-controlled-stall/login caveat. Archive local SHA-256 b8904fefa8c88e6f10c338f54b849baf88111e89c226844246c55e3b8e1c8284; Sites stored hash sha256:374689ede74a52674305cefa2ec9bc03374713d89502cb2949f2eaad86dd9902, 194560 bytes, 12 files. No app release/download.",
+    "next_action": "Continue native authentication and runtime acceptance; keep the single canonical ff3da44 Dev.app and do not create another instance."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
