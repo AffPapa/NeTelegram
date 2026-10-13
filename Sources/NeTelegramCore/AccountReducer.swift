@@ -33,7 +33,6 @@ public enum AccountReducer {
             return .closed
 
         default:
-            if let telegramUserID { return .active(telegramUserID: telegramUserID) }
             return .failed("Unsupported TDLib authorization state")
         }
     }

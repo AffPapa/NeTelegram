@@ -119,6 +119,54 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("5551234", selectedCallingCode: "US") == .invalidCountryCode)
 }
 
+@Test func incomingTextEntitiesPreserveUTF16RangesAndResolveOnlySafeLinks() {
+    let text = "😀 visit t.me/example and read this label"
+    let source = text as NSString
+    let urlRange = source.range(of: "t.me/example")
+    let labelRange = source.range(of: "this label")
+    let spans = IncomingTextEntityPresentation.spans(in: [
+        "text": text,
+        "entities": [
+            [
+                "offset": urlRange.location,
+                "length": urlRange.length,
+                "type": ["@type": "textEntityTypeUrl"],
+            ],
+            [
+                "offset": labelRange.location,
+                "length": labelRange.length,
+                "type": ["@type": "textEntityTypeTextUrl", "url": "https://example.org/read"],
+            ],
+            [
+                "offset": Int32.max,
+                "length": 1,
+                "type": ["@type": "textEntityTypeBold"],
+            ],
+            [
+                "offset": 0,
+                "length": source.length + 1,
+                "type": ["@type": "textEntityTypeUrl"],
+            ],
+        ],
+    ])
+
+    #expect(spans.count == 2)
+    #expect(spans[0].offsetUTF16 == urlRange.location)
+    #expect(IncomingTextEntityPresentation.destination(for: spans[0], in: text)?.absoluteString == "https://t.me/example")
+    #expect(IncomingTextEntityPresentation.destination(for: spans[1], in: text)?.absoluteString == "https://example.org/read")
+}
+
+@Test func incomingTextEntityRejectsUnsafeTextUrlSchemes() {
+    let text = "open this"
+    let span = IncomingTextEntitySpan(
+        offsetUTF16: 0,
+        lengthUTF16: (text as NSString).length,
+        type: "textEntityTypeTextUrl",
+        argument: "file:///private/secret"
+    )
+    #expect(IncomingTextEntityPresentation.destination(for: span, in: text) == nil)
+}
+
 @Test func developmentWindowTitleIdentifiesTheExactDevCommitButLeavesReleaseBrandingAlone() {
     #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram.dev", sourceCommit: "ABCDEF123456") == "NeTelegram · dev abcdef12")
     #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram.dev", sourceCommit: "abcdef123456", hasUncommittedChanges: true) == "NeTelegram · dev abcdef12+dirty")
@@ -2231,6 +2279,11 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
         current: .starting,
         authorizationState: "authorizationStateWaitEncryptionKey",
         telegramUserID: nil
+    ) == .failed("Unsupported TDLib authorization state"))
+    #expect(AccountReducer.reduce(
+        current: .active(telegramUserID: 441),
+        authorizationState: "authorizationStateFutureUnknown",
+        telegramUserID: 441
     ) == .failed("Unsupported TDLib authorization state"))
     #expect(AuthorizationStep(tdlibType: "authorizationStateReady").uiAvailability == .nonInteractive)
 }

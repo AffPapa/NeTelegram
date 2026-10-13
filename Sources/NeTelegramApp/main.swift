@@ -4102,21 +4102,100 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             appendMessageActions(message, into: destination)
             return
         }
-        let textValue: String
-        if type == "messageText", let text = content["text"] as? [String: Any] {
-            textValue = text["text"] as? String ?? ""
-        } else {
-            textValue = IncomingMessagePresentation.cardText(for: type)
-        }
         let sender = message["sender_id"] as? [String: Any]
         let who = sender? ["@type"] as? String == "messageSenderUser" ? "Пользователь" : "Сообщение"
-        let label = NSTextField(wrappingLabelWithString: "\(who): \(textValue)")
-        label.font = .systemFont(ofSize: 14)
-        label.maximumNumberOfLines = 0
-        label.setAccessibilityLabel("\(who). \(textValue)")
-        destination.addArrangedSubview(label)
+        if type == "messageText",
+           let formattedText = content["text"] as? [String: Any],
+           let textView = incomingMessageTextView(
+            formattedText: formattedText,
+            prefix: "\(who): ",
+            maximumWidth: messageTextWidth(for: destination, albumPhotoWidth: photoWidth)
+           ) {
+            destination.addArrangedSubview(textView)
+        } else {
+            let textValue = IncomingMessagePresentation.cardText(for: type)
+            let label = NSTextField(wrappingLabelWithString: "\(who): \(textValue)")
+            label.font = .systemFont(ofSize: 14)
+            label.maximumNumberOfLines = 0
+            label.setAccessibilityLabel("\(who). \(textValue)")
+            destination.addArrangedSubview(label)
+        }
         appendReplyAction(message, into: destination)
         appendMessageActions(message, into: destination)
+    }
+
+    private func messageTextWidth(for destination: NSStackView, albumPhotoWidth: CGFloat) -> CGFloat {
+        if destination !== messageList { return max(120, albumPhotoWidth + 8) }
+        let available = messageScroll?.contentView.bounds.width ?? 0
+        return max(240, available - 32)
+    }
+
+    private func incomingMessageTextView(
+        formattedText: [String: Any],
+        prefix: String,
+        maximumWidth: CGFloat
+    ) -> NSTextView? {
+        guard let text = formattedText["text"] as? String else { return nil }
+        let spans = IncomingTextEntityPresentation.spans(in: formattedText)
+        let baseFont = NSFont.systemFont(ofSize: 14)
+        let prefixLength = (prefix as NSString).length
+        let attributed = NSMutableAttributedString(
+            string: prefix + text,
+            attributes: [.font: baseFont, .foregroundColor: NSColor.labelColor]
+        )
+        for span in spans {
+            let range = NSRange(location: prefixLength + span.offsetUTF16, length: span.lengthUTF16)
+            guard NSMaxRange(range) <= attributed.length else { continue }
+            switch span.type {
+            case "textEntityTypeUrl", "textEntityTypeTextUrl", "textEntityTypeEmailAddress":
+                if let url = IncomingTextEntityPresentation.destination(for: span, in: text) {
+                    attributed.addAttributes(
+                        [.link: url, .foregroundColor: NSColor.linkColor, .underlineStyle: NSUnderlineStyle.single.rawValue],
+                        range: range
+                    )
+                }
+            case "textEntityTypeBold":
+                let currentFont = attributed.attribute(.font, at: range.location, effectiveRange: nil) as? NSFont ?? baseFont
+                attributed.addAttribute(.font, value: NSFontManager.shared.convert(currentFont, toHaveTrait: .boldFontMask), range: range)
+            case "textEntityTypeItalic":
+                let currentFont = attributed.attribute(.font, at: range.location, effectiveRange: nil) as? NSFont ?? baseFont
+                attributed.addAttribute(.font, value: NSFontManager.shared.convert(currentFont, toHaveTrait: .italicFontMask), range: range)
+            case "textEntityTypeUnderline":
+                attributed.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+            case "textEntityTypeStrikethrough":
+                attributed.addAttribute(.strikethroughStyle, value: NSUnderlineStyle.single.rawValue, range: range)
+            case "textEntityTypeCode", "textEntityTypePre":
+                attributed.addAttribute(.font, value: NSFont.monospacedSystemFont(ofSize: 13, weight: .regular), range: range)
+            default:
+                break
+            }
+        }
+
+        let width = max(120, maximumWidth)
+        let textContainer = NSTextContainer(containerSize: NSSize(width: width, height: .greatestFiniteMagnitude))
+        textContainer.lineFragmentPadding = 0
+        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: width, height: 1), textContainer: textContainer)
+        textView.textContainerInset = .zero
+        textView.isEditable = false
+        textView.isSelectable = true
+        textView.isRichText = false
+        textView.drawsBackground = false
+        textView.isVerticallyResizable = false
+        textView.isHorizontallyResizable = false
+        textView.minSize = .zero
+        textView.maxSize = NSSize(width: width, height: .greatestFiniteMagnitude)
+        textView.textStorage?.setAttributedString(attributed)
+        guard let layoutManager = textView.layoutManager else { return nil }
+        layoutManager.ensureLayout(for: textContainer)
+        let contentHeight = max(20, ceil(layoutManager.usedRect(for: textContainer).height))
+        textView.frame = NSRect(x: 0, y: 0, width: width, height: contentHeight)
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            textView.widthAnchor.constraint(equalToConstant: width),
+            textView.heightAnchor.constraint(equalToConstant: contentHeight),
+        ])
+        textView.setAccessibilityHelp("Текст и ссылки из сообщения Telegram")
+        return textView
     }
 
     private func appendMessageActions(_ message: [String: Any], into destination: NSStackView) {
@@ -4643,12 +4722,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         photoViews[key] = imageView
         destination.addArrangedSubview(imageView)
 
-        let caption = ((content["caption"] as? [String: Any])?["text"] as? String ?? "")
-        if !caption.isEmpty {
-            let label = NSTextField(wrappingLabelWithString: caption)
-            label.font = .systemFont(ofSize: 13)
-            label.maximumNumberOfLines = 0
-            destination.addArrangedSubview(label)
+        if let caption = content["caption"] as? [String: Any],
+           let text = caption["text"] as? String,
+           !text.isEmpty,
+           let textView = incomingMessageTextView(
+            formattedText: caption,
+            prefix: "",
+            maximumWidth: width
+           ) {
+            destination.addArrangedSubview(textView)
         }
 
         if variant.isDownloaded, let path = variant.localPath, !path.isEmpty {
