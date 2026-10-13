@@ -43,6 +43,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var qrImageView: NSImageView!
     private var loginHeading: NSTextField!
     private var loginSubtitle: NSTextField!
+    private var loginDisclosure: NSTextField!
     private var authCard: AuthenticationCardView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
@@ -315,10 +316,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
         loginHeading.font = .systemFont(ofSize: 25, weight: .semibold)
         loginHeading.alignment = .center
-        loginSubtitle = NSTextField(wrappingLabelWithString: "NeTelegram — независимый неофициальный клиент в экосистеме Telegram, который использует Telegram API и TDLib. Проект не имеет прямого отношения к Telegram Messenger LLP. Войдите по номеру телефона; сессии других клиентов не импортируются.")
+        loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
+        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram использует Telegram API и TDLib и входит в экосистему Telegram. Это независимый проект, не связанный напрямую с Telegram Messenger LLP; сессии других приложений не импортируются.")
+        loginDisclosure.font = .systemFont(ofSize: 11)
+        loginDisclosure.textColor = .tertiaryLabelColor
+        loginDisclosure.alignment = .center
+        loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
 
         accountPicker = NSPopUpButton(frame: NSRect(x: 16, y: 625, width: 298, height: 30), pullsDown: false)
         accountPicker.isHidden = true
@@ -427,7 +433,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPicker, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPicker, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -454,6 +460,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             loginHeading.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
             loginSubtitle.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginDisclosure.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
