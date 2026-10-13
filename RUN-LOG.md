@@ -475,3 +475,11 @@
 - Archive SHA-256 local `458456229885704413ba63fbe22b7f6baaa9415fe184a00f66875af8f8274cb5`; Sites archive receipt `sha256:f4237d5da1dc9a5dc55be20b61c0ca8acb672bf9c1fe42c8620f9aff52c55eef`, 532480 bytes/15 files.
 - Anonymous public checks after v157: `/`, `/features/`, `/devlog/`, `/downloads/` each HTTP 200 `text/html`; current-source/CI markers passed; downloads has no installer links.
 - App source unchanged. Local suite 153/153 and hosted macOS CI 38469520583 remain valid; current-source Dev.app c028bd3 AX smoke passed with no phone/code/profile/session. No real login or 20-runtime certification.
+
+
+### 2026-10-14 — native workflow trigger accuracy and faster verification policy
+
+- Review found the native workflow filters used lowercase `scripts/...`, while the tracked native inputs are under case-sensitive `Scripts/...`. Corrected both push and pull-request filters, and added the workflow file itself so future trigger edits receive the native bundle check.
+- Kept source-only Swift edits off the expensive pinned-TDLib workflow: `ci.yml` already runs the serial macOS tests for `Sources/**` and `Tests/**`; dispatch the native workflow only for TDLib/runtime integration, native packaging inputs, or a frozen candidate. This preserves fast iteration without dropping source test coverage.
+- Local validation passed: Ruby YAML parse; case-sensitive existence and inclusion of each native script in both filters; `git diff --check`. No Swift code changed, so the 153/153 suite was not repeated.
+- Current Dev.app lifecycle script was not claimed as a pass: the shell process/LaunchServices route could not control the already-running app (`pgrep` reports sysmond unavailable; `open -n` returns `kLSNoExecutableErr`). CUA independently confirms the existing canonical c028bd3 window is running on the accountless phone form. No replacement instance, profile, or login data was created.
