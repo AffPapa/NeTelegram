@@ -2182,6 +2182,31 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(mode?.intValue == 0o600)
 }
 
+@Test func encryptedDraftStoreKeepsLastDurableCopyWhenDiskWriteFails() throws {
+    enum InjectedFailure: Error { case diskFull }
+
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let key = Data(repeating: 0xA8, count: 32)
+    let conversation = ConversationKey(account: account, chatID: 78)
+    let healthyStore = try EncryptedDraftStore(account: account, stateDirectory: root, key: key)
+    try healthyStore.save([conversation: "last durable copy"])
+    let oldCiphertext = try Data(contentsOf: root.appendingPathComponent("drafts.aesgcm"))
+
+    let failingStore = try EncryptedDraftStore(
+        account: account,
+        stateDirectory: root,
+        key: key,
+        replaceFile: { _, _ in throw InjectedFailure.diskFull }
+    )
+    #expect(throws: EncryptedDraftStoreError.persistence) {
+        try failingStore.save([conversation: "new dirty copy"])
+    }
+    #expect(try Data(contentsOf: root.appendingPathComponent("drafts.aesgcm")) == oldCiphertext)
+    #expect(try healthyStore.load() == [conversation: "last durable copy"])
+}
+
 @Test func encryptedDraftStoreFailsClosedOnWrongKeyAndCrossAccountData() throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }

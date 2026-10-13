@@ -19,13 +19,28 @@ public final class EncryptedDraftStore: @unchecked Sendable {
     private let account: AccountUUID
     private let fileURL: URL
     private let key: SymmetricKey
+    private let replaceFile: (Data, URL) throws -> Void
     private let lock = NSLock()
 
-    public init(account: AccountUUID, stateDirectory: URL, key: Data) throws {
+    public convenience init(account: AccountUUID, stateDirectory: URL, key: Data) throws {
+        try self.init(account: account, stateDirectory: stateDirectory, key: key) { data, url in
+            try AtomicPrivateFile.replace(data, at: url)
+        }
+    }
+
+    /// Internal fault-injection seam for proving that failed writes preserve
+    /// the last durable draft. Production callers use the public initializer.
+    init(
+        account: AccountUUID,
+        stateDirectory: URL,
+        key: Data,
+        replaceFile: @escaping (Data, URL) throws -> Void
+    ) throws {
         guard key.count == 32 else { throw EncryptedDraftStoreError.invalidKey }
         self.account = account
         self.fileURL = stateDirectory.appendingPathComponent("drafts.aesgcm", isDirectory: false)
         self.key = SymmetricKey(data: key)
+        self.replaceFile = replaceFile
         do {
             try FileManager.default.createDirectory(
                 at: stateDirectory,
@@ -108,7 +123,7 @@ public final class EncryptedDraftStore: @unchecked Sendable {
             let clearData = try JSONEncoder().encode(entries)
             let box = try AES.GCM.seal(clearData, using: key)
             guard let sealedData = box.combined else { throw EncryptedDraftStoreError.persistence }
-            try AtomicPrivateFile.replace(sealedData, at: fileURL)
+            try replaceFile(sealedData, fileURL)
         } catch let error as EncryptedDraftStoreError {
             throw error
         } catch {
