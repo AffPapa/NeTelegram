@@ -1943,6 +1943,22 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(!third)
 }
 
+@Test func keychainReadsRunOutsideTheMainThread() async throws {
+    let ranOnMainThread = try await SecretsStore.performKeychainRead { Thread.isMainThread }
+    #expect(!ranOnMainThread)
+}
+
+@Test func quittingInvalidatesAProfileRestoreThatMayResumeLate() {
+    var gate = ProfileRestoreGenerationGate()
+    let firstRestore = gate.begin()
+    #expect(gate.isCurrent(firstRestore))
+    gate.invalidate()
+    #expect(!gate.isCurrent(firstRestore))
+    let retry = gate.begin()
+    #expect(gate.isCurrent(retry))
+    #expect(!gate.isCurrent(firstRestore))
+}
+
 @Test func notificationPublicationIsSerializedWithPrivacyLock() async {
     let barrier = PrivacyDispatchBarrier()
     let publicationEntered = LockedTestValue(false)

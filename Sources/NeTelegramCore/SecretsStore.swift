@@ -17,6 +17,14 @@ public struct SecretsStore: Sendable {
 
     public init() {}
 
+    /// SecItem calls are synchronous and may wait on Keychain services or a
+    /// user-visible access decision. Run them away from AppKit's main actor.
+    public static func performKeychainRead<Value: Sendable>(
+        _ operation: @escaping @Sendable () throws -> Value
+    ) async throws -> Value {
+        try await Task.detached(priority: .utility, operation: operation).value
+    }
+
     public func telegramAPIHash() throws -> String {
         var query = Self.itemQuery(
             account: TelegramApplicationIdentity.keychainAccount,

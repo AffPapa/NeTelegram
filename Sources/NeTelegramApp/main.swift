@@ -71,6 +71,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var shutdownProgressTask: Task<Void, Never>?
     private var resumeProfilesAfterAbortedTermination = false
     private var profileRestoreInProgress = false
+    private var profileRestoreGenerationGate = ProfileRestoreGenerationGate()
     private var phoneCountries: [PhoneCountry] = []
     private var selectedCallingCode = "1"
     private var showingQR = false
@@ -226,9 +227,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         if terminationBarrier.isFinished { return .terminateNow }
         guard flushDirtyDraftsBeforeQuit() else { return .terminateCancel }
-        guard !profileRestoreInProgress else {
-            setStatus("Восстанавливаю профили. Повторите выход после завершения запуска.")
-            return .terminateCancel
+        if profileRestoreInProgress {
+            _ = profileRestoreGenerationGate.invalidate()
+            profileRestoreInProgress = false
         }
         guard !resumeProfilesAfterAbortedTermination, pendingClosures.isEmpty else {
             setStatus("Ожидаю подтверждения TDLib перед повторной попыткой выхода.")
@@ -1093,7 +1094,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard let self else { return }
             defer { self.profileOpenRequests.remove(account) }
             do {
-                let apiHash = try SecretsStore().telegramAPIHash()
+                let apiHash = try await SecretsStore.performKeychainRead {
+                    try SecretsStore().telegramAPIHash()
+                }
                 if let startup = self.scheduleProfileStartup(profile, apiHash: apiHash, select: true) {
                     await startup.value
                 }
@@ -1478,12 +1481,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func restoreProfiles(recoveryAfterCancelledTermination: Bool = false) async {
         guard !profileRestoreInProgress || recoveryAfterCancelledTermination else { return }
+        let restoreGeneration = profileRestoreGenerationGate.begin()
         profileRestoreInProgress = true
-        defer { profileRestoreInProgress = false }
+        defer {
+            if profileRestoreGenerationGate.isCurrent(restoreGeneration) {
+                profileRestoreInProgress = false
+            }
+        }
         do {
             let storageRoot = try prepareAccountStorage()
             let catalogue = try accountCatalogue()
             var profiles = await catalogue.allProfiles()
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             let cleanupProfiles = profiles.filter { $0.logoutCleanupPending == true }
             for profile in cleanupProfiles {
                 guard let expectedTelegramUserID = profile.telegramUserID else {
@@ -1498,11 +1507,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 } catch {
                     profileStartupFailures.insert(profile.id)
                 }
+                guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             }
             profiles = await catalogue.allProfiles()
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             rememberProfiles(profiles)
             refreshAccountPicker()
-            let apiHash = try SecretsStore().telegramAPIHash()
+            let apiHash = try await SecretsStore.performKeychainRead {
+                try SecretsStore().telegramAPIHash()
+            }
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             let authorized = profiles.filter { $0.telegramUserID != nil && $0.logoutCleanupPending != true }
             let pending = profiles.filter { $0.telegramUserID == nil }.sorted { $0.createdAt < $1.createdAt }
             var pendingWithStoredDatabase = Set<AccountUUID>()
@@ -1561,18 +1575,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     : "Выберите страну и введите номер телефона.")
             }
         } catch let error as AccountStorageLeaseError {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
             setStatus(error.localizedDescription)
         } catch let error as AccountStorageUpgradeError {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
             setStatus(error.localizedDescription)
         } catch SecretsStoreError.missing {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
                 setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
         } catch {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
             setStatus("Каталог профилей не удалось безопасно открыть. Данные не сброшены.")
@@ -1628,7 +1646,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         do {
             guard !closingForTermination else { return }
             _ = try prepareAccountStorage()
-            let apiHash = try SecretsStore().telegramAPIHash()
+            let apiHash = try await SecretsStore.performKeychainRead {
+                try SecretsStore().telegramAPIHash()
+            }
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
             knownProfilesByAccount[profile.id] = profile
@@ -1694,20 +1714,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if gateway == nil { gateway = try TDLibGateway(libraryURL: library) }
             guard let gateway, let catalogue else { throw TDLibGatewayError.clientCreation }
             let root = try accountStorageRoot()
-            let prepared = try await Task.detached(priority: .utility) { () throws -> (AccountStoragePaths, Data) in
+            let prepared = try await SecretsStore.performKeychainRead { () throws -> (AccountStoragePaths, Data, Data) in
                 let paths = try AccountStoragePaths(rootURL: root, account: profile.id)
                 let hasDatabaseFiles = try !FileManager.default.contentsOfDirectory(atPath: paths.database.path).isEmpty
-                let key = try SecretsStore().databaseKey(for: profile.id, createIfMissing: !hasDatabaseFiles)
-                return (paths, key)
-            }.value
-            guard !Task.isCancelled, !closingForTermination else { return }
-            do {
-                let draftsURL = prepared.0.appState.appendingPathComponent("drafts.aesgcm")
-                let appStateKey = try SecretsStore().appStateKey(
+                let secrets = SecretsStore()
+                let databaseKey = try secrets.databaseKey(for: profile.id, createIfMissing: !hasDatabaseFiles)
+                let draftsURL = paths.appState.appendingPathComponent("drafts.aesgcm")
+                let appStateKey = try secrets.appStateKey(
                     for: profile.id,
                     createIfMissing: !FileManager.default.fileExists(atPath: draftsURL.path)
                 )
-                let draftStore = try EncryptedDraftStore(account: profile.id, stateDirectory: prepared.0.appState, key: appStateKey)
+                return (paths, databaseKey, appStateKey)
+            }
+            guard !Task.isCancelled, !closingForTermination else { return }
+            do {
+                let draftStore = try EncryptedDraftStore(account: profile.id, stateDirectory: prepared.0.appState, key: prepared.2)
                 draftStoresByAccount[profile.id] = draftStore
                 for (conversation, text) in try draftStore.load() { draftsByConversation[conversation] = text }
                 unavailableDraftAccounts.remove(profile.id)
