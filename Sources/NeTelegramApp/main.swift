@@ -1874,9 +1874,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 pending: pending,
                 pendingWithStoredDatabase: pendingWithStoredDatabase
             )
-            let toRestore = candidates.filter {
-                runtimesByAccount[$0.id] == nil && profileStartupTasks[$0.id] == nil
-            }
+            let toRestore = AccountRestorePlanner.pendingStartupProfiles(
+                candidates: candidates,
+                running: Set(runtimesByAccount.keys),
+                starting: Set(profileStartupTasks.keys)
+            )
             if toRestore.isEmpty {
                 if profiles.isEmpty {
                     pendingAuthorizationType = "authorizationStateWaitPhoneNumber"

@@ -907,6 +907,11 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         pendingWithStoredDatabase: []
     )
     #expect(plan == profiles)
+    #expect(AccountRestorePlanner.pendingStartupProfiles(
+        candidates: plan,
+        running: [],
+        starting: []
+    ) == profiles)
 
     let scheduler = RuntimeStartupScheduler(parallelism: 2)
     await scheduler.acquire()
@@ -930,6 +935,24 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     for start in queuedStarts { await start.value }
     #expect(await scheduler.activeStarts() == 0)
     #expect(await scheduler.queuedStarts() == 0)
+}
+
+@Test func pendingStartupSelectionKeepsTwentyCandidatesAndExcludesOnlyRunningOrStartingProfiles() {
+    let profiles = (1...20).map { n in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "70000000-0000-0000-0000-%012d", n))!),
+            telegramUserID: Int64(70_000 + n)
+        )
+    }
+    let pending = AccountRestorePlanner.pendingStartupProfiles(
+        candidates: profiles,
+        running: [profiles[4].id],
+        starting: [profiles[11].id]
+    )
+    #expect(pending.count == 18)
+    #expect(pending == profiles.enumerated().compactMap { index, profile in
+        index == 4 || index == 11 ? nil : profile
+    })
 }
 
 @Test func runtimeGenerationChangesForEveryClientOfAnAccount() async {
