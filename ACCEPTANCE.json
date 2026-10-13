@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a passes 129/129 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. Synthetic network/wake fanout covers 20 runtime sinks; native sleep/wake, real login, real 20-account sessions, signing/notarization and release remain incomplete.",
+  "status": "implementation_in_progress; app source 4478f967654b270cd78f71a5afe69f625491d38d passes 130/130 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. Authorization-step announcements use static state-only copy and account/generation/step deduplication; real VoiceOver and account workflows remain unverified.",
   "cases": [
     {
       "id": "APP01",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Incoming TDLib text entities and photo captions use validated UTF-16 ranges and safe links. The AppKit login screen exposes an accessible name and instructions for its QR image; the empty QR view is hidden while TDLib has not supplied a link or when image generation fails. Single-line authorization text fields already submit through the window text-command delegate on Return. Exact source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c builds and passes 110/110 local Swift tests. No native VoiceOver interaction, keyboard-only journey, RTL/IME, QR login, or real-account auth was tested; status remains partial."
+      "evidence": "App source 4478f967654b270cd78f71a5afe69f625491d38d adds AppKit announcementRequested events for the static typed authorization steps phone, code, 2FA, email, registration and QR. No TDLib payload or entered values are passed into announcement text; duplicate state is suppressed per account and runtime generation. The new mapping/dedup test passes in the 130/130 exact-source Swift suite. Exact-source CI and pinned TDLib/Dev.app assembly succeeded. No native VoiceOver walkthrough, keyboard-only journey, RTL/IME, QR interaction or real account auth was performed; status remains partial."
     },
     {
       "id": "APP23",
