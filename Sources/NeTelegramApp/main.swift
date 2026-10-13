@@ -710,7 +710,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let accounts = Array(runtimesByAccount.values)
         let authorized = accounts.filter { $0.telegramUserID != nil }.count
         let awaitingInput = accounts.filter { AuthorizationStep(tdlibType: $0.authorizationState).awaitsUserInput }.count
-        let failed = accounts.filter { $0.authorizationState == "authorizationStateClosed" || $0.lastTDLibError != nil }.count
+        var failedAccounts = profileStartupFailures
+        failedAccounts.formUnion(accounts.filter {
+            $0.authorizationState == "authorizationStateClosed" || $0.lastTDLibError != nil
+        }.map(\.account))
+        let failed = failedAccounts.count
         let storageWarning = pendingProfileStorageWarnings > 0
             ? " · \(pendingProfileStorageWarnings) локальных профилей не проверены"
             : ""
@@ -1867,6 +1871,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 let confirmedLogout = target.logoutWasAccepted
                 let loggedOutUserID = target.telegramUserID
                 var removedLogoutProfile = false
+                if !confirmedLogout && !closingForTermination {
+                    // Background profiles need the same honest failure status
+                    // as the selected profile; keep the verified identity and
+                    // let the user reopen that exact local profile explicitly.
+                    profileStartupFailures.insert(target.account)
+                }
                 if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)

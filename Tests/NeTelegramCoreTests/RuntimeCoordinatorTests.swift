@@ -410,10 +410,19 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
         runtimeIsOpen: true,
         hasError: false
     )
+    let closedBackgroundProfile = AccountPresentation.pickerTitle(
+        localOrdinal: 3,
+        telegramUserID: 123,
+        candidate: "Test User",
+        authorizationState: nil,
+        runtimeIsOpen: false,
+        hasError: true
+    )
 
     #expect(firstPending == "Локальный вход 1 — ожидает номер")
     #expect(secondPending == "Локальный вход 2 — ожидает код")
     #expect(verified == "Test User · профиль 3 — подключён")
+    #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
