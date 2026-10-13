@@ -9,6 +9,14 @@ OPENSSL_SOURCE="$ROOT_DIR/.build/openssl-src"
 OPENSSL_PREFIX="$ROOT_DIR/.build/openssl-install"
 TDLIB_COMMIT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["ref"])' "$PIN_FILE")"
 OPENSSL_COMMIT="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build_dependencies"]["openssl"]["ref"])' "$PIN_FILE")"
+EXPECTED_GPERF_VERSION="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["build_dependencies"]["gperf"]["version"])' "$PIN_FILE")"
+GPERF_EXECUTABLE="$(xcrun --find gperf)"
+GPERF_VERSION="$("$GPERF_EXECUTABLE" --version | sed -n '1s/^GNU gperf //p')"
+if [ "$GPERF_VERSION" != "$EXPECTED_GPERF_VERSION" ]; then
+  echo "Pinned gperf $EXPECTED_GPERF_VERSION is required; selected Xcode provides ${GPERF_VERSION:-unknown}" >&2
+  exit 1
+fi
+echo "Using pinned gperf $GPERF_VERSION from $GPERF_EXECUTABLE"
 
 mkdir -p "$OPENSSL_SOURCE"
 if [ ! -d "$OPENSSL_SOURCE/.git" ]; then
@@ -73,6 +81,7 @@ cmake -S "$SOURCE_DIR" -B "$BUILD_DIR" \
   -DOPENSSL_USE_STATIC_LIBS=TRUE \
   -DOPENSSL_SSL_LIBRARY="$OPENSSL_PREFIX/lib/libssl.a" \
   -DOPENSSL_CRYPTO_LIBRARY="$OPENSSL_PREFIX/lib/libcrypto.a" \
+  -DGPERF_EXECUTABLE="$GPERF_EXECUTABLE" \
   -DCMAKE_OSX_ARCHITECTURES=arm64 \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0
 cmake --build "$BUILD_DIR" --target tdjson --parallel 2

@@ -43,6 +43,8 @@ jobs:
           swift --version
           xcodebuild -version
           cmake --version
+          xcrun --find gperf
+          gperf --version
           uname -m
           test "$(uname -m)" = arm64
 

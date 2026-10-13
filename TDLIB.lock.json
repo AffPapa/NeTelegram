@@ -29,7 +29,13 @@
     "zlib": {
       "provider": "macOS SDK",
       "license": "Zlib"
+    },
+    "gperf": {
+      "provider": "selected Xcode toolchain",
+      "version": "3.0.3",
+      "license": "GPL-3.0-or-later",
+      "build_only": true
     }
   },
-  "status": "TDLib_and_OpenSSL_arm64_builds_verified_for_macos_14; AppKit single-profile auth prompt and TDLib close barrier smoke passed; multi-account runtime, full DB recovery, and transitive release SBOM pending"
+  "status": "TDLib/OpenSSL arm64 build pinned for macOS 14; Xcode gperf version enforced; TDLib dylib included in Dev.app; real-account validation and final release SBOM pending"
 }
