@@ -1,0 +1,7 @@
+{
+  "route": "/downloads/",
+  "title": "Загрузки и установка — NeTelegram",
+  "description": "Статус загрузок NeTelegram: проверенной сборки для macOS пока нет. Требования к подписи, нотариальному заверению и проверке файлов.",
+  "body_class": "content-page",
+  "active": "downloads"
+}

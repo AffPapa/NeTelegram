@@ -1,0 +1,106 @@
+<section class="home-hero" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-mark" aria-hidden="true"></span> НЕЗАВИСИМЫЙ ПРОЕКТ <span class="eyebrow-separator">/</span> ДЛЯ macOS</p>
+        <h1 id="hero-title">Переписки на Mac.<br><span>В отдельном окне.</span></h1>
+        <p class="hero-lead"><strong>NeTelegram</strong> — независимый проект альтернативного клиента для чатов Telegram на Mac. Нативный интерфейс на Swift и AppKit; исходники и статус разработки открыты.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="/features/">Что планируем <span aria-hidden="true">↗</span></a>
+          <a class="button button-secondary" href="https://github.com/AffPapa/NeTelegram">Исходный код <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-release" role="status">
+          <span class="release-indicator" aria-hidden="true"></span>
+          <span><strong>Приложение в разработке</strong><small>Проверенной сборки для скачивания пока нет.</small></span>
+          <a href="/downloads/">Статус загрузок <span aria-hidden="true">→</span></a>
+        </div>
+        <ul class="hero-facts" aria-label="Целевая платформа">
+          <li>macOS 14 и новее</li>
+          <li>Сначала Apple Silicon</li>
+          <li>Исходники на GitHub</li>
+        </ul>
+      </div>
+
+      <figure class="hero-visual">
+        <div class="visual-topline"><span><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i></span><span>КОНЦЕПЦИЯ ИНТЕРФЕЙСА</span><span aria-hidden="true">N</span></div>
+        <svg class="runtime-illustration" viewBox="0 0 620 440" role="img" aria-labelledby="runtime-title runtime-desc">
+          <title id="runtime-title">Оригинальная концептуальная иллюстрация окна NeTelegram</title>
+          <desc id="runtime-desc">Схематичный макет окна переписки для Mac, нарисованный для сайта. Это не снимок работающего приложения и не демонстрация реальных сообщений или подключённых аккаунтов.</desc>
+          <defs>
+            <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#edf2ee"/></linearGradient>
+            <linearGradient id="bubble" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d8f0e5"/><stop offset="1" stop-color="#e5f1df"/></linearGradient>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="19" flood-color="#26392f" flood-opacity=".14"/></filter>
+          </defs>
+          <ellipse cx="318" cy="385" rx="218" ry="19" fill="#dfe6df" opacity=".8"/>
+          <g filter="url(#shadow)">
+            <rect x="49" y="35" width="522" height="340" rx="23" fill="url(#paper)" stroke="#d9e2db"/>
+            <path d="M72 35h476a23 23 0 0 1 23 23v34H49V58a23 23 0 0 1 23-23Z" fill="#fbfcfa"/>
+            <circle cx="76" cy="62" r="5" fill="#ee8d81"/><circle cx="94" cy="62" r="5" fill="#e9c36b"/><circle cx="112" cy="62" r="5" fill="#7db797"/>
+            <rect x="135" y="53" width="267" height="18" rx="9" fill="#f0f3ef"/>
+            <rect x="67" y="108" width="132" height="247" rx="13" fill="#f0f4f0"/>
+            <rect x="82" y="124" width="101" height="24" rx="7" fill="#fff" stroke="#e3e9e3"/>
+            <circle cx="96" cy="136" r="5" fill="#7eb8a1"/><path d="M108 136h58" stroke="#aebdb3" stroke-width="4" stroke-linecap="round"/>
+            <rect x="78" y="158" width="111" height="48" rx="9" fill="#e0eee5"/>
+            <circle cx="94" cy="175" r="8" fill="#bfdcc9"/><path d="M109 173h53M109 184h37" stroke="#9eb3a3" stroke-width="4" stroke-linecap="round"/>
+            <rect x="78" y="215" width="111" height="48" rx="9" fill="#fff"/>
+            <circle cx="94" cy="232" r="8" fill="#d5e3ef"/><path d="M109 230h53M109 241h37" stroke="#c1cbd0" stroke-width="4" stroke-linecap="round"/>
+            <rect x="78" y="272" width="111" height="48" rx="9" fill="#fff"/>
+            <circle cx="94" cy="289" r="8" fill="#ecdcc4"/><path d="M109 287h53M109 298h37" stroke="#c1cbd0" stroke-width="4" stroke-linecap="round"/>
+            <path d="M222 118h326" stroke="#e2e8e3"/>
+            <circle cx="241" cy="139" r="14" fill="#d8e8dd"/><path d="M264 136h113M264 146h74" stroke="#c2cec4" stroke-width="4" stroke-linecap="round"/>
+            <rect x="225" y="169" width="194" height="58" rx="15" fill="#fff" stroke="#e3e8e3"/>
+            <circle cx="245" cy="189" r="5" fill="#b9c9be"/><path d="M261 188h128M261 201h91" stroke="#c4cec6" stroke-width="4" stroke-linecap="round"/>
+            <rect x="302" y="238" width="246" height="65" rx="16" fill="url(#bubble)"/>
+            <path d="M322 258h187M322 271h138" stroke="#91b29b" stroke-width="4" stroke-linecap="round"/>
+            <rect x="225" y="321" width="323" height="29" rx="14" fill="#fff" stroke="#e0e7e1"/>
+            <circle cx="241" cy="335" r="6" fill="#c1d1c5"/><path d="M260 335h100" stroke="#d1d9d2" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g class="art-orbit" aria-hidden="true"><circle cx="527" cy="98" r="25" fill="#d8eee1"/><path d="M519 98h16M527 90v16" stroke="#347a5a" stroke-width="2" stroke-linecap="round"/></g>
+          <g class="art-note" aria-hidden="true"><rect x="31" y="321" width="78" height="35" rx="17" fill="#fff" stroke="#dfe6df"/><circle cx="49" cy="338" r="5" fill="#83b89c"/><path d="M61 338h32" stroke="#aebdb2" stroke-width="4" stroke-linecap="round"/></g>
+        </svg>
+        <figcaption>Оригинальная иллюстрация-концепт. Макет не показывает готовое приложение.</figcaption>
+      </figure>
+    </section>
+
+    <section class="proof-bar" id="status" aria-label="Текущий статус проекта">
+      <div><span class="proof-label">КОД</span><strong>Открыт</strong><a href="https://github.com/AffPapa/NeTelegram" aria-label="Исходный код на GitHub">↗</a></div>
+      <div><span class="proof-label">ПРИЛОЖЕНИЕ</span><strong>В разработке</strong><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506" aria-label="Текущий macOS CI">↗</a></div>
+      <div><span class="proof-label">ЗАГРУЗКИ</span><strong>Пока нет сборки</strong><a href="/downloads/" aria-label="Подробности о загрузках">↗</a></div>
+    </section>
+
+    <section class="focus-section section" aria-labelledby="focus-title">
+      <div class="section-heading">
+        <p class="section-kicker">ЗАДАЧА ПРОЕКТА</p>
+        <div><h2 id="focus-title">Мессенджер для Mac.<br>С понятными границами.</h2><p>Мы строим отдельный нативный интерфейс к облачным чатам. Вот на чём сосредоточена разработка — и где заканчиваются подтверждённые сегодня факты.</p></div>
+      </div>
+      <div class="focus-grid">
+        <article class="focus-card focus-card-native"><span class="focus-mark" aria-hidden="true">⌘</span><p class="state-label state-code">СБОРКА В CI ПРОВЕРЕНА</p><h3>Нативная среда macOS</h3><p>Исходник и тесты прошли macOS CI; отдельный workflow собрал закреплённую TDLib и Dev.app. Smoke закрытия окна и возврата из Dock есть на более раннем commit; реальный вход не выполнялся.</p><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506">Проверить CI <span aria-hidden="true">↗</span></a></article>
+        <article class="focus-card focus-card-data"><span class="focus-mark" aria-hidden="true">◫</span><p class="state-label state-detail">АРХИТЕКТУРНЫЙ ПРИНЦИП</p><h3>Данные профилей отдельно</h3><p>Для каждого аккаунта проектируются отдельные локальные данные. NeTelegram не импортирует сессии из других клиентов. Это описание проекта, а не проверка реального входа.</p><a href="/privacy/">Как устроена приватность <span aria-hidden="true">↗</span></a></article>
+        <article class="focus-card focus-card-runtime"><span class="focus-mark" aria-hidden="true">↗</span><p class="state-label state-synthetic">ЦЕЛЬ · НЕ СЕРТИФИЦИРОВАНО</p><h3>Подключённые аккаунты работают в фоне</h3><p>Цель — одновременно обрабатывать обновления всех доступных профилей. Тест постановки 20 профилей в очередь синтетический; двадцать авторизованных аккаунтов и ресурсы Mac ещё не проверены.</p><a href="/features/">Все возможности и ограничения <span aria-hidden="true">↗</span></a></article>
+      </div>
+    </section>
+
+    <section class="release-section" aria-labelledby="release-title">
+      <div class="release-copy"><p class="section-kicker">ПЕРВЫЙ РЕЛИЗ</p><h2 id="release-title">Когда будет готово — дадим проверяемую ссылку.</h2><p>Сейчас нет подписанной сборки для Mac. Загрузки появятся после проверки совместимости, подписи Developer ID, Apple notarization и установщика.</p></div>
+      <div class="release-box"><span class="release-box-icon" aria-hidden="true">↓</span><div><strong>Скачать пока нельзя</strong><p>Опубликованной версии и проверенных файлов нет.</p></div><span class="release-chip">В РАЗРАБОТКЕ</span><a href="/downloads/">Проверить страницу загрузок <span aria-hidden="true">→</span></a></div>
+    </section>
+
+    <section class="journal-section section" aria-labelledby="journal-title">
+      <div class="section-heading">
+        <p class="section-kicker">ОТКРЫТАЯ РАЗРАБОТКА</p>
+        <div><div class="journal-heading"><h2 id="journal-title">Что изменилось</h2><a href="/devlog/">Весь журнал <span aria-hidden="true">↗</span></a></div><p>Каждая запись указывает исходный код и проверки. Синтетические результаты не выдаются за настоящий пользовательский сценарий.</p></div>
+      </div>
+      <article class="latest-entry">
+        <time datetime="2026-10-13"><span>13</span> ОКТЯБРЯ 2026</time>
+        <div><p class="journal-tag">СТАРТ ПРОФИЛЕЙ</p><h3>Подготовка каждого профиля проходит отдельно</h3><p>Подготовка каталогов и двух ключей вынесена в проверяемый Core-шаг, который AppDelegate выполняет до создания TDLib runtime. В синтетической проверке 19 профилей прошли подготовку, а ошибка Keychain у одного не создала ключ и не повредила его прежние файлы. Реальный Keychain и авторизованные аккаунты не проверялись.</p><div class="journal-links"><a href="https://github.com/AffPapa/NeTelegram/commit/26abae365b4eec54882ae69cc1274e20ddabb276">Исходный commit ↗</a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506">macOS CI ↗</a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731851">Сборка Dev.app ↗</a></div></div>
+      </article>
+    </section>
+
+    <section class="independence-panel" aria-labelledby="independence-title">
+      <span class="independence-mark" aria-hidden="true">i</span>
+      <div><h2 id="independence-title">Независимый проект. Не приложение Telegram.</h2><p>NeTelegram — независимый сторонний проект и не имеет прямого отношения к Telegram; Telegram Messenger LLP не разрабатывала и не одобряла приложение. Проект использует Telegram API и TDLib; совместимость публичного названия и отдельные требования API Terms ещё оцениваются.</p></div>
+      <a href="https://core.telegram.org/api/terms">Условия API <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="english-summary" id="english" lang="en" aria-labelledby="english-title">
+      <p class="section-kicker">ENGLISH OVERVIEW</p>
+      <div><h2 id="english-title">A separate messaging workspace for Mac.</h2><p><strong>NeTelegram</strong> is an independent open-source project for a native macOS client to Telegram cloud chats. It is not the official Telegram app and has no direct relationship with Telegram Messenger LLP. Development is ongoing: real account login, twenty authorized background runtimes, and a signed download have not been verified.</p><div class="english-links"><a href="/features/">Features and limitations ↗</a><a href="/downloads/">Download status ↗</a><a href="https://github.com/AffPapa/NeTelegram">Source code ↗</a><a href="/privacy/">Privacy ↗</a></div></div>
+    </section>

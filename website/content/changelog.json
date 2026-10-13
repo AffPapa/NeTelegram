@@ -1,0 +1,7 @@
+{
+  "route": "/changelog/",
+  "title": "История выпусков — NeTelegram",
+  "description": "Опубликованные версии NeTelegram и статус релизов. Приложение пока в разработке; проверенных загрузок нет.",
+  "body_class": "content-page",
+  "active": "changelog"
+}

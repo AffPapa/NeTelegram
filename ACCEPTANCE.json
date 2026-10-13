@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Two targeted local APP02 tests passed; exact-SHA macOS CI 38425731506 and pinned TDLib/Dev.app build 38425731851 passed. Public Site v137 is live. Real Telegram login and twenty authorized-runtime certification remain open; no signed app release.",
+  "status": "implementation_in_progress; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Two targeted local APP02 tests passed; exact-SHA macOS CI 38425731506 and pinned TDLib/Dev.app build 38425731851 passed. Public Site v141 is live. Real Telegram login and twenty authorized-runtime certification remain open; no signed app release.",
   "current_evidence": {
     "app_source_commit": "26abae365b4eec54882ae69cc1274e20ddabb276",
     "app_tests": "Two targeted tests passed on Xcode 27.0 / Swift 6.4. AppDelegate calls the production-used ProfileStoragePreparer before TDLib runtime creation. With 20 synthetic startup attempts, one injected errSecInteractionNotAllowed failed while 19 prepared; existing DB/draft files remained unchanged and no replacement key was added. This did not touch the system Keychain.",
@@ -13,7 +13,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v137 at https://netelegram.iryadom.chatgpt.site; source 775fee7bc71391ba90a5976492542128e1b16044; deployment appgdep_6ace570e7e6481918128a73c93c1e559. Public devlog and both restored screenshot assets opened with cache-busted v137 URLs. Downloads remain unavailable; current app-source evidence and independent-project disclosure remain visible.",
+    "site": "Public Site v141 at https://netelegram.iryadom.chatgpt.site; source 4f99890bb6e01872e0e13dc02f975981c103abd7; deployment appgdep_6ace5c143c2c819182fe7243ce9a7c42. Shared build-time shell/template drives all eight static routes; content stays separate and pages do not require JavaScript. Public homepage, downloads and dense devlog were visually checked; route/metadata/internal-link validator passed. Downloads remain unavailable; app-source remains 26abae365b4eec54882ae69cc1274e20ddabb276.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -463,25 +463,25 @@
     "hosted_ci": "Exact-SHA macOS CI 38425731506 passed for 26abae365b4eec54882ae69cc1274e20ddabb276.",
     "native_dev_app_smoke": "Pinned TDLib/Dev.app workflow 38425731851 passed for 26abae365b4eec54882ae69cc1274e20ddabb276; it built and assembled an arm64 development bundle but did not perform GUI interaction or account login.",
     "scope": "Synthetic Keychain backend and scheduler only. No system Keychain access, Telegram account login, real 20 runtime, memory/performance measurement, Developer ID signing or notarization.",
-    "publication": "Site v137 deployed from exact source 775fee7bc71391ba90a5976492542128e1b16044; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Public /devlog/?v=137 and both restored screenshot assets opened; each PNG is 1024x768. Site archive content hash sha256:e33b7240ce7799f65b72be5e163345865cf11b609322444c2779ae06a98ff767.",
+    "publication": "Site v141 deployed from exact Site source 4f99890bb6e01872e0e13dc02f975981c103abd7; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Shared template/build generator and all route fragments are mirrored into website/. Focused checks passed for 8 static routes; public browser visually reviewed home, downloads and devlog. No app downloads or release.",
     "release_preflight": "No signed/notarized application, real account, or twenty-account runtime certification."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 137,
-    "source_commit": "775fee7bc71391ba90a5976492542128e1b16044",
+    "version": 141,
+    "source_commit": "4f99890bb6e01872e0e13dc02f975981c103abd7",
     "app_repository_commit": "26abae365b4eec54882ae69cc1274e20ddabb276",
-    "deployment_id": "appgdep_6ace570e7e6481918128a73c93c1e559",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_04790af39c4c8191af0e2d10eeff20be",
+    "deployment_id": "appgdep_6ace5c143c2c819182fe7243ce9a7c42",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_89adc85509388191a024b0ec32faf360",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "6671753a0140be6bafe2d30da674e5ff05d9e771f193103f71b351c66ea671f7",
-    "sites_archive_content_hash": "sha256:e33b7240ce7799f65b72be5e163345865cf11b609322444c2779ae06a98ff767",
-    "archive_bytes": 491520,
+    "archive_sha256": "390ea6353ec63a6c6bc319adb943282d5e77aec22d8c0faa49d0cca8d802b16d",
+    "sites_archive_content_hash": "sha256:157432c3b19cf4bfabfe1f85a0c3aa951d09305779300996f8b99885674c82bb",
+    "archive_bytes": 522240,
     "archive_file_count": 15,
-    "description": "Development landing keeps its original hierarchy, concept illustration, bilingual evidence-led feature pages, and honest no-download state. Restored two missing historical devlog screenshots after auditing image references.",
-    "public_verification": "Sites deployment succeeded. Cache-busted public browser opened /devlog/?v=137; both image assets opened as browser image documents at 1024x768. Current app-source/CI, no-download status, and non-affiliation disclosure remain visible."
+    "description": "All eight routes now use one static build-time shell and independent content fragments. Shared navigation includes an accessible native mobile disclosure; titles, descriptions, Open Graph and canonical metadata are generated centrally. A public visual pass corrected the legacy status card and constrained the dense devlog to the reading measure. No app download was added.",
+    "public_verification": "Sites confirmed successful public deployment. Focused local validator checked all eight routes, one H1 each, shared shell, active navigation, canonical metadata, internal links and assets. Browser screenshots verified homepage, downloads status card and devlog reading width. Download page truthfully shows no app release."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -507,5 +507,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue from one distinct acceptance gap. Do not rerun APP02 or Site v137 checks absent changed input. Real account login remains deferred; prioritize a bounded Core/runtime gap, then verify only its changed surface and exact-source CI."
+  "next_action": "Continue from one distinct app acceptance gap. Do not repeat APP02 or Site v141 checks without changed input. Real Telegram login remains deferred; prioritize a bounded Core/runtime gap, then verify only its changed surface and exact-source CI."
 }

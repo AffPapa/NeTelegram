@@ -1,0 +1,7 @@
+{
+  "route": "/roadmap/",
+  "title": "План разработки — NeTelegram",
+  "description": "Этапы разработки NeTelegram, проверки и открытые релизные блокеры.",
+  "body_class": "content-page",
+  "active": "roadmap"
+}

@@ -1,0 +1,7 @@
+{
+  "route": "/source/",
+  "title": "Исходный код и лицензия — NeTelegram",
+  "description": "Исходный код NeTelegram, лицензия, сторонние зависимости, безопасность и поддержка.",
+  "body_class": "content-page",
+  "active": "source"
+}

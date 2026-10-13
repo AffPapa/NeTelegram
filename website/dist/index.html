@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f7f8f5">
+  <meta name="theme-color" content="#f6f7f3">
   <meta name="description" content="NeTelegram — независимый проект неофициального альтернативного клиента Telegram для macOS. Нативный интерфейс на Swift и AppKit, открытая разработка и честные сведения о возможностях и ограничениях. Приложение пока в разработке, загрузки нет.">
-  <meta property="og:title" content="NeTelegram — отдельный клиент для macOS">
-  <meta property="og:description" content="Независимый проект альтернативного клиента для облачных чатов Telegram. Исходный код открыт; приложение и проверенные загрузки ещё в разработке.">
+  <meta property="og:title" content="NeTelegram — альтернативный клиент Telegram для macOS">
+  <meta property="og:description" content="NeTelegram — независимый проект неофициального альтернативного клиента Telegram для macOS. Нативный интерфейс на Swift и AppKit, открытая разработка и честные сведения о возможностях и ограничениях. Приложение пока в разработке, загрузки нет.">
   <meta property="og:type" content="website">
+  <link rel="canonical" href="https://netelegram.iryadom.chatgpt.site/">
   <title>NeTelegram — альтернативный клиент Telegram для macOS</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/site.css">
@@ -16,18 +17,11 @@
 <body class="home-page">
   <a class="skip-link" href="#main">К основному содержимому</a>
   <header class="topbar">
-    <a class="wordmark" href="/" aria-label="NeTelegram — главная"><span class="mark" aria-hidden="true">N</span><span>NeTelegram</span></a>
-    <nav aria-label="Основная навигация">
-      <a href="/features/">Возможности</a>
-      <a href="/downloads/">Загрузки</a>
-      <a href="/devlog/">Разработка</a>
-      <a href="/source/">Исходники</a>
-      <a class="language-link" href="#english" lang="en" aria-label="Jump to the English overview">EN</a>
-    </nav>
+    <a class="wordmark" href="/" aria-label="NeTelegram — главная" aria-current="page"><span class="mark" aria-hidden="true">N</span><span>NeTelegram</span></a>
+    <nav class="desktop-nav" aria-label="Основная навигация"><a href="/features/">Возможности</a><a href="/downloads/">Загрузки</a><a href="/changelog/">Релизы</a><a href="/devlog/">Разработка</a><a href="/roadmap/">План</a><a href="/privacy/">Приватность</a><a href="/source/">Исходники</a><a class="language-link" href="/#english" lang="en">EN</a></nav>
+    <details class="mobile-nav"><summary aria-label="Открыть меню"><span></span><span></span><span></span></summary><nav aria-label="Мобильная навигация"><a href="/features/">Возможности</a><a href="/downloads/">Загрузки</a><a href="/changelog/">Релизы</a><a href="/devlog/">Разработка</a><a href="/roadmap/">План</a><a href="/privacy/">Приватность</a><a href="/source/">Исходники</a><a href="/#english" lang="en">English overview</a></nav></details>
   </header>
-
-  <main id="main">
-    <section class="home-hero" id="home" aria-labelledby="hero-title">
+  <main id="main" class="page-main"><section class="home-hero" id="home" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow"><span class="status-mark" aria-hidden="true"></span> НЕЗАВИСИМЫЙ ПРОЕКТ <span class="eyebrow-separator">/</span> ДЛЯ macOS</p>
         <h1 id="hero-title">Переписки на Mac.<br><span>В отдельном окне.</span></h1>
@@ -132,9 +126,11 @@
     <section class="english-summary" id="english" lang="en" aria-labelledby="english-title">
       <p class="section-kicker">ENGLISH OVERVIEW</p>
       <div><h2 id="english-title">A separate messaging workspace for Mac.</h2><p><strong>NeTelegram</strong> is an independent open-source project for a native macOS client to Telegram cloud chats. It is not the official Telegram app and has no direct relationship with Telegram Messenger LLP. Development is ongoing: real account login, twenty authorized background runtimes, and a signed download have not been verified.</p><div class="english-links"><a href="/features/">Features and limitations ↗</a><a href="/downloads/">Download status ↗</a><a href="https://github.com/AffPapa/NeTelegram">Source code ↗</a><a href="/privacy/">Privacy ↗</a></div></div>
-    </section>
-  </main>
-
-  <footer class="site-footer"><a class="wordmark" href="/" aria-label="NeTelegram — главная"><span class="mark" aria-hidden="true">N</span><span>NeTelegram</span></a><span>Независимый проект · В разработке · 2026</span><nav aria-label="Документы"><a href="/privacy/">Приватность</a><a href="/roadmap/">Roadmap</a><a href="/source/">Исходники</a></nav></footer>
+    </section></main>
+  <footer class="site-footer">
+    <a class="wordmark" href="/" aria-label="NeTelegram — главная"><span class="mark" aria-hidden="true">N</span><span>NeTelegram</span></a>
+    <p>Независимый проект, не связанный с Telegram. Проект в разработке; проверенной сборки пока нет.</p>
+    <nav aria-label="Информация"><a href="/privacy/">Приватность</a><a href="/source/">Исходники и поддержка</a><a href="/downloads/">Статус загрузок</a></nav>
+  </footer>
 </body>
 </html>

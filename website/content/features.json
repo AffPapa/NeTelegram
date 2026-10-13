@@ -1,0 +1,7 @@
+{
+  "route": "/features/",
+  "title": "Возможности и ограничения — NeTelegram",
+  "description": "Реализованные в исходниках части, проверенный статус и границы продукта NeTelegram.",
+  "body_class": "content-page",
+  "active": "features"
+}

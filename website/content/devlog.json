@@ -1,0 +1,7 @@
+{
+  "route": "/devlog/",
+  "title": "Журнал разработки — NeTelegram",
+  "description": "Хронология изменений NeTelegram с привязкой к исходному коду, CI и границам проведённых проверок.",
+  "body_class": "content-page",
+  "active": "devlog"
+}

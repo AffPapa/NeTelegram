@@ -1,0 +1,7 @@
+{
+  "route": "/privacy/",
+  "title": "Конфиденциальность — NeTelegram",
+  "description": "Что обрабатывают сайт и приложение NeTelegram, как разделены локальные данные и какие есть ограничения.",
+  "body_class": "content-page",
+  "active": "privacy"
+}

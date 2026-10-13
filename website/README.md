@@ -1,5 +1,7 @@
-# Website assets
+# Website source
 
-The static development site is published through the existing OpenAI Sites project. Its source-sync checkout and Git remote are separate from this application repository. To update it, follow the current Sites workflow, keep the existing project ID, push the exact source state to the Site's own source remote, package and save that version, then deploy it. Never change this repository's `origin` to the Site helper remote.
+The OpenAI Site is a buildless, pre-rendered static website. Its editable route content and metadata live in `content/`; `build_site.py` renders every page through one shared semantic shell into `dist/`. Shared navigation, canonical/OG metadata, responsive menu and footer are edited once in that generator; page-specific prose stays in the matching content fragment.
 
-`dist/` is the static output corresponding to the current development Site publication. It contains no app downloads until a verified release exists. Update it alongside completed milestones and releases; do not hand-edit version or download metadata outside the release manifest.
+Run `python3 build_site.py` followed by `python3 validate_site.py` to regenerate and check all eight routes. The validator checks route shell, one H1, active navigation, canonical metadata, local links and required assets. Output remains HTML/CSS with no JavaScript dependency.
+
+`dist/` mirrors the current published development Site and contains no app downloads until a verified release exists. The Site uses its own OpenAI Sites project/source checkout and Git remote. Never change this application's Git `origin` to the Site helper remote; publish through the supported Sites workflow after synchronizing the exact source commit.
