@@ -421,6 +421,40 @@ import Testing
     #expect(barrier.isFinished)
 }
 
+@Test func runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain() {
+    var shutdown = RuntimeShutdownCoordinator()
+    let clients = Set((0..<20).map(Int32.init))
+    #expect(shutdown.begin(clients: clients))
+    #expect(shutdown.pendingClientIDs == clients)
+    #expect(!shutdown.beginReceiverDrain())
+
+    #expect(!shutdown.acknowledgeClosed(clientID: 99))
+    for client in clients.sorted() {
+        #expect(shutdown.acknowledgeClosed(clientID: client))
+    }
+    #expect(shutdown.canDrainReceiver)
+    #expect(!shutdown.acknowledgeClosed(clientID: clients.first!))
+    #expect(shutdown.beginReceiverDrain())
+    #expect(shutdown.finishReceiverDrain())
+    #expect(shutdown.isFinished)
+    #expect(!shutdown.begin(clients: clients))
+}
+
+@Test func runtimeShutdownCoordinatorCancelsQuitWhenOneCloseIsRejected() {
+    var shutdown = RuntimeShutdownCoordinator()
+    #expect(shutdown.begin(clients: [11, 12, 13]))
+
+    // AppKit cancels quit when any close is rejected; already-accepted closes
+    // are tracked by the general profile lifecycle until their Closed updates.
+    #expect(shutdown.cancelAfterCloseRejection(clientID: 12))
+    #expect(!shutdown.isPending)
+    #expect(shutdown.pendingClientIDs.isEmpty)
+    #expect(!shutdown.acknowledgeClosed(clientID: 11))
+    #expect(!shutdown.beginReceiverDrain())
+    #expect(!shutdown.cancelAfterCloseRejection(clientID: 12))
+    #expect(shutdown.begin(clients: [11, 12, 13]))
+}
+
 private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     private let lock = NSLock()
     private var stored: Value

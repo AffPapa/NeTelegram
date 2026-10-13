@@ -2,6 +2,7 @@
 """Render NeTelegram's prebuilt, no-JavaScript public pages from shared shell + content."""
 from html import escape
 import json
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -65,4 +66,5 @@ for meta_path in sorted((ROOT / "content").glob("*.json")):
     output = DIST / ("index.html" if name == "index" else f"{name}/index.html")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(html)
+shutil.copyfile(ROOT / "site.css", DIST / "site.css")
 print(f"Rendered {len(list((ROOT / 'content').glob('*.json')))} static routes into dist/.")
