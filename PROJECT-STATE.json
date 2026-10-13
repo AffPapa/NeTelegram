@@ -37,7 +37,7 @@
           "mrdumay-source (inactive)"
         ]
       },
-      "note": "Existing Git credential helper was used for source push. No token was created or printed. This checkpoint update is not pushed yet."
+      "note": "App source and the documentation/site-mirror checkpoint were pushed to origin/main using the existing Git credential helper. The final pushed checkpoint commit is recorded in RUN-LOG.md. No token was created or printed."
     },
     "latest_exact_commit_native_workflow": {
       "run_id": 38431733910,
