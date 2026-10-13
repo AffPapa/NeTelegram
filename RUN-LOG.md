@@ -412,3 +412,22 @@
 - The bilingual devlog reports exact app source 94740d3, the first-run country UI visible in a current-source Dev.app, prior-source 152/152 suite coverage, current test-runner interruption and current hosted CI still in progress. It makes no current-source test PASS claim. Downloads remains without app URLs.
 - Anonymous HTTPS checks: `/devlog/` and `/downloads/` both returned HTTP/2 200 and `text/html`; live content assertions passed. Site archive `/private/tmp/netelegram-site-v154.tar`: local SHA-256 `a9f68baeb47fbb9d59f9e06d86917d1a2084919329fc2e7da5c28c8b61c77836`, 290346 bytes; Sites archive receipt `sha256:4c62478ca725e7d990ef4829ba912136ca34990d0c4236197532f900434390e2`, 522240 bytes, 15 files.
 - Current exact-source macOS CI run [38466197778](https://github.com/AffPapa/NeTelegram/actions/runs/38466197778) was in progress at publication time. Metadata run [38466400353](https://github.com/AffPapa/NeTelegram/actions/runs/38466400353) is queued for checkpoint d2df61b. No app release/downloads, real login, or account data.
+
+
+### 2026-10-14 — reconcile test status and remove stale-version loops
+
+- Rechecked GitHub run 38466197778 against exact app-source SHA 94740d38bfa845919ac2863ad0e78d1a7d494a04: macOS CI ended `cancelled` at the five-minute timeout during `swift test --no-parallel --verbose`. No failed assertion surfaced and no test result was produced; current-source suite is not PASS. Metadata validation 38466847617 passed for checkpoint 4d9989c.
+- Reconciled the top-level acceptance summary to app source 94740d3, prior-source-only 152/152 coverage (be58d83), Site v154 and the terminal CI result. The existing `last_verification` and PROJECT-STATE already had the correct current source, but ACCEPTANCE top-level still said 2cd13c2, 151/151 and Site v152.
+- Read-only Site QA found stale homepage/features cards still linking run 38447978740 and claiming 151 tests. One corrective Site publication is being prepared; no app rebuild or test rerun is needed for these metadata/content changes.
+- Fast path from here: diagnose why the serial test runner stalls before retrying once; choose the next independent production-wiring slice after that. Real login remains user-deferred. No account/session data or credentials accessed.
+
+
+- Publication update: checkpoint reconciliation commit `6ee3a837aba4e737d84443b5a3dc61ca9bef6c69` is local and unpushed. `git push origin main` failed before transport because DNS could not resolve `github.com`; no retry was made. Existing Sites source checkout `/private/tmp/netelegram-site-source` has a prepared homepage/features/devlog correction (all eight static routes validate); the official helper failed before commit/push because DNS could not resolve `git.chatgpt-team.site`. No Site version was saved or deployed. Both DNS checks failed at `curl` resolution; no fallback endpoint/token route was attempted. Resume by checking DNS once, then push the exact checkpoint and use the official Site helper once.
+
+
+### 2026-10-14 — isolate the silent CI runner with two focused tests
+
+- Downloaded job logs for exact-source macOS run 38466197778. Xcode 16.4 / Swift 6.1.2 compiled and linked the test bundle in 47.20s; the job log then shows no test completion output before `The operation was canceled` at 20:58:21Z. GitHub cleanup terminated orphan `swiftpm-testing`. The job's configured timeout is five minutes; the log does not identify the cancellation initiator, so cause is recorded as unknown rather than asserted.
+- Built current source 94740d3 locally with Xcode 27 / Swift 6.4 in 5.38s and ran only two filtered tests: `cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable` passed in 0.002s; `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` passed in 0.001s. These are synthetic Core tests; they do not invoke AppDelegate restoration or real TDLib accounts. No full suite PASS is claimed.
+- Initial targeted launch under the default sandbox failed before the test runner because `sandbox-exec` was denied; the authorized host execution completed the two focused commands. No app source changed and no full-suite retry was made.
+- DNS still fails for `github.com` and `git.chatgpt-team.site`. The app checkpoint is local/ahead and the Site homepage/features/devlog edits remain uncommitted locally; no external source push, Site version save, or deployment occurred.
