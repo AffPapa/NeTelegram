@@ -1475,6 +1475,48 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(dispatched == 1)
 }
 
+@Test func privacyBarrierRejectsQueuedAuthenticationAfterLockAndUnlock() throws {
+    let account = AccountUUID()
+    let otherAccount = AccountUUID()
+    let generation = RuntimeGeneration(3)
+    let barrier = PrivacyDispatchBarrier()
+    let queuedEpoch = barrier.currentEpoch()
+    var dispatched = 0
+
+    #expect(barrier.dispatchAuthenticationCommand(
+        account: account,
+        runtimeGeneration: generation,
+        privacyEpoch: queuedEpoch,
+        currentAccount: account,
+        currentGeneration: generation
+    ) { dispatched += 1 })
+    #expect(!barrier.dispatchAuthenticationCommand(
+        account: account,
+        runtimeGeneration: generation,
+        privacyEpoch: queuedEpoch,
+        currentAccount: otherAccount,
+        currentGeneration: generation
+    ) { dispatched += 1 })
+    #expect(!barrier.dispatchAuthenticationCommand(
+        account: account,
+        runtimeGeneration: generation,
+        privacyEpoch: queuedEpoch,
+        currentAccount: account,
+        currentGeneration: RuntimeGeneration(4)
+    ) { dispatched += 1 })
+
+    _ = barrier.setLocked(true)
+    _ = barrier.setLocked(false)
+    #expect(!barrier.dispatchAuthenticationCommand(
+        account: account,
+        runtimeGeneration: generation,
+        privacyEpoch: queuedEpoch,
+        currentAccount: account,
+        currentGeneration: generation
+    ) { dispatched += 1 })
+    #expect(dispatched == 1)
+}
+
 @Test func privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent() async {
     let account = AccountUUID()
     let barrier = PrivacyDispatchBarrier()

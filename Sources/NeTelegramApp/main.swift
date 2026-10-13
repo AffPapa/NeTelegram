@@ -820,6 +820,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func primaryAction() {
+        guard !lockState else { return }
         guard let runtime else {
             guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber" else {
                 setStatus("Подождите, пока подготовится экран входа.")
@@ -831,6 +832,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         guard let authType = pendingAuthorizationType, !authRequestInFlight else { return }
+        let target = runtime
+        let account = target.account
+        let generation = target.generation
+        let privacyEpoch = privacyDispatchBarrier.currentEpoch()
         do {
             let request: [String: Any]
             switch authType {
@@ -871,7 +876,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let extra = "auth-\(historyRequestCounter)"
             var routedRequest = request
             routedRequest["@extra"] = extra
-            try runtime.send(routedRequest)
+            let dispatched = try privacyDispatchBarrier.dispatchAuthenticationCommand(
+                account: account,
+                runtimeGeneration: generation,
+                privacyEpoch: privacyEpoch,
+                currentAccount: target.account,
+                currentGeneration: target.generation
+            ) { try target.send(routedRequest) }
+            guard dispatched else {
+                setStatus("Шаг входа отменён: приложение заблокировано или профиль изменился.")
+                return
+            }
             pendingAuthRequestsByExtra[extra] = (runtime.account, authType)
             authRequestInFlight = true
             actionButton.isEnabled = false
@@ -5181,6 +5196,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func beginQRLogin() {
+        guard !lockState else { return }
         guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber" else {
             setStatus("Подождите, пока Telegram подготовит экран входа.")
             return
@@ -5191,11 +5207,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         do {
-            authRequestInFlight = true
-            qrButton.isEnabled = false
             historyRequestCounter &+= 1
             let extra = "auth-\(historyRequestCounter)"
-            try runtime.send(["@type": "requestQrCodeAuthentication", "other_user_ids": [], "@extra": extra])
+            let account = runtime.account
+            let generation = runtime.generation
+            let privacyEpoch = privacyDispatchBarrier.currentEpoch()
+            let dispatched = try privacyDispatchBarrier.dispatchAuthenticationCommand(
+                account: account,
+                runtimeGeneration: generation,
+                privacyEpoch: privacyEpoch,
+                currentAccount: runtime.account,
+                currentGeneration: runtime.generation
+            ) {
+                try runtime.send(["@type": "requestQrCodeAuthentication", "other_user_ids": [], "@extra": extra])
+            }
+            guard dispatched else {
+                setStatus("Вход по QR отменён: приложение заблокировано или профиль изменился.")
+                return
+            }
+            authRequestInFlight = true
+            qrButton.isEnabled = false
             pendingAuthRequestsByExtra[extra] = (runtime.account, "authorizationStateWaitPhoneNumber")
             setStatus("Запрашиваю QR-код…")
         } catch {

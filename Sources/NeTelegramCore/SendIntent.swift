@@ -192,4 +192,26 @@ public final class PrivacyDispatchBarrier: @unchecked Sendable {
         try send()
         return true
     }
+
+    /// Serializes user initiated authentication commands against privacy lock.
+    /// Authentication can precede a verified Telegram user ID, so this binds
+    /// the dispatch to the locally owned account and runtime generation only.
+    @discardableResult
+    public func dispatchAuthenticationCommand(
+        account: AccountUUID,
+        runtimeGeneration: RuntimeGeneration,
+        privacyEpoch: UInt64,
+        currentAccount: AccountUUID,
+        currentGeneration: RuntimeGeneration,
+        send: () throws -> Void
+    ) rethrows -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !isLocked,
+              privacyEpoch == epoch,
+              account == currentAccount,
+              runtimeGeneration == currentGeneration else { return false }
+        try send()
+        return true
+    }
 }
