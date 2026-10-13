@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public product name Neridian, repository codename NeTelegram. Source 88ba7e2 passed exact macOS CI and pinned accountless Dev.app smoke; public Site v101 current. No app release or download exists; real accounts, signing, notarization and 20-runtime certification remain open.",
+  "status": "implementation_in_progress; public product name Neridian, repository codename NeTelegram. Source code 88ba7e2 passed 118/118 exact macOS CI and pinned accountless Dev.app smoke. Canonical local Dev.app is now built from c6bd4e4 and phone-entry screen visually checked. Public Site v101 is live pending v102 update. No app release or download exists.",
   "cases": [
     {
       "id": "APP01",
@@ -423,19 +423,19 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Source commit 88ba7e2 adds adaptive width constraints for explanatory/registration content and raises minimum height to 700pt; exact macOS CI and pinned Dev.app workflow passed, including accountless first-run capture. The captured image was not independently reviewed. Existing local process is an older build and was not replaced. Dark/light contrast, registration/2FA/QR states, and local source-matched visual verification remain untested."
+      "evidence": "App source change 88ba7e2 adds adaptive widths and 700pt minimum height. Exact-source macOS CI passed 118/118; pinned TDLib arm64 Dev.app workflow opened/captured an accountless first-run screen. After safely quitting the old 0aa8254 empty first-run process, canonical Dev.app was built locally from c6bd4e4 (only ACCEPTANCE.json differs from code source 88ba7e2), Swift 6.4/arm64, source fingerprint 8a0ede09be358cd57b4c58ce9473172f76d2822eb015203ba1b6a0f713f57a25, isolated support root /private/tmp/netelegram-auth-layout-smoke. Default phone-entry screen was visually reviewed: centered and readable in light appearance; title carries the build SHA. No credentials entered. Code/2FA/QR/registration states, minimum-size behavior, dark/high-contrast appearance and VoiceOver remain untested."
     }
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "88ba7e2b8d41927f427008ea339a259bf2fd8238",
-    "local_command": "No local build or tests run for this source commit; sandbox denied Xcode module-cache access. git diff --check passed before source push.",
-    "local_result": "Not run locally. CI is authoritative for this source commit; no local pass claimed.",
-    "hosted_ci": "Exact-source macOS CI 38363652001 and pinned TDLib/isolated Dev.app workflow 38363652045 both succeeded for 88ba7e2b8d41927f427008ea339a259bf2fd8238.",
-    "hosted_result": "macOS CI passed 118/118 Swift Testing tests. Pinned TDLib workflow built and verified arm64 Dev.app, opened/captured the accountless first-run screen, and quit. No Telegram account login or real-account behavior is represented.",
-    "scope": "Auth layout change is source/CI verified only. Registration/code/2FA/QR states at minimum window, appearance contrast, and local visual review remain open. All 20 genuine runtime sessions/performance, DB migration/recovery, Keychain/disk failure, Developer ID/notarization, Gatekeeper, Sparkle, and release remain unverified. Public name is Neridian; user declined the sponsored-video player, so channel access and stable release stay gated.",
-    "publication": "Public Neridian Development Site v101 is live at https://netelegram.iryadom.chatgpt.site. Site source commit 9f570bb899077077ccfd4734dfe21d5818e720fd; deployment appgdep_6acde14899d48191ada2aeee0f522f7c succeeded; audience public. Anonymous HTTPS returned 200 for all 10 routes with expected HTML/XML MIME. Homepage/features/devlog/roadmap refer to app source 88ba7e2, exact CI and accountless smoke. Downloads says NO RELEASE; stable/alpha feeds are valid and empty.",
-    "next_action": "Continue native implementation from source 88ba7e2. Do not replace the still-running old local process. Inspect/fix auth contrast and states through one source-matched native QA pass after it exits. Real Telegram login remains deferred by user."
+    "source_commit": "c6bd4e475210bbbb1c5c37058947adc82a818218",
+    "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-auth-layout-smoke ./Scripts/dev-app.sh --launch",
+    "local_result": "Canonical /private/tmp/NeTelegram-Dev.app built successfully with clean source tree, ARM64, Apple Swift 6.4, pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, ad-hoc dev signing, and source fingerprint 8a0ede09be358cd57b4c58ce9473172f76d2822eb015203ba1b6a0f713f57a25. BuildInfo records c6bd4e4 (only acceptance/docs changed since app code SHA 88ba7e2). Native phone-entry screen opened and was visually checked centered/readable in light appearance; isolated empty QA support root. No credentials entered.",
+    "hosted_ci": "Source commit 88ba7e2: exact-source macOS CI 38363652001 and pinned TDLib/isolated Dev.app 38363652045. Acceptance/docs commit c6bd4e4: macOS CI 38364899648.",
+    "hosted_result": "Source macOS CI passed 118/118 Swift Testing tests; pinned TDLib workflow built arm64 Dev.app and captured the accountless first-run screen. Acceptance commit CI also succeeded. No real-account login or account behaviors are represented.",
+    "scope": "Phone-entry screen on one canonical local Dev.app is visually checked, but code/2FA/QR/registration and minimum-size variants are not. Real login/read/send/logout, all 20 simultaneous real runtime and performance, migration/recovery, real Keychain, Developer ID/notarization, Gatekeeper, Sparkle and release remain unverified. User chose Neridian and declined sponsored-video playback; channel access and stable release remain gated.",
+    "publication": "Public Site v101 at https://netelegram.iryadom.chatgpt.site remains active/public; update v102 is being prepared to record this latest local smoke. v101 source 9f570bb899077077ccfd4734dfe21d5818e720fd, deployment appgdep_6acde14899d48191ada2aeee0f522f7c. Downloads says NO RELEASE; feeds are empty.",
+    "next_action": "Publish the factual v102 follow-up for the source-matched canonical local screen. Then continue next native acceptance slice; do not enter Telegram credentials without a new direct instruction."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
