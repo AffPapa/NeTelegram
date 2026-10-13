@@ -16,7 +16,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v129 deployment succeeded at https://netelegram.iryadom.chatgpt.site; Site source 3d8768a41c35c2a58155af796fdce93e1742ff59, app source 6434b101b8bd7124321858e79beb8535536b1aca, deployment appgdep_6ace47b7829481919509682da8984d45, version appgprj_6acba85192e08191acdf7011928848cf~appgver_06de39ff88d481919aa752aa7254b159. The bilingual devlog records the tested APP01 queue-dispatch milestone and exact coverage. Direct URL HTTP fetch is blocked by DNS in this environment; no v129 route-level PASS. Downloads remain NO RELEASE.",
+    "site": "Public Site v130 deployment succeeded for exact source eb33a39823a068d5405b2d1792508dcb41254467 and app-source 6434b101b8bd7124321858e79beb8535536b1aca. The refreshed public browser tab confirms EN navigation, a conceptual single-window illustration without a numeric account badge, plain-language status, current exact-SHA CI links, no download button, and no-release copy. Direct web fetch remains unavailable from this environment.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -475,19 +475,19 @@
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 129,
-    "source_commit": "3d8768a41c35c2a58155af796fdce93e1742ff59",
+    "version": 130,
+    "source_commit": "eb33a39823a068d5405b2d1792508dcb41254467",
     "app_repository_commit": "6434b101b8bd7124321858e79beb8535536b1aca",
-    "deployment_id": "appgdep_6ace47b7829481919509682da8984d45",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_06de39ff88d481919aa752aa7254b159",
+    "deployment_id": "appgdep_6ace4a5da9648191ba9e6ada4a9cf801",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_fbc448b84be881918f54b53ea22254bd",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "4a67fa0b8983f984b12aa6452d25ca8a93f7e94894bb9ed51d79c46b0df60acf",
-    "sites_archive_content_hash": "sha256:1405033d04e1eb84b9ad7f93fb398b02b777c5176b642c6b4becdd45c91c717a",
+    "archive_sha256": "b3e2115a0d32da9cdf66015ca9ea66848f5161c20ab50a88a01e07157630054c",
+    "sites_archive_content_hash": "sha256:2bccaef60fb35a85cff28b9ee35d8693eca15e6e430569de09bde439e30a7760",
     "archive_bytes": 225280,
     "archive_file_count": 12,
-    "description": "Publishes exact-source APP01 queue-dispatch evidence after synthetic tests, full macOS CI and accountless Dev.app lifecycle smoke. Download status remains NO RELEASE.",
-    "public_verification": "Sites deployment succeeded and the exact archive was checked. Direct public HTTP fetch was unavailable due DNS; routes were not independently fetched after v129."
+    "description": "Refines the landing based on official telegram.org structure: keeps a concise hero and truthful product/status sections, removes numeric account-count imagery, clarifies status copy, adds EN anchor, and synchronizes exact current app-source evidence. No downloads are available.",
+    "public_verification": "Sites reported public deployment succeeded. Refreshed current public browser tab accessibility tree shows the exact new content. Direct web HTTP fetch unavailable; not claimed."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -513,5 +513,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Choose the next single APP01/APP02 integration slice by inspecting the current acceptance gaps; avoid repeating the exact 3 local tests, CI run or native smoke unless relevant source inputs change. Real Telegram login remains deferred by the user."
+  "next_action": "Implement the existing planned SecretsStore Keychain backend injection slice. Do not repeat Site v130 validation or APP01 tests unless relevant inputs change; real account login remains deferred."
 }
