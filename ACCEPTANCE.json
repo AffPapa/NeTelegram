@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public product name Neridian, repository codename NeTelegram. Source code 88ba7e2 passed 118/118 exact macOS CI and pinned accountless Dev.app smoke. Canonical local Dev.app is now built from c6bd4e4 and phone-entry screen visually checked. Public Site v101 is live pending v102 update. No app release or download exists.",
+  "status": "implementation_in_progress; public product name Neridian, repository codename NeTelegram. Source code 88ba7e2 passed 118/118 exact macOS CI and pinned accountless Dev.app smoke. Canonical local Dev.app built from c6bd4e4 and phone-entry screen visually checked. Public Site v102 is live and anonymously verified. No app release or download exists.",
   "cases": [
     {
       "id": "APP01",
@@ -324,7 +324,7 @@
       "method": "native tool receipts",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Separate public Site project appgprj_6acba85192e08191acdf7011928848cf at https://netelegram.iryadom.chatgpt.site; active public version 101 uses Site source 9f570bb899077077ccfd4734dfe21d5818e720fd."
+      "evidence": "Separate public Site project appgprj_6acba85192e08191acdf7011928848cf at https://netelegram.iryadom.chatgpt.site; active public version 102, Site source eb6972ace4b5c2b9a5c45805eee1de91e332b109."
     },
     {
       "id": "SITE02",
@@ -333,7 +333,7 @@
       "method": "native tools+anonymous HTTP",
       "required_for": "site",
       "status": "passed",
-      "evidence": "Site v101 deployment appgdep_6acde14899d48191ada2aeee0f522f7c succeeded. Anonymous TLS-validating fetch returned 200 for all 8 HTML pages and both XML feeds with expected MIME types."
+      "evidence": "Site v102 deployment appgdep_6acde3a0a8608191bc941d4b6892cfcc succeeded. Anonymous TLS-validating checks returned 200 for all 8 HTML pages and both configured XML feeds with expected MIME; both feeds parse as XML."
     },
     {
       "id": "SITE03",
@@ -342,7 +342,7 @@
       "method": "generator+public download",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public v101 now refers to current app source 88ba7e2 and exact-source macOS CI 118/118 plus pinned TDLib/arm64 Dev.app accountless smoke. Downloads explicitly says NO RELEASE; no binary CTA or signed app exists."
+      "evidence": "Public v102 links to app source c6bd4e4; source code 88ba7e2 passed 118 Swift tests and pinned arm64 accountless Dev.app smoke; one canonical local phone-entry screen was then reviewed. Downloads says NO RELEASE; no signed app or release binary exists."
     },
     {
       "id": "SITE04",
@@ -351,7 +351,7 @@
       "method": "local build+browser",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Site v101 archive is source commit 9f570bb899077077ccfd4734dfe21d5818e720fd; Python HTMLParser accepted all 8 pages and public route checks passed. CI first-run screenshot was captured for app commit 88ba7e2 but not separately visually reviewed; screenshot appearance and registration/code/QR minimum-size states remain unverified."
+      "evidence": "Site v102 archive is source commit eb6972ace4b5c2b9a5c45805eee1de91e332b109; local HTML parsing and anonymous public route checks passed. App auth visual coverage is only the default phone-entry state; code/2FA/QR/registration and min-size/accessibility checks remain open."
     },
     {
       "id": "SITE05",
@@ -360,7 +360,7 @@
       "method": "schema+readback",
       "required_for": "site",
       "status": "partial",
-      "evidence": "Public Site v101 mirrors app source 88ba7e2 and exact CI status. No release manifest is populated with signed bytes; alpha/stable appcasts remain valid and empty. Cross-site updater/download byte coherence is not applicable until a signed candidate exists."
+      "evidence": "Public Site v102 mirrors app source c6bd4e4 and current verified status. No release manifest contains signed bytes; alpha/stable appcasts are valid and empty. Download/updater byte coherence awaits a signed app candidate."
     },
     {
       "id": "OPS01",
@@ -431,28 +431,28 @@
     "source_commit": "c6bd4e475210bbbb1c5c37058947adc82a818218",
     "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-auth-layout-smoke ./Scripts/dev-app.sh --launch",
     "local_result": "Canonical /private/tmp/NeTelegram-Dev.app built successfully with clean source tree, ARM64, Apple Swift 6.4, pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, ad-hoc dev signing, and source fingerprint 8a0ede09be358cd57b4c58ce9473172f76d2822eb015203ba1b6a0f713f57a25. BuildInfo records c6bd4e4 (only acceptance/docs changed since app code SHA 88ba7e2). Native phone-entry screen opened and was visually checked centered/readable in light appearance; isolated empty QA support root. No credentials entered.",
-    "hosted_ci": "Source commit 88ba7e2: exact-source macOS CI 38363652001 and pinned TDLib/isolated Dev.app 38363652045. Acceptance/docs commit c6bd4e4: macOS CI 38364899648.",
+    "hosted_ci": "Source commit 88ba7e2: exact-source macOS CI 38363652001 and pinned TDLib/isolated Dev.app 38363652045. Acceptance/docs commit c6bd4e4: macOS CI 38364899648. Docs/evidence commit 7f2ef4d3dcb9a0bbd22eb2dc6a3b1479d48592ed: macOS CI 38365535154 succeeded.",
     "hosted_result": "Source macOS CI passed 118/118 Swift Testing tests; pinned TDLib workflow built arm64 Dev.app and captured the accountless first-run screen. Acceptance commit CI also succeeded. No real-account login or account behaviors are represented.",
     "scope": "Phone-entry screen on one canonical local Dev.app is visually checked, but code/2FA/QR/registration and minimum-size variants are not. Real login/read/send/logout, all 20 simultaneous real runtime and performance, migration/recovery, real Keychain, Developer ID/notarization, Gatekeeper, Sparkle and release remain unverified. User chose Neridian and declined sponsored-video playback; channel access and stable release remain gated.",
-    "publication": "Public Site v101 at https://netelegram.iryadom.chatgpt.site remains active/public; update v102 is being prepared to record this latest local smoke. v101 source 9f570bb899077077ccfd4734dfe21d5818e720fd, deployment appgdep_6acde14899d48191ada2aeee0f522f7c. Downloads says NO RELEASE; feeds are empty.",
-    "next_action": "Publish the factual v102 follow-up for the source-matched canonical local screen. Then continue next native acceptance slice; do not enter Telegram credentials without a new direct instruction."
+    "publication": "Public Site v102 at https://netelegram.iryadom.chatgpt.site is active/public. Site source commit eb6972ace4b5c2b9a5c45805eee1de91e332b109; deployment appgdep_6acde3a0a8608191bc941d4b6892cfcc succeeded; version appgprj_6acba85192e08191acdf7011928848cf~appgver_828ccb8d6d008191aa79ea3fbc3e59b1. Anonymous TLS-validating checks returned 200 for 8 HTML pages plus /updates/stable.xml and /updates/alpha.xml (text/xml); XML parsed, homepage links current c6bd4e4 app source, downloads says NO RELEASE. Archive SHA-256 6f333b4311122849361973c21e258e15335c0a2274a2b671d5e702bd3159e0c9; Sites hash sha256:6f333b4311122849361973c21e258e15335c0a2274a2b671d5e702bd3159e0c9; 184320 bytes, 12 files.",
+    "next_action": "Continue the next native implementation/acceptance slice without rebuilding the current Dev.app unless its source changes; real Telegram login remains deferred. Keep channel access and stable release gated."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 101,
-    "source_commit": "9f570bb899077077ccfd4734dfe21d5818e720fd",
-    "deployment_id": "appgdep_6acde14899d48191ada2aeee0f522f7c",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_e4011021410081919fd14c7c9725a0b9",
+    "version": 102,
+    "source_commit": "eb6972ace4b5c2b9a5c45805eee1de91e332b109",
+    "deployment_id": "appgdep_6acde3a0a8608191bc941d4b6892cfcc",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_828ccb8d6d008191aa79ea3fbc3e59b1",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "96f743c9559c7cfa1a556f843c06cf3f6276e6dbbf0e61d0bcc24ee9e0cfcfe9",
-    "sites_archive_content_hash": "sha256:5cd8d9f4b0b025f046ce7422a44a0c3d6dca26eb37fcab354215567f5bb93020",
+    "archive_sha256": "e0b9e9029316da6a11b43aa8e9ca69aef4ab0f9fae60febad208bf17475bbf65",
+    "sites_archive_content_hash": "sha256:6f333b4311122849361973c21e258e15335c0a2274a2b671d5e702bd3159e0c9",
     "archive_bytes": 184320,
     "archive_file_count": 12,
-    "github_mirror_commit": "3eb5100a33889a51b5dd1677e71e6339100df150",
-    "description": "Neridian Development v101 documents auth layout source 88ba7e2 and passing 118-test macOS CI plus accountless pinned Dev.app smoke. No binary is offered; stable and alpha feeds remain empty.",
-    "public_verification": "Anonymous TLS-validating fetch returned 200 for /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/stable.xml and /updates/alpha.xml. Expected MIME types; updated pages contain current source hash."
+    "github_mirror_commit": "eb6972ace4b5c2b9a5c45805eee1de91e332b109",
+    "description": "Neridian Development v102 records the canonical local phone-entry visual check, current source and compatibility gate. No binary is offered; stable and alpha feeds remain empty.",
+    "public_verification": "Anonymous TLS-validating requests returned 200 for all 8 HTML routes and /updates/stable.xml and /updates/alpha.xml; HTML is text/html, feeds are text/xml and parse successfully. Homepage shows app source c6bd4e4; downloads says NO RELEASE."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
