@@ -1578,12 +1578,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("TDLib update пришёл от неизвестного профиля; fallback на выбранный аккаунт запрещён.")
                 return
             }
+            guard let object = (try? JSONSerialization.jsonObject(with: update.json)) as? [String: Any] else {
+                setStatus("TDLib update после маршрутизации оказался некорректным JSON; профиль не переназначен.")
+                return
+            }
             let previousAuthorizationState = target.authorizationState
             let previousTelegramUserID = target.telegramUserID
             let previousDisplayName = target.displayName
             let previousError = target.lastTDLibError
             let previousIdentityPersistenceFailure = target.identityPersistenceFailed
-            await target.consume(update.json)
+            await target.consume(object)
             if let verifiedUserID = target.telegramUserID,
                var profile = knownProfilesByAccount[target.account],
                profile.telegramUserID != verifiedUserID || profile.displayName != target.displayName {
@@ -1628,7 +1632,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     setStatus("Аккаунт авторизован.")
                 }
             }
-            await handle(update.json, from: target)
+            await handle(object, from: target)
             refreshStatusMenu()
         }
     }
@@ -1639,8 +1643,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите NeTelegram после освобождения памяти.")
     }
 
-    private func handle(_ update: Data, from target: LocalAccountRuntime) async {
-        guard let object = (try? JSONSerialization.jsonObject(with: update)) as? [String: Any] else { return }
+    private func handle(_ object: [String: Any], from target: LocalAccountRuntime) async {
         let updateType = object["@type"] as? String ?? ""
         if target.telegramUserID == nil,
            !["updateAuthorizationState", "countries", "error"].contains(updateType) {
@@ -5480,8 +5483,7 @@ private final class LocalAccountRuntime {
         mainChatLoadState.invalidate()
     }
 
-    func consume(_ update: Data) async {
-        guard let object = (try? JSONSerialization.jsonObject(with: update)) as? [String: Any] else { return }
+    func consume(_ object: [String: Any]) async {
         if object["@type"] as? String == "updateAuthorizationState",
            let authorization = object["authorization_state"] as? [String: Any],
            let state = authorization["@type"] as? String {
