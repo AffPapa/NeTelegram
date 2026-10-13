@@ -89,6 +89,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var historyAnchorByConversation: [ConversationKey: Int64] = [:]
     private var messageList: NSStackView!
     private var messageScroll: NSScrollView!
+    private var messageReadViewsByID: [Int64: NSView] = [:]
+    private var visibleReadReceiptRegistry = VisibleMessageReadRegistry()
+    private var visibleReadReceiptTask: Task<Void, Never>?
     private var composerScroll: NSScrollView!
     private var composer: NSTextView!
     private var replyStatusLabel: NSTextField!
@@ -483,6 +486,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         messageScroll.hasVerticalScroller = true
         messageScroll.drawsBackground = false
         messageScroll.setAccessibilityLabel("История переписки")
+        messageScroll.contentView.postsBoundsChangedNotifications = true
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(messageViewportBoundsDidChange(_:)),
+            name: NSView.boundsDidChangeNotification,
+            object: messageScroll.contentView
+        )
         messageScroll.documentView = messageList
         chatPane.addSubview(messageScroll)
         NSLayoutConstraint.activate([
@@ -570,6 +580,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     func windowDidResize(_ notification: Notification) {
         guard (notification.object as? NSWindow) === window else { return }
         layoutWindowContents()
+        scheduleVisibleReadReceiptEvaluation()
+    }
+
+    func windowDidBecomeKey(_ notification: Notification) {
+        guard (notification.object as? NSWindow) === window else { return }
+        scheduleVisibleReadReceiptEvaluation()
+    }
+
+    @objc private func messageViewportBoundsDidChange(_ notification: Notification) {
+        guard let clipView = notification.object as? NSClipView,
+              clipView === messageScroll?.contentView else { return }
+        scheduleVisibleReadReceiptEvaluation()
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -1818,6 +1840,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func handle(_ object: [String: Any], from target: LocalAccountRuntime) async {
         let updateType = object["@type"] as? String ?? ""
+        if let extra = object["@extra"] as? String, extra.hasPrefix("message-view-") {
+            guard updateType == "ok" || updateType == "error" else { return }
+            _ = visibleReadReceiptRegistry.resolve(
+                extra: extra,
+                account: target.account,
+                runtimeGeneration: target.generation,
+                succeeded: updateType == "ok"
+            )
+            return
+        }
         if target.telegramUserID == nil,
            !["updateAuthorizationState", "countries", "error"].contains(updateType) {
             return
@@ -2054,6 +2086,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)
+                visibleReadReceiptRegistry.remove(account: target.account)
                 if !confirmedLogout {
                     // A closed runtime cannot reconcile its old notification
                     // set. Remove its previews and click routes immediately;
@@ -3110,6 +3143,121 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         return ConversationKey(account: account, chatID: chatID)
     }
 
+    private func scheduleVisibleReadReceiptEvaluation() {
+        guard !lockState else {
+            visibleReadReceiptTask?.cancel()
+            visibleReadReceiptTask = nil
+            return
+        }
+        visibleReadReceiptTask?.cancel()
+        visibleReadReceiptTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: 180_000_000)
+            guard !Task.isCancelled, let self else { return }
+            self.visibleReadReceiptTask = nil
+            self.dispatchVisibleReadReceiptsForCurrentConversation()
+        }
+    }
+
+    private func dispatchVisibleReadReceiptsForCurrentConversation() {
+        guard !lockState,
+              !tdlibReceiveFailed,
+              window.isVisible,
+              window.isKeyWindow,
+              !window.isMiniaturized,
+              NSApp.isActive,
+              !chatPane.isHidden,
+              let selected = runtime,
+              selected.authorizationState == "authorizationStateReady",
+              let userID = selected.telegramUserID,
+              runtimesByAccount[selected.account] === selected,
+              let conversation = currentConversationKey(),
+              conversation.account == selected.account,
+              let messages = messagesByConversation[conversation] else { return }
+
+        window.contentView?.layoutSubtreeIfNeeded()
+        messageList.layoutSubtreeIfNeeded()
+        let viewport = messageList.convert(messageScroll.contentView.bounds, from: messageScroll.contentView)
+        guard !viewport.isEmpty else { return }
+        var visibleIDs = Set<Int64>()
+        for (id, view) in messageReadViewsByID {
+            guard view.window === window, !view.isHidden, !view.bounds.isEmpty else { continue }
+            let frame = view.convert(view.bounds, to: messageList)
+            if viewport.contains(frame) { visibleIDs.insert(id) }
+        }
+        guard !visibleIDs.isEmpty else { return }
+
+        let candidates: [VisibleMessageReadCandidate] = messages.compactMap { message in
+            guard let id = (message["id"] as? NSNumber)?.int64Value, id > 0 else { return nil }
+            let incoming = (message["is_outgoing"] as? Bool) == false
+            let selfDestruct = (message["self_destruct_in"] as? NSNumber)?.doubleValue ?? 0
+            let paidStars = (message["paid_message_star_count"] as? NSNumber)?.int64Value ?? 0
+            let content = message["content"] as? [String: Any] ?? [:]
+            let isPhoto = content["@type"] as? String == "messagePhoto"
+            let restrictedPhoto = isPhoto && (
+                (content["is_secret"] as? Bool ?? false)
+                    || (message["can_be_saved"] as? Bool == false)
+            )
+            return VisibleMessageReadCandidate(
+                messageID: id,
+                isIncoming: incoming,
+                canBeViewed: selfDestruct <= 0 && paidStars == 0 && !restrictedPhoto
+            )
+        }
+        let ids = visibleReadReceiptRegistry.candidateIDs(
+            messages: candidates,
+            fullyVisibleMessageIDs: visibleIDs,
+            conversation: conversation,
+            runtimeGeneration: selected.generation
+        )
+        guard !ids.isEmpty else { return }
+
+        historyRequestCounter &+= 1
+        let extra = "message-view-\(historyRequestCounter)"
+        guard let request = visibleReadReceiptRegistry.begin(
+            extra: extra,
+            conversation: conversation,
+            runtimeGeneration: selected.generation,
+            messageIDs: ids
+        ) else { return }
+        let tdRequest: [String: Any] = [
+            "@type": "viewMessages",
+            "chat_id": conversation.chatID,
+            "message_ids": request.messageIDs.map { NSNumber(value: $0) },
+            "source": NSNull(),
+            "force_read": false,
+            "@extra": extra,
+        ]
+        let epoch = privacyDispatchBarrier.currentEpoch()
+        do {
+            let didDispatch = try privacyDispatchBarrier.dispatchBoundUserCommand(
+                account: selected.account,
+                expectedTelegramUserID: userID,
+                runtimeGeneration: selected.generation,
+                privacyEpoch: epoch,
+                currentAccount: runtime?.account ?? AccountUUID(),
+                currentTelegramUserID: selected.telegramUserID ?? 0,
+                currentGeneration: selected.generation
+            ) {
+                try selected.send(tdRequest)
+            }
+            if !didDispatch {
+                _ = visibleReadReceiptRegistry.resolve(
+                    extra: extra,
+                    account: selected.account,
+                    runtimeGeneration: selected.generation,
+                    succeeded: false
+                )
+            }
+        } catch {
+            _ = visibleReadReceiptRegistry.resolve(
+                extra: extra,
+                account: selected.account,
+                runtimeGeneration: selected.generation,
+                succeeded: false
+            )
+        }
+    }
+
     private func canSendInTopic(_ topic: ConversationTopicKey, account: AccountUUID, chatID: Int64) -> Bool {
         guard case .forum(let topicID) = topic else { return true }
         guard let descriptor = forumTopicsByAccount[account]?[chatID]?.first(where: { $0.id == topicID }) else { return false }
@@ -3771,6 +3919,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func renderMessages<S: Sequence>(_ messages: S) where S.Element == [String: Any] {
+        messageReadViewsByID.removeAll()
+        defer { scheduleVisibleReadReceiptEvaluation() }
         let ordered = Array(messages)
         let selected = runtime
         let chatID = selected.flatMap { selectedChatByAccount[$0.account] }
@@ -3803,7 +3953,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         for run in runs {
             let items = run.messageIndices.map { ordered[$0] }
             if run.albumID == nil {
-                for message in items { appendMessage(message) }
+                for message in items {
+                    let body = appendMessage(message)
+                    if let id = (message["id"] as? NSNumber)?.int64Value, let body {
+                        messageReadViewsByID[id] = body
+                    }
+                }
             } else {
                 appendPhotoAlbum(items)
             }
@@ -4084,7 +4239,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 tile.spacing = 5
                 tile.translatesAutoresizingMaskIntoConstraints = false
                 tile.widthAnchor.constraint(equalToConstant: 188).isActive = true
-                appendMessage(message, into: tile, photoWidth: 180)
+                _ = appendMessage(message, into: tile, photoWidth: 180)
+                if let id = (message["id"] as? NSNumber)?.int64Value {
+                    messageReadViewsByID[id] = tile
+                }
                 row.addArrangedSubview(tile)
             }
             messageList.addArrangedSubview(row)
@@ -4092,18 +4250,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func appendMessage(_ message: [String: Any], into stack: NSStackView? = nil, photoWidth: CGFloat = 320) {
-        let destination: NSStackView = stack ?? messageList!
-        guard let content = message["content"] as? [String: Any] else { return }
+    @discardableResult
+    private func appendMessage(_ message: [String: Any], into stack: NSStackView? = nil, photoWidth: CGFloat = 320) -> NSView? {
+        var destination: NSStackView = stack ?? messageList!
+        guard let content = message["content"] as? [String: Any] else { return nil }
         let type = content["@type"] as? String ?? ""
         if type == "messagePhoto" {
+            if stack == nil {
+                let photoTile = NSStackView()
+                photoTile.orientation = .vertical
+                photoTile.alignment = .leading
+                photoTile.spacing = 5
+                photoTile.translatesAutoresizingMaskIntoConstraints = false
+                photoTile.widthAnchor.constraint(equalToConstant: photoWidth + 8).isActive = true
+                messageList.addArrangedSubview(photoTile)
+                destination = photoTile
+            }
             appendPhotoMessage(message, content: content, into: destination, width: photoWidth)
             appendReplyAction(message, into: destination)
             appendMessageActions(message, into: destination)
-            return
+            return destination
         }
         let sender = message["sender_id"] as? [String: Any]
         let who = sender? ["@type"] as? String == "messageSenderUser" ? "Пользователь" : "Сообщение"
+        let body: NSView
         if type == "messageText",
            let formattedText = content["text"] as? [String: Any],
            let textView = incomingMessageTextView(
@@ -4112,6 +4282,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             maximumWidth: messageTextWidth(for: destination, albumPhotoWidth: photoWidth)
            ) {
             destination.addArrangedSubview(textView)
+            body = textView
         } else {
             let textValue = IncomingMessagePresentation.cardText(for: type)
             let label = NSTextField(wrappingLabelWithString: "\(who): \(textValue)")
@@ -4119,9 +4290,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             label.maximumNumberOfLines = 0
             label.setAccessibilityLabel("\(who). \(textValue)")
             destination.addArrangedSubview(label)
+            body = label
         }
         appendReplyAction(message, into: destination)
         appendMessageActions(message, into: destination)
+        return body
     }
 
     private func messageTextWidth(for destination: NSStackView, albumPhotoWidth: CGFloat) -> CGFloat {
@@ -4656,6 +4829,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func clearStack(_ stack: NSStackView) {
         if stack === chatList { searchResultByControlID.removeAll() }
         if stack === messageList {
+            visibleReadReceiptTask?.cancel()
+            visibleReadReceiptTask = nil
+            messageReadViewsByID.removeAll()
             messageActionTargetsByControlID.removeAll()
             messageActionButtonsByControlID.removeAll()
             photoPresentationGeneration &+= 1
@@ -5463,6 +5639,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     @objc private func closeWindow() { window.performClose(nil) }
     @objc private func lock() {
         guard !lockState else { return }
+        visibleReadReceiptTask?.cancel()
+        visibleReadReceiptTask = nil
+        visibleReadReceiptRegistry.removeAll()
+        messageReadViewsByID.removeAll()
         searchDebounceTask?.cancel()
         searchDebounceTask = nil
         searchGeneration &+= 1

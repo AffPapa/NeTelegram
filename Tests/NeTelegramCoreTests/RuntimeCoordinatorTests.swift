@@ -2600,3 +2600,79 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     ])
     #expect(TextEntityParser.entities(in: "http:// and https://valid.example").count == 1)
 }
+
+@Test func visibleReadCandidatesRequireIncomingVisiblePermittedMessageIDs() {
+    let account = AccountUUID()
+    let conversation = ConversationKey(account: account, chatID: 81, topic: .forum(topicID: 6))
+    let registry = VisibleMessageReadRegistry()
+    let candidates = [
+        VisibleMessageReadCandidate(messageID: 10, isIncoming: true),
+        VisibleMessageReadCandidate(messageID: 11, isIncoming: true),
+        VisibleMessageReadCandidate(messageID: 12, isIncoming: false),
+        VisibleMessageReadCandidate(messageID: 13, isIncoming: true, canBeViewed: false),
+        VisibleMessageReadCandidate(messageID: 0, isIncoming: true),
+        VisibleMessageReadCandidate(messageID: 10, isIncoming: true),
+    ]
+
+    #expect(registry.candidateIDs(
+        messages: candidates,
+        fullyVisibleMessageIDs: [10, 12, 13, 0],
+        conversation: conversation,
+        runtimeGeneration: RuntimeGeneration(2)
+    ) == [10])
+}
+
+@Test func visibleReadRegistryDeduplicatesPendingAndSucceededRequestsAndReleasesFailures() {
+    let account = AccountUUID()
+    let conversation = ConversationKey(account: account, chatID: 82, topic: .thread(messageThreadID: 91))
+    let generation = RuntimeGeneration(4)
+    let candidates = [VisibleMessageReadCandidate(messageID: 20, isIncoming: true)]
+    var registry = VisibleMessageReadRegistry()
+
+    #expect(registry.begin(extra: "read-a", conversation: conversation, runtimeGeneration: generation, messageIDs: [20])?.messageIDs == [20])
+    #expect(registry.candidateIDs(messages: candidates, fullyVisibleMessageIDs: [20], conversation: conversation, runtimeGeneration: generation).isEmpty)
+    #expect(registry.resolve(extra: "read-a", account: account, runtimeGeneration: generation, succeeded: false)?.messageIDs == [20])
+    #expect(registry.candidateIDs(messages: candidates, fullyVisibleMessageIDs: [20], conversation: conversation, runtimeGeneration: generation) == [20])
+
+    #expect(registry.begin(extra: "read-b", conversation: conversation, runtimeGeneration: generation, messageIDs: [20])?.messageIDs == [20])
+    #expect(registry.resolve(extra: "read-b", account: account, runtimeGeneration: generation, succeeded: true)?.messageIDs == [20])
+    #expect(registry.candidateIDs(messages: candidates, fullyVisibleMessageIDs: [20], conversation: conversation, runtimeGeneration: generation).isEmpty)
+}
+
+@Test func visibleReadRegistrySeparatesAccountTopicAndRuntimeGenerationAndCanPrune() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let conversationA = ConversationKey(account: accountA, chatID: 83, topic: .forum(topicID: 1))
+    let conversationB = ConversationKey(account: accountB, chatID: 83, topic: .forum(topicID: 1))
+    let generation = RuntimeGeneration(8)
+    var registry = VisibleMessageReadRegistry(maximumRetainedMessages: 1)
+
+    #expect(registry.begin(extra: "read-a", conversation: conversationA, runtimeGeneration: generation, messageIDs: [30]) != nil)
+    #expect(registry.resolve(extra: "read-a", account: accountB, runtimeGeneration: generation, succeeded: true) == nil)
+    #expect(registry.candidateIDs(
+        messages: [VisibleMessageReadCandidate(messageID: 30, isIncoming: true)],
+        fullyVisibleMessageIDs: [30],
+        conversation: conversationA,
+        runtimeGeneration: generation
+    ).isEmpty)
+    #expect(registry.resolve(extra: "read-a", account: accountA, runtimeGeneration: generation, succeeded: true) != nil)
+    #expect(registry.candidateIDs(
+        messages: [VisibleMessageReadCandidate(messageID: 30, isIncoming: true)],
+        fullyVisibleMessageIDs: [30],
+        conversation: conversationA,
+        runtimeGeneration: generation
+    ).isEmpty)
+    #expect(registry.candidateIDs(
+        messages: [VisibleMessageReadCandidate(messageID: 30, isIncoming: true)],
+        fullyVisibleMessageIDs: [30],
+        conversation: conversationB,
+        runtimeGeneration: RuntimeGeneration(9)
+    ) == [30])
+    registry.remove(account: accountA)
+    #expect(registry.candidateIDs(
+        messages: [VisibleMessageReadCandidate(messageID: 30, isIncoming: true)],
+        fullyVisibleMessageIDs: [30],
+        conversation: conversationA,
+        runtimeGeneration: generation
+    ) == [30])
+}

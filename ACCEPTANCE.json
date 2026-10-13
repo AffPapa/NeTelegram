@@ -89,8 +89,8 @@
       "expected": "online=false не close; невидимые сообщения не получают искусственные view/read.",
       "method": "protocol fixtures+native",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Local candidate adds a debounced AppKit viewport check and pinned-TDLib viewMessages requests only for incoming, fully visible message cards in the active unlocked window; force_read is false. A bounded per-conversation registry deduplicates pending/succeeded IDs and keeps account/runtime routing isolated. Swift suite 106/106 passes and AppKit target compiles. Native viewport behavior, real-account receipt semantics, lock/sleep/reopen, sponsored media, and a remote CI run for this candidate are not verified; no acceptance pass is claimed."
     },
     {
       "id": "APP11",
