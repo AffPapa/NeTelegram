@@ -5,6 +5,17 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func loginItemPreferencePolicyOnlyRegistersAfterExplicitOptIn() {
+    #expect(LoginItemPreferencePolicy.action(for: .notRegistered, requestedEnabled: false) == .noChange)
+    #expect(LoginItemPreferencePolicy.action(for: .notRegistered, requestedEnabled: true) == .register)
+    #expect(LoginItemPreferencePolicy.action(for: .requiresApproval, requestedEnabled: true) == .openLoginItemsSettings)
+    #expect(LoginItemPreferencePolicy.action(for: .requiresApproval, requestedEnabled: false) == .unregister)
+    #expect(LoginItemPreferencePolicy.action(for: .enabled, requestedEnabled: true) == .noChange)
+    #expect(LoginItemPreferencePolicy.action(for: .enabled, requestedEnabled: false) == .unregister)
+    #expect(LoginItemPreferencePolicy.action(for: .unavailable, requestedEnabled: false) == .showUnavailable)
+    #expect(LoginItemPreferencePolicy.action(for: .unavailable, requestedEnabled: true) == .showUnavailable)
+}
+
 @Test func accountNotificationCleanupRemovesOnlyClosedAccountsRoutes() {
     let closedAccount = AccountUUID()
     let activeAccount = AccountUUID()

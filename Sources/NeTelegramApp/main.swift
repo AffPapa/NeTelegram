@@ -889,9 +889,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         NSApp.windowsMenu = windowMenu
     }
 
+    private func loginItemRegistrationState(_ status: SMAppService.Status) -> LoginItemRegistrationState {
+        switch status {
+        case .notFound: .unavailable
+        case .notRegistered: .notRegistered
+        case .requiresApproval: .requiresApproval
+        case .enabled: .enabled
+        @unknown default: .unavailable
+        }
+    }
+
     @objc private func configureLoginAtStartup() {
         let service = SMAppService.mainApp
-        guard service.status != .notFound else {
+        let initialState = loginItemRegistrationState(service.status)
+        guard initialState != .unavailable else {
             let error = NSAlert()
             error.messageText = "macOS не нашла службу автозапуска \(ProductIdentity.displayName)"
             error.informativeText = "Откройте приложение из установленного пакета и повторите попытку."
@@ -899,7 +910,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
 
-        let enabled = service.status == .enabled || service.status == .requiresApproval
+        let enabled = initialState == .enabled || initialState == .requiresApproval
         let toggle = NSButton(checkboxWithTitle: "Запускать \(ProductIdentity.displayName) при входе в macOS", target: nil, action: nil)
         toggle.state = enabled ? .on : .off
 
@@ -914,22 +925,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         do {
-            if toggle.state == .on {
-                if service.status == .requiresApproval {
-                    setStatus("Автозапуск ожидает разрешения в Системных настройках.")
-                    SMAppService.openSystemSettingsLoginItems()
-                    return
-                }
-                if service.status != .enabled { try service.register() }
-                if service.status == .requiresApproval {
-                    setStatus("Автозапуск ожидает разрешения в Системных настройках.")
-                    SMAppService.openSystemSettingsLoginItems()
-                } else {
+            let requestedEnabled = toggle.state == .on
+            switch LoginItemPreferencePolicy.action(for: initialState, requestedEnabled: requestedEnabled) {
+            case .showUnavailable:
+                setStatus("macOS не нашла службу автозапуска \(ProductIdentity.displayName).")
+            case .noChange:
+                setStatus(requestedEnabled
+                    ? "Автозапуск \(ProductIdentity.displayName) при входе уже включён."
+                    : "Автозапуск \(ProductIdentity.displayName) при входе уже выключен.")
+            case .openLoginItemsSettings:
+                setStatus("Автозапуск ожидает разрешения в Системных настройках.")
+                SMAppService.openSystemSettingsLoginItems()
+            case .register:
+                try service.register()
+                switch loginItemRegistrationState(service.status) {
+                case .enabled:
                     setStatus("Автозапуск \(ProductIdentity.displayName) при входе включён.")
+                case .requiresApproval:
+                    setStatus("Автозапуск ожидает разрешения в Системных настройках.")
+                    SMAppService.openSystemSettingsLoginItems()
+                case .notRegistered, .unavailable:
+                    setStatus("macOS не подтвердила регистрацию автозапуска. Проверьте объекты входа в Системных настройках.")
                 }
-            } else {
-                if service.status != .notRegistered { try service.unregister() }
-                setStatus("Автозапуск \(ProductIdentity.displayName) при входе выключен.")
+            case .unregister:
+                try service.unregister()
+                if loginItemRegistrationState(service.status) == .notRegistered {
+                    setStatus("Автозапуск \(ProductIdentity.displayName) при входе выключен.")
+                } else {
+                    setStatus("macOS не подтвердила отмену автозапуска. Проверьте объекты входа в Системных настройках.")
+                }
             }
         } catch {
             setStatus("macOS не изменила настройку автозапуска. Проверьте объекты входа в Системных настройках.")
