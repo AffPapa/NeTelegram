@@ -53,8 +53,8 @@
       "expected": "Неинтерактивный bootstrap продолжается; auth UI ждёт owner unlock; остальные не выключаются.",
       "method": "native",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "At app-source commit 0fe2a13ecd7f227e10a2c1fa6773069c53f83e52, lock() now closes PrivacyDispatchBarrier before UI cleanup or draft storage I/O. This makes command dispatch linearize before the lock or be rejected after it, including while dirty drafts flush. Local Swift suite passed 126/126, including privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent and privacyBarrierRejectsQueuedAuthenticationAfterLockAndUnlock. Exact-source macOS CI 38379269975 and pinned TDLib/isolated Dev.app workflow 38379269906 succeeded. Source review confirms restoreProfiles is independent of lockState and locked authorization updates retain current state without presenting auth UI; LocalAuthentication cancellation keeps the UI locked. Native startup-under-lock, reauth UI on a real profile, and concurrent background-account behavior remain unverified; acceptance stays partial."
     },
     {
       "id": "APP07",
