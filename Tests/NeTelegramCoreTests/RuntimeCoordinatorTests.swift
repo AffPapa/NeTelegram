@@ -2725,6 +2725,59 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func oneProfileStorageKeychainFailurePreservesItsDataAndDoesNotBlockOtherProfiles() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let failedAccount = AccountUUID()
+    let failedPaths = try AccountStoragePaths(rootURL: root, account: failedAccount)
+    let databaseMarker = failedPaths.database.appendingPathComponent("existing.db")
+    let draftMarker = failedPaths.appState.appendingPathComponent("drafts.aesgcm")
+    try Data("database remains".utf8).write(to: databaseMarker)
+    try Data("drafts remain".utf8).write(to: draftMarker)
+    let failedBackend = FakeKeychainItemBackend(readFailure: errSecInteractionNotAllowed)
+
+    let accounts = [failedAccount] + (0..<19).map { _ in AccountUUID() }
+    let tasks = accounts.map { account in
+        Task {
+            await scheduler.withPermit {
+                let backend: FakeKeychainItemBackend
+                if account == failedAccount {
+                    backend = failedBackend
+                } else {
+                    let accountName = account.id.uuidString.lowercased()
+                    backend = FakeKeychainItemBackend(values: [
+                        FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.database-key"): Data(repeating: 1, count: 32),
+                        FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.app-state-key"): Data(repeating: 2, count: 32),
+                    ])
+                }
+                do {
+                    _ = try await SecretsStore.performKeychainRead {
+                        try ProfileStoragePreparer.prepare(
+                            account: account,
+                            rootURL: root,
+                            secrets: SecretsStore(backend: backend)
+                        )
+                    }
+                    return true
+                } catch {
+                    return false
+                }
+            }
+        }
+    }
+
+    var successes: [Bool] = []
+    for task in tasks { successes.append(await task.value) }
+    #expect(successes.filter { $0 }.count == 19)
+    #expect(!successes[0])
+    #expect(try Data(contentsOf: databaseMarker) == Data("database remains".utf8))
+    #expect(try Data(contentsOf: draftMarker) == Data("drafts remain".utf8))
+    #expect(failedBackend.operationCounts.adds == 0)
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func quittingInvalidatesAProfileRestoreThatMayResumeLate() {
     var gate = ProfileRestoreGenerationGate()
     let firstRestore = gate.begin()

@@ -2047,21 +2047,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             if gateway == nil { gateway = try TDLibGateway(libraryURL: library) }
             guard let gateway, let catalogue else { throw TDLibGatewayError.clientCreation }
             let root = try accountStorageRoot()
-            let prepared = try await SecretsStore.performKeychainRead { () throws -> (AccountStoragePaths, Data, Data) in
-                let paths = try AccountStoragePaths(rootURL: root, account: profile.id)
-                let hasDatabaseFiles = try !FileManager.default.contentsOfDirectory(atPath: paths.database.path).isEmpty
-                let secrets = SecretsStore()
-                let databaseKey = try secrets.databaseKey(for: profile.id, createIfMissing: !hasDatabaseFiles)
-                let draftsURL = paths.appState.appendingPathComponent("drafts.aesgcm")
-                let appStateKey = try secrets.appStateKey(
-                    for: profile.id,
-                    createIfMissing: !FileManager.default.fileExists(atPath: draftsURL.path)
+            let prepared = try await SecretsStore.performKeychainRead { () throws -> PreparedProfileStorage in
+                try ProfileStoragePreparer.prepare(
+                    account: profile.id,
+                    rootURL: root,
+                    secrets: SecretsStore()
                 )
-                return (paths, databaseKey, appStateKey)
             }
             guard !Task.isCancelled, !closingForTermination else { return }
             do {
-                let draftStore = try EncryptedDraftStore(account: profile.id, stateDirectory: prepared.0.appState, key: prepared.2)
+                let draftStore = try EncryptedDraftStore(account: profile.id, stateDirectory: prepared.paths.appState, key: prepared.appStateKey)
                 draftStoresByAccount[profile.id] = draftStore
                 for (conversation, text) in try draftStore.load() { draftsByConversation[conversation] = text }
                 unavailableDraftAccounts.remove(profile.id)
@@ -2071,8 +2066,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("Черновики этого аккаунта не открыты; сохранённые данные не изменены.")
             }
             let outgoingPhotoStore = OutgoingPhotoManifestStore(
-                stateDirectory: prepared.0.appState,
-                accountFilesDirectory: prepared.0.files
+                stateDirectory: prepared.paths.appState,
+                accountFilesDirectory: prepared.paths.files
             )
             outgoingPhotoManifestStoresByAccount[profile.id] = outgoingPhotoStore
             do {
@@ -2087,7 +2082,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
             guard !Task.isCancelled, !closingForTermination else { return }
-            let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.0, databaseKey: prepared.1, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
+            let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.paths, databaseKey: prepared.databaseKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
             startupRuntime = runtime
             let route = try runtime.registerRoute()
             try await runtimeCoordinator.registerBeforeFirstRequest(route)
