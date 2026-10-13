@@ -571,3 +571,10 @@
 - Retrieved jobs and decoded logs for exact-source Actions run [38478591456](https://github.com/AffPapa/NeTelegram/actions/runs/38478591456), job `115575330981`, using the connected GitHub read API. macOS 15.7.9 arm64 / Xcode 16.4 built the test binary successfully in 31.65s. The workflow then produced no test output for 272s before cancellation; cleanup terminated `swiftpm-testing`.
 - This rules out a compile failure but does not identify a hanging test or prove the runner itself is at fault. Keep hosted status cancelled/no PASS. Same-SHA rerun remains unavailable (connector returned 403); do not retry unchanged inputs. At the next planned Swift source change, add a filtered deterministic runner probe before the one full serial suite and use that exact run to localize the stall.
 - Efficiency decision: use one checkout and one app candidate; no rebuild or full local suite was repeated because this turn changed only workflow/evidence documentation. The canonical Dev.app was exited normally after the accountless login UI check; no phone/code was entered.
+
+
+### 2026-10-14 — reduce CI rebuild time and localize silent test stalls
+
+- Updated `.github/workflows/ci.yml` with a SwiftPM `.build` cache keyed by macOS, architecture, Swift/Xcode versions, `Package.swift`, and `TDLIB.lock.json`. Added a known-fast filtered runner probe before the existing serial full suite. This keeps the concurrency-sensitive test suite serial while distinguishing runner startup from a later suite stall.
+- Local validation passed: Ruby YAML parse, both checkpoint JSON parses, and `git diff --check`. No Swift source changed, so no Swift tests, app rebuild, or Site deployment were run.
+- The optimization is not proven faster yet. First hosted run must report cache status, probe output, full-suite result and elapsed time. Baseline run 38478591456 compiled in 31.65s, then emitted no test output for 272s before cancellation; hosted PASS remains absent.

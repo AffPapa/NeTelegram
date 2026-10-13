@@ -40,12 +40,30 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Record toolchain
+        id: toolchain
         run: |
           swift --version
           xcodebuild -version
           uname -m
 
-      - name: Build app and run core tests
+          echo "swift=$(swift --version | sed -n '1s/.*version \([^ ]*\).*/\1/p')" >> "$GITHUB_OUTPUT"
+          echo "xcode=$(xcodebuild -version | awk '/^Xcode / { print $2; exit }')" >> "$GITHUB_OUTPUT"
+          echo "arch=$(uname -m)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore incremental SwiftPM build cache
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
+        with:
+          path: .build
+          key: macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-
+
+      - name: Probe Swift Testing runner
+        # A known-fast deterministic test distinguishes runner startup hangs
+        # from a stall later in the full suite without parallelizing tests.
+        run: swift test --no-parallel --verbose --filter publicDisplayNameMatchesRepositoryName
+
+      - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output
         # makes the handoff from build/link to test-runner startup observable.
         run: swift test --no-parallel --verbose

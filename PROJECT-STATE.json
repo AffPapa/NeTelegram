@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "phase": "Exact app source 209be94 retains local serial suite PASS 157/157; decoded logs for hosted macOS run 38478591456 confirm the test binary built in 31.65s, then emitted no test output for 272s before cancellation. Root cause is not identified; do not rerun unchanged full suite. Canonical Dev.app accountless phone/QR smoke and normal app-menu Quit process exit are confirmed. Public Site v162 remains current.",
-  "verified_at": "2026-10-14T05:51:23+07:00",
+  "phase": "Exact app source 209be94 retains local serial suite PASS 157/157; hosted run 38478591456 built in 31.65s then stalled silently until cancellation. CI workflow now has a filtered runner probe and toolchain/pin-scoped SwiftPM cache, locally YAML/JSON/whitespace validated but not yet hosted. Canonical Dev.app accountless phone/QR smoke and normal app-menu Quit process exit are confirmed. Public Site v162 remains current.",
+  "verified_at": "2026-10-14T06:01:52+07:00",
+  "ci_efficiency_change": {
+    "workflow_path": ".github/workflows/ci.yml",
+    "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
+    "local_validation": "Ruby YAML parse, JSON parse, and git diff --check passed. No Swift source changed, so no local Swift suite or Dev.app rebuild was run.",
+    "hosted_validation": "pending publication; cache-hit, filtered-probe, full-suite result, and elapsed-time improvement are not yet verified",
+    "prior_baseline": "Hosted run 38478591456: test binary build 31.65s, then no test output for 272s before cancellation; no test-level root cause or hosted PASS.",
+    "next_action": "Publish this workflow checkpoint when Git transport is available; inspect the exact Actions run once for cache hit and probe/full-suite outcome."
+  },
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
