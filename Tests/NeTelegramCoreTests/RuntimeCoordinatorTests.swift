@@ -1833,6 +1833,51 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(routedA.systemIdentifier != routedB.systemIdentifier)
 }
 
+@Test func tdlibNotificationUpdateReplacesPushContentWithExactConversationRoute() throws {
+    let account = AccountUUID()
+    let update: [String: Any] = [
+        "@type": "updateNotification",
+        "notification_group_id": 7,
+        "notification": [
+            "id": 19,
+            "date": 321,
+            "is_silent": true,
+            "type": [
+                "@type": "notificationTypeNewMessage",
+                "show_preview": true,
+                "message": [
+                    "id": 88,
+                    "chat_id": -44,
+                    "topic_id": ["@type": "messageTopicThread", "message_thread_id": 55],
+                    "content": ["@type": "messageText", "text": ["text": "Обновлённый текст"]],
+                ],
+            ],
+        ],
+    ]
+
+    let routed = try #require(TDLibNotificationRouter.routeUpdate(account: account, update: update))
+    #expect(routed.groupID == 7)
+    #expect(routed.notificationID == 19)
+    #expect(routed.conversation == ConversationKey(account: account, chatID: -44, topic: .thread(messageThreadID: 55)))
+    #expect(routed.messageID == 88)
+    #expect(routed.preview == "Обновлённый текст")
+    #expect(routed.isSilent)
+}
+
+@Test func tdlibNotificationUpdateDoesNotInventRouteForPartialPushOrWrongUpdateKind() {
+    let account = AccountUUID()
+    let partialPush: [String: Any] = [
+        "@type": "updateNotification",
+        "notification_group_id": 7,
+        "notification": [
+            "id": 19,
+            "type": ["@type": "notificationTypeNewPushMessage"],
+        ],
+    ]
+    #expect(TDLibNotificationRouter.routeUpdate(account: account, update: partialPush) == nil)
+    #expect(TDLibNotificationRouter.routeUpdate(account: account, update: ["@type": "updateNotificationGroup"]) == nil)
+}
+
 @Test func privacyLockKeepsActiveNotificationRouteWithGenericContent() throws {
     let account = AccountUUID()
     let raw: [String: Any] = [

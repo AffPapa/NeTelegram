@@ -14,6 +14,10 @@ public struct RoutedTDLibNotification: Hashable, Sendable {
     public let preview: String?
 
     public var systemIdentifier: String {
+        Self.systemIdentifier(account: account, groupID: groupID, notificationID: notificationID)
+    }
+
+    public static func systemIdentifier(account: AccountUUID, groupID: Int32, notificationID: Int32) -> String {
         "netelegram.\(account.id.uuidString.lowercased()).\(groupID).\(notificationID)"
     }
 }
@@ -33,6 +37,16 @@ public struct TDLibNotificationPresentation: Equatable, Sendable {
 /// Converts TDLib's per-client update payloads into explicit account/chat/topic
 /// targets. Unknown topics and non-message notification kinds fail closed.
 public enum TDLibNotificationRouter {
+    /// Routes an update that replaces the content of an active notification.
+    /// A NewPushMessage may not yet contain enough information to open a
+    /// conversation; TDLib can later send this update with a full NewMessage.
+    public static func routeUpdate(account: AccountUUID, update: [String: Any]) -> RoutedTDLibNotification? {
+        guard update["@type"] as? String == "updateNotification",
+              let groupID = (update["notification_group_id"] as? NSNumber)?.int32Value,
+              let notification = update["notification"] as? [String: Any] else { return nil }
+        return route(account: account, groupID: groupID, groupChatID: 0, notification: notification)
+    }
+
     public static func presentation(
         for notification: RoutedTDLibNotification,
         isPrivacyLocked: Bool,
