@@ -458,3 +458,20 @@
 - Official Sites helper initially failed inside sandbox on DNS for `git.chatgpt-team.site`; same helper succeeded through approved host network using credential only over hidden stdin. No Site origin was replaced and no token was printed. Site source `7590ad7` saved/deployed as v155, then anonymous QA found that the intended new devlog marker had not landed. Corrected the source and published v156 from `5e9651446a4bfbae4bd3bc0f086c9d481f9560d5` (deployment `appgdep_6acea15c55f881918a6f848cac79f7a6`).
 - Public v156 checks: `/`, `/features/`, `/devlog/`, `/downloads/` each returned HTTP 200 `text/html`; current CI/source markers pass, and downloads contains no installer links. Local v156 archive SHA-256 `0c473115004e34a4119b8d9eae36a295e08c571a78ae0465131f0d095e3e1fab`; Sites archive receipt `sha256:f96442371e6bf138335de9f090bcec6cdf07b4e6a225ebfdb7f000cd13de79ac`.
 - No app bundle was rebuilt or launched. No real Telegram account was entered. All-20 runtime, current-source native GUI smoke, Developer ID/notarization, updater and compatibility gates remain open; no binary release/download is claimed.
+
+
+### 2026-10-14 — current-source accountless Dev.app smoke
+
+- Canonical `Scripts/dev-app.sh --launch` passed its process guard and built `org.affpapa.netelegram.dev` from clean HEAD `c028bd3859d76b6abf31634a4bb62f071d5e9f57` in 9.05s; nested ad-hoc codesign verification passed. arm64, minimum macOS 14.0; isolated support root `/private/tmp/netelegram-c028-dev-support`.
+- Bundle source fingerprint `d4a02f5339d4d87b9f79ab6d4df9f9ca56639e6f09366e3520e1afc66c9586d8`; executable SHA-256 `e9a30f6e2413e2b2cbc163ce3f5ce82462c431a546e258e7b513a9843bf2fa35`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`.
+- Accessibility smoke: country/phone form, locale-suggested Thailand +66, neutral status, Continue and QR visible. No phone, OTP, profile or Telegram session entered. Native Dev.app remains open. This is not a release signature/notarization check.
+- Metadata validation `38470536609` passed for c028bd3. No app-source changes since 4d6820d; 153/153 local suite and macOS CI `38469520583` remain the current app-source test evidence.
+
+
+### 2026-10-14 — current-source smoke published to Site v157
+
+- Site homepage/features/devlog now report canonical Dev.app smoke from clean app checkpoint `c028bd3`, not only historical parent `94740d3`. The status remains accountless, ad-hoc development signed, and not a release.
+- Official Sites helper source commit `3c14efda4c204c0bb3ca57a95aca0b2b8f27b751`; saved version 157 `appgprj_6acba85192e08191acdf7011928848cf~appgver_68bbface67388191aa283ec451dcb128`; deployment `appgdep_6acea2b8963481919ba43b8a1b5c0dfa6` succeeded on the existing public Site `https://netelegram.iryadom.chatgpt.site`. No Site project/origin changes.
+- Archive SHA-256 local `458456229885704413ba63fbe22b7f6baaa9415fe184a00f66875af8f8274cb5`; Sites archive receipt `sha256:f4237d5da1dc9a5dc55be20b61c0ca8acb672bf9c1fe42c8620f9aff52c55eef`, 532480 bytes/15 files.
+- Anonymous public checks after v157: `/`, `/features/`, `/devlog/`, `/downloads/` each HTTP 200 `text/html`; current-source/CI markers passed; downloads has no installer links.
+- App source unchanged. Local suite 153/153 and hosted macOS CI 38469520583 remain valid; current-source Dev.app c028bd3 AX smoke passed with no phone/code/profile/session. No real login or 20-runtime certification.
