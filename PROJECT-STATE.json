@@ -12,7 +12,7 @@
     "repository_id": 1415421574,
     "branch": "main",
     "commit": "2285792bd360b392c79e4fe9da70dd7d70b86be7",
-    "working_tree_clean": false,
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38404936494,
@@ -122,7 +122,7 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "2285792bd360b392c79e4fe9da70dd7d70b86be7",
+    "repo_head_before_checkpoint": "e30a91cb0aa58e672aefd6600eb7f71b4ef8c2bc",
     "app_source_commit_authority": "source.commit",
     "app_source_commit": "2285792bd360b392c79e4fe9da70dd7d70b86be7"
   },
@@ -137,6 +137,5 @@
     "On resume read PROJECT-STATE, the newest RUN-LOG entry, and only relevant ACCEPTANCE cases. Reuse PASS only for matching source/input, harness, and environment; after two identical failures diagnose before retrying. On verifier anomalies inspect the raw artifact/HTTP response first.",
     "Run Sites helper only from the dedicated Site checkout returned by its opening result, never from the app repository; on DNS denial, keep the same helper/remote and retry with authorized network access.",
     "The APP04 CI smoke initially counted the status-bar service window as a user window and recorded launch before AppKit presentation. The final verified metric counts only visible titled app windows and records launch after visibility; keep those semantics in the CI artifact and devlog. Do not treat failed diagnostic runs as passes."
-  ],
-  "checkpoint_status": "Documentation and Site mirror edits are staged for a factual checkpoint commit; app source remains at the verified commit recorded in source.commit."
+  ]
 }
