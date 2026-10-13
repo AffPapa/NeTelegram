@@ -128,6 +128,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var draftStoresByAccount: [AccountUUID: EncryptedDraftStore] = [:]
     private var dirtyDraftAccounts: Set<AccountUUID> = []
     private var unavailableDraftAccounts: Set<AccountUUID> = []
+    private var lockedDirtyDraftRecovery: [ConversationKey: String] = [:]
     private var sendEligibilityByAccount: [AccountUUID: [Int64: ChatSendPermission]] = [:]
     private var pendingSendByExtra: [String: PendingSend] = [:]
     private var pendingSendLifecycle = SendMessageLifecycle<PendingSend>()
@@ -5129,7 +5130,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
         }
         cancelAllPhotoDownloads()
-        let draftsFlushed = flushDirtyDraftsBeforeQuit()
+        _ = flushDirtyDraftsBeforeQuit()
+        lockedDirtyDraftRecovery = DraftPrivacyCache.lock(
+            presentationDrafts: &draftsByConversation,
+            dirtyAccounts: dirtyDraftAccounts
+        )
         lockState = true
         privacyDispatchBarrier.setLocked(true)
         UNUserNotificationCenter.current().removeAllDeliveredNotifications()
@@ -5177,7 +5182,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         failedSponsoredPhotos.removeAll()
         pendingForumTopicsByExtra.removeAll()
         selectedChatByAccount.removeAll()
-        if draftsFlushed { draftsByConversation.removeAll() }
         clearStack(chatList)
         photoPipeline.cancelAllPreviews()
         closePhotoViewer()
@@ -5213,6 +5217,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.notificationUnlockHandoff.clear()
                     return
                 }
+                DraftPrivacyCache.unlock(
+                    presentationDrafts: &self.draftsByConversation,
+                    lockedDirtyDrafts: &self.lockedDirtyDraftRecovery
+                )
                 self.lockState = false
                 self.privacyDispatchBarrier.setLocked(false)
                 self.lockedView.isHidden = true

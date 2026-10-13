@@ -5,6 +5,33 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func privacyLockPurgesPresentationDraftsButRetainsDirtyRecoveryUntilUnlock() {
+    let dirtyAccount = AccountUUID()
+    let persistedAccount = AccountUUID()
+    let dirtyConversation = ConversationKey(account: dirtyAccount, chatID: 10)
+    let persistedConversation = ConversationKey(account: persistedAccount, chatID: 20)
+    var presentationDrafts = [
+        dirtyConversation: "unsaved sensitive draft",
+        persistedConversation: "already persisted draft",
+    ]
+
+    var lockedDirtyDrafts = DraftPrivacyCache.lock(
+        presentationDrafts: &presentationDrafts,
+        dirtyAccounts: [dirtyAccount]
+    )
+
+    #expect(presentationDrafts.isEmpty)
+    #expect(lockedDirtyDrafts == [dirtyConversation: "unsaved sensitive draft"])
+
+    DraftPrivacyCache.unlock(
+        presentationDrafts: &presentationDrafts,
+        lockedDirtyDrafts: &lockedDirtyDrafts
+    )
+
+    #expect(presentationDrafts == [dirtyConversation: "unsaved sensitive draft"])
+    #expect(lockedDirtyDrafts.isEmpty)
+}
+
 @Test func sponsoredMessagesCacheExpiresAtFiveMinutesAndRejectsFutureTimestamp() {
     let now = Date(timeIntervalSince1970: 10_000)
     #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: nil, now: now))
