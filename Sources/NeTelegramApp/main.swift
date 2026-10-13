@@ -6259,10 +6259,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               !arguments[index + 1].isEmpty else { return }
         let recorder = WindowLifecycleSmokeRecorder(fileURL: URL(fileURLWithPath: arguments[index + 1]))
         windowLifecycleSmokeRecorder = recorder
-        recorder.record("launched", visibleWindowCount: visibleApplicationWindowCount)
         Task { @MainActor [weak self] in
+            for _ in 0..<100 {
+                guard let self else { return }
+                if self.visibleApplicationWindowCount > 0 { break }
+                try? await Task.sleep(for: .milliseconds(100))
+            }
+            guard let self else { return }
+            recorder.record("launched", visibleWindowCount: self.visibleApplicationWindowCount)
+            guard let window = self.window, window.isVisible else { return }
             try? await Task.sleep(for: .seconds(6))
-            guard let self, let window = self.window, window.isVisible else { return }
+            guard self.window === window, window.isVisible else { return }
             window.performClose(nil)
         }
     }
