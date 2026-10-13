@@ -288,3 +288,9 @@
 
 - Static review of app source `4e96a1556e6cd5f74d0cabeb651e21fa64793b51` confirms a 900×700 minimum window, a 568 px maximum auth card and 360 px inputs. The constraints fit at the declared minimum width; this does not establish visual quality or height behavior.
 - Exact-source pinned Dev.app run `38451242039` published a review artifact containing the native first-run image. The image has not yet been visually inspected. Code/2FA/QR/registration screen layouts and accessibility remain unverified; AUTH03 stays partial. Next action is to inspect the artifact and make only screenshot-backed layout changes.
+
+### 2026-10-14 — make Telegram ecosystem disclosure explicit in sign-in
+
+- Rechecked current primary Telegram API Terms and pinned TDLib 1.8.68 schema. Terms §2.2 calls for prominent notice that the client uses Telegram API and is part of the Telegram ecosystem. The sign-in intro now says both explicitly while preserving NeTelegram's independent/no-affiliation disclosure.
+- The exact pinned TDLib schema contains sponsored channel messages with `messageVideo` plus timed video-message advertisement APIs. User previously declined a video player; channel access/stable release therefore remains deferred. Terms §§1.3/1.4 do not enumerate a minimum feature checklist in the primary page, so this compatibility review remains open.
+- Exact-source local AppKit/Core build passed on Xcode 27 / Swift 6.4 in 5.69 seconds. No account or keychain data was accessed. CI and pinned Dev.app smoke are pending for the changed source.

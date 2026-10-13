@@ -315,7 +315,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
         loginHeading.font = .systemFont(ofSize: 25, weight: .semibold)
         loginHeading.alignment = .center
-        loginSubtitle = NSTextField(wrappingLabelWithString: "NeTelegram — независимый неофициальный клиент, который использует Telegram API и TDLib. Проект не имеет прямого отношения к Telegram Messenger LLP. Войдите по номеру телефона; сессии других клиентов не импортируются.")
+        loginSubtitle = NSTextField(wrappingLabelWithString: "NeTelegram — независимый неофициальный клиент в экосистеме Telegram, который использует Telegram API и TDLib. Проект не имеет прямого отношения к Telegram Messenger LLP. Войдите по номеру телефона; сессии других клиентов не импортируются.")
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
