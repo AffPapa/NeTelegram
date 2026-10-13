@@ -45,7 +45,13 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38407466662",
       "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9"
     },
-    "repo_head_policy": "Read `git rev-parse HEAD` at resume; the state file does not self-reference its containing docs commit."
+    "repo_head_policy": "Read `git rev-parse HEAD` at resume; the state file does not self-reference its containing docs commit.",
+    "latest_checkpoint_ci": {
+      "run_id": 38410317727,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38410317727",
+      "checkpoint_commit": "34dd0b34a5b6092d98122fec3a1e78e013326f3d"
+    }
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
@@ -80,7 +86,7 @@
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": "Exact-SHA CI workflow 38399172724 confirmed appless Dev.app last user-facing window close -> same PID remains with zero titled application windows -> LaunchServices reopen -> exactly one titled window in the same PID -> normal Cmd+Q exit. The status-bar service window is excluded from user-facing window count. No Telegram account or background updates were tested.",
-    "publication": "Latest app Swift source remains 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. APP16 test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a is on main; exact-source macOS CI 38409529115 passed. Site v122 remains live pending v123 devlog deployment. No app binary release.",
+    "publication": "Latest app Swift source remains 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. APP16 test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a is on main; exact-SHA macOS CI 38409529115 passed. Site v123 is live and anonymously verified. No app binary release.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
     "seo_keyword_research": "Live qualitative SERP wording: RU: неофициальный клиент Telegram для macOS; клиент Telegram для Mac; альтернативный клиент Telegram для Mac/macOS; приложение для Telegram на Mac. EN: unofficial Telegram client for macOS; Telegram client for Mac; alternative Telegram client for Mac/macOS; native macOS Telegram client; open-source Telegram client for Mac. No search volume/rank source was available.",
@@ -101,10 +107,10 @@
     "updater_feeds": "empty valid stable and alpha feeds",
     "public_route_verified": "Anonymous HTTPS curl with TLS verification: /devlog/ 200 text/html (new 04279b9 entry), /downloads/ 200 text/html (NO RELEASE and no release-download link), /updates/stable.xml 200 text/xml valid XML, /updates/alpha.xml 200 text/xml valid XML.",
     "archive_local_sha256": "23f329caf27bf679b3863498fe27da8693c99bd9c35e913df45d7208a2707c5b",
-    "archive_sites_reported_content_hash": "sha256:b3f0e2f29a37f01e86d47571b48c3061d761a86630caca3270bc4436dc4fe19b",
+    "archive_sites_reported_content_hash": "sha256:fff05212b572d4aebe8f9f0e6f2b98780828fceeb00ced58589d49a49e9ccc1e",
     "archive_file_count": 14,
     "sites_reported_archive_size_bytes": 450560,
-    "local_archive_size_bytes": 450560,
+    "local_archive_size_bytes": 276931,
     "archive_local_path": "/private/tmp/netelegram-site-v123.tar.gz",
     "saved_archive_content_hash": "sha256:fff05212b572d4aebe8f9f0e6f2b98780828fceeb00ced58589d49a49e9ccc1e",
     "saved_archive_size_bytes": 450560
@@ -128,7 +134,7 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "04279b967c8296a8c73719ce79030286dfe4570a",
+    "repo_head_before_checkpoint": "34dd0b34a5b6092d98122fec3a1e78e013326f3d",
     "app_source_commit_authority": "source.commit",
     "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9"
   },
