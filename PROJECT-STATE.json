@@ -12,7 +12,7 @@
     "repository_id": 1415421574,
     "branch": "main",
     "commit": "dd11b9f38978870bf80509c239070d2570c7d8d4",
-    "working_tree_clean": false,
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38388246897,
@@ -42,7 +42,8 @@
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38388246709"
     },
-    "checkout_path": "/private/tmp/netelegram-cli-work"
+    "checkout_path": "/private/tmp/netelegram-cli-work",
+    "document_checkpoint_commit": "b6a1c1cbbe752d8d54bd4c4a90dbbb2f76032ab1"
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
@@ -71,7 +72,7 @@
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
     "current_head_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless.",
-    "current_head_site": "Before this update, public Site v113 and both checked devlog source trees ended at e89265c, despite the prior checkpoint claiming 4478f96 was visible. Publishing a corrected factual devlog is in progress; do not claim current until anonymous live verification.",
+    "current_head_site": "Site v114 public deployment appgdep_6ace12db0d3881918a0b08d461c495c7 succeeded from Site source commit 9f7b2256db715fd83b90f51a5cf22374ab1d26c4. Anonymous curl verified /devlog/ 200 text/html containing 4478f96 and dd11b9f; /downloads/ 200 text/html and no release; /updates/stable.xml and /updates/alpha.xml 200 text/xml and parse as empty valid XML. An initial parser falsely reported missing commits due a boolean-expression bug; corrected verifier confirmed them.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection.",
     "current_head_native_workflow": "Pinned TDLib workflow 38388246709 succeeded for exact app-source SHA dd11b9f38978870bf80509c239070d2570c7d8d4; it built and verified an isolated arm64 Dev.app. No launch, account login, or real Notification Center behavior.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified."
@@ -81,17 +82,19 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 113,
-    "source_commit": "1f90e6eebc373566c52a1f11bc4b74e3a8396d33",
-    "deployment_id": "appgdep_6ace1019a9ac8191a9ad7c5ae7084255",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_a1fc62d0d44c8191a7a7bbfd02066571",
+    "latest_version": 114,
+    "source_commit": "9f7b2256db715fd83b90f51a5cf22374ab1d26c4",
+    "deployment_id": "appgdep_6ace12db0d3881918a0b08d461c495c7",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_8f91acef31b48191b6fdcb39ab5ad7fb",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous HTTPS verified v113 /devlog/ and /downloads/ as 200 text/html. The devlog names exact app SHA 4478f967654b270cd78f71a5afe69f625491d38d and states native VoiceOver/auth remain unverified. Downloads says NO RELEASE.",
-    "archive_local_sha256": "154f4c44023aadea761cf822a7dc6eeddf786936cd5cc8beec01734bfc98951f",
-    "archive_sites_reported_content_hash": "sha256:c220736b23ea0bf86893c977c24a3f20e5cb584c80d2a30d1e9760f926f4c221",
+    "public_route_verified": "Anonymous curl: /devlog/ 200 text/html contains exact commits 4478f96 and dd11b9f; /downloads/ 200 text/html clearly states no app release; /updates/stable.xml and /updates/alpha.xml 200 text/xml parse as valid empty feeds.",
+    "archive_local_sha256": "3228b204d8e769eef7ebb51baf150bd7c52d2615f43a6d8ff06f3116a71dec08",
+    "archive_sites_reported_content_hash": "sha256:8cfcb5561d0f39237bdb5f335ba3c5a60821c861ccfd60e5764b07270a8df3f3",
     "archive_size_bytes": 460800,
-    "archive_file_count": 14
+    "archive_file_count": 14,
+    "archive_local_size_bytes": 278327,
+    "archive_sites_reported_size_bytes": 460800
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -102,7 +105,7 @@
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified."
   ],
-  "next_action": "Publish corrected Site devlog and reconcile its exact saved version/deployment; then continue with next product gap. Keep app source dd11b9f separate from docs checkpoint commit, and label every binary by exact source SHA. Do not open the old Dev.app candidate unless its installed bytes/source are first verified.",
+  "next_action": "Continue implementation from app-source dd11b9f. Next select one high-risk synthetic-testable runtime gap; do not start login because user deferred it. When building/launching, label by app-source SHA and verify installed bundle/process independently. Run only tests relevant to changed code, then exact-SHA CI. Site source is v114 and public; keep downloads unavailable until an actual signed/notarized app release exists.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -117,5 +120,13 @@
       "working_tree": "14 modified tracked paths and 26 untracked paths",
       "handling": "preserve without reset, clean, stash, merge, build or launch until a separate file-level reconciliation is planned"
     }
-  }
+  },
+  "avoid_repeat_errors": [
+    "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
+    "Separate app-source SHA, docs/checkpoint commit, Site-source commit, saved Site version, and deployment ID in every checkpoint.",
+    "After every Site deployment, anonymously verify real routes and MIME/content. Parse checks independently; an incorrect verifier result is not deployment failure until raw response is inspected.",
+    "For Sites source helper, first run open mode and retain its returned opening result; then run publish mode with that exact result. If sandbox DNS blocks the official host, retry the same helper with approved network access; do not change origin or use a guessed endpoint.",
+    "Preserve the old dirty NeTelegram checkout; build and commit only from /private/tmp/netelegram-cli-work unless a separate reconciliation is planned.",
+    "Do not rerun full suites or rebuild unchanged app source. Tie each validation to the changed app-source SHA and keep accountless CI evidence separate from real Telegram coverage."
+  ]
 }
