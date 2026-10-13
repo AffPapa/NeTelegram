@@ -9,6 +9,12 @@ SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support}"
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
 FRAMEWORKS="$APP_PATH/Contents/Frameworks"
+DEV_COMMIT="$(git -C "$ROOT_DIR" rev-parse HEAD)"
+if [[ -n "$(git -C "$ROOT_DIR" status --porcelain)" ]]; then
+    DEV_DIRTY=true
+else
+    DEV_DIRTY=false
+fi
 MODE="build"
 
 if [[ "${1:-}" == "--launch" ]]; then
@@ -63,7 +69,7 @@ cp "$TDJSON" "$FRAMEWORKS/libtdjson.dylib"
 chmod 755 "$APP_EXECUTABLE"
 chmod 644 "$FRAMEWORKS/libtdjson.dylib"
 
-cat > "$APP_PATH/Contents/Info.plist" <<'PLIST'
+cat > "$APP_PATH/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
@@ -75,14 +81,20 @@ cat > "$APP_PATH/Contents/Info.plist" <<'PLIST'
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>0.0.0-dev</string>
 <key>CFBundleVersion</key><string>0</string>
+<key>NeTelegramDevelopmentCommit</key><string>$DEV_COMMIT</string>
+<key>NeTelegramDevelopmentDirty</key><$([ "$DEV_DIRTY" == "true" ] && echo true || echo false)/>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
 </dict></plist>
 PLIST
 
-python3 - "$ROOT_DIR" "$APP_PATH/Contents/Resources/BuildInfo.json" "$SUPPORT_ROOT" "$APP_PATH" <<'PY'
+/usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentCommit' "$APP_PATH/Contents/Info.plist" | grep -Fx "$DEV_COMMIT"
+/usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentDirty' "$APP_PATH/Contents/Info.plist" | grep -Fx "$DEV_DIRTY"
+
+python3 - "$ROOT_DIR" "$APP_PATH/Contents/Resources/BuildInfo.json" "$SUPPORT_ROOT" "$APP_PATH" "$DEV_DIRTY" <<'PY'
 import hashlib, json, pathlib, subprocess, sys
-root, output, support, app = map(pathlib.Path, sys.argv[1:])
+root, output, support, app = map(pathlib.Path, sys.argv[1:5])
+working_tree_dirty = sys.argv[5] == "true"
 files = [root / "Package.swift", root / "TDLIB.lock.json"]
 files += sorted((root / "Sources").rglob("*"))
 files = [p for p in files if p.is_file()]
@@ -99,6 +111,7 @@ info = {
     "bundle_path": str(app),
     "support_root": str(support),
     "git_head": command("git", "-C", str(root), "rev-parse", "HEAD"),
+    "working_tree_dirty": working_tree_dirty,
     "source_fingerprint_sha256": h.hexdigest(),
     "swift_version": command("swift", "--version").splitlines()[0],
     "tdlib_commit": json.loads((root / "TDLIB.lock.json").read_text()).get("ref"),

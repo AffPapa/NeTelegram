@@ -546,7 +546,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         content.addSubview(lockedView)
 
         let window = NSWindow(contentRect: content.frame, styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
-        window.title = "NeTelegram"
+        window.title = identifiedWindowTitle("NeTelegram")
         window.contentView = content
         // NSWindow owns the content view's frame. The auth stack is centered
         // by Auto Layout inside that coordinate space, independent of window size.
@@ -1042,7 +1042,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         actionButton.isEnabled = !profileRestoreInProgress && !closingForTermination
         actionButton.isHidden = false
         setStatus("Профиль закрыт. Локальные данные сохранены; повторный вход в другой аккаунт не выполняется.")
-        window.title = "Профиль временно закрыт — NeTelegram"
+        window.title = identifiedWindowTitle("Профиль временно закрыт — NeTelegram")
     }
 
     /// Clears the previous account's visible conversation before opening a
@@ -1082,7 +1082,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading.stringValue = "Локальный профиль"
         loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные предыдущего профиля скрыты."
         statusLabel.stringValue = "Открываю профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…"
-        window.title = "NeTelegram"
+        window.title = identifiedWindowTitle("NeTelegram")
     }
 
     private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
@@ -4661,7 +4661,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard targetIsAuthorizedSelected() else { return }
         authStack.isHidden = true
         chatPane.isHidden = false
-        window.title = runtime.flatMap(safeAccountName).map { "\($0) — NeTelegram" } ?? "NeTelegram"
+        window.title = identifiedWindowTitle(runtime.flatMap(safeAccountName).map { "\($0) — NeTelegram" } ?? "NeTelegram")
     }
 
     private func targetIsAuthorizedSelected() -> Bool { runtime?.telegramUserID != nil }
@@ -4670,6 +4670,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         AccountPresentation.verifiedDisplayName(
             telegramUserID: runtime.telegramUserID,
             candidate: runtime.displayName
+        )
+    }
+
+    private func identifiedWindowTitle(_ title: String) -> String {
+        DevelopmentBuildIdentity.windowTitle(
+            title,
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            sourceCommit: Bundle.main.object(forInfoDictionaryKey: "NeTelegramDevelopmentCommit") as? String,
+            hasUncommittedChanges: (Bundle.main.object(forInfoDictionaryKey: "NeTelegramDevelopmentDirty") as? NSNumber)?.boolValue ?? false
         )
     }
 
@@ -4986,7 +4995,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             title: "Выходим из аккаунта",
             subtitle: "Ожидаю подтверждения Telegram. Остальные аккаунты продолжают работать."
         )
-        window.title = "Выход из аккаунта — NeTelegram"
+        window.title = identifiedWindowTitle("Выход из аккаунта — NeTelegram")
         setStatus("Telegram завершает сеанс и удаляет локальные данные аккаунта…")
     }
 
@@ -5148,7 +5157,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         setComposerText("")
         refreshComposerState()
         lockedView.isHidden = false
-        window.title = "Заблокировано — NeTelegram"
+        window.title = identifiedWindowTitle("Заблокировано — NeTelegram")
         // Reject queued or late UI intent before requesting system authentication.
         unlock()
     }
@@ -5203,7 +5212,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.showAuthenticatedChatUI()
                     self.refreshChatList()
                     self.displaySelectedConversation()
-                    self.window.title = self.safeAccountName(selected).map { "\($0) — NeTelegram" } ?? "NeTelegram"
+                    self.window.title = self.identifiedWindowTitle(self.safeAccountName(selected).map { "\($0) — NeTelegram" } ?? "NeTelegram")
                 } else if let selected = self.runtime {
                     self.presentAuthorizationState(self.pendingAuthorizationType, info: self.authPresentationInfoByAccount[selected.account] ?? [:])
                 } else if let closedProfile = self.closedProfileToRetry {

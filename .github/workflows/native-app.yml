@@ -71,6 +71,8 @@ jobs:
           /usr/bin/lipo "$APP/Contents/MacOS/NeTelegram" -verify_arch arm64
           /usr/bin/lipo "$APP/Contents/Frameworks/libtdjson.dylib" -verify_arch arm64
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" | grep -Fx 'org.affpapa.netelegram.dev'
+          /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentCommit' "$APP/Contents/Info.plist" | grep -Fx "$GITHUB_SHA"
+          /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentDirty' "$APP/Contents/Info.plist" | grep -Fx false
           /usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$APP/Contents/Info.plist" | grep -Fx '14.0'
           python3 -m json.tool "$APP/Contents/Resources/BuildInfo.json" >/dev/null
           REVIEW_DIR="${RUNNER_TEMP}/netelegram-review-bundle"

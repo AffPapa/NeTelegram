@@ -28,6 +28,13 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("5551234", selectedCallingCode: "US") == .invalidCountryCode)
 }
 
+@Test func developmentWindowTitleIdentifiesTheExactDevCommitButLeavesReleaseBrandingAlone() {
+    #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram.dev", sourceCommit: "ABCDEF123456") == "NeTelegram · dev abcdef12")
+    #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram.dev", sourceCommit: "abcdef123456", hasUncommittedChanges: true) == "NeTelegram · dev abcdef12+dirty")
+    #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram.dev", sourceCommit: nil) == "NeTelegram · dev unknown")
+    #expect(DevelopmentBuildIdentity.windowTitle("NeTelegram", bundleIdentifier: "org.affpapa.netelegram", sourceCommit: "abcdef1234567890") == "NeTelegram")
+}
+
 @Test func sponsoredChannelPlacementsRespectServerIntervalAndKeepAlbumsWhole() {
     let spaced = SponsoredMessagesPolicy.placements(
         cardCount: 5,
