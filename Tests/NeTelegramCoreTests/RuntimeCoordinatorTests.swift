@@ -446,6 +446,98 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     }
 }
 
+private struct FakeKeychainCoordinate: Hashable {
+    let account: String
+    let service: String
+}
+
+private final class FakeKeychainItemBackend: KeychainItemBackend, @unchecked Sendable {
+    private let lock = NSLock()
+    private var values: [FakeKeychainCoordinate: Data]
+    private var deleted: [FakeKeychainCoordinate] = []
+    private var reads = 0
+    private var adds = 0
+    private var updates = 0
+    private var readFailure: OSStatus?
+    private var updateFailure: OSStatus?
+    private var addFailure: OSStatus?
+    private var deleteFailure: OSStatus?
+
+    init(
+        values: [FakeKeychainCoordinate: Data] = [:],
+        readFailure: OSStatus? = nil,
+        updateFailure: OSStatus? = nil,
+        addFailure: OSStatus? = nil,
+        deleteFailure: OSStatus? = nil
+    ) {
+        self.values = values
+        self.readFailure = readFailure
+        self.updateFailure = updateFailure
+        self.addFailure = addFailure
+        self.deleteFailure = deleteFailure
+    }
+
+    func read(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        lock.lock()
+        defer { lock.unlock() }
+        reads += 1
+        if let readFailure { return (readFailure, nil) }
+        guard let data = values[FakeKeychainCoordinate(account: account, service: service)] else {
+            return (errSecItemNotFound, nil)
+        }
+        return (errSecSuccess, data)
+    }
+
+    func add(data: Data, account: String, service: String) -> OSStatus {
+        lock.lock()
+        defer { lock.unlock() }
+        adds += 1
+        if let addFailure { return addFailure }
+        let coordinate = FakeKeychainCoordinate(account: account, service: service)
+        guard values[coordinate] == nil else { return errSecDuplicateItem }
+        values[coordinate] = data
+        return errSecSuccess
+    }
+
+    func update(data: Data, account: String, service: String) -> OSStatus {
+        lock.lock()
+        defer { lock.unlock() }
+        updates += 1
+        if let updateFailure { return updateFailure }
+        let coordinate = FakeKeychainCoordinate(account: account, service: service)
+        guard values[coordinate] != nil else { return errSecItemNotFound }
+        values[coordinate] = data
+        return errSecSuccess
+    }
+
+    func delete(account: String, service: String) -> OSStatus {
+        lock.lock()
+        defer { lock.unlock() }
+        if let deleteFailure { return deleteFailure }
+        let coordinate = FakeKeychainCoordinate(account: account, service: service)
+        deleted.append(coordinate)
+        return values.removeValue(forKey: coordinate) == nil ? errSecItemNotFound : errSecSuccess
+    }
+
+    var operationCounts: (reads: Int, adds: Int, updates: Int) {
+        lock.lock()
+        defer { lock.unlock() }
+        return (reads, adds, updates)
+    }
+
+    var deletedCoordinates: [FakeKeychainCoordinate] {
+        lock.lock()
+        defer { lock.unlock() }
+        return deleted
+    }
+
+    func storedData(account: String, service: String) -> Data? {
+        lock.lock()
+        defer { lock.unlock() }
+        return values[FakeKeychainCoordinate(account: account, service: service)]
+    }
+}
+
 private actor AsyncTestGate {
     private var isOpen = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -822,6 +914,71 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: Data(repeating: 7, count: 32), createIfMissing: true) == .use(Data(repeating: 7, count: 32)))
     #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: Data(repeating: 7, count: 31), createIfMissing: true) == .failure(errSecDecode))
     #expect(SecretsStore.keyLookupDecision(status: errSecSuccess, data: nil, createIfMissing: true) == .failure(errSecDecode))
+}
+
+@Test func secretsStoreUsesInjectedKeychainCRUDAndFailsClosed() throws {
+    let account = AccountUUID()
+    let accountName = account.id.uuidString.lowercased()
+    let databaseService = "org.affpapa.netelegram.database-key"
+
+    let failedReadBackend = FakeKeychainItemBackend(readFailure: errSecInteractionNotAllowed)
+    let failedReadStore = SecretsStore(backend: failedReadBackend)
+    #expect(throws: SecretsStoreError.keychain(errSecInteractionNotAllowed)) {
+        try failedReadStore.databaseKey(for: account)
+    }
+    #expect(failedReadBackend.operationCounts.adds == 0)
+
+    let createBackend = FakeKeychainItemBackend()
+    let createStore = SecretsStore(backend: createBackend)
+    let createdKey = try createStore.databaseKey(for: account)
+    #expect(createdKey.count == 32)
+    #expect(createBackend.operationCounts.adds == 1)
+    #expect(try createStore.databaseKey(for: account) == createdKey)
+    #expect(createBackend.operationCounts.adds == 1)
+    #expect(createBackend.storedData(account: accountName, service: databaseService) == createdKey)
+
+    let readOnlyBackend = FakeKeychainItemBackend()
+    let readOnlyStore = SecretsStore(backend: readOnlyBackend)
+    #expect(throws: SecretsStoreError.missing("Existing key for \(databaseService)")) {
+        try readOnlyStore.databaseKey(for: account, createIfMissing: false)
+    }
+    #expect(readOnlyBackend.operationCounts.adds == 0)
+
+    let apiHash = "0123456789abcdef0123456789ABCDEF"
+    let updateFailureBackend = FakeKeychainItemBackend(updateFailure: errSecInteractionNotAllowed)
+    let updateFailureStore = SecretsStore(backend: updateFailureBackend)
+    #expect(throws: SecretsStoreError.keychain(errSecInteractionNotAllowed)) {
+        try updateFailureStore.storeTelegramAPIHash(apiHash)
+    }
+    #expect(updateFailureBackend.operationCounts.updates == 1)
+    #expect(updateFailureBackend.operationCounts.adds == 0)
+}
+
+@Test func secretsStoreDeletesOnlyTheRequestedAccountsKeyNamespaces() throws {
+    let account = AccountUUID()
+    let otherAccount = AccountUUID()
+    let accountName = account.id.uuidString.lowercased()
+    let otherAccountName = otherAccount.id.uuidString.lowercased()
+    let database = "org.affpapa.netelegram.database-key"
+    let appState = "org.affpapa.netelegram.app-state-key"
+    let apiHashService = TelegramApplicationIdentity.keychainService
+    let backend = FakeKeychainItemBackend(values: [
+        FakeKeychainCoordinate(account: accountName, service: database): Data(repeating: 1, count: 32),
+        FakeKeychainCoordinate(account: accountName, service: appState): Data(repeating: 2, count: 32),
+        FakeKeychainCoordinate(account: otherAccountName, service: database): Data(repeating: 3, count: 32),
+        FakeKeychainCoordinate(account: otherAccountName, service: appState): Data(repeating: 4, count: 32),
+        FakeKeychainCoordinate(account: TelegramApplicationIdentity.keychainAccount, service: apiHashService): Data("0123456789abcdef0123456789ABCDEF".utf8),
+    ])
+
+    try SecretsStore(backend: backend).removeAccountKeys(for: account)
+
+    #expect(Set(backend.deletedCoordinates) == Set([
+        FakeKeychainCoordinate(account: accountName, service: database),
+        FakeKeychainCoordinate(account: accountName, service: appState),
+    ]))
+    #expect(backend.storedData(account: otherAccountName, service: database) == Data(repeating: 3, count: 32))
+    #expect(backend.storedData(account: otherAccountName, service: appState) == Data(repeating: 4, count: 32))
+    #expect(backend.storedData(account: TelegramApplicationIdentity.keychainAccount, service: apiHashService) != nil)
 }
 
 @Test func startupLimitDoesNotBecomeResidentAccountLimit() async throws {

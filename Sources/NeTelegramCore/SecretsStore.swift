@@ -1,6 +1,40 @@
 import Foundation
 import Security
 
+protocol KeychainItemBackend: Sendable {
+    func read(account: String, service: String) -> (status: OSStatus, data: Data?)
+    func add(data: Data, account: String, service: String) -> OSStatus
+    func update(data: Data, account: String, service: String) -> OSStatus
+    func delete(account: String, service: String) -> OSStatus
+}
+
+private struct SecurityKeychainItemBackend: KeychainItemBackend {
+    func read(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        var query = SecretsStore.itemQuery(account: account, service: service)
+        query[kSecReturnData as String] = true
+        query[kSecMatchLimit as String] = kSecMatchLimitOne
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        return (status, result as? Data)
+    }
+
+    func add(data: Data, account: String, service: String) -> OSStatus {
+        var query = SecretsStore.itemQuery(account: account, service: service)
+        query[kSecValueData as String] = data
+        return SecItemAdd(query as CFDictionary, nil)
+    }
+
+    func update(data: Data, account: String, service: String) -> OSStatus {
+        let query = SecretsStore.itemQuery(account: account, service: service)
+        return SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+    }
+
+    func delete(account: String, service: String) -> OSStatus {
+        let query = SecretsStore.itemQuery(account: account, service: service)
+        return SecItemDelete(query as CFDictionary)
+    }
+}
+
 public enum SecretsStoreError: Error, Equatable {
     case missing(String)
     case keychain(OSStatus)
@@ -9,6 +43,8 @@ public enum SecretsStoreError: Error, Equatable {
 
 /// Keychain access for local project credentials and per-account encryption keys.
 public struct SecretsStore: Sendable {
+    private let backend: any KeychainItemBackend
+
     enum KeyLookupDecision: Equatable {
         case use(Data)
         case create
@@ -16,7 +52,13 @@ public struct SecretsStore: Sendable {
         case failure(OSStatus)
     }
 
-    public init() {}
+    public init() {
+        backend = SecurityKeychainItemBackend()
+    }
+
+    init(backend: any KeychainItemBackend) {
+        self.backend = backend
+    }
 
     /// SecItem calls are synchronous and may wait on Keychain services or a
     /// user-visible access decision. Run them away from AppKit's main actor.
@@ -27,17 +69,14 @@ public struct SecretsStore: Sendable {
     }
 
     public func telegramAPIHash() throws -> String {
-        var query = Self.itemQuery(
+        let result = backend.read(
             account: TelegramApplicationIdentity.keychainAccount,
             service: TelegramApplicationIdentity.keychainService
         )
-        query[kSecReturnData as String] = true
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        let status = result.status
         guard status != errSecItemNotFound else { throw SecretsStoreError.missing("Telegram API hash") }
         guard status == errSecSuccess else { throw SecretsStoreError.keychain(status) }
-        guard let data = result as? Data, let value = String(data: data, encoding: .utf8), !value.isEmpty else {
+        guard let data = result.data, let value = String(data: data, encoding: .utf8), !value.isEmpty else {
             throw SecretsStoreError.missing("Telegram API hash")
         }
         return value
@@ -49,21 +88,17 @@ public struct SecretsStore: Sendable {
         guard Self.isValidTelegramAPIHash(value) else {
             throw SecretsStoreError.invalidTelegramAPIHash
         }
-        let query = Self.itemQuery(
-            account: TelegramApplicationIdentity.keychainAccount,
-            service: TelegramApplicationIdentity.keychainService
-        )
+        let account = TelegramApplicationIdentity.keychainAccount
+        let service = TelegramApplicationIdentity.keychainService
         let data = Data(value.utf8)
-        let updateStatus = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        let updateStatus = backend.update(data: data, account: account, service: service)
         if updateStatus == errSecSuccess { return }
         guard updateStatus == errSecItemNotFound else { throw SecretsStoreError.keychain(updateStatus) }
 
-        var addQuery = query
-        addQuery[kSecValueData as String] = data
-        let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+        let addStatus = backend.add(data: data, account: account, service: service)
         if addStatus == errSecSuccess { return }
         if addStatus == errSecDuplicateItem {
-            let retryStatus = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+            let retryStatus = backend.update(data: data, account: account, service: service)
             guard retryStatus == errSecSuccess else { throw SecretsStoreError.keychain(retryStatus) }
             return
         }
@@ -97,8 +132,7 @@ public struct SecretsStore: Sendable {
     }
 
     private func removeKey(account: String, service: String) throws {
-        let query = Self.itemQuery(account: account, service: service)
-        let status = SecItemDelete(query as CFDictionary)
+        let status = backend.delete(account: account, service: service)
         guard status == errSecSuccess || status == errSecItemNotFound else {
             throw SecretsStoreError.keychain(status)
         }
@@ -106,14 +140,8 @@ public struct SecretsStore: Sendable {
 
     private func key(for account: AccountUUID, service: String, createIfMissing: Bool) throws -> Data {
         let accountName = account.id.uuidString.lowercased()
-        let baseQuery = Self.itemQuery(account: accountName, service: service)
-
-        var readQuery = baseQuery
-        readQuery[kSecReturnData as String] = true
-        readQuery[kSecMatchLimit as String] = kSecMatchLimitOne
-        var result: CFTypeRef?
-        let readStatus = SecItemCopyMatching(readQuery as CFDictionary, &result)
-        switch Self.keyLookupDecision(status: readStatus, data: result as? Data, createIfMissing: createIfMissing) {
+        let readResult = backend.read(account: accountName, service: service)
+        switch Self.keyLookupDecision(status: readResult.status, data: readResult.data, createIfMissing: createIfMissing) {
         case let .use(data):
             return data
         case .missing:
@@ -130,18 +158,12 @@ public struct SecretsStore: Sendable {
         }
         guard randomStatus == errSecSuccess else { throw SecretsStoreError.keychain(randomStatus) }
 
-        var addQuery = baseQuery
-        addQuery[kSecValueData as String] = generated
-        let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+        let addStatus = backend.add(data: generated, account: accountName, service: service)
         if addStatus == errSecSuccess { return generated }
         if addStatus == errSecDuplicateItem {
-            var retryQuery = baseQuery
-            retryQuery[kSecReturnData as String] = true
-            retryQuery[kSecMatchLimit as String] = kSecMatchLimitOne
-            result = nil
-            let retryStatus = SecItemCopyMatching(retryQuery as CFDictionary, &result)
-            guard retryStatus == errSecSuccess, let existing = result as? Data, existing.count == 32 else {
-                throw SecretsStoreError.keychain(retryStatus == errSecSuccess ? errSecDecode : retryStatus)
+            let retryResult = backend.read(account: accountName, service: service)
+            guard retryResult.status == errSecSuccess, let existing = retryResult.data, existing.count == 32 else {
+                throw SecretsStoreError.keychain(retryResult.status == errSecSuccess ? errSecDecode : retryResult.status)
             }
             return existing
         }
