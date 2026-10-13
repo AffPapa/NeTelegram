@@ -986,6 +986,63 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect((finished.firstIndex(of: "1:1") ?? .max) < (finished.firstIndex(of: "1:2") ?? .min))
 }
 
+@Test func twentyClientPipelineKeepsOtherAccountsMovingWhenOneReducerCallbackStalls() async throws {
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    var routes: [RuntimeRoute] = []
+    for value in 1...20 {
+        let route = RuntimeRoute(
+            account: AccountUUID(UUID(uuidString: String(format: "40000000-0000-0000-0000-%012d", value))!),
+            generation: RuntimeGeneration(1),
+            client: ClientID(Int32(value))
+        )
+        try await coordinator.registerBeforeFirstRequest(route)
+        routes.append(route)
+    }
+    let clientIDs = routes.map(\.client)
+
+    let pollIndex = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let index = pollIndex.get()
+        pollIndex.set(index + 1)
+        guard clientIDs.indices.contains(index) else { return .copyFailure }
+        let client = clientIDs[index].value
+        let eventType = index == 1 ? "updateDeleteMessages" : "updateConnectionState"
+        return .update(Data("{\"@client_id\":\(client),\"@type\":\"\(eventType)\"}".utf8))
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator)
+    let stalledClient = ClientID(1)
+    let stalledCallback = AsyncTestGate()
+    let started = LockedTestValue<Set<Int32>>([])
+    let completed = LockedTestValue<Set<Int32>>([])
+    let failed = LockedTestValue(false)
+
+    pipeline.start(
+        onEvent: { event in
+            guard case .routed(let update) = event else { return }
+            started.mutate { $0.insert(update.route.client.value) }
+            if update.route.client == stalledClient { await stalledCallback.wait() }
+            completed.mutate { $0.insert(update.route.client.value) }
+        },
+        onReceiveFailure: { _ in failed.set(true) }
+    )
+
+    let otherClients = Set((2...20).map(Int32.init))
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while !started.get().isSuperset(of: otherClients) && clock.now < deadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    let otherClientsProgressed = started.get().isSuperset(of: otherClients)
+    #expect(otherClientsProgressed, "Every non-stalled client must be routed despite client 1's delayed callback")
+    #expect(completed.get().isSuperset(of: otherClients), "One slow account callback must not stop the other 19 lanes")
+    #expect(!failed.get(), "Receive failure is reported only after accepted updates are drained")
+
+    await stalledCallback.open()
+    #expect(await waitForTrue(failed, timeout: .seconds(2)))
+    #expect(completed.get() == Set((1...20).map(Int32.init)))
+    #expect(gateway.receiveWorkerHasExited)
+}
+
 @Test func tdlibGatewayFailsClosedWhenPinnedLibraryIsUnavailable() {
     let missingLibrary = FileManager.default.temporaryDirectory
         .appendingPathComponent("netelegram-missing-\(UUID().uuidString).dylib")
