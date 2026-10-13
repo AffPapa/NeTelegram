@@ -424,35 +424,49 @@ import Testing
 @Test func runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain() {
     var shutdown = RuntimeShutdownCoordinator()
     let clients = Set((0..<20).map(Int32.init))
-    #expect(shutdown.begin(clients: clients))
+    let began = shutdown.begin(clients: clients)
+    #expect(began)
     #expect(shutdown.pendingClientIDs == clients)
-    #expect(!shutdown.beginReceiverDrain())
+    let prematureDrain = shutdown.beginReceiverDrain()
+    #expect(!prematureDrain)
 
-    #expect(!shutdown.acknowledgeClosed(clientID: 99))
+    let unknownAcknowledgement = shutdown.acknowledgeClosed(clientID: 99)
+    #expect(!unknownAcknowledgement)
     for client in clients.sorted() {
-        #expect(shutdown.acknowledgeClosed(clientID: client))
+        let acknowledged = shutdown.acknowledgeClosed(clientID: client)
+        #expect(acknowledged)
     }
     #expect(shutdown.canDrainReceiver)
-    #expect(!shutdown.acknowledgeClosed(clientID: clients.first!))
-    #expect(shutdown.beginReceiverDrain())
-    #expect(shutdown.finishReceiverDrain())
+    let duplicateAcknowledgement = shutdown.acknowledgeClosed(clientID: clients.first!)
+    #expect(!duplicateAcknowledgement)
+    let beganDrain = shutdown.beginReceiverDrain()
+    #expect(beganDrain)
+    let finishedDrain = shutdown.finishReceiverDrain()
+    #expect(finishedDrain)
     #expect(shutdown.isFinished)
-    #expect(!shutdown.begin(clients: clients))
+    let duplicateBegin = shutdown.begin(clients: clients)
+    #expect(!duplicateBegin)
 }
 
 @Test func runtimeShutdownCoordinatorCancelsQuitWhenOneCloseIsRejected() {
     var shutdown = RuntimeShutdownCoordinator()
-    #expect(shutdown.begin(clients: [11, 12, 13]))
+    let began = shutdown.begin(clients: [11, 12, 13])
+    #expect(began)
 
     // AppKit cancels quit when any close is rejected; already-accepted closes
     // are tracked by the general profile lifecycle until their Closed updates.
-    #expect(shutdown.cancelAfterCloseRejection(clientID: 12))
+    let cancelled = shutdown.cancelAfterCloseRejection(clientID: 12)
+    #expect(cancelled)
     #expect(!shutdown.isPending)
     #expect(shutdown.pendingClientIDs.isEmpty)
-    #expect(!shutdown.acknowledgeClosed(clientID: 11))
-    #expect(!shutdown.beginReceiverDrain())
-    #expect(!shutdown.cancelAfterCloseRejection(clientID: 12))
-    #expect(shutdown.begin(clients: [11, 12, 13]))
+    let staleAcknowledgement = shutdown.acknowledgeClosed(clientID: 11)
+    #expect(!staleAcknowledgement)
+    let drainAfterCancel = shutdown.beginReceiverDrain()
+    #expect(!drainAfterCancel)
+    let duplicateCancellation = shutdown.cancelAfterCloseRejection(clientID: 12)
+    #expect(!duplicateCancellation)
+    let retryBegan = shutdown.begin(clients: [11, 12, 13])
+    #expect(retryBegan)
 }
 
 private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
