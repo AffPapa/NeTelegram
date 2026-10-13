@@ -6,18 +6,24 @@ public struct AccountProfile: Codable, Sendable, Equatable, Identifiable {
     public private(set) var telegramUserID: Int64?
     public private(set) var displayName: String?
     public private(set) var logoutCleanupPending: Bool?
+    public private(set) var unverifiedRemovalPending: Bool?
 
-    public init(id: AccountUUID = AccountUUID(), createdAt: Date = Date(), telegramUserID: Int64? = nil, displayName: String? = nil, logoutCleanupPending: Bool? = nil) {
+    public init(id: AccountUUID = AccountUUID(), createdAt: Date = Date(), telegramUserID: Int64? = nil, displayName: String? = nil, logoutCleanupPending: Bool? = nil, unverifiedRemovalPending: Bool? = nil) {
         self.id = id
         self.createdAt = createdAt
         self.telegramUserID = telegramUserID
         self.displayName = displayName
         self.logoutCleanupPending = logoutCleanupPending
+        self.unverifiedRemovalPending = unverifiedRemovalPending
     }
 
     public mutating func associateVerifiedIdentity(_ userID: Int64, displayName: String? = nil) {
         telegramUserID = userID
         self.displayName = displayName
+    }
+
+    public mutating func markUnverifiedRemovalPending() {
+        unverifiedRemovalPending = true
     }
 
     public mutating func markLogoutCleanupPending() {
@@ -29,7 +35,30 @@ public enum AccountCatalogueError: Error, Equatable {
     case duplicateAccount
     case accountNotFound
     case identityMismatch
+    case verifiedProfileCannotBeRemoved
     case persistence(String)
+}
+
+/// Removes a local login profile only after its TDLib runtime has reported
+/// Closed. The durable marker excludes the profile from restoration, so an
+/// interrupted key/file cleanup can be retried without reopening its database.
+public enum PendingUnverifiedProfileCleanup {
+    public static func resume(
+        account: AccountUUID,
+        catalogue: AccountCatalogue,
+        removeKeys: @Sendable (AccountUUID) async throws -> Void,
+        removeFiles: @Sendable (AccountUUID) async throws -> Void
+    ) async throws {
+        guard let profile = await catalogue.allProfiles().first(where: { $0.id == account }),
+              profile.telegramUserID == nil,
+              profile.logoutCleanupPending != true,
+              profile.unverifiedRemovalPending == true else {
+            throw AccountCatalogueError.identityMismatch
+        }
+        try await removeKeys(account)
+        try await removeFiles(account)
+        try await catalogue.removeUnverifiedProfile(account)
+    }
 }
 
 /// Executes the destructive portion of a confirmed logout only after the
@@ -104,10 +133,50 @@ public actor AccountCatalogue {
         if let existingUserID = profiles[index].telegramUserID, existingUserID != userID {
             throw AccountCatalogueError.identityMismatch
         }
+        guard profiles[index].unverifiedRemovalPending != true else {
+            throw AccountCatalogueError.identityMismatch
+        }
         let old = profiles[index]
         profiles[index].associateVerifiedIdentity(userID, displayName: displayName)
         do { try persist() } catch {
             profiles[index] = old
+            throw error
+        }
+    }
+
+    /// Persists the removal barrier before closing an unfinished login. If
+    /// identity verification wins the race, the operation fails without
+    /// touching the profile or its secrets.
+    public func markUnverifiedRemovalPending(_ account: AccountUUID) throws {
+        guard let index = profiles.firstIndex(where: { $0.id == account }) else {
+            throw AccountCatalogueError.accountNotFound
+        }
+        guard profiles[index].telegramUserID == nil,
+              profiles[index].logoutCleanupPending != true else {
+            throw AccountCatalogueError.verifiedProfileCannotBeRemoved
+        }
+        let old = profiles[index]
+        profiles[index].markUnverifiedRemovalPending()
+        do { try persist() } catch {
+            profiles[index] = old
+            throw error
+        }
+    }
+
+    /// The profile can be forgotten only after the caller's TDLib Closed
+    /// barrier, and only while it has no verified Telegram identity.
+    public func removeUnverifiedProfile(_ account: AccountUUID) throws {
+        guard let index = profiles.firstIndex(where: { $0.id == account }) else {
+            throw AccountCatalogueError.accountNotFound
+        }
+        guard profiles[index].telegramUserID == nil,
+              profiles[index].logoutCleanupPending != true,
+              profiles[index].unverifiedRemovalPending == true else {
+            throw AccountCatalogueError.verifiedProfileCannotBeRemoved
+        }
+        let removed = profiles.remove(at: index)
+        do { try persist() } catch {
+            profiles.insert(removed, at: index)
             throw error
         }
     }

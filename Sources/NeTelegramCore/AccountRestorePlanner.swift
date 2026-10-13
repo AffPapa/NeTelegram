@@ -9,15 +9,21 @@ public enum AccountRestorePlanner {
         pendingWithStoredDatabase: Set<AccountUUID>
     ) -> [AccountProfile] {
         let recoverablePending = pending.filter {
-            $0.logoutCleanupPending != true && pendingWithStoredDatabase.contains($0.id)
+            $0.logoutCleanupPending != true
+                && $0.unverifiedRemovalPending != true
+                && pendingWithStoredDatabase.contains($0.id)
         }
-        let recoverableAuthorized = authorized.filter { $0.logoutCleanupPending != true }
+        let recoverableAuthorized = authorized.filter {
+            $0.logoutCleanupPending != true && $0.unverifiedRemovalPending != true
+        }
         if !recoverablePending.isEmpty {
             return recoverableAuthorized + recoverablePending
         }
         if !recoverableAuthorized.isEmpty {
             return recoverableAuthorized
         }
-        return Array(pending.filter { $0.logoutCleanupPending != true }.prefix(1))
+        return Array(pending.filter {
+            $0.logoutCleanupPending != true && $0.unverifiedRemovalPending != true
+        }.prefix(1))
     }
 }

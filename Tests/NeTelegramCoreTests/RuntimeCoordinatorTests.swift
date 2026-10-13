@@ -601,12 +601,22 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         hasError: true,
         logoutCleanupPending: true
     )
+    let removalCleanup = AccountPresentation.pickerTitle(
+        localOrdinal: 5,
+        telegramUserID: nil,
+        candidate: nil,
+        authorizationState: nil,
+        runtimeIsOpen: false,
+        hasError: true,
+        unverifiedRemovalPending: true
+    )
 
     #expect(firstPending == "Локальный вход 1 — ожидает номер")
     #expect(secondPending == "Локальный вход 2 — ожидает код")
     #expect(verified == "Test User · профиль 3 — подключён")
     #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
     #expect(logoutCleanup == "Test User · профиль 4 — очистка после выхода ожидает")
+    #expect(removalCleanup == "Локальный вход 5 — удаление незавершённого входа ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
@@ -1603,6 +1613,145 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         pending: [cleanupPending],
         pendingWithStoredDatabase: [cleanupPending.id]
     ).isEmpty)
+}
+
+@Test func pendingUnverifiedProfileRemovalCannotBeRestoredAndCanResumeAfterFailure() async throws {
+    enum InjectedFailure: Error { case fileRemoval }
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: account)
+    let accountRoot = root.appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+    try FileManager.default.createDirectory(at: accountRoot, withIntermediateDirectories: true)
+    try await catalogue.markUnverifiedRemovalPending(account)
+
+    let marked = try #require(await catalogue.allProfiles().first)
+    #expect(marked.telegramUserID == nil)
+    #expect(marked.unverifiedRemovalPending == true)
+    #expect(AccountRestorePlanner.profilesToRestore(
+        authorized: [],
+        pending: [marked],
+        pendingWithStoredDatabase: [account]
+    ).isEmpty)
+
+    let failOnce = LockedTestValue(true)
+    await #expect(throws: InjectedFailure.self) {
+        try await PendingUnverifiedProfileCleanup.resume(
+            account: account,
+            catalogue: catalogue,
+            removeKeys: { _ in },
+            removeFiles: { _ in
+                if failOnce.get() {
+                    failOnce.set(false)
+                    throw InjectedFailure.fileRemoval
+                }
+                try FileManager.default.removeItem(at: accountRoot)
+            }
+        )
+    }
+
+    let retained = try #require(await catalogue.allProfiles().first)
+    #expect(retained.unverifiedRemovalPending == true)
+    #expect(AccountRestorePlanner.profilesToRestore(
+        authorized: [],
+        pending: [retained],
+        pendingWithStoredDatabase: [account]
+    ).isEmpty)
+
+    try await PendingUnverifiedProfileCleanup.resume(
+        account: account,
+        catalogue: catalogue,
+        removeKeys: { _ in },
+        removeFiles: { _ in
+            if FileManager.default.fileExists(atPath: accountRoot.path) {
+                try FileManager.default.removeItem(at: accountRoot)
+            }
+        }
+    )
+    #expect(await catalogue.allProfiles().isEmpty)
+    #expect(!FileManager.default.fileExists(atPath: accountRoot.path))
+}
+
+@Test func unverifiedRemovalCannotMarkOrDeleteVerifiedIdentity() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: account)
+    try await catalogue.associateVerifiedIdentity(42, with: account)
+
+    await #expect(throws: AccountCatalogueError.verifiedProfileCannotBeRemoved) {
+        try await catalogue.markUnverifiedRemovalPending(account)
+    }
+    await #expect(throws: AccountCatalogueError.verifiedProfileCannotBeRemoved) {
+        try await catalogue.removeUnverifiedProfile(account)
+    }
+    let retained = try #require(await catalogue.allProfiles().first)
+    #expect(retained.telegramUserID == 42)
+    #expect(retained.unverifiedRemovalPending != true)
+}
+
+@Test func unverifiedRemovalKeepsProfileAndFilesWhenKeychainDeletionFails() async throws {
+    enum InjectedFailure: Error { case keychain }
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: account)
+    try await catalogue.markUnverifiedRemovalPending(account)
+    let accountRoot = root.appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+    try FileManager.default.createDirectory(at: accountRoot, withIntermediateDirectories: true)
+    let failOnce = LockedTestValue(true)
+    let removedFiles = LockedTestValue(0)
+    let removeKeys: @Sendable (AccountUUID) async throws -> Void = { _ in
+        if failOnce.get() {
+            failOnce.set(false)
+            throw InjectedFailure.keychain
+        }
+    }
+    let removeFiles: @Sendable (AccountUUID) async throws -> Void = { _ in
+        removedFiles.mutate { $0 += 1 }
+        try FileManager.default.removeItem(at: accountRoot)
+    }
+
+    await #expect(throws: InjectedFailure.self) {
+        try await PendingUnverifiedProfileCleanup.resume(
+            account: account,
+            catalogue: catalogue,
+            removeKeys: removeKeys,
+            removeFiles: removeFiles
+        )
+    }
+    #expect(await catalogue.allProfiles().first?.unverifiedRemovalPending == true)
+    #expect(FileManager.default.fileExists(atPath: accountRoot.path))
+    #expect(removedFiles.get() == 0)
+
+    try await PendingUnverifiedProfileCleanup.resume(
+        account: account,
+        catalogue: catalogue,
+        removeKeys: removeKeys,
+        removeFiles: removeFiles
+    )
+    #expect(await catalogue.allProfiles().isEmpty)
+    #expect(!FileManager.default.fileExists(atPath: accountRoot.path))
+    #expect(removedFiles.get() == 1)
+}
+
+@Test func identityAssociationIsRejectedAfterUnverifiedRemovalBarrier() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: account)
+    try await catalogue.markUnverifiedRemovalPending(account)
+
+    await #expect(throws: AccountCatalogueError.identityMismatch) {
+        try await catalogue.associateVerifiedIdentity(42, with: account)
+    }
+    let retained = try #require(await catalogue.allProfiles().first)
+    #expect(retained.telegramUserID == nil)
+    #expect(retained.unverifiedRemovalPending == true)
 }
 
 @Test func pendingLogoutCleanupResumesAfterKeyFileAndCatalogueFailures() async throws {

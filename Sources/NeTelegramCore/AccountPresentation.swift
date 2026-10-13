@@ -15,6 +15,7 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
     case authorized
     case verifyingIdentity
     case logoutCleanupPending
+    case unverifiedRemovalPending
     case failed
 
     public var label: String {
@@ -33,6 +34,7 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
         case .authorized: "подключён"
         case .verifyingIdentity: "проверяет identity"
         case .logoutCleanupPending: "очистка после выхода ожидает"
+        case .unverifiedRemovalPending: "удаление незавершённого входа ожидает"
         case .failed: "ошибка"
         }
     }
@@ -131,7 +133,8 @@ public enum AccountPresentation {
         authorizationState: String?,
         runtimeIsOpen: Bool,
         hasError: Bool,
-        logoutCleanupPending: Bool = false
+        logoutCleanupPending: Bool = false,
+        unverifiedRemovalPending: Bool = false
     ) -> String {
         let ordinal = max(1, localOrdinal)
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate)
@@ -141,7 +144,8 @@ public enum AccountPresentation {
             authorizationState: authorizationState,
             runtimeIsOpen: runtimeIsOpen,
             hasError: hasError,
-            logoutCleanupPending: logoutCleanupPending
+            logoutCleanupPending: logoutCleanupPending,
+            unverifiedRemovalPending: unverifiedRemovalPending
         ).label
         return "\(identity) — \(status)"
     }
@@ -151,8 +155,10 @@ public enum AccountPresentation {
         authorizationState: String?,
         runtimeIsOpen: Bool,
         hasError: Bool,
-        logoutCleanupPending: Bool = false
+        logoutCleanupPending: Bool = false,
+        unverifiedRemovalPending: Bool = false
     ) -> AccountProfilePickerStatus {
+        if unverifiedRemovalPending { return .unverifiedRemovalPending }
         if logoutCleanupPending { return .logoutCleanupPending }
         if authorizationState == nil, runtimeIsOpen { return .starting }
         let step = AuthorizationStep(tdlibType: authorizationState)

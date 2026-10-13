@@ -73,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var shutdownProgressTask: Task<Void, Never>?
     private var resumeProfilesAfterAbortedTermination = false
     private var profileRestoreInProgress = false
+    private var removeUnverifiedProfileMenuItem: NSMenuItem?
     private var profileRestoreGenerationGate = ProfileRestoreGenerationGate()
     private var phoneCountries: [PhoneCountry] = []
     private var selectedCallingCode = "1"
@@ -794,6 +795,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         logoutAccountMenuItem?.isEnabled = !lockState
             && runtime?.telegramUserID != nil
             && runtime?.isLogoutRequested == false
+        if let item = removeUnverifiedProfileMenuItem {
+            let selectedID = selectedAccountID()
+            let profile = selectedID.flatMap { knownProfilesByAccount[$0] }
+            let selectedRuntime = selectedID.flatMap { runtimesByAccount[$0] }
+            let busy = selectedID.map {
+                profileRestoreInProgress || closingForTermination
+                    || profileStartupTasks[$0] != nil || profileOpenRequests.contains($0)
+            } ?? true
+            item.isEnabled = !lockState && !busy && profile != nil
+                && profile?.telegramUserID == nil && selectedRuntime?.telegramUserID == nil
+        }
     }
 
     private func buildMainMenu() {
@@ -834,6 +846,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         logout.target = self
         logoutAccountMenuItem = logout
         accountMenu.addItem(logout)
+        let removeUnverified = NSMenuItem(
+            title: "Удалить незавершённый вход…",
+            action: #selector(removeUnverifiedLoginProfile),
+            keyEquivalent: ""
+        )
+        removeUnverified.target = self
+        removeUnverifiedProfileMenuItem = removeUnverified
+        accountMenu.addItem(removeUnverified)
         accountMenuItem.submenu = accountMenu
 
         let windowMenuItem = NSMenuItem()
@@ -1053,6 +1073,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let index = accountPicker.indexOfSelectedItem
         guard accountPickerAccounts.indices.contains(index) else { return }
         let account = accountPickerAccounts[index]
+        if let profile = knownProfilesByAccount[account], profile.unverifiedRemovalPending == true {
+            if let target = runtimesByAccount[account] {
+                if target.requestUnverifiedProfileRemoval() {
+                    if let client = target.route?.client.value { pendingClosures.insert(client) }
+                    if target === runtime { showUnverifiedRemovalWaiting() }
+                    setStatus("Повторяю close для незавершённого входа. Локальная база останется до TDLib Closed.")
+                } else {
+                    if target === runtime { showUnverifiedRemovalWaiting() }
+                    setStatus("TDLib пока не принял close. Данные локального профиля сохранены для повтора.")
+                }
+                refreshStatusMenu()
+            } else {
+                retryPendingUnverifiedProfileCleanup(profile)
+            }
+            return
+        }
         guard let selected = runtimesByAccount[account] else {
             retryOpeningProfile(account)
             return
@@ -1115,7 +1151,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 authorizationState: runtime?.authorizationState,
                 runtimeIsOpen: runtime != nil || profileStartupTasks[id] != nil,
                 hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil,
-                logoutCleanupPending: profile.logoutCleanupPending == true
+                logoutCleanupPending: profile.logoutCleanupPending == true,
+                unverifiedRemovalPending: profile.unverifiedRemovalPending == true
             ))
         }
         accountPicker.isHidden = accountPickerAccounts.isEmpty
@@ -1127,6 +1164,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         } else if let runtime, let index = accountPickerAccounts.firstIndex(of: runtime.account) {
             accountPicker.selectItem(at: index)
         }
+    }
+
+    private func selectedAccountID() -> AccountUUID? {
+        let index = accountPicker.indexOfSelectedItem
+        if accountPickerAccounts.indices.contains(index) { return accountPickerAccounts[index] }
+        return runtime?.account
     }
 
     private func rememberProfiles(_ profiles: [AccountProfile]) {
@@ -1147,11 +1190,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             retryPendingLogoutCleanup(profile)
             return
         }
+        if profile.unverifiedRemovalPending == true {
+            retryPendingUnverifiedProfileCleanup(profile)
+            return
+        }
         profileOpenRequests.insert(account)
         setStatus("Повторно открываю локальный профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…")
         Task { @MainActor [weak self] in
             guard let self else { return }
-            defer { self.profileOpenRequests.remove(account) }
+            defer {
+                self.profileOpenRequests.remove(account)
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+            }
             do {
                 let apiHash = try await SecretsStore.performKeychainRead {
                     try SecretsStore().telegramAPIHash()
@@ -1206,6 +1257,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    private func retryPendingUnverifiedProfileCleanup(_ profile: AccountProfile) {
+        guard !profileRestoreInProgress, !closingForTermination,
+              !profileOpenRequests.contains(profile.id),
+              profileStartupTasks[profile.id] == nil,
+              runtimesByAccount[profile.id] == nil,
+              profile.unverifiedRemovalPending == true,
+              profile.telegramUserID == nil else { return }
+        profileOpenRequests.insert(profile.id)
+        setStatus("Продолжаю удаление незавершённого локального входа…")
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer { self.profileOpenRequests.remove(profile.id) }
+            do {
+                try await self.completePendingUnverifiedProfileCleanup(profile.id)
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+                self.setStatus("Незавершённый локальный вход удалён.")
+            } catch {
+                self.profileStartupFailures.insert(profile.id)
+                self.refreshAccountPicker(select: profile.id)
+                self.refreshStatusMenu()
+                self.setStatus("Удаление не завершилось. Данные сохранены для безопасного повтора; выберите этот профиль и повторите удаление.")
+            }
+        }
+    }
+
     private func showClosedProfileRecovery(_ account: AccountUUID) {
         closedProfileToRetry = account
         closePhotoViewer()
@@ -1233,6 +1310,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         actionButton.isHidden = false
         setStatus("Профиль закрыт. Локальные данные сохранены; повторный вход в другой аккаунт не выполняется.")
         window.title = identifiedWindowTitle("Профиль временно закрыт — \(ProductIdentity.displayName)")
+    }
+
+    private func showUnverifiedRemovalWaiting() {
+        authRequestInFlight = false
+        chatPane.isHidden = true
+        setAuthCardVisible(true)
+        loginHeading.stringValue = "Удаление незавершённого входа"
+        loginSubtitle.stringValue = "Профиль закрывается. Локальные данные останутся до подтверждения TDLib; при ошибке выберите этот профиль, чтобы повторить close."
+        registrationTermsScroll.isHidden = true
+        countryPicker.isHidden = true
+        phoneField.isHidden = true
+        emailField.isHidden = true
+        inputField.isHidden = true
+        secureInputField.isHidden = true
+        firstNameField.isHidden = true
+        lastNameField.isHidden = true
+        registrationConsent.isHidden = true
+        qrImageView.isHidden = true
+        qrButton.isHidden = true
+        actionButton.isHidden = true
+        actionButton.isEnabled = false
     }
 
     /// Clears the previous account's visible conversation before opening a
@@ -1327,6 +1425,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         knownProfilesByAccount.removeValue(forKey: account)
         profileOrder.removeAll { $0 == account }
         profileStartupFailures.remove(account)
+    }
+
+    private func completePendingUnverifiedProfileCleanup(_ account: AccountUUID) async throws {
+        guard let catalogue else { throw AccountCatalogueError.accountNotFound }
+        let storageRoot = try accountStorageRoot()
+        try await PendingUnverifiedProfileCleanup.resume(
+            account: account,
+            catalogue: catalogue,
+            removeKeys: { account in
+                try await Task.detached(priority: .utility) {
+                    try SecretsStore().removeAccountKeys(for: account)
+                }.value
+            },
+            removeFiles: { account in
+                let accountRoot = storageRoot
+                    .appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+                try await Task.detached(priority: .utility) {
+                    if FileManager.default.fileExists(atPath: accountRoot.path) {
+                        try FileManager.default.removeItem(at: accountRoot)
+                    }
+                }.value
+            }
+        )
+        purgeInMemoryAccountState(account)
+        knownProfilesByAccount.removeValue(forKey: account)
+        profileOrder.removeAll { $0 == account }
+        profileStartupFailures.remove(account)
+        if closedProfileToRetry == account { closedProfileToRetry = nil }
     }
 
     private func purgeInMemoryAccountState(_ account: AccountUUID) {
@@ -1425,6 +1551,84 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func addAccountFromMenu() { addAccount() }
+
+    @objc private func removeUnverifiedLoginProfile() {
+        guard !lockState, !closingForTermination,
+              let account = selectedAccountID(),
+              let profile = knownProfilesByAccount[account],
+              profile.telegramUserID == nil,
+              profile.logoutCleanupPending != true,
+              profileStartupTasks[account] == nil,
+              !profileOpenRequests.contains(account),
+              !profileRestoreInProgress else {
+            setStatus("Удалить можно только выбранный незавершённый вход после завершения его запуска.")
+            return
+        }
+        let target = runtimesByAccount[account]
+        guard target?.telegramUserID == nil else {
+            setStatus("У этого профиля уже подтверждена identity; удаление как незавершённого входа запрещено.")
+            return
+        }
+        let ordinal = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
+        let title = target.flatMap { safeAccountName($0) } ?? "Локальный вход \(ordinal)"
+        let alert = NSAlert()
+        alert.alertStyle = .critical
+        alert.messageText = "Удалить «\(title)»?"
+        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные NeTelegram. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
+        alert.addButton(withTitle: "Удалить незавершённый вход")
+        alert.addButton(withTitle: "Отмена")
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+        guard !lockState, !closingForTermination,
+              knownProfilesByAccount[account]?.telegramUserID == nil,
+              runtimesByAccount[account] === target,
+              profileStartupTasks[account] == nil else {
+            setStatus("Профиль изменился или запуск ещё работает; удаление не начато.")
+            return
+        }
+        profileOpenRequests.insert(account)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer {
+                self.profileOpenRequests.remove(account)
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+            }
+            do {
+                guard let catalogue = self.catalogue else { throw AccountCatalogueError.accountNotFound }
+                if profile.unverifiedRemovalPending != true {
+                    try await catalogue.markUnverifiedRemovalPending(account)
+                }
+                if let updated = await catalogue.allProfiles().first(where: { $0.id == account }) {
+                    guard updated.telegramUserID == nil, updated.unverifiedRemovalPending == true else {
+                        throw AccountCatalogueError.verifiedProfileCannotBeRemoved
+                    }
+                    self.knownProfilesByAccount[account] = updated
+                }
+                if let target {
+                    guard target.requestUnverifiedProfileRemoval() else {
+                        self.setStatus("TDLib не принял close. Профиль и данные сохранены; выберите его позже, чтобы повторить.")
+                        self.refreshAccountPicker(select: account)
+                        self.refreshStatusMenu()
+                        return
+                    }
+                    if let client = target.route?.client.value { self.pendingClosures.insert(client) }
+                    if target === self.runtime {
+                        self.showUnverifiedRemovalWaiting()
+                    }
+                    self.setStatus("Закрываю незавершённый профиль. Его данные удалятся только после подтверждения TDLib, что база закрыта.")
+                } else {
+                    try await self.completePendingUnverifiedProfileCleanup(account)
+                    self.setStatus("Незавершённый локальный вход и его данные удалены.")
+                }
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+            } catch AccountCatalogueError.verifiedProfileCannotBeRemoved {
+                self.setStatus("У профиля подтверждена Telegram identity; локальное удаление не выполнено.")
+            } catch {
+                self.setStatus("Не удалось начать удаление. Профиль и локальные данные сохранены.")
+            }
+        }
+    }
 
     @objc private func logOutSelectedAccount() {
         guard !lockState,
@@ -1568,6 +1772,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
                 guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             }
+            let unfinishedRemovalProfiles = profiles.filter { $0.unverifiedRemovalPending == true }
+            for profile in unfinishedRemovalProfiles where runtimesByAccount[profile.id] == nil
+                && profileStartupTasks[profile.id] == nil {
+                do {
+                    try await completePendingUnverifiedProfileCleanup(profile.id)
+                } catch {
+                    profileStartupFailures.insert(profile.id)
+                }
+                guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            }
             profiles = await catalogue.allProfiles()
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             rememberProfiles(profiles)
@@ -1614,6 +1828,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     setStatus("Введите номер и нажмите «Продолжить», чтобы начать вход.")
                 } else if profiles.contains(where: { $0.logoutCleanupPending == true }) {
                     setStatus("Очистка после подтверждённого выхода ожидает. Выберите этот профиль, чтобы безопасно продолжить.")
+                } else if profiles.contains(where: { $0.unverifiedRemovalPending == true }) {
+                    setStatus("Удаление незавершённого входа ожидает. Выберите этот профиль, чтобы безопасно повторить.")
                 }
                 refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()
@@ -2215,9 +2431,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 let client = target.route?.client.value
                 let wasSelected = target === runtime
                 let confirmedLogout = target.logoutWasAccepted
+                let unverifiedRemovalPending = knownProfilesByAccount[target.account]?.unverifiedRemovalPending == true
                 let loggedOutUserID = target.telegramUserID
                 var removedLogoutProfile = false
-                if !confirmedLogout && !closingForTermination {
+                var removedUnverifiedProfile = false
+                if !confirmedLogout && !unverifiedRemovalPending && !closingForTermination {
                     // Background profiles need the same honest failure status
                     // as the selected profile; keep the verified identity and
                     // let the user reopen that exact local profile explicitly.
@@ -2249,7 +2467,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 // An unexpected close must not silently change the UI to another
                 // Telegram identity. A user-requested logout may return to an
                 // already-authorized account, as that transition was explicit.
-                if wasSelected { runtime = confirmedLogout ? runtimesByAccount.values.first : nil }
+                if wasSelected {
+                    runtime = (confirmedLogout || unverifiedRemovalPending) ? runtimesByAccount.values.first : nil
+                }
                 if confirmedLogout, let loggedOutUserID {
                     purgeInMemoryAccountState(target.account)
                     let cleanup = await finishLogoutProfile(target, expectedTelegramUserID: loggedOutUserID)
@@ -2265,10 +2485,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     if let route = target.route { await runtimeCoordinator.removeRouteAfterClosed(route.client) }
                     pendingClosures.remove(client)
                 }
+                if unverifiedRemovalPending {
+                    purgeInMemoryAccountState(target.account)
+                    do {
+                        // TDLib has reported Closed and its route has been
+                        // removed above; only now may the DB directory/keys go.
+                        try await completePendingUnverifiedProfileCleanup(target.account)
+                        removedUnverifiedProfile = true
+                        setStatus("Незавершённый вход и его локальные данные удалены.")
+                    } catch {
+                        profileStartupFailures.insert(target.account)
+                        setStatus("TDLib закрыл профиль, но локальная очистка не завершилась. Профиль сохранён для безопасного повтора.")
+                    }
+                }
                 if wasSelected, confirmedLogout, let next = runtime {
                     refreshAccountPicker(select: next.account)
                     presentRuntime(next)
-                } else if wasSelected, !confirmedLogout, !closingForTermination {
+                } else if wasSelected, !confirmedLogout, !unverifiedRemovalPending, !closingForTermination {
                     closedProfileToRetry = target.account
                     profileStartupFailures.insert(target.account)
                     if !lockState { showClosedProfileRecovery(target.account) }
@@ -2280,6 +2513,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     setAuthCardVisible(true)
                     loginHeading.stringValue = "Очистка профиля не завершена"
                     loginSubtitle.stringValue = "Telegram подтвердил выход. Локальная запись сохранена из-за ошибки очистки; добавьте другой аккаунт через меню «Аккаунт» после устранения ошибки Keychain или диска."
+                    phoneField.isHidden = true
+                    inputField.isHidden = true
+                    secureInputField.isHidden = true
+                    qrImageView.isHidden = true
+                    actionButton.isHidden = true
+                } else if wasSelected, unverifiedRemovalPending, let next = runtime {
+                    refreshAccountPicker(select: next.account)
+                    presentRuntime(next)
+                } else if wasSelected, removedUnverifiedProfile, runtimesByAccount.isEmpty {
+                    runtime = nil
+                    pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+                    showPhoneEntry()
+                } else if wasSelected, unverifiedRemovalPending, runtimesByAccount.isEmpty {
+                    runtime = nil
+                    chatPane.isHidden = true
+                    setAuthCardVisible(true)
+                    loginHeading.stringValue = "Удаление ожидает"
+                    loginSubtitle.stringValue = "Профиль останется закрытым, пока локальная очистка не завершится. Выберите его в списке аккаунтов, чтобы повторить."
                     phoneField.isHidden = true
                     inputField.isHidden = true
                     secureInputField.isHidden = true
@@ -6286,6 +6537,7 @@ private final class LocalAccountRuntime {
     private var logoutExtra: String?
     private(set) var isLogoutRequested = false
     private(set) var logoutWasAccepted = false
+    private(set) var isUnverifiedProfileRemovalRequested = false
     private var logoutFailureNotice = false
     private var didRequestCurrentUser = false
     private var mainChatLoadState = ChatListLoadState()
@@ -6319,6 +6571,9 @@ private final class LocalAccountRuntime {
     func send(_ request: [String: Any]) throws {
         guard let route else { return }
         let type = request["@type"] as? String
+        guard !isUnverifiedProfileRemovalRequested || type == "close" else {
+            throw CocoaError(.userCancelled)
+        }
         guard !isLogoutRequested || type == "close" || type == "logOut" else {
             throw CocoaError(.userCancelled)
         }
@@ -6345,6 +6600,12 @@ private final class LocalAccountRuntime {
         try send(["@type": "logOut", "@extra": extra])
         logoutExtra = extra
         isLogoutRequested = true
+    }
+
+    func requestUnverifiedProfileRemoval() -> Bool {
+        guard telegramUserID == nil, !isLogoutRequested else { return false }
+        isUnverifiedProfileRemovalRequested = true
+        return close()
     }
 
     func takeLogoutFailureNotice() -> Bool {
