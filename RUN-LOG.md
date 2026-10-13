@@ -1,6 +1,11 @@
-# Run log — Neridian
+# NeTelegram run log
 
-# Run log — Neridian
+## 2026-10-13 — Oversized TDLib updates fail closed
+
+- App source commit: `6c6fff49d6c43746b3990de178b723d1eaf75172`.
+- The C bridge measures the borrowed TDLib JSON before copying and rejects payloads above 16 MiB. The Swift queue rejects any single event larger than its configured byte capacity; the receive gateway reports the bound and prevents further sends instead of silently dropping an update.
+- Local serial Swift suite: 136/136 passed. Exact-SHA [macOS CI](https://github.com/AffPapa/NeTelegram/actions/runs/38395900507) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38395900428) passed.
+- Not verified: real-account overload behavior, Instruments/RSS measurements, and a 20-account burst. No login or account data was used.
 
 ## 2026-10-13 — Safe unfinished-login removal published to development Site
 

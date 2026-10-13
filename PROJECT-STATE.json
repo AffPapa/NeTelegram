@@ -11,14 +11,14 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "36e73242246e5729d9818a2e76c1d2de2628eb17",
-    "working_tree_clean": true,
+    "commit": "6c6fff49d6c43746b3990de178b723d1eaf75172",
+    "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38393905223,
+      "run_id": 38395900507,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38393905223",
-      "app_source_commit": "36e73242246e5729d9818a2e76c1d2de2628eb17"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38395900507",
+      "app_source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172"
     },
     "published_application_releases": [],
     "github_access": {
@@ -39,10 +39,10 @@
       "note": "Git push for the app-source commit succeeded through the existing Git transport. gh auth status was checked and both stored CLI credentials are invalid. Do not run gh auth login or create a token as a retry; Git transport and GitHub connector are separate. No credential material is recorded."
     },
     "latest_exact_commit_native_workflow": {
-      "run_id": 38393905240,
+      "run_id": 38395900428,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38393905240",
-      "app_source_commit": "36e73242246e5729d9818a2e76c1d2de2628eb17"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38395900428",
+      "app_source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172"
     },
     "repo_head_policy": "Read `git rev-parse HEAD` at resume; the state file does not self-reference its containing docs commit."
   },
@@ -63,11 +63,11 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 135,
-      "command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-brand-check",
+      "count": 136,
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-oversize-check",
       "xcode": "Xcode 27.0 / Swift 6.4 / macOS 27 SDK",
-      "source_commit": "36e73242246e5729d9818a2e76c1d2de2628eb17",
-      "scope": "Full serial synthetic Swift suite; no real Telegram login."
+      "source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172",
+      "scope": "Full serial synthetic Swift suite; regression covers oversized update admission and fail-closed receive behavior; no real Telegram login."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -75,11 +75,12 @@
     "gatekeeper_and_sparkle_update": "not verified",
     "current_head_site": "Public Site version 116 deployed successfully from Site source c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc; deployment appgdep_6ace1e5aa3e48191958f3aaed3b43932. Anonymous public HTTPS returned 200 for six HTML routes and two valid empty updater RSS feeds. No downloads.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection.",
-    "current_head_native_workflow": "Pinned TDLib and Dev.app workflow 38393905240 succeeded for exact app-source SHA 36e73242246e5729d9818a2e76c1d2de2628eb17. Built and verified arm64 Dev.app, launched first-run UI, captured screenshot and quit. No phone number, code, or Telegram account was entered.",
+    "current_head_native_workflow": "Pinned TDLib and arm64 Dev.app workflow 38395900428 succeeded for exact app-source SHA 6c6fff49d6c43746b3990de178b723d1eaf75172. Built/verified Dev.app using the updated C bridge and smoke; accountless only, no phone number or code entered.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": "Exact-SHA CI Dev.app launch/screenshot/quit passed in workflow 38390951049 for app-source d57d569c08ca5273435fdb2e95a51629e1527df5. This is an accountless first-run smoke; the new removal menu path itself was not clicked and no TDLib profile close was exercised.",
-    "publication": "GitHub app source 36e7324 and documentation/checkpoint b6baba0 pushed. Exact-source CI and pinned Dev.app workflow passed. OpenAI Site v116 deployed publicly from c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc and verified anonymously. No app binary release/download."
+    "publication": "GitHub app source 6c6fff49d6c43746b3990de178b723d1eaf75172 pushed to main. Exact-source macOS CI and pinned TDLib/Dev.app workflow both succeeded. No app binary release/download. Public Site remains v116 pending devlog synchronization.",
+    "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -101,14 +102,14 @@
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
-    "User login and real single-account read/send/logout smoke; do not start until the user chooses to enter credentials in Neridian.",
+    "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Synthetic APP13 fanout now covers 20 runtime sinks; native sleep/wake, all-active real account recovery, notifications, storage faults and performance measurements remain open.",
     "Developer ID identity, notarization credentials, stapling, Gatekeeper and update-signing key.",
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified."
   ],
-  "next_action": "Continue from exact app source 36e73242246e5729d9818a2e76c1d2de2628eb17 (repo docs HEAD b6baba0) and public Site v116. Next: inspect the exact-SHA Dev.app screenshot for the changed onboarding disclosure, then select one testable product slice. Do not repeat the verified brand/site workflows. Real login remains deferred; no 20-account coverage, Developer ID/notarization, or stable release is verified. Keep Terms §2.3 title, §2.2 disclosure review, basic-functionality, and sponsored-media gates explicit.",
+  "next_action": "Next bounded milestone: APP04 close-last-window and Dock reopen on one exact-SHA Dev.app; assert same PID survives zero windows, reopen yields exactly one window, Cmd+Q exits. Do not repeat queue fix, rename/SEO, 136-test suite, or workflows unchanged. Real login remains deferred; no 20-account certification, Developer ID/notarization, or app release. Site remains v116 until this milestone journal update is published.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
@@ -119,7 +120,7 @@
     },
     "repo_head_before_checkpoint": "65537b78b4663a93852bc3cb87ef83f63b00b1bd",
     "app_source_commit_authority": "source.commit",
-    "app_source_commit": "d57d569c08ca5273435fdb2e95a51629e1527df5"
+    "app_source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",

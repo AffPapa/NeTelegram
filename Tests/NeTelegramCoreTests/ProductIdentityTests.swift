@@ -12,7 +12,7 @@ struct ProductIdentityTests {
         let support = URL(fileURLWithPath: "/tmp/netelegram-storage-test/Library/Application Support", isDirectory: true)
         let release = AccountStorageRoot.resolve(
             applicationSupportDirectory: support,
-            bundleIdentifier: "org.affpapa.neridian",
+            bundleIdentifier: "org.affpapa.netelegram",
             isDevelopmentBuild: false
         )
         let development = AccountStorageRoot.resolve(
