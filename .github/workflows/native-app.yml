@@ -6,20 +6,20 @@ on:
     paths:
       - '.github/workflows/native-app.yml'
       - 'Package.swift'
-      - 'Scripts/build-tdlib.sh'
-      - 'Scripts/dev-app.sh'
-      - 'Scripts/window-lifecycle-smoke.sh'
-      - 'Scripts/tdlib-smoke.c'
+      - 'scripts/build-tdlib.sh'
+      - 'scripts/dev-app.sh'
+      - 'scripts/window-lifecycle-smoke.sh'
+      - 'scripts/tdlib-smoke.c'
       - 'Sources/**'
       - 'TDLIB.lock.json'
   pull_request:
     paths:
       - '.github/workflows/native-app.yml'
       - 'Package.swift'
-      - 'Scripts/build-tdlib.sh'
-      - 'Scripts/dev-app.sh'
-      - 'Scripts/window-lifecycle-smoke.sh'
-      - 'Scripts/tdlib-smoke.c'
+      - 'scripts/build-tdlib.sh'
+      - 'scripts/dev-app.sh'
+      - 'scripts/window-lifecycle-smoke.sh'
+      - 'scripts/tdlib-smoke.c'
       - 'Sources/**'
       - 'TDLIB.lock.json'
   workflow_dispatch:
@@ -61,13 +61,13 @@ jobs:
           key: macos-15-arm64-tdlib-${{ hashFiles('TDLIB.lock.json') }}
 
       - name: Build and verify pinned TDLib
-        run: bash Scripts/build-tdlib.sh
+        run: bash scripts/build-tdlib.sh
 
       - name: Assemble and verify isolated Dev.app
         env:
           NETELEGRAM_SUPPORT_ROOT: ${{ runner.temp }}/netelegram-ci-support
         run: |
-          bash Scripts/dev-app.sh
+          bash scripts/dev-app.sh
           APP=/private/tmp/NeTelegram-Dev.app
           test -x "$APP/Contents/MacOS/NeTelegram"
           test -f "$APP/Contents/Frameworks/libtdjson.dylib"
@@ -83,7 +83,7 @@ jobs:
           mkdir -p "$REVIEW_DIR"
           ditto "$APP" "$REVIEW_DIR/NeTelegram-Dev.app"
           cp .build/canonical-dev-build/NeTelegram-Dev.build.json "$REVIEW_DIR/"
-          bash Scripts/window-lifecycle-smoke.sh \
+          bash scripts/window-lifecycle-smoke.sh \
             "$APP" \
             "$NETELEGRAM_SUPPORT_ROOT" \
             "$REVIEW_DIR/NeTelegram-window-lifecycle.json" \

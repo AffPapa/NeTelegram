@@ -3,11 +3,29 @@ name: macOS CI
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'website/**'
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'Package.swift'
+      - 'TDLIB.lock.json'
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'ACCEPTANCE.json'
+      - 'CONTRACTS.json'
+      - 'release-manifest.template.json'
+      - 'release-index.template.json'
+      - 'devlog-entry.template.json'
   pull_request:
-    paths-ignore:
-      - 'website/**'
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'Package.swift'
+      - 'TDLIB.lock.json'
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'ACCEPTANCE.json'
+      - 'CONTRACTS.json'
+      - 'release-manifest.template.json'
+      - 'release-index.template.json'
+      - 'devlog-entry.template.json'
   workflow_dispatch:
 
 permissions:
