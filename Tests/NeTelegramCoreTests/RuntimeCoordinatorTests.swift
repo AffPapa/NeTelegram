@@ -517,6 +517,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let generationA = RuntimeGeneration(4)
     let generationB = RuntimeGeneration(9)
     let conversationA = ConversationKey(account: accountA, chatID: 77, topic: .forum(topicID: 11))
+    let otherTopicA = ConversationKey(account: accountA, chatID: 77, topic: .forum(topicID: 12))
     let conversationB = ConversationKey(account: accountB, chatID: 77, topic: .forum(topicID: 22))
     let snapshots = [
         accountA: AccountConversationSnapshot(
@@ -533,11 +534,25 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         ),
     ]
 
-    // A -> B -> A uses the same server chat ID; account namespace and typed
-    // topic keep the restored composer and conversation attached to A.
-    let selectedB = snapshots[accountB]!
-    #expect(selectedB.conversation == conversationB)
-    #expect(selectedB.draft == "draft belonging to B")
+    // Exercise the exact snapshot policy called by AppKit for repeated
+    // A -> B -> A transitions. Equal server chat IDs must not blur account or
+    // typed forum-topic identity, and each runtime generation stays stable.
+    let runtimeGenerations = [accountA: generationA, accountB: generationB]
+    let expectedDrafts = [accountA: "draft belonging to A", accountB: "draft belonging to B"]
+    let expectedConversations = [accountA: conversationA, accountB: conversationB]
+    for transition in 0..<1_000 {
+        let selectedAccount = transition.isMultiple(of: 2) ? accountA : accountB
+        let snapshot = snapshots[selectedAccount]!
+        let selectedConversation = expectedConversations[selectedAccount]!
+        #expect(snapshot.restoredDraft(
+            account: selectedAccount,
+            generation: runtimeGenerations[selectedAccount]!,
+            conversation: selectedConversation
+        ) == expectedDrafts[selectedAccount])
+        #expect(snapshot.account == selectedAccount)
+        #expect(snapshot.generation == runtimeGenerations[selectedAccount])
+        #expect(snapshot.conversation == selectedConversation)
+    }
     let restoredA = snapshots[accountA]!
     #expect(AccountPresentation.conversationRestoration(
         telegramUserID: 501,
@@ -546,10 +561,21 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         expectedAccount: accountA,
         expectedGeneration: generationA
     ) == .reopen(chatID: 77))
-    #expect(restoredA.account == accountA)
-    #expect(restoredA.generation == generationA)
-    #expect(restoredA.conversation == conversationA)
-    #expect(restoredA.draft == "draft belonging to A")
+    #expect(restoredA.restoredDraft(
+        account: accountA,
+        generation: generationA,
+        conversation: conversationA
+    ) == "draft belonging to A")
+    #expect(restoredA.restoredDraft(
+        account: accountB,
+        generation: generationB,
+        conversation: conversationB
+    ) == nil)
+    #expect(restoredA.restoredDraft(
+        account: accountA,
+        generation: generationA,
+        conversation: otherTopicA
+    ) == nil)
     #expect(conversationA != conversationB)
     #expect(AccountPresentation.conversationRestoration(
         telegramUserID: 501,

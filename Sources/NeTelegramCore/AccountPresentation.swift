@@ -107,6 +107,20 @@ public struct AccountConversationSnapshot: Sendable, Equatable {
     }
 
     public var selectedChatID: Int64? { conversation?.chatID }
+
+    /// Returns a draft only when the snapshot still belongs to the exact
+    /// account runtime and typed conversation being presented. AppKit uses
+    /// this same policy when reopening a remembered chat after account changes.
+    public func restoredDraft(
+        account expectedAccount: AccountUUID,
+        generation expectedGeneration: RuntimeGeneration,
+        conversation expectedConversation: ConversationKey
+    ) -> String? {
+        guard account == expectedAccount,
+              generation == expectedGeneration,
+              conversation == expectedConversation else { return nil }
+        return draft
+    }
 }
 
 /// Produces a human-facing account label only after TDLib has confirmed the

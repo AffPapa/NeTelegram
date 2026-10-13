@@ -3566,14 +3566,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         let conversation = currentConversationKey(for: runtime.account, chatID: id)
         let restoredDraft: String
-        if let presentationSnapshot,
-           presentationSnapshot.account == runtime.account,
-           presentationSnapshot.generation == runtime.generation,
-           presentationSnapshot.conversation == conversation {
-            restoredDraft = presentationSnapshot.draft
-        } else {
-            restoredDraft = draftsByConversation[conversation] ?? ""
-        }
+        restoredDraft = presentationSnapshot?.restoredDraft(
+            account: runtime.account,
+            generation: runtime.generation,
+            conversation: conversation
+        ) ?? draftsByConversation[conversation] ?? ""
         setComposerText(restoredDraft)
         refreshReplyStatus(for: conversation)
         do {
