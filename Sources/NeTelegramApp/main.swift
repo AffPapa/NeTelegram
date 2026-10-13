@@ -942,15 +942,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField.isHidden = true
         actionButton.isEnabled = false
         setStatus("Выбран аккаунт \(safeAccountName(selected) ?? "Аккаунт"). Остальные авторизованные аккаунты продолжают работу.")
-        if selected.telegramUserID != nil {
+        switch AccountPresentation.conversationRestoration(
+            telegramUserID: selected.telegramUserID,
+            authorizationState: selected.authorizationState,
+            selectedChatID: selectedChatByAccount[selected.account]
+        ) {
+        case .reopen(let chatID):
+            selected.loadMainChats()
+            showAuthenticatedChatUI()
+            refreshChatList()
+            // selectAccount closed the previous account's visible chat. Restore
+            // this account through the same TDLib openChat path so the restored
+            // UI and TDLib's displayed-chat state cannot diverge.
+            openChat(chatID: chatID, in: selected)
+        case .emptyConversation:
             selected.loadMainChats()
             showAuthenticatedChatUI()
             refreshChatList()
             displaySelectedConversation()
             refreshComposerState()
-            return
+        case .authorization:
+            presentAuthorizationState(selected.authorizationState, info: authPresentationInfoByAccount[selected.account] ?? [:])
         }
-        presentAuthorizationState(selected.authorizationState, info: authPresentationInfoByAccount[selected.account] ?? [:])
     }
 
     private func refreshAccountPicker(select account: AccountUUID? = nil) {

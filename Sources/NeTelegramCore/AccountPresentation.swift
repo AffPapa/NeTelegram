@@ -36,6 +36,12 @@ public enum AccountProfilePickerStatus: Sendable, Equatable {
     }
 }
 
+public enum AccountConversationRestoration: Sendable, Equatable {
+    case authorization
+    case emptyConversation
+    case reopen(chatID: Int64)
+}
+
 /// Produces a human-facing account label only after TDLib has confirmed the
 /// server identity. Local AccountUUIDs are storage keys and must never leak
 /// into account pickers or window titles as if they were Telegram profiles.
@@ -49,6 +55,22 @@ public enum AccountPresentation {
     ) -> Bool {
         guard telegramUserID != nil else { return false }
         return authorizationState == nil || authorizationState == "authorizationStateReady"
+    }
+
+    /// Selects the presentation path without creating or replacing an account
+    /// runtime. Remembered chat state is restored only for a verified identity
+    /// whose current authorization state still permits authenticated UI.
+    public static func conversationRestoration(
+        telegramUserID: Int64?,
+        authorizationState: String?,
+        selectedChatID: Int64?
+    ) -> AccountConversationRestoration {
+        guard restoresAuthenticatedChat(
+            telegramUserID: telegramUserID,
+            authorizationState: authorizationState
+        ) else { return .authorization }
+        guard let selectedChatID else { return .emptyConversation }
+        return .reopen(chatID: selectedChatID)
     }
 
     public static func verifiedDisplayName(telegramUserID: Int64?, candidate: String?) -> String? {
