@@ -13,8 +13,10 @@
         "scope": "Exact-source macOS 15 Apple Silicon serial Swift suite passed 155/155."
       },
       "current_checkpoint_metadata": {
-        "result": "pending",
-        "scope": "JSON checkpoint changed after app-source CI; metadata workflow will validate the checkpoint commit."
+        "run_id": 38473446842,
+        "workflow_commit": "c9ef6f728e1e999ef311e726709f8f7753839d7e",
+        "result": "success",
+        "scope": "metadata.yml parsed checked-in JSON successfully for checkpoint c9ef6f7."
       },
       "previous_native_bundle_baseline": {
         "run_id": 38457814416,
@@ -36,7 +38,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
-    "site": "Public Site v157 at https://netelegram.iryadom.chatgpt.site; source 3c14efda4c204c0bb3ca57a95aca0b2b8f27b751, deployment appgdep_6acea2b8963481919ba43b8a1b5c0dfa6. All 4 anonymous routes returned HTTP 200 text/html and current source/CI markers passed; downloads has no binary installer links.",
+    "site": "Public Site v158 at https://netelegram.iryadom.chatgpt.site; source 02a5dbdde3d877e3791397b392c183453b03fa50; deployment appgdep_6acea846c16c8191b1db071a9eb334c0. Anonymous /, /features/, /devlog/, /downloads/ returned HTTP 200 text/html; devlog verifies be4707d and CI 38473154528. Downloads has no installer links.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -505,24 +507,23 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 157,
-    "source_commit": "3c14efda4c204c0bb3ca57a95aca0b2b8f27b751",
-    "app_repository_commit": "c028bd3859d76b6abf31634a4bb62f071d5e9f57",
-    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-    "deployment_id": "appgdep_6acea2b8963481919ba43b8a1b5c0dfa6",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_68bbface67388191aa283ec451dcb128",
+    "version": 158,
+    "source_commit": "02a5dbdde3d877e3791397b392c183453b03fa50",
+    "app_repository_commit": "c9ef6f728e1e999ef311e726709f8f7753839d7e",
+    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "deployment_id": "appgdep_6acea846c16c8191b1db071a9eb334c0",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_042a2e3e757881919cdfd4e1ba0d6c2b",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "description": "Bilingual factual development Site. Current-source accountless native login screen smoke, local and hosted tests, limitations and no-download status.",
-    "local_archive_path": "/private/tmp/netelegram-site-v157.tar",
-    "local_archive_sha256": "458456229885704413ba63fbe22b7f6baaa9415fe184a00f66875af8f8274cb5",
-    "local_archive_size_bytes": 293338,
-    "saved_archive_content_hash": "sha256:f4237d5da1dc9a5dc55be20b61c0ca8acb672bf9c1fe42c8620f9aff52c55eef",
+    "local_archive_path": "/private/tmp/netelegram-site-privacy-v158.tar",
+    "local_archive_sha256": "320c16dc1960daacfb27f16c9488c236e59d33db99c527e658fbdc09a95929fc",
+    "local_archive_size_bytes": 293899,
+    "saved_archive_content_hash": "sha256:7ee8dcf223331b8ae32405033935c0b72509235434276cf13699b98ef6eda36b",
     "saved_archive_size_bytes": 532480,
     "archive_file_count": 15,
-    "github_ci_run_id": 38469520583,
-    "metadata_validation_run_id": 38470536609,
-    "public_verification": "After v157, anonymous /, /features/, /devlog/, and /downloads/ all returned HTTP 200 text/html; c028bd3/app-source4d6820d/CI markers passed. Downloads contains no .dmg/.zip installer link."
+    "github_ci_run_id": 38473154528,
+    "metadata_validation_run_id": 38473446842,
+    "public_verification": "Anonymous HTTPS /, /features/, /devlog/, /downloads/ each returned HTTP 200 text/html. Devlog has be4707d/CI markers; downloads shows no release, with no installer links."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
@@ -549,5 +550,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue one isolated runtime slice using exact-source CI 155/155 for be4707d. Inspect canonical Dev.app process and embedded BuildInfo before any rebuild; do not create a second app identity. User deferred real auth. All-20 real runtimes, API compatibility, Developer ID/notarization and updater gates remain open."
+  "next_action": "Inspect one canonical Dev.app process and embedded BuildInfo before any current-source native GUI smoke. Do not launch a second bundle. Continue one acceptance gap per slice; real auth remains deferred, all-20 and distribution gates remain open."
 }

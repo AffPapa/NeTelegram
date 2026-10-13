@@ -490,3 +490,10 @@
 - Focused local privacy tests passed 2/2. Exact-SHA [GitHub macOS CI run 38473154528](https://github.com/AffPapa/NeTelegram/actions/runs/38473154528) passed the complete Apple Silicon serial suite, 155/155 (41 seconds).
 - A local full-suite attempt stalled in the existing blocked-receive drain test; it was interrupted and is not counted as a local PASS. The exact-source hosted full suite passed. No duplicate run was launched.
 - Synthetic route/cache evidence only. Native Notification Center behavior, secure RAM erasure, late image/picker callbacks and real-account send races remain unverified. No Dev.app build, login, release asset, or Site update was made.
+
+## 2026-10-14 — Public devlog v158 synced to privacy-cache milestone
+
+- Existing public Site/project retained: `appgprj_6acba85192e08191acdf7011928848cf`; source commit `02a5dbdde3d877e3791397b392c183453b03fa50`; saved version 158 `appgprj_6acba85192e08191acdf7011928848cf~appgver_042a2e3e757881919cdfd4e1ba0d6c2b`; deployment `appgdep_6acea846c16c8191b1db071a9eb334c0` succeeded at https://netelegram.iryadom.chatgpt.site.
+- Site archive SHA-256 `320c16dc1960daacfb27f16c9488c236e59d33db99c527e658fbdc09a95929fc`; Sites-reported archive hash `sha256:7ee8dcf223331b8ae32405033935c0b72509235434276cf13699b98ef6eda36b`.
+- Static build and focused validation passed for all eight routes. Anonymous HTTPS checks returned 200 `text/html` for `/`, `/features/`, `/devlog/`, and `/downloads/`; the devlog contains app-source `be4707d` and CI `38473154528`. Downloads still has no installer links.
+- Site source uses its own Sites checkout/remote; the NeTelegram app origin was not changed. No app binary was built or published.
