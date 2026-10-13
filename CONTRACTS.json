@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "product": "NeTelegram",
-  "status": "design_only_not_implemented",
+  "status": "implementation_in_progress",
   "authority": "User 2026-10-11: all approximately20 accounts work in background; overrides prior cap3 design",
   "account_runtime_policy": {
     "target_simultaneously_authorized_accounts": 20,
@@ -156,5 +156,17 @@
     "No credentials through arguments/logs",
     "No public Apple submission IDs/private operational receipts",
     "App API identity is not user session"
-  ]
+  ],
+  "implementation_status": {
+    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 (local, not yet pushed)",
+    "evidence": "Exact local Swift suite 103/103 passed and the AppKit executable compiled. This does not certify real Telegram accounts, 20-runtime performance, native accessibility, or release readiness.",
+    "public_release": "none; public Site is still development-only and has no application download",
+    "remaining_gates": [
+      "real-account and 20-runtime certification",
+      "native lifecycle/accessibility and resource measurements",
+      "Telegram API title/basic-functionality/sponsored-video compatibility",
+      "Developer ID signing and notarization",
+      "Sparkle update signing and controlled update smoke"
+    ]
+  }
 }

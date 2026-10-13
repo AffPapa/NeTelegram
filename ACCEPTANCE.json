@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 24c1f31 passed 101/101 local Swift tests and exact workflows. App-source 1f1615e pins/verifies build-only gperf 3.0.3; exact-source macOS CI 38349233905 and pinned TDLib/arm64 Dev.app workflow 38349233892 succeeded. Public Site v90 and full website mirror are live. Real-account coverage, 20-session measurements, Telegram compatibility, Developer ID/notarization, updater and stable release gates remain open.",
+  "status": "implementation_in_progress; local implementation commit fd4586d adds validated incoming URL/textUrl/email entities, UTF-16-safe parsing and AppKit link/formatted-text display for messages and photo captions; unknown authorization states now fail closed. Exact local Swift suite 103/103 passed and AppKit target compiled. Push is currently blocked by local DNS resolution for github.com; no remote CI or Site update yet.",
   "cases": [
     {
       "id": "APP01",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "First-run screenshot from exact-source native artifact 11781410154 was visually reviewed (1024x768; SHA-256 11cc04c2632bd47307dd0fa2a03ce96fc87ff303088075e7b68058ba423eff41): branded phone/QR auth screen, no profiles or UUIDs. CI lacked API hash, so this does not verify Telegram login, VoiceOver, keyboard, RTL, IME or Reduced Motion."
+      "evidence": "Incoming text messages and photo captions now parse TDLib formattedText entity ranges using UTF-16 offsets, render supported text styling and clickable HTTP(S)/mailto/tg links in a selectable AppKit text view, and reject malformed ranges/unsafe URL schemes. Exact local suite 103/103 passes for source commit fd4586d. Native VoiceOver/keyboard/link-click interaction, RTL/IME, and real-account formatted text remain unverified; status remains partial."
     },
     {
       "id": "APP23",
@@ -410,20 +410,19 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
-    "local_command": "swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "101/101 Swift Testing tests passed; app and test products compiled; git diff --check passed. New deterministic test verifies account-scoped notification route cleanup.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38348346825 ; https://github.com/AffPapa/NeTelegram/actions/runs/38348346880",
-    "hosted_result": "Both exact-source workflows succeeded. Pinned workflow built TDLib, verified and launched a clean isolated Dev.app, captured a first-run screenshot, and quit; this is accountless CI smoke, not real Telegram coverage.",
+    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
+    "local_result": "103/103 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
+    "hosted_ci": "Not run for fd4586d. Existing credential helper push attempt failed before authentication because github.com did not resolve.",
+    "hosted_result": "No hosted CI, Dev.app replacement, or public Site update claimed for fd4586d.",
     "artifact": {
-      "workflow_run": 38348346880,
-      "source_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
-      "status": "review-only development artifact; not public distribution",
-      "signature": "development CI; not a release"
+      "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
+      "status": "local development source only; no new Dev.app, release, installer, or public binary",
+      "signature": "not a release"
     },
-    "scope": "No real Telegram login/read/send/logout (user deferred login); no live Notification Center, 20-account lifecycle/resource matrix, sleep/wake soak, full accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram title/basic-functionality/sponsored-video compatibility remain open.",
-    "publication": "App source 24c1f3191c861fca234bab5ded52503dee9c4205; subsequent dependency/toolchain correction 1f1615e613bba198f88bdd2701cabc3a6e34e65f passed exact-source CI and pinned TDLib/Dev.app CI. Site v90 public, GitHub mirror at ca2788a6afb21f1ea3cd4c77e8ddf81a207e1657. No app tag or public binary download exists.",
-    "next_action": "Continue one native correctness slice from the canonical checkout, run focused regression plus exact-source CI/Dev.app workflow. Real Telegram login remains deferred at user request; do not initiate it."
+    "scope": "Two deterministic incoming entity regressions cover UTF-16 offsets, web and textUrl destinations, invalid ranges and disallowed file URLs. Unknown/future authorization states fail closed even when a previous TelegramUserID exists. AppKit code compiles. Native link clicking/accessibility, login/read/send/logout, 20 real accounts, performance matrix, sleep/wake, Developer ID/notarization, Gatekeeper, updater and Telegram compatibility decisions remain open. The running canonical Dev.app was not touched.",
+    "publication": "Local main has source commit fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1. The last verified public GitHub main is f4505b329db5b72d023211af4ffc8fdcd21bac0c; a push attempt failed before authentication because github.com did not resolve. Site remains at v90; no app release or download exists.",
+    "next_action": "Retry Git push using the existing credential helper after github.com DNS works. Then verify exact-source CI, update Site devlog/mirror once, and obtain the build artifact without launching a second local Dev.app."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
