@@ -252,11 +252,11 @@
     {
       "id": "APP26",
       "name": "Команды runtime упорядочены перед close",
-      "expected": "Принятая команда завершается до запроса close; после принятого close новые команды этого runtime не отправляются. Если TDLib не принял close, runtime остаётся доступным.",
+      "expected": "Синхронный dispatch ранее принятой команды завершается до вызова TDLib close для того же runtime; после принятого close новые dispatch блокируются. Если TDLib немедленно отклоняет close, gate открывается обратно. Это не обещает получить удалённый ответ Telegram на каждую ранее отправленную команду до close.",
       "method": "deterministic core + native TDLib quit smoke",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "RuntimeCommandGate and TerminationBarrier regressions pass in 80/80; pinned TDLib/Dev.app run 38331575651 passed for exact commit fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. Multi-account native quit behavior remains unverified; status stays partial."
+      "evidence": "RuntimeCommandGate.dispatch and beginClosing use the same lock around gateway.send. LocalAccountRuntime.send and close both pass through this gate; read-only source audit at ad1a817 found no direct gateway.send bypass. Existing deterministic tests cover command-before-close ordering, immediate close rejection rollback, and late-dispatch rejection. Gate order is synchronous dispatch/enqueue order only; no remote TDLib response barrier is implemented or claimed. Exact-SHA pinned TDLib/Dev.app run 38440068795 was cancelled before steps, so native lifecycle evidence for HEAD is absent; prior accountless lifecycle smoke is on older product-code SHA 15cb93b. Multi-account real quit remains unverified."
     },
     {
       "id": "PERF01",

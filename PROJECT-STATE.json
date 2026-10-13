@@ -136,7 +136,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Proceed with the next distinct P0 runtime acceptance gap from app source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. Do not repeat APP16 local tests, the shared site redesign, or v147 route checks without changed inputs. Real login remains user-deferred. Preserve and state the exact blockers: 20 authorized-runtime coverage, signing/notarization, Telegram compatibility gates, and unavailable fresh hosted CI status.",
+  "next_action": "Next: resume a distinct P0 runtime acceptance gap from app source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. APP26 only guarantees serialized synchronous dispatch/enqueue; do not describe it as remote TDLib completion. Do not repeat APP16 tests or Site v147 checks without changed inputs. Real login remains user-deferred; real 20-runtime coverage, signing/notarization, Telegram compatibility and fresh hosted CI status remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
