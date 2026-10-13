@@ -1,19 +1,18 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3; local serial 136/136, exact-SHA macOS CI and pinned TDLib/Dev.app lifecycle smoke passed. Product brand NeTelegram is public; API title gate remains open. Site v118 is public and anonymous routes verified. APP04 is partial because no real accounts prove background processing. No app release.",
+  "status": "implementation_in_progress; app source/test commit 2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01; two targeted synthetic APP02 fault tests passed locally and exact-SHA macOS CI succeeded. APP02 remains partial because no real system Keychain or authorized account was used. NeTelegram branding and bilingual SEO copy are live; public Site v119 routes verified. No app release.",
   "current_evidence": {
-    "app_source_commit": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3",
-    "app_tests": "136/136 serial Swift tests passed on Xcode 27.0 / Swift 6.4 / macOS 27 SDK.",
+    "app_source_commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01",
+    "app_tests": "Two new targeted tests passed locally on Xcode 27.0 / Swift 6.4: injected Keychain error propagation without fallback and a stalled synthetic Keychain read while 19 other profile startup attempts complete. Exact-SHA macOS CI 38401445104 passed. The full local suite was not rerun.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38399172699",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38399172724"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38401445104"
     ],
-    "native_smoke": "Exact-source pinned TDLib/arm64 Dev.app run https://github.com/AffPapa/NeTelegram/actions/runs/38399172724 passed: accountless last titled window close preserves same PID at zero user-facing windows, LaunchServices reopen restores one window in same PID, Cmd+Q exits. Status-bar window excluded. No real accounts or background update processing.",
-    "product_branding": "NeTelegram; current GitHub README and public Site use NeTelegram, bilingual descriptive SEO copy, and a prominent independent/no-direct-connection disclosure. Current app-title §2.3 compatibility gate remains open; disclaimer does not override API Terms.",
+    "native_smoke": "Runtime/AppKit source did not change in the test-only commit; latest native lifecycle smoke remains pinned TDLib/Dev.app workflow 38399172724 on app-source 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3. Accountless close/reopen/Cmd+Q only; no account updates tested.",
+    "product_branding": "NeTelegram; GitHub README has detailed Russian and English content with independent/no-direct-connection disclosure. Public Site v119 is NeTelegram branded. GitHub About metadata remains a separate short English description; connector has no repository-description edit operation, and local gh auth is not usable.",
     "real_account_coverage": "none; user deferred login",
-    "twenty_authorized_runtime_coverage": "none; synthetic fanout tests do not count as real accounts",
+    "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v118 from 6a02f20f94d1bc460cfb2f39a3350b8033d0ad44, deployment appgdep_6ace28a09f9c819193ded68a92048fd4; anonymous route and MIME checks passed; download page still says NO RELEASE."
+    "site": "Public Site v119 from 825b9aa8d5bb8d72a69fc31ff676954bcc9825bd, deployment appgdep_6ace2c7af07c8191a65a2c9002324461, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_d184ab2af43c81919cdeea209adf53d3; all eight public pages and stable/alpha XML returned 200 with expected MIME and valid feeds; downloads say NO RELEASE."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -33,7 +32,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Source ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf moves API-hash and per-account DB/draft-key Keychain reads off AppKit main thread; ProfileRestoreGenerationGate invalidates a late restore after quit. Tests keychainReadsRunOutsideTheMainThread and quittingInvalidatesAProfileRestoreThatMayResumeLate pass in 124/124 local suite. A prior read-only sample of the old app showed SecItemCopyMatching on main; one new canonical Dev.app is responsive at the empty phone-entry screen. This is not a controlled injected Keychain stall or 20-profile soak; status stays partial."
+      "evidence": "At app source/test commit 2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01, injectedKeychainReadFailurePropagatesWithoutFallback confirms an errSecInteractionNotAllowed failure propagates; stalledKeychainReadDoesNotBlockOtherProfileStartupAttempts blocks one synthetic Keychain operation while the other 19 profile attempts finish with startup parallelism 2. Both targeted tests passed locally; exact-SHA macOS CI 38401445104 passed. These tests inject an operation into performKeychainRead and use RuntimeStartupScheduler; they do not exercise an actual macOS Keychain lock, app-level per-profile UI failure, real login, or 20 authorized sessions. APP02 remains partial."
     },
     {
       "id": "APP03",

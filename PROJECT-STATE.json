@@ -11,14 +11,14 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3",
+    "commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38399172699,
+      "run_id": 38401445104,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38399172699",
-      "app_source_commit": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38401445104",
+      "app_source_commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01"
     },
     "published_application_releases": [],
     "github_access": {
@@ -63,23 +63,23 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 136,
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app04-lifecycle-check",
+      "count": 2,
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app02-keychain-check --filter 'injectedKeychainReadFailurePropagatesWithoutFallback|stalledKeychainReadDoesNotBlockOtherProfileStartupAttempts'",
       "xcode": "Xcode 27.0 / Swift 6.4 / macOS 27 SDK",
-      "source_commit": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3",
-      "scope": "Full serial synthetic Swift suite passed after the DEBUG-only lifecycle smoke was corrected; no Telegram account login."
+      "source_commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01",
+      "scope": "Two targeted synthetic fault-injection tests passed locally; exact-SHA GitHub macOS CI passed. No system Keychain or Telegram account was used."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_site": "Public Site v118 deployed at https://netelegram.iryadom.chatgpt.site from Site source 6a02f20f94d1bc460cfb2f39a3350b8033d0ad44; deployment appgdep_6ace28a09f9c819193ded68a92048fd4. Anonymous curl verified HTTP 200 and expected MIME for /, /features/, /roadmap/, /devlog/, /downloads/ and /updates/stable.xml. Latest source, bilingual SEO copy and APP04 devlog are public; downloads truthfully say NO RELEASE; feeds remain valid empty RSS.",
+    "current_head_site": "Public Site v119 is live at https://netelegram.iryadom.chatgpt.site from source 825b9aa8d5bb8d72a69fc31ff676954bcc9825bd; deployment appgdep_6ace2c7af07c8191a65a2c9002324461; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_d184ab2af43c81919cdeea209adf53d3. Anonymous checks returned 200 with expected MIME for all eight pages and stable/alpha XML feeds; APP02 bilingual devlog, RU/EN disclosure, no Neridian on live routes, and NO RELEASE downloads verified.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection.",
-    "current_head_native_workflow": "Pinned TDLib and arm64 Dev.app workflow 38399172724 passed for exact app-source SHA 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3; accountless Dev.app built and packaged.",
+    "current_head_native_workflow": "No native workflow rerun for test-only app commit 2ba4ccf; runtime/AppKit source is unchanged from 13625c7, whose pinned TDLib/Dev.app lifecycle smoke 38399172724 passed. Do not treat that accountless smoke as real-account background processing evidence.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": "Exact-SHA CI workflow 38399172724 confirmed appless Dev.app last user-facing window close -> same PID remains with zero titled application windows -> LaunchServices reopen -> exactly one titled window in the same PID -> normal Cmd+Q exit. The status-bar service window is excluded from user-facing window count. No Telegram account or background updates were tested.",
-    "publication": "GitHub app-source commit 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3 is on main; exact-source macOS CI 38399172699 and pinned TDLib/Dev.app lifecycle workflow 38399172724 succeeded. Public Site v118 is live from source 6a02f20f94d1bc460cfb2f39a3350b8033d0ad44, deployment appgdep_6ace28a09f9c819193ded68a92048fd4, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_9c707118acac81918c9a4f27d010aec4; anonymous routes and MIME checks passed. No app binary release/download.",
+    "publication": "App source/test commit 2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01 is on main; exact-SHA macOS CI 38401445104 passed. Public Site v119 source 825b9aa8d5bb8d72a69fc31ff676954bcc9825bd, deployment appgdep_6ace2c7af07c8191a65a2c9002324461, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_d184ab2af43c81919cdeea209adf53d3; all public route/MIME checks passed. No app binary release/download.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified."
   },
   "site": {
@@ -87,19 +87,19 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 118,
-    "source_commit": "6a02f20f94d1bc460cfb2f39a3350b8033d0ad44",
-    "deployment_id": "appgdep_6ace28a09f9c819193ded68a92048fd4",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9c707118acac81918c9a4f27d010aec4",
+    "latest_version": 119,
+    "source_commit": "825b9aa8d5bb8d72a69fc31ff676954bcc9825bd",
+    "deployment_id": "appgdep_6ace2c7af07c8191a65a2c9002324461",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_d184ab2af43c81919cdeea209adf53d3",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous /usr/bin/curl after deployment on 2026-10-13: /, /features/, /roadmap/, /devlog/, /downloads/ returned 200 text/html and /updates/stable.xml returned 200 text/xml. Marker checks verified source 13625c7, bilingual SEO text, direct non-affiliation disclosure, APP04 lifecycle result, NO RELEASE downloads, and valid empty RSS.",
-    "archive_local_sha256": "74ab3f64766d8bc28baf0496404f9c6ffa9dbab5a8ac09e84c9be9cb0a492f2c",
-    "archive_sites_reported_content_hash": "sha256:c814243351c042a269312015df326165b628d2527a19e8d1685b648e4e04df5f",
+    "public_route_verified": "Anonymous HTTPS checks on 2026-10-13: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/ returned 200 text/html; /updates/stable.xml and /updates/alpha.xml returned 200 text/xml and parsed as RSS. Verified current APP02 commit/CI, bilingual disclosure, no current Neridian branding, and honest NO RELEASE state.",
+    "archive_local_sha256": "fa0c3a2a8e8a46d4a8833732893d7ce23b046a29e1e11e72bba158010adef395",
+    "archive_sites_reported_content_hash": "sha256:93442a07590e89d66466f71d6c70c409447d0c05293c10818485478c4db6f39f",
     "archive_file_count": 14,
     "sites_reported_archive_size_bytes": 440320,
-    "local_archive_size_bytes": 273761,
-    "archive_local_path": "/private/tmp/netelegram-site-v118.tar.gz"
+    "local_archive_size_bytes": 274321,
+    "archive_local_path": "/private/tmp/netelegram-site-v119.tar.gz"
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -110,7 +110,7 @@
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified."
   ],
-  "next_action": "Next bounded milestone: APP02 controlled Keychain/startup-failure handling with synthetic fault injection; avoid rerunning APP04 or the unchanged 136-test suite. Real Telegram login remains deferred by the user; real 20-account coverage, Developer ID/notarization, terms compatibility, and app distribution remain open.",
+  "next_action": "Next bounded milestone: APP03 account-switch isolation. Extract a testable account-local presentation snapshot (chat, typed topic, draft key) and add deterministic A→B→A coverage with the same numeric chat ID but distinct account drafts/topics; assert runtime generations do not change. Do not repeat the existing reopen-policy, send-intent capture, or encrypted draft round-trip tests. Keep APP03 partial until native integration and real-account paths are covered.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
@@ -119,9 +119,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3",
+    "repo_head_before_checkpoint": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01",
     "app_source_commit_authority": "source.commit",
-    "app_source_commit": "13625c702e6dbd5d14b2f6d7d2acbf210806a8f3"
+    "app_source_commit": "2ba4ccf0e8d899a2da7e4e42dedd30cbb5dc9b01"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
