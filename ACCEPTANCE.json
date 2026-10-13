@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 19ebb00 adds a spoken name and instructions to the QR authorization image and hides empty image state. Exact local suite 110/110 and exact-source macOS CI pass; pinned TDLib/Dev.app workflow is still running. Site v93 remains public; devlog update waits for the pinned workflow result. No release binary.",
+  "status": "implementation_in_progress; QR authorization image now has a VoiceOver name/help and empty QR state is hidden. Exact local Swift 110/110, exact-source macOS CI, and pinned TDLib/isolated Dev.app smoke succeeded for 19ebb00. Site v93 remains public until factual devlog v94 is deployed. No real QR login or app release.",
   "cases": [
     {
       "id": "APP01",
@@ -413,15 +413,15 @@
     "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
     "local_result": "110/110 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
-    "hosted_ci": "Exact-source macOS CI 38356823153 completed successfully for 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c; pinned TDLib/Dev.app run 38356822970 is still assembling the isolated bundle.",
-    "hosted_result": "Swift tests (Apple Silicon) passed for exact source SHA. Pinned TDLib and isolated Dev.app build/smoke remains in progress; do not claim its result yet.",
+    "hosted_ci": "Exact-source macOS CI 38356823153 and pinned TDLib/Dev.app workflow 38356822970 both completed successfully for 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c.",
+    "hosted_result": "Apple Silicon Swift tests passed. Pinned TDLib built; isolated arm64 Dev.app assembled, verified, launched, screenshot captured, and quit in CI. Accountless development smoke only; not a release.",
     "artifact": {
       "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
       "status": "local development source only; no release artifact or public binary",
       "signature": "not a release"
     },
     "scope": "VoiceOver name/help are assigned to the QR image and it is hidden when absent. Native VoiceOver traversal, actual QR auth and keyboard interaction remain unverified. No real accounts, 20-runtime certification, Developer ID/notarization, Gatekeeper or updater tests are claimed; existing local canonical Dev.app was not touched.",
-    "publication": "App source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c is pushed to public main. Site devlog update is pending exact-source CI completion; no release/download exists.",
+    "publication": "App source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c is on public main. Factual Site devlog publication remains to be completed; no application download exists.",
     "next_action": "Wait for exact-SHA macOS CI and pinned TDLib/Dev.app workflow. If green, publish factual APP22 devlog on the existing Site; if failed, fix the source issue and rerun before claiming completion."
   },
   "latest_site_deployment": {
@@ -442,7 +442,7 @@
     "date": "2026-10-13",
     "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
     "tests": "110/110 Swift Testing tests passed locally; AppKit target compiled; git diff --check passed.",
-    "hosted_ci": "macOS CI 38356823153 succeeded for exact SHA; pinned TDLib/Dev.app 38356822970 remains in progress.",
+    "hosted_ci": "Exact-source macOS CI 38356823153 and pinned TDLib/Dev.app workflow 38356822970 both succeeded for SHA 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c.",
     "site": "Current public Site v93. Devlog v94 update waits for exact-source CI.",
     "scope": "VoiceOver label/help on QR image; missing/generated-no-image states hide the image and report status. No native assistive-technology or real QR login proof."
   },
