@@ -154,6 +154,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var selectedChatByAccount: [AccountUUID: Int64] = [:]
     private var messagesByConversation: [ConversationKey: [[String: Any]]] = [:]
     private var pendingHistoryByExtra: [String: ConversationKey] = [:]
+    private var sponsoredMessagesByKey: [SponsoredMessagesKey: [SponsoredMessageCard]] = [:]
+    private var sponsoredMessagesFetchedAt: [SponsoredMessagesKey: Date] = [:]
+    private var pendingSponsoredMessagesByExtra: [String: SponsoredMessagesKey] = [:]
+    private var pendingSponsoredBotUsersByExtra: [String: SponsoredMessagesKey] = [:]
+    private var pendingSponsoredReportsByExtra: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
+    private var sponsoredEligibleChatKeys: Set<SponsoredMessagesKey> = []
+    private var sponsoredChannelKeys: Set<SponsoredMessagesKey> = []
+    private var sponsoredBotKeys: Set<SponsoredMessagesKey> = []
+    private var sponsoredActionByControlID: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
+    private var sponsoredReportActionByControlID: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
     private var pendingForumTopicsByExtra: [String: Int64] = [:]
     private var forumTopicsByAccount: [AccountUUID: [Int64: [ForumTopicDescriptor]]] = [:]
     private var forumChatsByAccount: [AccountUUID: Set<Int64>] = [:]
@@ -1104,6 +1114,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         requestedOriginalPhotos = requestedOriginalPhotos.filter { $0.account != account }
         photoDownloadsByConversation = photoDownloadsByConversation.filter { $0.key.account != account }
         pendingHistoryByExtra = pendingHistoryByExtra.filter { $0.value.account != account }
+        sponsoredMessagesByKey = sponsoredMessagesByKey.filter { $0.key.account != account }
+        sponsoredMessagesFetchedAt = sponsoredMessagesFetchedAt.filter { $0.key.account != account }
+        sponsoredEligibleChatKeys = sponsoredEligibleChatKeys.filter { $0.account != account }
+        sponsoredChannelKeys = sponsoredChannelKeys.filter { $0.account != account }
+        sponsoredBotKeys = sponsoredBotKeys.filter { $0.account != account }
+        pendingSponsoredMessagesByExtra = pendingSponsoredMessagesByExtra.filter { $0.value.account != account }
+        pendingSponsoredBotUsersByExtra = pendingSponsoredBotUsersByExtra.filter { $0.value.account != account }
+        pendingSponsoredReportsByExtra = pendingSponsoredReportsByExtra.filter { $0.value.key.account != account }
+        sponsoredActionByControlID = sponsoredActionByControlID.filter { $0.value.key.account != account }
+        sponsoredReportActionByControlID = sponsoredReportActionByControlID.filter { $0.value.key.account != account }
         pendingForumTopicsByExtra.removeAll()
         pendingSearchByExtra = pendingSearchByExtra.filter { $0.value.account != account }
         searchResults.removeAll()
@@ -2051,6 +2071,58 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             else if !lockState, target === runtime {
                 setStatus("TDLib сообщила об отказе. Черновик и фото сохранены; повтор не выполняется автоматически.")
             }
+        } else if object["@type"] as? String == "sponsoredMessages",
+                  let extra = object["@extra"] as? String,
+                  let key = pendingSponsoredMessagesByExtra.removeValue(forKey: extra) {
+            guard !lockState,
+                  let owner = runtimesByAccount[key.account], owner === target,
+                  owner.generation == key.generation else { return }
+            let cards = (object["messages"] as? [[String: Any]] ?? []).compactMap(SponsoredMessageCard.init(tdlibObject:))
+            sponsoredMessagesByKey[key] = cards
+            sponsoredMessagesFetchedAt[key] = Date()
+            if target === runtime, selectedChatByAccount[target.account] == key.chatID,
+               currentConversationKey() == currentConversationKey(for: target.account, chatID: key.chatID) {
+                let conversation = currentConversationKey(for: target.account, chatID: key.chatID)
+                clearStack(messageList)
+                renderMessages(messagesByConversation[conversation] ?? [])
+            }
+        } else if let extra = object["@extra"] as? String,
+                  let pending = pendingSponsoredReportsByExtra.removeValue(forKey: extra) {
+            guard !lockState,
+                  let owner = runtimesByAccount[pending.key.account], owner === target,
+                  owner.generation == pending.key.generation,
+                  target === runtime,
+                  selectedChatByAccount[target.account] == pending.key.chatID else { return }
+            switch SponsoredReportResult.type(from: object) {
+            case "reportSponsoredResultOptionRequired":
+                let options = SponsoredReportResult.options(from: object)
+                guard !options.isEmpty else {
+                    setStatus("Telegram не вернул варианты жалобы на рекламу.")
+                    return
+                }
+                let picker = NSPopUpButton(frame: NSRect(x: 0, y: 0, width: 280, height: 26), pullsDown: false)
+                for option in options { picker.addItem(withTitle: option.text) }
+                let alert = NSAlert()
+                alert.messageText = object["title"] as? String ?? "Пожаловаться на рекламу"
+                alert.accessoryView = picker
+                alert.addButton(withTitle: "Отправить")
+                alert.addButton(withTitle: "Отмена")
+                guard alert.runModal() == .alertFirstButtonReturn,
+                      options.indices.contains(picker.indexOfSelectedItem) else { return }
+                sendSponsoredReport(pending.key, card: pending.card, optionID: options[picker.indexOfSelectedItem].id, target: target)
+            case "reportSponsoredResultOk":
+                setStatus("Жалоба на рекламное сообщение отправлена.")
+            case "reportSponsoredResultAdsHidden":
+                sponsoredMessagesByKey.removeAll()
+                sponsoredMessagesFetchedAt.removeAll()
+                setStatus("Telegram скрыл рекламные сообщения во всех переписках.")
+            case "reportSponsoredResultPremiumRequired":
+                setStatus("Telegram требует Premium, чтобы скрыть такую рекламу.")
+            case "reportSponsoredResultFailed":
+                setStatus("Эта реклама уже устарела и не может быть отмечена.")
+            default:
+                setStatus("Telegram вернул неизвестный результат жалобы на рекламу.")
+            }
         } else if let type = object["@type"] as? String, type == "messages",
                   let messages = object["messages"] as? [[String: Any]],
                   let extra = object["@extra"] as? String, let conversation = pendingHistoryByExtra.removeValue(forKey: extra) {
@@ -2082,6 +2154,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshForumTopicPicker(for: chatID)
             loadSelectedConversationHistory(in: target, chatID: chatID)
             refreshComposerState()
+        } else if object["@type"] as? String == "user",
+                  let extra = object["@extra"] as? String,
+                  let key = pendingSponsoredBotUsersByExtra.removeValue(forKey: extra) {
+            guard !lockState,
+                  let owner = runtimesByAccount[key.account], owner === target,
+                  owner.generation == key.generation else { return }
+            guard (object["type"] as? [String: Any])?["@type"] as? String == "userTypeBot" else {
+                sponsoredEligibleChatKeys.remove(key)
+                sponsoredBotKeys.remove(key)
+                return
+            }
+            sponsoredEligibleChatKeys.insert(key)
+            sponsoredBotKeys.insert(key)
+            if target === runtime, selectedChatByAccount[target.account] == key.chatID {
+                loadSponsoredMessages(in: target, chatID: key.chatID)
+            }
         } else if let type = object["@type"] as? String, type == "user" {
             refreshAccountPicker(select: target === runtime ? target.account : nil)
             if target === runtime {
@@ -2089,6 +2177,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("Аккаунт авторизован. Загружаю список переписок…")
             }
         } else if let type = object["@type"] as? String, type == "error" {
+            if let extra = object["@extra"] as? String,
+               pendingSponsoredMessagesByExtra.removeValue(forKey: extra) != nil {
+                return
+            }
+            if let extra = object["@extra"] as? String,
+               pendingSponsoredBotUsersByExtra.removeValue(forKey: extra) != nil {
+                return
+            }
+            if let extra = object["@extra"] as? String,
+               pendingSponsoredReportsByExtra.removeValue(forKey: extra) != nil {
+                if target === runtime { setStatus("Не удалось отправить жалобу на рекламу.") }
+                return
+            }
             if let extra = object["@extra"] as? String,
                let pending = pendingAuthRequestsByExtra.removeValue(forKey: extra) {
                 if target === runtime, target.account == pending.account { authRequestInFlight = false }
@@ -2357,6 +2458,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         let isChannel = chatType? ["@type"] as? String == "chatTypeSupergroup"
             && (chatType? ["is_channel"] as? Bool ?? false)
+        let sponsoredKey = SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: id)
+        if isChannel {
+            sponsoredEligibleChatKeys.insert(sponsoredKey)
+            sponsoredChannelKeys.insert(sponsoredKey)
+            sponsoredBotKeys.remove(sponsoredKey)
+            if target === runtime, selectedChatByAccount[target.account] == id {
+                loadSponsoredMessages(in: target, chatID: id)
+            }
+        } else if chatType? ["@type"] as? String == "chatTypePrivate" {
+            sponsoredChannelKeys.remove(sponsoredKey)
+            if !sponsoredEligibleChatKeys.contains(sponsoredKey),
+               !pendingSponsoredBotUsersByExtra.values.contains(sponsoredKey),
+               let userID = (chatType?["user_id"] as? NSNumber)?.int64Value,
+               target === runtime, selectedChatByAccount[target.account] == id {
+                historyRequestCounter &+= 1
+                let extra = "sponsored-bot-user-\(historyRequestCounter)"
+                pendingSponsoredBotUsersByExtra[extra] = sponsoredKey
+                do {
+                    try target.send(["@type": "getUser", "user_id": userID, "@extra": extra])
+                } catch {
+                    pendingSponsoredBotUsersByExtra.removeValue(forKey: extra)
+                }
+            }
+        } else {
+            sponsoredEligibleChatKeys.remove(sponsoredKey)
+            sponsoredChannelKeys.remove(sponsoredKey)
+            sponsoredBotKeys.remove(sponsoredKey)
+        }
         let sender = chat["message_sender_id"] as? [String: Any]
         let senderUserID = sender? ["@type"] as? String == "messageSenderUser"
             ? (sender? ["user_id"] as? NSNumber)?.int64Value : nil
@@ -2369,6 +2498,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if target === runtime {
             refreshChatList()
             if selectedChatByAccount[target.account] == id { refreshComposerState() }
+        }
+    }
+
+    private func loadSponsoredMessages(in target: LocalAccountRuntime, chatID: Int64) {
+        let key = SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: chatID)
+        guard sponsoredEligibleChatKeys.contains(key),
+              SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: sponsoredMessagesFetchedAt[key], now: Date()),
+              !pendingSponsoredMessagesByExtra.values.contains(key) else { return }
+        historyRequestCounter &+= 1
+        let extra = "sponsored-\(historyRequestCounter)"
+        pendingSponsoredMessagesByExtra[extra] = key
+        do {
+            try target.send(SponsoredMessagesPolicy.request(chatID: chatID, extra: extra))
+        } catch {
+            pendingSponsoredMessagesByExtra.removeValue(forKey: extra)
         }
     }
 
@@ -3240,6 +3384,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func renderMessages<S: Sequence>(_ messages: S) where S.Element == [String: Any] {
         let ordered = Array(messages)
+        let selected = runtime
+        let chatID = selected.flatMap { selectedChatByAccount[$0.account] }
+        let key = selected.flatMap { target in chatID.map { SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: $0) } }
+        sponsoredActionByControlID.removeAll()
+        sponsoredReportActionByControlID.removeAll()
+        if let selected, let chatID, let key,
+           sponsoredEligibleChatKeys.contains(key), sponsoredBotKeys.contains(key) {
+            loadSponsoredMessages(in: selected, chatID: chatID)
+            for card in (sponsoredMessagesByKey[key] ?? []).prefix(1) { appendSponsoredMessage(card, key: key) }
+        }
         let ids = ordered.map { ($0["media_album_id"] as? NSNumber)?.int64Value ?? 0 }
         for run in MediaAlbumGrouping.runs(albumIDs: ids) {
             let items = run.messageIndices.map { ordered[$0] }
@@ -3249,6 +3403,151 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 appendPhotoAlbum(items)
             }
         }
+        guard !lockState, let selected, let chatID, let key,
+              sponsoredEligibleChatKeys.contains(key) else { return }
+        loadSponsoredMessages(in: selected, chatID: chatID)
+        if sponsoredChannelKeys.contains(key) {
+            for card in (sponsoredMessagesByKey[key] ?? []).prefix(1) {
+                appendSponsoredMessage(card, key: key)
+            }
+        }
+    }
+
+    private func appendSponsoredMessage(_ card: SponsoredMessageCard, key: SponsoredMessagesKey) {
+        let cardView = NSStackView()
+        cardView.orientation = .vertical
+        cardView.alignment = .leading
+        cardView.spacing = 7
+        cardView.edgeInsets = NSEdgeInsets(top: 12, left: 14, bottom: 12, right: 14)
+        cardView.wantsLayer = true
+        cardView.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
+        cardView.layer?.cornerRadius = 10
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+        cardView.widthAnchor.constraint(lessThanOrEqualToConstant: 620).isActive = true
+
+        let badge = NSTextField(labelWithString: card.recommended ? "Рекомендовано" : "Реклама")
+        badge.font = .systemFont(ofSize: 11, weight: .semibold)
+        badge.textColor = .controlAccentColor
+        badge.setAccessibilityLabel(card.recommended ? "Рекомендованная публикация" : "Спонсируемая публикация")
+        cardView.addArrangedSubview(badge)
+
+        let title = NSTextField(wrappingLabelWithString: card.title)
+        title.font = .systemFont(ofSize: 15, weight: .semibold)
+        title.maximumNumberOfLines = 0
+        cardView.addArrangedSubview(title)
+
+        if !card.text.isEmpty {
+            let body = NSTextField(wrappingLabelWithString: card.text)
+            body.font = .systemFont(ofSize: 14)
+            body.maximumNumberOfLines = 0
+            cardView.addArrangedSubview(body)
+        }
+        if card.contentType != "messageText" {
+            let media = NSTextField(wrappingLabelWithString: sponsoredMediaDescription(card.contentType))
+            media.font = .systemFont(ofSize: 12)
+            media.textColor = .secondaryLabelColor
+            media.maximumNumberOfLines = 0
+            cardView.addArrangedSubview(media)
+        }
+
+        if !card.sponsorInfo.isEmpty || !card.additionalInfo.isEmpty {
+            let info = NSTextField(wrappingLabelWithString: [card.sponsorInfo, card.additionalInfo].filter { !$0.isEmpty }.joined(separator: "\n"))
+            info.font = .systemFont(ofSize: 11)
+            info.textColor = .secondaryLabelColor
+            info.maximumNumberOfLines = 0
+            cardView.addArrangedSubview(info)
+        }
+
+        let button = NSButton(title: card.buttonText.isEmpty ? "Подробнее" : card.buttonText, target: self, action: #selector(openSponsoredLink(_:)))
+        button.bezelStyle = .rounded
+        button.isEnabled = !card.sponsorURL.isEmpty
+        button.setAccessibilityLabel("Реклама: \(button.title) — \(card.title)")
+        let controlID = UUID().uuidString
+        button.identifier = NSUserInterfaceItemIdentifier(controlID)
+        sponsoredActionByControlID[controlID] = (key, card)
+        cardView.addArrangedSubview(button)
+        if card.reportable {
+            let reportButton = NSButton(title: "Пожаловаться", target: self, action: #selector(reportSponsoredMessage(_:)))
+            reportButton.bezelStyle = .inline
+            reportButton.setAccessibilityLabel("Пожаловаться на рекламу: \(card.title)")
+            let reportControlID = UUID().uuidString
+            reportButton.identifier = NSUserInterfaceItemIdentifier(reportControlID)
+            sponsoredReportActionByControlID[reportControlID] = (key, card)
+            cardView.addArrangedSubview(reportButton)
+        }
+        messageList.addArrangedSubview(cardView)
+    }
+
+    private func sponsoredMediaDescription(_ type: String) -> String {
+        switch type {
+        case "messagePhoto": return "В этой рекламе есть фотография. Просмотр медиа пока не подключён."
+        case "messageAnimation": return "В этой рекламе есть анимация. Просмотр медиа пока не подключён."
+        case "messageVideo": return "В этой рекламе есть видео. Специальный рекламный просмотр ещё не подключён."
+        default: return "Содержимое рекламы пока не распознано; публикация не скрыта."
+        }
+    }
+
+    @objc private func openSponsoredLink(_ sender: NSButton) {
+        guard !lockState else { return }
+        guard let identifier = sender.identifier?.rawValue,
+              let action = sponsoredActionByControlID[identifier],
+              let target = runtimesByAccount[action.key.account], target === runtime,
+              target.generation == action.key.generation,
+              selectedChatByAccount[target.account] == action.key.chatID,
+              let components = URLComponents(string: action.card.sponsorURL),
+              let scheme = components.scheme?.lowercased(), ["https", "http"].contains(scheme),
+              components.user == nil, components.password == nil,
+              let host = components.host?.lowercased(), !host.isEmpty,
+              let url = components.url else {
+            setStatus("Ссылка этой рекламы пуста или пока не поддерживается.")
+            return
+        }
+        if !isTrustedTelegramLinkHost(host) {
+            let alert = NSAlert()
+            alert.messageText = "Открыть ссылку из рекламы?"
+            alert.informativeText = host
+            alert.alertStyle = .warning
+            alert.addButton(withTitle: "Открыть")
+            alert.addButton(withTitle: "Отмена")
+            guard alert.runModal() == .alertFirstButtonReturn else { return }
+        }
+        do {
+            try target.send(SponsoredMessagesPolicy.click(chatID: action.key.chatID, messageID: action.card.messageID))
+            _ = NSWorkspace.shared.open(url)
+        } catch {
+            setStatus("Не удалось открыть рекламную ссылку; аккаунт продолжает работать.")
+        }
+    }
+
+    @objc private func reportSponsoredMessage(_ sender: NSButton) {
+        guard !lockState,
+              let identifier = sender.identifier?.rawValue,
+              let action = sponsoredReportActionByControlID[identifier],
+              let target = runtimesByAccount[action.key.account], target === runtime,
+              target.generation == action.key.generation,
+              selectedChatByAccount[target.account] == action.key.chatID else {
+            setStatus("Жалобу можно отправить только для рекламы в открытой переписке.")
+            return
+        }
+        sendSponsoredReport(action.key, card: action.card, optionID: "", target: target)
+    }
+
+    private func sendSponsoredReport(_ key: SponsoredMessagesKey, card: SponsoredMessageCard, optionID: String, target: LocalAccountRuntime) {
+        guard !lockState, target === runtime, target.generation == key.generation,
+              selectedChatByAccount[target.account] == key.chatID else { return }
+        historyRequestCounter &+= 1
+        let extra = "sponsored-report-\(historyRequestCounter)"
+        pendingSponsoredReportsByExtra[extra] = (key, card)
+        do {
+            try target.send(SponsoredMessagesPolicy.report(chatID: key.chatID, messageID: card.messageID, optionID: optionID, extra: extra))
+        } catch {
+            pendingSponsoredReportsByExtra.removeValue(forKey: extra)
+            setStatus("Не удалось отправить жалобу на рекламу.")
+        }
+    }
+
+    private func isTrustedTelegramLinkHost(_ host: String) -> Bool {
+        ["telegram.org", "telegram.me", "telegram.dog", "t.me", "telegra.ph", "graph.org", "fragment.com", "telesco.pe"].contains { host == $0 || host.hasSuffix(".\($0)") }
     }
 
     private func appendPhotoAlbum(_ messages: [[String: Any]]) {
@@ -4600,6 +4899,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             accountRuntime.invalidateMainChatSnapshot()
         }
         pendingHistoryByExtra.removeAll()
+        sponsoredMessagesByKey.removeAll()
+        sponsoredMessagesFetchedAt.removeAll()
+        pendingSponsoredMessagesByExtra.removeAll()
+        pendingSponsoredBotUsersByExtra.removeAll()
+        pendingSponsoredReportsByExtra.removeAll()
+        sponsoredActionByControlID.removeAll()
+        sponsoredReportActionByControlID.removeAll()
         pendingForumTopicsByExtra.removeAll()
         selectedChatByAccount.removeAll()
         if draftsFlushed { draftsByConversation.removeAll() }

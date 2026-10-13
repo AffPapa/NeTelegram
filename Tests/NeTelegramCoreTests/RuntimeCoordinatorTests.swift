@@ -5,6 +5,79 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func sponsoredMessagesCacheExpiresAtFiveMinutesAndRejectsFutureTimestamp() {
+    let now = Date(timeIntervalSince1970: 10_000)
+    #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: nil, now: now))
+    #expect(!SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: now.addingTimeInterval(-299), now: now))
+    #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: now.addingTimeInterval(-300), now: now))
+    #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: now.addingTimeInterval(1), now: now))
+}
+
+@Test func sponsoredMessageRequestsKeepServerChatAndMessageIDs() {
+    let load = SponsoredMessagesPolicy.request(chatID: 73, extra: "sponsored-1")
+    #expect(load["@type"] as? String == "getChatSponsoredMessages")
+    #expect((load["chat_id"] as? NSNumber)?.int64Value == 73)
+    #expect(load["@extra"] as? String == "sponsored-1")
+
+    let click = SponsoredMessagesPolicy.click(chatID: 73, messageID: 91, media: true, fullscreen: false)
+    #expect(click["@type"] as? String == "clickChatSponsoredMessage")
+    #expect((click["chat_id"] as? NSNumber)?.int64Value == 73)
+    #expect((click["message_id"] as? NSNumber)?.int64Value == 91)
+    #expect(click["is_media_click"] as? Bool == true)
+    #expect(click["from_fullscreen"] as? Bool == false)
+
+    let report = SponsoredMessagesPolicy.report(chatID: 73, messageID: 91, optionID: "option", extra: "report-1")
+    #expect(report["@type"] as? String == "reportChatSponsoredMessage")
+    #expect(report["option_id"] as? String == "option")
+    #expect(report["@extra"] as? String == "report-1")
+}
+
+@Test func sponsoredReportOptionsKeepOpaqueTDLibByteIDsAndLocalizedLabels() {
+    let options = SponsoredReportResult.options(from: [
+        "@type": "reportSponsoredResultOptionRequired",
+        "options": [
+            ["@type": "reportOption", "id": "AQID", "text": "Недостоверная информация"],
+            ["@type": "reportOption", "id": "BAUG", "text": "Спам"],
+            ["@type": "reportOption", "id": "", "text": "ignored"],
+        ],
+    ])
+    #expect(options.map(\.id) == ["AQID", "BAUG"])
+    #expect(options.map(\.text) == ["Недостоверная информация", "Спам"])
+    #expect(SponsoredReportResult.type(from: ["@type": "reportSponsoredResultOptionRequired"]) == "reportSponsoredResultOptionRequired")
+}
+
+@Test func sponsoredMessageCardPreservesLabelsTextAndSponsorContext() {
+    let card = SponsoredMessageCard(tdlibObject: [
+        "message_id": 17,
+        "is_recommended": true,
+        "can_be_reported": true,
+        "title": "Partner",
+        "button_text": "Open",
+        "additional_info": "Terms apply",
+        "content": ["@type": "messageText", "text": ["text": "Hello 👋"]],
+        "sponsor": ["url": "https://example.org/", "info": "Sponsor details"],
+    ])
+    #expect(card?.messageID == 17)
+    #expect(card?.recommended == true)
+    #expect(card?.reportable == true)
+    #expect(card?.text == "Hello 👋")
+    #expect(card?.buttonText == "Open")
+    #expect(card?.sponsorInfo == "Sponsor details")
+    #expect(card?.additionalInfo == "Terms apply")
+}
+
+@Test func sponsoredMessageCardKeepsUnsupportedMediaTypeVisibleForFallback() {
+    let card = SponsoredMessageCard(tdlibObject: [
+        "message_id": 18,
+        "title": "Media sponsor",
+        "button_text": "Visit",
+        "content": ["@type": "messageVideo"],
+        "sponsor": ["url": "https://example.org/"],
+    ])
+    #expect(card?.contentType == "messageVideo")
+    #expect(card?.text == "")
+}
+
 @Test func authenticationCodePromptUsesMaskedTDLibDestination() {
     let message = AuthenticationCodePrompt.message(
         codeType: "authenticationCodeTypeTelegramMessage",
