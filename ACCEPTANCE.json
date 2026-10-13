@@ -152,8 +152,8 @@
       "expected": "Immutable intent и callback остаются A; send-as/topic/права проверяются.",
       "method": "native+integration",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Text/photo send paths capture account, Telegram identity, runtime generation and conversation before dispatch; photo-picker completion revalidates privacy epoch, identity, permission and topic. Regression sendIntentDispatchStaysOnAccountAAfterSelectionSwitchesToB simulates UI selection changing A→B after capture and verifies the queued dispatch still targets A. Exact-source local Swift suite passed 111/111 and macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38357782191 succeeded for 0ed9b9dc50dec1149688a901950fd8bcd7a665b4. This is contract-level synthetic coverage; real native picker/send timing, send-as/permission changes against TDLib, and authorized-account A→B integration remain unverified."
     },
     {
       "id": "APP18",
