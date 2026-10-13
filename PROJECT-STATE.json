@@ -12,8 +12,6 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
-    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38461168203,
@@ -41,13 +39,13 @@
       },
       "note": "App source and the documentation/site-mirror checkpoint were pushed to origin/main using the existing Git credential helper. The final pushed checkpoint commit is recorded in RUN-LOG.md. No token was created or printed."
     },
-    "repo_head_policy": "On resume, git rev-parse HEAD and origin/main are authoritative. App source SHA and documentation/workflow checkpoint HEAD are recorded separately; a later metadata-only checkpoint may advance HEAD without changing app source. Site source, saved version and deployment are separate.",
+    "repo_head_policy": "At each resume, git rev-parse HEAD and origin/main are authoritative. The checkpoint records the last audited parent and its prior cleanliness, not a self-referential commit ID. App-source SHA, docs/checkpoint commits, Site source/version/deployment, and built bundle fingerprints are separate.",
     "latest_checkpoint_ci": {
-      "run_id": 38461168216,
+      "run_id": 38462120071,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38461168216",
-      "checkpoint_commit": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
-      "note": "Metadata validation run 38461916813 passed for checkpoint 462131b, including the Site v152 receipt. This separate checkpoint-hygiene commit will trigger one more metadata validation; no app rebuild is required."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38462120071",
+      "checkpoint_commit": "f99ce1941f7f785721c34531a444936af0d59eca",
+      "note": "Final metadata validation passed for checkpoint f99ce19. GitHub API was not reachable during the current resume, so the run result is carried forward from the immediately preceding runner receipt; no app rebuild or retest was needed."
     },
     "last_native_bundle_smoke": {
       "run_id": 38457814416,
@@ -57,7 +55,9 @@
       "workflow_commit": "6145b0156068f784e1eea3bf70df77a8b834bf83",
       "scope": "Pinned TDLib and isolated arm64 Dev.app build, bundle verification, accountless first-run capture and window close/reopen/quit smoke passed; screenshot visually reviewed, disclosure small/low-contrast.",
       "status_scope": "Historical baseline for app source 6145b015; no pinned native workflow rerun for 2cd13c2 because this was a text-style-only source change."
-    }
+    },
+    "last_audited_checkpoint_commit": "f99ce1941f7f785721c34531a444936af0d59eca",
+    "pre_edit_working_tree_clean": true
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
@@ -70,14 +70,14 @@
     "signing": "ad-hoc development signature",
     "distribution_ready": false,
     "process_state": "Canonical /private/tmp/NeTelegram-Dev.app was launched from the source tree whose fingerprint matches the committed app source; current process state not re-queried after visual capture.",
-    "historical_only": false,
-    "note": "One accountless auth-screen candidate. Source fingerprint 3038c01c875af925bdf39eb7134cdd3f861bd14597d53c1138a7ecfdf0f51e1c; executable SHA-256 2ba1f7c3adc0d9214b3fa62051959e38f84849058a4c173ed2c00676ead52259; pinned TDLib JSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; screenshot /private/tmp/netelegram-auth-ui.png SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c. Built from source tree based on 4062225654c270dde65d4dbf492d005bc31470f2 with the pending 2-line source diff; ad-hoc development signature only."
+    "historical_only": true,
+    "note": "Accountless auth-screen evidence only; this candidate is not asserted to be the currently running or installed bundle. Source fingerprint 3038c01c875af925bdf39eb7134cdd3f861bd14597d53c1138a7ecfdf0f51e1c; executable SHA-256 2ba1f7c3adc0d9214b3fa62051959e38f84849058a4c173ed2c00676ead52259; pinned TDLib JSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; screenshot /private/tmp/netelegram-auth-ui.png SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c. Build was based on 4062225654c270dde65d4dbf492d005bc31470f2 with a pending two-line source diff that became app source 2cd13c2; ad-hoc development signature only. Process state was not re-queried after capture."
   },
   "verification": {
     "current_head_targeted_tests": {
       "result": "Exact source app 2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb: local serial swift test passed 151/151 (0.203s execution; 5.30s build) on Xcode 27.0 / Swift 6.4. Hosted macOS CI run 38461168203 for checkpoint 0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a passed all 151 tests in 0.620s on its current source tree; no same-SHA retry.",
       "xcode": "Local Xcode 27.0 / Swift 6.4; hosted macOS Apple Silicon workflow toolchain recorded in run artifacts.",
-      "current_head": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
+      "tested_checkpoint_commit": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
       "app_source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
       "run_id": 38461168203,
       "duration_seconds": 71,
@@ -139,9 +139,9 @@
     "archive_local_path": "/private/tmp/netelegram-site-v152.tar.gz",
     "saved_archive_content_hash": "sha256:2758ac725793abf912182785aa5cd48110e70432c6c819f4b600114d396d0786",
     "saved_archive_size_bytes": 512000,
-    "app_repository_commit": "0c8ee8358e8fe7d5e79204336ccc0c6a9e387f7a",
+    "app_repository_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
     "asset_cleanup": "No app downloads were added because no verified signed/notarized release exists.",
-    "latest_devlog_commit": "e671ff012964561583051b18772ddbae0d34f409",
+    "latest_site_source_commit": "e671ff012964561583051b18772ddbae0d34f409",
     "current_head_site": "Public Site v152; project appgprj_6acba85192e08191acdf7011928848cf; source e671ff012964561583051b18772ddbae0d34f409; deployment appgdep_6ace91b5ca288191bd66fe1f88c5f08b; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_842b1ec7f2648191bf3c4c2e64dc28f9."
   },
   "open_gates": [
@@ -154,7 +154,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue from app source 2cd13c2 and checkpoint 462131b. Current app CI 38461168203 passed 151 tests; this UI-only delta used one canonical Dev.app screenshot and no duplicate native package build. Site v152 receipt is current. Select the next P0 implementation slice; keep real-account/all-20, Developer ID/notarization and Telegram compatibility gates open.",
+  "next_action": "Push this checkpoint-only correction, then rely on its metadata workflow; do not rerun app tests or rebuild Dev.app. Next P0 candidate is first-run country selection without phantom profile/runtime creation or guessed locale codes; retain explicit international-number fallback until a safe country-data source is established.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
