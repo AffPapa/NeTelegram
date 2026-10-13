@@ -302,7 +302,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
         loginHeading.font = .systemFont(ofSize: 25, weight: .semibold)
         loginHeading.alignment = .center
-        loginSubtitle = NSTextField(wrappingLabelWithString: "Войдите по номеру телефона. Профиль создаётся отдельно в Neridian; сессии из Telegram Desktop и других клиентов не импортируются.")
+        loginSubtitle = NSTextField(wrappingLabelWithString: "NeTelegram использует Telegram API и является частью экосистемы Telegram. Это независимое неофициальное приложение без связи с Telegram Messenger LLP. Войдите по номеру телефона; сессии других клиентов не импортируются.")
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
@@ -312,7 +312,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
         accountPicker.setAccessibilityLabel("Локальный профиль и статус входа")
-        accountPicker.setAccessibilityHelp("Это профили, созданные внутри Neridian на этом Mac. Сессии и файлы других Telegram-приложений не импортируются.")
+        accountPicker.setAccessibilityHelp("Это профили, созданные внутри NeTelegram на этом Mac. Сессии и файлы других Telegram-приложений не импортируются.")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.isHidden = true
@@ -926,7 +926,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         field.setAccessibilityLabel("Telegram API hash приложения")
         field.setAccessibilityHelp("Сохраняется только в Связке ключей macOS. Не вводите код входа или пароль Telegram сюда.")
         let alert = NSAlert()
-        alert.messageText = "Настройка подключения Neridian"
+        alert.messageText = "Настройка подключения NeTelegram"
         alert.informativeText = "Введите API hash этого приложения из my.telegram.org. Значение хранится в Связке ключей macOS и не записывается в файлы проекта."
         alert.accessoryView = field
         alert.addButton(withTitle: "Сохранить в Связку ключей")
@@ -1213,7 +1213,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
-                self.setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+                self.setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
             } catch {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
@@ -1864,7 +1864,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
-                setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
         } catch {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
@@ -1936,7 +1936,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-                setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
         } catch let error as AccountStorageLeaseError {
             setStatus(error.localizedDescription)
         } catch let error as AccountStorageUpgradeError {
