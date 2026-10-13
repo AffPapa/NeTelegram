@@ -32,6 +32,28 @@ public enum AccountCatalogueError: Error, Equatable {
     case persistence(String)
 }
 
+/// Executes the destructive portion of a confirmed logout only after the
+/// catalogue has durably marked the profile as pending cleanup. Injected
+/// operations keep each irreversible boundary testable and make retries safe.
+public enum PendingLogoutCleanup {
+    public static func resume(
+        account: AccountUUID,
+        expectedTelegramUserID: Int64,
+        catalogue: AccountCatalogue,
+        removeKeys: @Sendable (AccountUUID) async throws -> Void,
+        removeFiles: @Sendable (AccountUUID) async throws -> Void
+    ) async throws {
+        guard let profile = await catalogue.allProfiles().first(where: { $0.id == account }),
+              profile.telegramUserID == expectedTelegramUserID,
+              profile.logoutCleanupPending == true else {
+            throw AccountCatalogueError.identityMismatch
+        }
+        try await removeKeys(account)
+        try await removeFiles(account)
+        try await catalogue.removeProfile(account, expectedTelegramUserID: expectedTelegramUserID)
+    }
+}
+
 /// Stores only local namespaces and verified server identity. Session material
 /// remains in TDLib's per-account database; OTP and 2FA values are never fields.
 public actor AccountCatalogue {

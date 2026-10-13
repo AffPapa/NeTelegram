@@ -1154,6 +1154,104 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     ).isEmpty)
 }
 
+@Test func pendingLogoutCleanupResumesAfterKeyFileAndCatalogueFailures() async throws {
+    enum FailurePoint: Int, CaseIterable, Sendable {
+        case keyRemoval
+        case fileRemoval
+        case cataloguePersistence
+    }
+    enum InjectedFailure: Error { case step }
+
+    for failurePoint in FailurePoint.allCases {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let account = AccountUUID()
+        let catalogue = try AccountCatalogue(rootURL: root)
+        _ = try await catalogue.addProfile(id: account)
+        try await catalogue.associateVerifiedIdentity(8001, displayName: "Former User", with: account)
+        try await catalogue.markLogoutCleanupPending(account, expectedTelegramUserID: 8001)
+
+        let catalogueURL = root.appendingPathComponent("accounts.json")
+        let savedCatalogue = try Data(contentsOf: catalogueURL)
+        if failurePoint == .cataloguePersistence {
+            try FileManager.default.removeItem(at: catalogueURL)
+            try FileManager.default.createDirectory(at: catalogueURL, withIntermediateDirectories: false)
+        }
+        let accountRoot = root.appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+        try FileManager.default.createDirectory(at: accountRoot, withIntermediateDirectories: true)
+        let calls = LockedTestValue<[String]>([])
+        let shouldFail = LockedTestValue(true)
+
+        let removeKeys: @Sendable (AccountUUID) async throws -> Void = { _ in
+            calls.mutate { $0.append("keys") }
+            if failurePoint == .keyRemoval, shouldFail.get() {
+                shouldFail.set(false)
+                throw InjectedFailure.step
+            }
+        }
+        let removeFiles: @Sendable (AccountUUID) async throws -> Void = { _ in
+            calls.mutate { $0.append("files") }
+            if FileManager.default.fileExists(atPath: accountRoot.path) {
+                try FileManager.default.removeItem(at: accountRoot)
+            }
+            if failurePoint == .fileRemoval, shouldFail.get() {
+                shouldFail.set(false)
+                throw InjectedFailure.step
+            }
+        }
+
+        if failurePoint == .cataloguePersistence {
+            await #expect(throws: AccountCatalogueError.self) {
+                try await PendingLogoutCleanup.resume(
+                    account: account,
+                    expectedTelegramUserID: 8001,
+                    catalogue: catalogue,
+                    removeKeys: removeKeys,
+                    removeFiles: removeFiles
+                )
+            }
+            try FileManager.default.removeItem(at: catalogueURL)
+            try savedCatalogue.write(to: catalogueURL)
+        } else {
+            await #expect(throws: InjectedFailure.self) {
+                try await PendingLogoutCleanup.resume(
+                    account: account,
+                    expectedTelegramUserID: 8001,
+                    catalogue: catalogue,
+                    removeKeys: removeKeys,
+                    removeFiles: removeFiles
+                )
+            }
+        }
+
+        let retained = await catalogue.allProfiles()
+        #expect(retained.count == 1)
+        #expect(retained[0].telegramUserID == 8001)
+        #expect(retained[0].logoutCleanupPending == true)
+        #expect(AccountRestorePlanner.profilesToRestore(
+            authorized: retained,
+            pending: retained,
+            pendingWithStoredDatabase: [account]
+        ).isEmpty)
+
+        try await PendingLogoutCleanup.resume(
+            account: account,
+            expectedTelegramUserID: 8001,
+            catalogue: catalogue,
+            removeKeys: removeKeys,
+            removeFiles: removeFiles
+        )
+        #expect(await catalogue.allProfiles().isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: accountRoot.path))
+        switch failurePoint {
+        case .keyRemoval:
+            #expect(calls.get() == ["keys", "keys", "files"])
+        case .fileRemoval, .cataloguePersistence:
+            #expect(calls.get() == ["keys", "files", "keys", "files"])
+        }
+    }
+}
+
 @Test func accountCatalogueRefusesToReassignAnExistingTelegramIdentity() async throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }

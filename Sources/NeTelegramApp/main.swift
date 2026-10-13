@@ -1167,24 +1167,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         _ account: AccountUUID,
         expectedTelegramUserID: Int64
     ) async throws {
-        guard let catalogue,
-              let profile = await catalogue.allProfiles().first(where: { $0.id == account }),
-              profile.telegramUserID == expectedTelegramUserID,
-              profile.logoutCleanupPending == true else {
-            throw AccountCatalogueError.identityMismatch
-        }
-        // Persisted cleanup state precedes destructive work. Key and directory
-        // removal are idempotent, so failures can resume without reopening a
-        // partially erased database as the previous Telegram identity.
-        let accountRoot = try accountStorageRoot()
-            .appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
-        try await Task.detached(priority: .utility) {
-            try SecretsStore().removeAccountKeys(for: account)
-            if FileManager.default.fileExists(atPath: accountRoot.path) {
-                try FileManager.default.removeItem(at: accountRoot)
+        guard let catalogue else { throw AccountCatalogueError.accountNotFound }
+        let storageRoot = try accountStorageRoot()
+        try await PendingLogoutCleanup.resume(
+            account: account,
+            expectedTelegramUserID: expectedTelegramUserID,
+            catalogue: catalogue,
+            removeKeys: { account in
+                try await Task.detached(priority: .utility) {
+                    try SecretsStore().removeAccountKeys(for: account)
+                }.value
+            },
+            removeFiles: { account in
+                let accountRoot = storageRoot
+                    .appendingPathComponent(account.id.uuidString.lowercased(), isDirectory: true)
+                try await Task.detached(priority: .utility) {
+                    if FileManager.default.fileExists(atPath: accountRoot.path) {
+                        try FileManager.default.removeItem(at: accountRoot)
+                    }
+                }.value
             }
-        }.value
-        try await catalogue.removeProfile(account, expectedTelegramUserID: expectedTelegramUserID)
+        )
         knownProfilesByAccount.removeValue(forKey: account)
         profileOrder.removeAll { $0 == account }
         profileStartupFailures.remove(account)
