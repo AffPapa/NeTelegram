@@ -386,6 +386,13 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
 }
 
 @Test func accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus() {
+    #expect(AccountPresentation.pickerStatus(
+        telegramUserID: 123,
+        authorizationState: nil,
+        runtimeIsOpen: true,
+        hasError: false
+    ) == .starting)
+
     let firstPending = AccountPresentation.pickerTitle(
         localOrdinal: 1,
         telegramUserID: nil,

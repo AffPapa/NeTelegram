@@ -116,6 +116,7 @@ public enum AccountPresentation {
         logoutCleanupPending: Bool = false
     ) -> AccountProfilePickerStatus {
         if logoutCleanupPending { return .logoutCleanupPending }
+        if authorizationState == nil, runtimeIsOpen { return .starting }
         let step = AuthorizationStep(tdlibType: authorizationState)
         if hasError || step == .closed { return .failed }
         switch step {
