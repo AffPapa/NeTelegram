@@ -1596,7 +1596,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                         // Each client has an ordered async delivery lane. Awaiting
                         // MainActor here preserves that client's order without
                         // holding the shared TDLib reducer behind another account.
-                        await self?.receive(event)
+                        switch event {
+                        case .routed(let update):
+                            let document = try? await TDLibJSONDocument.decodeOffMainActor(update.json)
+                            await self?.receive(event, decodedDocument: document)
+                        case .routingFailure:
+                            await self?.receive(event)
+                        }
                     },
                     onReceiveFailure: { [weak self] _ in
                         await self?.handleTDLibReceiveFailure()
@@ -1658,7 +1664,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func receive(_ event: TDLibPipelineEvent) async {
+    private func receive(_ event: TDLibPipelineEvent, decodedDocument: TDLibJSONDocument? = nil) async {
         switch event {
         case .routingFailure(let error):
             setStatus("TDLib update не маршрутизирован (\(error)); fallback на выбранный профиль запрещён.")
@@ -1667,7 +1673,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("TDLib update пришёл от неизвестного профиля; fallback на выбранный аккаунт запрещён.")
                 return
             }
-            guard let object = (try? JSONSerialization.jsonObject(with: update.json)) as? [String: Any] else {
+            guard let object = decodedDocument?.object else {
                 setStatus("TDLib update после маршрутизации оказался некорректным JSON; профиль не переназначен.")
                 return
             }

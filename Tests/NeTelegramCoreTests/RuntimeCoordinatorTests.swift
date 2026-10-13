@@ -1252,6 +1252,16 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     }
 }
 
+@MainActor @Test func tdlibJSONDocumentDecodesOffMainActorWithoutChangingFields() async throws {
+    let data = Data(#"{"@type":"updateMessageSendSucceeded","@client_id":17,"message":{"id":42,"content":{"@type":"messageText","text":{"text":"hello 😀"}}}}"#.utf8)
+    let document = try await TDLibJSONDocument.decodeOffMainActor(data)
+    #expect(!document.wasDecodedOnMainThread)
+    #expect(document.object["@type"] as? String == "updateMessageSendSucceeded")
+    #expect((document.object["message"] as? [String: Any])?["id"] as? Int == 42)
+    let content = ((document.object["message"] as? [String: Any])?["content"] as? [String: Any])
+    #expect(content?["@type"] as? String == "messageText")
+}
+
 @Test func accountCatalogueRefusesToReassignAnExistingTelegramIdentity() async throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }
