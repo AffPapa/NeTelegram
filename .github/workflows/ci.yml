@@ -20,7 +20,11 @@ concurrency:
 jobs:
   test:
     name: Swift tests (Apple Silicon)
-    runs-on: macos-15
+    # Keep CI on the same pinned Swift/Xcode generation used for the current
+    # app build. macos-15 selected Swift 6.1.2/Xcode 16.4 and stalled one
+    # cancellation-sensitive startup test despite the full suite passing on
+    # Swift 6.4/Xcode 27 locally.
+    runs-on: xcode-27
     timeout-minutes: 10
     steps:
       - name: Check out source
