@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "App source ec2d91b passes 158/158 local and exact-source hosted tests. Canonical Dev.app was rebuilt and opened once from clean repo checkpoint e1fa509; the live window shows the current accountless phone/QR entry screen. Public development Site v165 is live; no signed/notarized release or download exists.",
-  "verified_at": "2026-10-14T06:46:00+07:00",
+  "verified_at": "2026-10-14T07:01:00+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -363,5 +363,21 @@
     "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
     "live_ui": "CUA confirmed title NeTelegram · dev e1fa5093, phone/QR entry and independent-client disclosure. No phone, OTP or Telegram account was entered.",
     "scope": "One canonical Dev.app path; previous empty 7f95e03 instance exited before replacement. Not a login, send, account, all-20 or release test."
+  },
+  "latest_workflow_trigger_validation": {
+    "commit": "3dfc6f205c439a50890850fa96ad092731da5041",
+    "change": "Added Sources/** to native-app.yml push and pull_request filters so all Swift app-source changes get an exact-SHA pinned-TDLib Dev.app lifecycle smoke.",
+    "metadata_run": {
+      "id": 38486733576,
+      "result": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38486733576"
+    },
+    "native_bundle_run": {
+      "id": 38486733631,
+      "result": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38486733631"
+    },
+    "app_source_changed": false,
+    "scope": "Workflow-only commit triggered native bundle/lifecycle smoke and metadata validation. No Swift unit suite was needed because app source and tests did not change. Existing local canonical Dev.app was not relaunched."
   }
 }
