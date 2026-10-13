@@ -164,8 +164,8 @@
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
     "repo_head_before_checkpoint": "549c55a24a0f756050e4a21446a74050d86be217",
-    "app_source_commit_authority": "pending commit for the country-picker slice",
-    "app_source_commit": "pending commit for the country-picker slice"
+    "app_source_commit_authority": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
+    "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
