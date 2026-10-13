@@ -8,14 +8,14 @@ on:
       - 'Package.swift'
       - 'TDLIB.lock.json'
       - 'Sources/**'
-      - 'Tests/**'
+      - 'Tests/NeTelegramCoreTests/**'
   pull_request:
     paths:
       - '.github/workflows/ci.yml'
       - 'Package.swift'
       - 'TDLIB.lock.json'
       - 'Sources/**'
-      - 'Tests/**'
+      - 'Tests/NeTelegramCoreTests/**'
   workflow_dispatch:
 
 permissions:
