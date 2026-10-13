@@ -578,5 +578,14 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Implement only a reproduced accountless AUTH03 registration-layout issue at 900x700; then one focused native UI check, one full local serial suite for the new Swift SHA, and one exact-source hosted run. Preserve real-login deferral and existing release gates."
+  "next_action": "Push the current release-validator checkpoint and inspect its exact metadata workflow result; then resume a bounded app-source slice from 209be94. Rebuild and rerun Swift tests only if Swift source or its harness changes. Keep real login deferred and release gates open.",
+  "latest_release_candidate_validation": {
+    "date": "2026-10-14",
+    "checkpoint_commit": "pending",
+    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "result": "11/11 targeted Python unit tests passed; candidate and publication-receipt guards reject incomplete, mismatched, secret-bearing, or non-real evidence.",
+    "checks": "JSON parse, Python byte-compile and git diff --check passed. Hosted metadata workflow pending checkpoint push.",
+    "scope": "Release automation validation only; no app build, login, signing, notarization, release upload or Site deployment.",
+    "release_readiness": "No app release. Real-account coverage, Developer ID/notarization, compatibility decisions, Gatekeeper install and updater smoke remain open."
+  }
 }

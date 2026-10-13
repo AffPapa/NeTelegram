@@ -20,10 +20,21 @@
   "changes": [],
   "known_limitations": [],
   "test_evidence": [],
+  "account_coverage": {
+    "real_authorized_accounts": 0,
+    "performance_account_counts": [],
+    "performance_matrix": []
+  },
+  "telegram_compatibility": {
+    "terms_2_3_title": "open",
+    "sponsored_media_3_3": "deferred",
+    "basic_functionality_1_3_1_4": "open"
+  },
   "artifact_contract": {
     "all": [
       "kind",
       "filename",
+      "path",
       "url",
       "bytes",
       "sha256",

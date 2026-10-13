@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "App source 209be94 passes local and hosted serial suites 157/157; warm CI cache reduced the compile step from 48.43s to 17.50s in two measured runs. Public development Site v163 now records those exact results; anonymous /devlog returned 200 text/html. No app binary release.",
-  "verified_at": "2026-10-14T06:20:42+07:00",
+  "phase": "App source 209be94 passes local and hosted serial suites 157/157; warm CI cache reduced one measured compile from 48.43s to 17.50s. Public development Site v164 is live. Added a fail-closed candidate/receipt validator; 11 targeted tests pass locally. No app binary release.",
+  "verified_at": "2026-10-14T06:27:43+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -101,20 +101,20 @@
     "current_head_site": {
       "date": "2026-10-14",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-      "version": 163,
-      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_763225b471fc8191a19b41d759f602f1",
-      "source_commit": "73bdefad3368d9ed6d65d0e15745303e138db127",
+      "version": 164,
+      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_eb3a0b7bd7f081918427d509fff4a766",
+      "source_commit": "458e535ef2a81ff1a8ffe35a0428711d2a469d37",
       "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-      "deployment_id": "appgdep_6acebad482b88191b71d3ba495b4ba9b",
+      "deployment_id": "appgdep_6acebc95df188191a0a76fe5b408adbc",
       "url": "https://netelegram.iryadom.chatgpt.site",
       "audience": "public",
-      "local_archive_path": "/private/tmp/netelegram-site-v163.tar.gz",
-      "local_archive_sha256": "183568ef690995b5e3047a9da2b26314b4fb9e3566f39bd5a5693378d2b0b2e0",
-      "local_archive_size_bytes": 296477,
-      "saved_archive_content_hash": "sha256:97d555f676cc5e463e93f66bc6791ab719d3176fde98486d2d80659accc60f02",
-      "saved_archive_size_bytes": 552960,
-      "archive_file_count": 15,
-      "public_verification": "Sites reports public audience and successful production deploy; anonymous /devlog returned 200 text/html. Static archive contains all eight HTML routes, feeds and assets; verified devlog markers and no installer URL."
+      "local_archive_path": "/private/tmp/netelegram-site-v164.tar.gz",
+      "local_archive_sha256": "604bcd6645f27b49b27e894db078968a486e45c3f2f938f6854769d7fb4dca88",
+      "local_archive_size_bytes": 185332,
+      "saved_archive_content_hash": "sha256:3959c3f17d243017cfe88cd6d82afced055bd4f44686343ed4686b40f2ed30df",
+      "saved_archive_size_bytes": 419840,
+      "archive_file_count": 14,
+      "public_verification": "Deployment succeeded; anonymous HTTPS /devlog returned 200 text/html. Obsolete screenshot asset and former work name are absent."
     },
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
@@ -247,7 +247,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Accountless AUTH03 geometry is partial, not a confirmed defect. First establish one deterministic registration-state path or reproduce the clipping at the supported 900x700 size; only then make one AppKit change, run one focused native layout check and the full local serial suite once. Reuse the successful CI baseline for unchanged app source 209be94. Keep real login deferred; no app release until signing, compatibility and coverage gates close.",
+  "next_action": "Push the current release-validator checkpoint, inspect the exact metadata workflow result, then resume the next bounded app-source slice from app source 209be94; only rebuild/test the app if Swift source or its harness changes. Keep real login deferred and release gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -315,5 +315,16 @@
     "saved_archive_size_bytes": 419840,
     "archive_file_count": 14,
     "public_verification": "Deployment succeeded. Anonymous HTTPS /devlog/ returned 200 text/html; NeTelegram wording is present, and the superseded screenshot path and old working name are absent from the live page and packaged Site."
+  },
+  "release_candidate_validation": {
+    "status": "implemented_not_used_for_release",
+    "validator": "Scripts/validate_release.py",
+    "commands": [
+      "python3 Scripts/validate_release.py candidate <manifest.json> --assets-dir <frozen-assets-dir>",
+      "python3 Scripts/validate_release.py receipt <manifest.json> <receipt.json>"
+    ],
+    "local_tests": "11/11 targeted unittest cases passed; JSON parse, Python byte-compile, and git diff --check passed.",
+    "scope": "Release metadata guard only. It does not build, sign, notarize, upload, deploy, or prove real account coverage.",
+    "app_release_status": "No app release; signing, notarization, real account and 20-account measurement gates remain open."
   }
 }

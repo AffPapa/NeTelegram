@@ -13,6 +13,8 @@ on:
       - 'release-manifest.template.json'
       - 'release-index.template.json'
       - 'devlog-entry.template.json'
+      - 'Scripts/validate_release.py'
+      - 'Tests/release/**'
   pull_request:
     paths:
       - '.github/workflows/metadata.yml'
@@ -24,6 +26,8 @@ on:
       - 'release-manifest.template.json'
       - 'release-index.template.json'
       - 'devlog-entry.template.json'
+      - 'Scripts/validate_release.py'
+      - 'Tests/release/**'
   workflow_dispatch:
 
 permissions:
@@ -52,3 +56,4 @@ jobs:
           python3 -m json.tool release-manifest.template.json >/dev/null
           python3 -m json.tool release-index.template.json >/dev/null
           python3 -m json.tool devlog-entry.template.json >/dev/null
+          python3 -m unittest discover -s Tests/release -t . -p 'test_*.py' -v
