@@ -157,7 +157,7 @@
       "method": "real network+fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "80/80 exact-source suite includes monotonic network-path revisions, duplicate/superseded debounce rejection, and TDLib network-type updates. Real Wi-Fi/sleep/network-flap reconnect remains unverified; status stays partial."
+      "evidence": "Exact-source app commit ec2d91b96dfed996d32d825bd03c1aabc3596c1a: local serial Swift suite 158/158; GitHub Actions run 38485519098 passed 158/158 on macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2. Synthetic fanout tests cover 20 runtime sinks, duplicate/stale revision rejection, and per-account failure recovery with the latest pending network type. Real Wi-Fi changes and native sleep/wake recovery remain unverified; status stays partial."
     },
     {
       "id": "APP13",
@@ -166,7 +166,7 @@
       "method": "native hardware",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App source 9ae1f4a0c77f03ca65e3048b084238e0923bbf0a passes the 129/129 Swift suite and exact-SHA CI. A deterministic synthetic test sends path A, path B and wake reapply to 20 runtime sinks; duplicate and stale debounce work is rejected, and RuntimeGeneration values remain unchanged. Exact-source CI built and verified the isolated arm64 Dev.app. Native macOS sleep/wake, real Telegram sessions, server-side duplicate sends/notifications, and recovery on hardware remain unverified; status stays partial."
+      "evidence": "Exact-source app commit ec2d91b96dfed996d32d825bd03c1aabc3596c1a: local serial Swift suite 158/158 and exact-SHA GitHub Actions run 38485519098 passed 158/158. Synthetic tests fan out wake/path updates to 20 runtime sinks and inject one account setter failure; the failed account keeps only the latest pending state and recovers without retrying other accounts or changing RuntimeGeneration. Physical Mac sleep/wake, real sessions, server-side duplicate sends/notifications and all-20 hardware recovery remain unverified; status stays partial."
     },
     {
       "id": "APP14",
