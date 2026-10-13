@@ -1,14 +1,16 @@
 # NeTelegram — unofficial Telegram client for macOS
 
+[English](README.md) · [Русский](README.ru.md)
+
 **NeTelegram** is a separate native macOS application in development, built with Swift and AppKit and designed for Telegram cloud chats through a pinned TDLib version. If you are looking for an unofficial Telegram client for macOS, a Telegram client for Mac, or an open-source macOS Telegram client, this repository publishes the source, current evidence, and product limitations.
 
-> **Independent project.** NeTelegram is not an official Telegram app, is not developed by Telegram, and has no direct affiliation with, endorsement by, or connection to Telegram Messenger LLP. Telegram and TDLib names describe compatibility and belong to their respective owners. NeTelegram uses the Telegram API/TDLib; it is a separate client in the Telegram ecosystem, not a separate messaging network.
+> **Independent project.** NeTelegram is not an official Telegram app, is not developed by Telegram, and has no direct relationship or affiliation with, endorsement by, or connection to Telegram Messenger LLP. Telegram and TDLib names describe compatibility and belong to their respective owners. NeTelegram uses the Telegram API/TDLib; it is a separate client in the Telegram ecosystem, not a separate messaging network.
 
 > **Status:** development continues. There is no signed installer to download. Real account login, account-based message sending, and twenty simultaneously authorized accounts have not been verified. See the [development site](https://netelegram.iryadom.chatgpt.site/) for downloads, changelog, development log, roadmap, privacy, and source links.
 
 ### Looking for an alternative Telegram client for Mac or a Telegram for Mac download?
 
-NeTelegram is an independent native client project for macOS. It is not the official Telegram for Mac and it is not a separate messaging service. The repository documents the source, current verification status, and planned scope. There is no ready-to-download app yet because no signed, verified installer has been released. Phrases such as “unofficial Telegram client for macOS”, “alternative Telegram client for Mac”, and “open-source Telegram client for macOS” describe the project topic; they do not imply Telegram endorsement or measured search demand.
+NeTelegram is an independent native client project for macOS. It is not the official Telegram for Mac and it is not a separate messaging service. The repository documents the source, current verification status, and planned scope. There is no ready-to-download app yet because no signed, verified installer has been released. Current search-result wording includes “unofficial Telegram client for macOS”, “Telegram client for Mac”, “alternative Telegram client for Mac/macOS”, “native macOS Telegram client”, and “open-source Telegram client for Mac”. These phrases describe the project topic; they do not imply Telegram endorsement or measured search demand.
 
 ## Intended scope
 
@@ -22,7 +24,7 @@ Version 1 excludes calls, voice chats, audio recording or playback, a general vi
 
 ## Compatibility and naming
 
-Observed search wording includes “unofficial Telegram client for macOS”, “Telegram alternative client for Mac”, “Telegram client for Mac”, «неофициальный клиент Telegram для macOS» and «альтернативный клиент Telegram для Mac». These are descriptive phrases, not claims of official status, rankings, or measured search demand. Search volumes and site rankings have not been measured.
+Observed search wording includes “unofficial Telegram client for macOS”, “Telegram alternative client for Mac”, “Telegram client for Mac”, “app for Telegram on Mac”, «неофициальный клиент Telegram для macOS», «клиент Telegram для Mac», «альтернативный клиент Telegram для Mac/macOS» and «приложение для Telegram на Mac». These are descriptive phrases, not claims of official status, rankings, or measured search demand. Search volumes and site rankings have not been measured.
 
 Current [Telegram API Terms](https://core.telegram.org/api/terms) restrict the app title: §2.3 allows “Telegram” in the title only when it is preceded by “Unofficial”. Therefore using NeTelegram as the exact display title remains a separate compatibility gate; the non-affiliation statement above does not waive it. Section 2.2 also requires a prominent disclosure that the app uses the Telegram API and is part of the Telegram ecosystem. Channel access and stable release remain deferred because sponsored-message/video and basic-functionality requirements are unresolved. No API compatibility claim is made.
 
@@ -45,9 +47,11 @@ Do not reuse another app's API credentials or import another client's sessions. 
 
 # NeTelegram — неофициальный клиент Telegram для macOS
 
+[English](README.md) · [Русский](README.ru.md)
+
 **NeTelegram** — отдельное нативное приложение для macOS на Swift и AppKit, разрабатываемое для облачных чатов Telegram через закреплённую версию TDLib. Здесь опубликованы исходники, фактический статус и ограничения для тех, кто ищет неофициальный клиент Telegram для macOS, альтернативный клиент Telegram для Mac или open-source клиент Telegram для Mac.
 
-> **Независимый проект.** NeTelegram не является официальным приложением Telegram, не разработан Telegram и не имеет прямой связи, одобрения или аффилиации с Telegram Messenger LLP. Названия Telegram и TDLib описывают совместимость и принадлежат правообладателям. NeTelegram использует Telegram API/TDLib и является отдельным клиентом экосистемы Telegram, а не самостоятельной сетью обмена сообщениями.
+> **Независимый проект.** NeTelegram не является официальным приложением Telegram, не разработан Telegram и не имеет прямого отношения или аффилиации, одобрения либо связи с Telegram Messenger LLP. Названия Telegram и TDLib описывают совместимость и принадлежат правообладателям. NeTelegram использует Telegram API/TDLib и является отдельным клиентом экосистемы Telegram, а не самостоятельной сетью обмена сообщениями.
 
 > **Статус:** разработка продолжается. Подписанной сборки для скачивания нет. Реальный вход в аккаунт, отправка сообщений и работа двадцати одновременно авторизованных аккаунтов не проверены. См. [сайт разработки](https://netelegram.iryadom.chatgpt.site/) — там находятся загрузки, changelog, журнал работ, roadmap, приватность и ссылки на исходники.
 
@@ -63,7 +67,7 @@ Do not reuse another app's API credentials or import another client's sessions. 
 
 ## Совместимость и название
 
-В поисковой выдаче встречаются формулировки «неофициальный клиент Telegram для macOS», «альтернативный клиент Telegram для Mac», «клиент Telegram для Mac» и “unofficial Telegram client for macOS”. Это описательные запросы, а не заявление об официальном статусе, позициях или объёме спроса. Поисковые объёмы и позиции сайта не измерялись.
+В поисковой выдаче встречаются формулировки «неофициальный клиент Telegram для macOS», «клиент Telegram для Mac», «альтернативный клиент Telegram для Mac/macOS», «приложение для Telegram на Mac», “unofficial Telegram client for macOS” и “alternative Telegram client for Mac”. Это описательные запросы, а не заявление об официальном статусе, позициях или объёме спроса. Поисковые объёмы и позиции сайта не измерялись.
 
 Действующие [условия Telegram API](https://core.telegram.org/api/terms) ограничивают заголовок приложения: §2.3 допускает слово “Telegram” только если перед ним стоит “Unofficial”. Поэтому точное display title `NeTelegram` остаётся отдельным gate совместимости; сноска о независимости это условие не отменяет. §2.2 отдельно требует заметно сообщать, что приложение использует Telegram API и является частью экосистемы Telegram. Чтение каналов и stable-релиз отложены из-за требований к sponsored messages/video и базовой функциональности. Совместимость API не заявляется.
 
