@@ -13,6 +13,40 @@ import Testing
     #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: now.addingTimeInterval(1), now: now))
 }
 
+@Test func sponsoredChannelPlacementsRespectServerIntervalAndKeepAlbumsWhole() {
+    let spaced = SponsoredMessagesPolicy.placements(
+        cardCount: 5,
+        ordinaryMessageCount: 50,
+        albumEndMessageCounts: Array(1...50),
+        messagesBetween: 20
+    )
+    #expect(spaced == [
+        SponsoredMessagePlacement(cardIndex: 0, afterMessageCount: 50),
+        SponsoredMessagePlacement(cardIndex: 1, afterMessageCount: 30),
+        SponsoredMessagePlacement(cardIndex: 2, afterMessageCount: 10),
+    ])
+
+    let albums = SponsoredMessagesPolicy.placements(
+        cardCount: 4,
+        ordinaryMessageCount: 31,
+        albumEndMessageCounts: [5, 11, 16, 27],
+        messagesBetween: 10
+    )
+    #expect(albums == [
+        SponsoredMessagePlacement(cardIndex: 0, afterMessageCount: 31),
+        SponsoredMessagePlacement(cardIndex: 1, afterMessageCount: 16),
+        SponsoredMessagePlacement(cardIndex: 2, afterMessageCount: 5),
+    ])
+
+    let zeroInterval = SponsoredMessagesPolicy.placements(
+        cardCount: 3,
+        ordinaryMessageCount: 8,
+        albumEndMessageCounts: [2, 4, 8],
+        messagesBetween: 0
+    )
+    #expect(zeroInterval == [SponsoredMessagePlacement(cardIndex: 0, afterMessageCount: 8)])
+}
+
 @Test func sponsoredMessageRequestsKeepServerChatAndMessageIDs() {
     let load = SponsoredMessagesPolicy.request(chatID: 73, extra: "sponsored-1")
     #expect(load["@type"] as? String == "getChatSponsoredMessages")

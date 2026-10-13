@@ -108,4 +108,39 @@ public enum SponsoredMessagesPolicy {
         if let extra { request["@extra"] = extra }
         return request
     }
+
+    /// Returns insertion points after ordinary messages, without splitting albums.
+    /// TDLib defines `messages_between` as the minimum ordinary-message distance
+    /// between sponsored messages; zero means only one sponsored message is shown.
+    public static func placements(
+        cardCount: Int,
+        ordinaryMessageCount: Int,
+        albumEndMessageCounts: [Int],
+        messagesBetween: Int32
+    ) -> [SponsoredMessagePlacement] {
+        guard cardCount > 0 else { return [] }
+        let total = max(0, ordinaryMessageCount)
+        var result = [SponsoredMessagePlacement(cardIndex: 0, afterMessageCount: total)]
+        guard messagesBetween > 0 else { return result }
+
+        let boundaries = Set(albumEndMessageCounts.filter { $0 >= 0 && $0 < total } + [0])
+            .sorted(by: >)
+        var previous = total
+        for cardIndex in 1..<cardCount {
+            guard let boundary = boundaries.first(where: { previous - $0 >= Int(messagesBetween) }) else { break }
+            result.append(SponsoredMessagePlacement(cardIndex: cardIndex, afterMessageCount: boundary))
+            previous = boundary
+        }
+        return result
+    }
+}
+
+public struct SponsoredMessagePlacement: Equatable, Sendable {
+    public let cardIndex: Int
+    public let afterMessageCount: Int
+
+    public init(cardIndex: Int, afterMessageCount: Int) {
+        self.cardIndex = cardIndex
+        self.afterMessageCount = afterMessageCount
+    }
 }

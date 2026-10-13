@@ -156,6 +156,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var messagesByConversation: [ConversationKey: [[String: Any]]] = [:]
     private var pendingHistoryByExtra: [String: ConversationKey] = [:]
     private var sponsoredMessagesByKey: [SponsoredMessagesKey: [SponsoredMessageCard]] = [:]
+    private var sponsoredMessagesBetweenByKey: [SponsoredMessagesKey: Int32] = [:]
     private var sponsoredMessagesFetchedAt: [SponsoredMessagesKey: Date] = [:]
     private var pendingSponsoredMessagesByExtra: [String: SponsoredMessagesKey] = [:]
     private var pendingSponsoredBotUsersByExtra: [String: SponsoredMessagesKey] = [:]
@@ -1158,6 +1159,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         photoDownloadsByConversation = photoDownloadsByConversation.filter { $0.key.account != account }
         pendingHistoryByExtra = pendingHistoryByExtra.filter { $0.value.account != account }
         sponsoredMessagesByKey = sponsoredMessagesByKey.filter { $0.key.account != account }
+        sponsoredMessagesBetweenByKey = sponsoredMessagesBetweenByKey.filter { $0.key.account != account }
         sponsoredMessagesFetchedAt = sponsoredMessagesFetchedAt.filter { $0.key.account != account }
         sponsoredEligibleChatKeys = sponsoredEligibleChatKeys.filter { $0.account != account }
         sponsoredChannelKeys = sponsoredChannelKeys.filter { $0.account != account }
@@ -2135,6 +2137,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                   owner.generation == key.generation else { return }
             let cards = (object["messages"] as? [[String: Any]] ?? []).compactMap(SponsoredMessageCard.init(tdlibObject:))
             sponsoredMessagesByKey[key] = cards
+            sponsoredMessagesBetweenByKey[key] = (object["messages_between"] as? NSNumber)?.int32Value ?? 0
             sponsoredMessagesFetchedAt[key] = Date()
             if target === runtime, selectedChatByAccount[target.account] == key.chatID,
                currentConversationKey() == currentConversationKey(for: target.account, chatID: key.chatID) {
@@ -2170,6 +2173,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 setStatus("Жалоба на рекламное сообщение отправлена.")
             case "reportSponsoredResultAdsHidden":
                 sponsoredMessagesByKey.removeAll()
+                sponsoredMessagesBetweenByKey.removeAll()
                 sponsoredMessagesFetchedAt.removeAll()
                 setStatus("Telegram скрыл рекламные сообщения во всех переписках.")
             case "reportSponsoredResultPremiumRequired":
@@ -3465,20 +3469,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             for card in (sponsoredMessagesByKey[key] ?? []).prefix(1) { appendSponsoredMessage(card, key: key) }
         }
         let ids = ordered.map { ($0["media_album_id"] as? NSNumber)?.int64Value ?? 0 }
-        for run in MediaAlbumGrouping.runs(albumIDs: ids) {
+        let runs = MediaAlbumGrouping.runs(albumIDs: ids)
+        let channelCards: [SponsoredMessageCard]
+        let channelPlacements: [SponsoredMessagePlacement]
+        if !lockState, let selected, let chatID, let key, sponsoredEligibleChatKeys.contains(key), sponsoredChannelKeys.contains(key) {
+            loadSponsoredMessages(in: selected, chatID: chatID)
+            channelCards = sponsoredMessagesByKey[key] ?? []
+            channelPlacements = SponsoredMessagesPolicy.placements(
+                cardCount: channelCards.count,
+                ordinaryMessageCount: ordered.count,
+                albumEndMessageCounts: runs.map { $0.messageIndices.last.map { $0 + 1 } ?? 0 },
+                messagesBetween: sponsoredMessagesBetweenByKey[key] ?? 0
+            )
+        } else {
+            channelCards = []
+            channelPlacements = []
+        }
+        for run in runs {
             let items = run.messageIndices.map { ordered[$0] }
             if run.albumID == nil {
                 for message in items { appendMessage(message) }
             } else {
                 appendPhotoAlbum(items)
             }
+            let boundary = (run.messageIndices.last ?? -1) + 1
+            if let key {
+                for placement in channelPlacements where placement.afterMessageCount == boundary {
+                    guard channelCards.indices.contains(placement.cardIndex) else { continue }
+                    appendSponsoredMessage(channelCards[placement.cardIndex], key: key)
+                }
+            }
         }
         guard !lockState, let selected, let chatID, let key,
               sponsoredEligibleChatKeys.contains(key) else { return }
         loadSponsoredMessages(in: selected, chatID: chatID)
         if sponsoredChannelKeys.contains(key) {
-            for card in (sponsoredMessagesByKey[key] ?? []).prefix(1) {
-                appendSponsoredMessage(card, key: key)
+            for placement in channelPlacements where placement.afterMessageCount == ordered.count {
+                guard channelCards.indices.contains(placement.cardIndex) else { continue }
+                appendSponsoredMessage(channelCards[placement.cardIndex], key: key)
             }
         }
     }
@@ -5087,6 +5115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         pendingHistoryByExtra.removeAll()
         sponsoredMessagesByKey.removeAll()
+        sponsoredMessagesBetweenByKey.removeAll()
         sponsoredMessagesFetchedAt.removeAll()
         pendingSponsoredMessagesByExtra.removeAll()
         pendingSponsoredBotUsersByExtra.removeAll()
