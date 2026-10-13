@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source dd11b9f38978870bf80509c239070d2570c7d8d4 passes 130/130 Swift tests and exact-SHA Swift CI plus pinned TDLib/Dev.app build. TDLib active-notification snapshots are silently reconciled into Notification Center; real account delivery remains unverified.",
+  "status": "implementation_in_progress; app source d57d569 implements safe removal of unverified local login profiles. Local serial suite 134/134 and exact-SHA GitHub CI/native Dev.app first-run smoke passed. New removal UI path and TDLib close are not yet exercised with an account; no real login or account coverage claim.",
   "cases": [
     {
       "id": "APP01",
@@ -424,17 +424,27 @@
       "required_for": "all releases",
       "status": "partial",
       "evidence": "App source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 adds a centered adaptive AppKit card around phone/code/2FA/QR/registration and a Keychain-backed API hash setup entry point. Local Swift suite 128/128 passed. Exact-source CI 38384029589 and pinned TDLib/Dev.app workflow 38384029582 passed; the CI first-run screen was visually reviewed and published with SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. It contains no profile UUID or user account. API hash entry is secure-field based and input validation is unit tested; actual macOS Keychain persistence and login are not tested. Dark appearance, minimum window, code/2FA/QR/registration, high contrast, VoiceOver and IME remain unverified."
+    },
+    {
+      "id": "AUTH04",
+      "name": "Удаление незавершённого локального входа",
+      "expected": "Удаляется только профиль без подтверждённого TelegramUserID. Удаление фиксируется до close; рестарт не открывает профиль с pending marker. Ключи и файлы удаляются после TDLib Closed и снятия route; ошибки допускают безопасный повтор. Подтверждённый аккаунт этим действием удалить нельзя.",
+      "method": "Core failure-injection tests + exact-source native Dev.app UI smoke; no Telegram credentials required",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "App source d57d569 adds an explicit “Удалить незавершённый вход…” action, durable unverified-removal marker, identity-association guard, restore exclusion, and retryable Keychain/file/catalogue cleanup after authorizationStateClosed and route removal. Local serial suite passed 134/134, including verified-identity rejection, no-restore while pending, retry after file failure, and retaining files when key deletion fails. Native menu journey and actual TDLib close remain unverified pending exact-SHA Dev.app smoke; no real login or confirmed account was used."
     }
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache swift test --scratch-path /private/tmp/netelegram-spm-test-run",
-    "local_result": "124/124 Swift tests passed. Canonical /private/tmp/NeTelegram-Dev.app built from exact source ff3da44, arm64, macOS 14 baseline, ad-hoc dev signature; codesign --verify --deep --strict passed. CUA found one window titled Neridian · dev ff3da446 showing the empty phone-entry form. No number or code entered.",
-    "hosted_ci": "Exact-source macOS CI 38372557522 and pinned TDLib/Dev.app workflow 38372557539 succeeded for full source SHA ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf.",
-    "scope": "Read-only sample of old Dev.app PID 28662 showed synchronous SecretsStore.telegramAPIHash at SecItemCopyMatching on AppKit main thread. New source moves API hash and per-account DB/draft key reads off main and invalidates stale restore generation on quit. Regression tests pass; a controlled Keychain stall, real Telegram login, real notifications, all 20 accounts, performance and data recovery remain unverified. User deferred login and declined sponsored-video playback; channel access and stable release remain gated.",
-    "publication": "Public Site v105 deployed at https://netelegram.iryadom.chatgpt.site; project appgprj_6acba85192e08191acdf7011928848cf; source commit afe7ad56a9c5fe5c8e64db7d038f1c7266054ae2; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_1d7fda6a6ef88191bab55b53a041c3cb; deployment appgdep_6acdf35049a881918cafd1afa4e9179f succeeded; audience public. Anonymous HTTPS GET /devlog/ returned 107238 bytes and contained the Keychain entry, exact source link, and explicit no-controlled-stall/login caveat. Archive local SHA-256 b8904fefa8c88e6f10c338f54b849baf88111e89c226844246c55e3b8e1c8284; Sites stored hash sha256:374689ede74a52674305cefa2ec9bc03374713d89502cb2949f2eaad86dd9902, 194560 bytes, 12 files. No app release/download.",
-    "next_action": "Continue native authentication and runtime acceptance; keep the single canonical ff3da44 Dev.app and do not create another instance."
+    "source_commit": "d57d569c08ca5273435fdb2e95a51629e1527df5",
+    "local_command": "swift test --no-parallel --jobs 2 --scratch-path <isolated SwiftPM scratch>",
+    "local_result": "134/134 Swift tests passed on Xcode 27.0 / Swift 6.4 / macOS 27 SDK. The executable target compiled. Four targeted profile-removal/picker tests passed first; the final full serial suite also passed after the Keychain-failure recovery case.",
+    "hosted_ci": "Exact-source macOS CI 38390951012 passed for d57d569c08ca5273435fdb2e95a51629e1527df5.",
+    "native_dev_app_smoke": "Pinned TDLib and Dev.app workflow 38390951049 succeeded for exact source d57d569c08ca5273435fdb2e95a51629e1527df5. Built/verified arm64 Dev.app, launched first-run UI, captured screenshot and quit. No credentials or Telegram account. The removal menu path was not interacted with.",
+    "scope": "Only synthetic/core behavior verified locally. No user phone/code entered, no real login, no 20-account runtime coverage, no Developer ID/notarization, and no public app download.",
+    "memory_audit": "Codex local memory note compressed to 1,570 bytes and corrected to route through the current checkpoint. Generated MEMORY and cloud saved memories were not changed.",
+    "publication": "Existing public Site v114 remains current pending a single development-journal update for d57d569; no app binary release/download."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -462,20 +472,10 @@
   },
   "latest_source_audit": {
     "date": "2026-10-13",
-    "source_commit": "1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462",
-    "change": "Added secure native API hash configuration using NSSecureTextField and macOS Keychain; validates 32 ASCII hex characters before saving off the main thread. No profile/session import.",
-    "local_checks": "swift test on Xcode 27.0 / Swift 6.4 / macOS 27 SDK: 128/128 passed; git diff --check passed. Validation tests cover accepted/rejected API hash formats.",
-    "macos_ci": {
-      "run_id": 38384029589,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029589"
-    },
-    "pinned_tdlib_devapp": {
-      "run_id": 38384029582,
-      "status": "success for exact SHA; pinned TDLib built and isolated arm64 Dev.app verified; accountless first-run screenshot captured",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38384029582"
-    },
-    "scope": "CI screenshot reviewed; no actual Keychain write or login was performed. No real account, 20-runtime, performance or distribution-signing evidence."
+    "source_commit": "d57d569c08ca5273435fdb2e95a51629e1527df5",
+    "change": "Added a user-confirmed removal path restricted to unverified local login profiles. A persisted marker excludes the profile from restoration; identity association is rejected after marking; TDLib close and route removal precede account-key/file cleanup. Cleanup failures retain a retryable marker.",
+    "local_checks": "134/134 serial Swift tests passed. Tests cover pending restore exclusion, retry after file failure, Keychain failure preserving files, and refusal to remove verified identities.",
+    "hosted_checks": "macOS CI 38390951012 and pinned TDLib/Dev.app workflow 38390951049 succeeded for exact source SHA d57d569c08ca5273435fdb2e95a51629e1527df5."
   },
   "latest_access_audit": {
     "date": "2026-10-13",
