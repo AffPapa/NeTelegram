@@ -1,0 +1,51 @@
+name: Metadata validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/metadata.yml'
+      - 'ACCEPTANCE.json'
+      - 'CONTRACTS.json'
+      - 'TDLIB.lock.json'
+      - 'PROJECT-STATE.json'
+      - 'release-manifest.template.json'
+      - 'release-index.template.json'
+      - 'devlog-entry.template.json'
+  pull_request:
+    paths:
+      - '.github/workflows/metadata.yml'
+      - 'ACCEPTANCE.json'
+      - 'CONTRACTS.json'
+      - 'TDLIB.lock.json'
+      - 'PROJECT-STATE.json'
+      - 'release-manifest.template.json'
+      - 'release-index.template.json'
+      - 'devlog-entry.template.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: metadata-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate project metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Validate checked-in JSON
+        run: |
+          python3 -m json.tool ACCEPTANCE.json >/dev/null
+          python3 -m json.tool CONTRACTS.json >/dev/null
+          python3 -m json.tool TDLIB.lock.json >/dev/null
+          python3 -m json.tool PROJECT-STATE.json >/dev/null
+          python3 -m json.tool release-manifest.template.json >/dev/null
+          python3 -m json.tool release-index.template.json >/dev/null
+          python3 -m json.tool devlog-entry.template.json >/dev/null

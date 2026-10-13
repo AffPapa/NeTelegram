@@ -9,11 +9,6 @@ on:
       - 'TDLIB.lock.json'
       - 'Sources/**'
       - 'Tests/**'
-      - 'ACCEPTANCE.json'
-      - 'CONTRACTS.json'
-      - 'release-manifest.template.json'
-      - 'release-index.template.json'
-      - 'devlog-entry.template.json'
   pull_request:
     paths:
       - '.github/workflows/ci.yml'
@@ -21,11 +16,6 @@ on:
       - 'TDLIB.lock.json'
       - 'Sources/**'
       - 'Tests/**'
-      - 'ACCEPTANCE.json'
-      - 'CONTRACTS.json'
-      - 'release-manifest.template.json'
-      - 'release-index.template.json'
-      - 'devlog-entry.template.json'
   workflow_dispatch:
 
 permissions:
@@ -54,12 +44,3 @@ jobs:
 
       - name: Build app and run core tests
         run: swift test --no-parallel
-
-      - name: Validate checked-in JSON
-        run: |
-          python3 -m json.tool ACCEPTANCE.json >/dev/null
-          python3 -m json.tool CONTRACTS.json >/dev/null
-          python3 -m json.tool TDLIB.lock.json >/dev/null
-          python3 -m json.tool release-manifest.template.json >/dev/null
-          python3 -m json.tool release-index.template.json >/dev/null
-          python3 -m json.tool devlog-entry.template.json >/dev/null
