@@ -497,3 +497,9 @@
 - Site archive SHA-256 `320c16dc1960daacfb27f16c9488c236e59d33db99c527e658fbdc09a95929fc`; Sites-reported archive hash `sha256:7ee8dcf223331b8ae32405033935c0b72509235434276cf13699b98ef6eda36b`.
 - Static build and focused validation passed for all eight routes. Anonymous HTTPS checks returned 200 `text/html` for `/`, `/features/`, `/devlog/`, and `/downloads/`; the devlog contains app-source `be4707d` and CI `38473154528`. Downloads still has no installer links.
 - Site source uses its own Sites checkout/remote; the NeTelegram app origin was not changed. No app binary was built or published.
+
+## 2026-10-14 — One canonical current-source Dev.app build and login smoke
+
+- Gracefully quit the one old accountless `org.affpapa.netelegram.dev` process (source c028bd3), confirmed its PID exited, and rebuilt the same canonical `/private/tmp/NeTelegram-Dev.app` once from clean checkpoint `e7ee13a87275140615da8328244964b1b5faad48`. Build completed in 9.20s on arm64 / Swift 6.4; nested ad-hoc `codesign --verify --deep --strict` passed. Source fingerprint `0d26a0d079dc72136b29f31f72079329c73238c488c315fae493434e0bdabca0`; executable SHA-256 `580aa2cec16857a043381660bd331424129f8b9cb880b476cf55ad36ffb613a5`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`.
+- AX confirms the single running window is titled `NeTelegram · dev e7ee13a8`, with welcome text, phone field, Continue, and QR; no UUID profile is visible. No phone, OTP or account data was entered.
+- Smoke is partial: after at least five seconds the status remains `Подключаю экран входа…`. A one-second process sample observed `restoreProfiles` awaiting Security `SecItemCopyMatching` on a utility task while AppKit's main thread was idle. The cause of the Keychain wait is not yet diagnosed. This is not an auth PASS and no API hash was reused.
