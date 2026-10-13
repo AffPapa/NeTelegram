@@ -105,6 +105,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var replyStatusLabel: NSTextField!
     private var clearReplyButton: NSButton!
     private var replyTargetsByConversation: [ConversationKey: Int64] = [:]
+    private var typingActionPolicy = TypingActionPolicy()
     private var replyCandidatesByControlID: [String: MessageKey] = [:]
     private var messageActionTargetsByControlID: [String: MessageActionTarget] = [:]
     private var messageActionButtonsByControlID: [String: NSButton] = [:]
@@ -999,6 +1000,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         closePhotoViewer()
         if let previous = runtime, previous !== selected,
            let previousChat = selectedChatByAccount[previous.account] {
+            stopTypingAction()
             cancelPhotoDownloads(account: previous.account, chatID: previousChat)
             try? previous.send(["@type": "closeChat", "chat_id": previousChat])
         }
@@ -1178,6 +1180,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         closePhotoViewer()
         if let previous = runtime,
            let previousChat = selectedChatByAccount[previous.account] {
+            stopTypingAction()
             cancelPhotoDownloads(account: previous.account, chatID: previousChat)
             try? previous.send(["@type": "closeChat", "chat_id": previousChat])
         }
@@ -3135,6 +3138,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         searchResultByControlID.removeAll()
         if runtime !== target {
             if let old = runtime, let oldChat = selectedChatByAccount[old.account] {
+                stopTypingAction()
                 cancelPhotoDownloads(account: old.account, chatID: oldChat)
                 try? old.send(["@type": "closeChat", "chat_id": oldChat])
             }
@@ -3166,6 +3170,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func openChat(chatID id: Int64, in runtime: LocalAccountRuntime) {
         closePhotoViewer()
         if let previous = selectedChatByAccount[runtime.account], previous != id {
+            stopTypingAction()
             cancelPhotoDownloads(account: runtime.account, chatID: previous)
             try? runtime.send(["@type": "closeChat", "chat_id": previous])
         }
@@ -3219,6 +3224,64 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return ConversationKey(account: account, chatID: chatID, topic: .forum(topicID: topicID))
         }
         return ConversationKey(account: account, chatID: chatID)
+    }
+
+    private func updateTypingAction(for text: String, runtime: LocalAccountRuntime, conversation: ConversationKey) {
+        guard !lockState, !tdlibReceiveFailed,
+              runtime === self.runtime,
+              runtime.telegramUserID != nil else { return }
+        let commands = typingActionPolicy.update(
+            conversation: conversation,
+            hasText: !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+            now: ProcessInfo.processInfo.systemUptime
+        )
+        for command in commands { dispatchTypingAction(command) }
+    }
+
+    private func stopTypingAction() {
+        guard let command = typingActionPolicy.stop() else { return }
+        dispatchTypingAction(command)
+    }
+
+    private func dispatchTypingAction(_ command: TypingActionCommand) {
+        let conversation: ConversationKey
+        let action: Any
+        switch command {
+        case .typing(let key):
+            conversation = key
+            action = ["@type": "chatActionTyping"]
+        case .cancel(let key):
+            conversation = key
+            action = NSNull()
+        }
+        guard let target = runtimesByAccount[conversation.account],
+              let userID = target.telegramUserID else { return }
+        let intentEpoch = privacyDispatchBarrier.currentEpoch()
+        let request: [String: Any] = [
+            "@type": "sendChatAction",
+            "chat_id": conversation.chatID,
+            "topic_id": tdlibTopicValue(for: conversation.topic),
+            "business_connection_id": "",
+            "action": action,
+        ]
+        do {
+            let accepted = try privacyDispatchBarrier.dispatchBoundUserCommand(
+                account: conversation.account,
+                expectedTelegramUserID: userID,
+                runtimeGeneration: target.generation,
+                privacyEpoch: intentEpoch,
+                currentAccount: target.account,
+                currentTelegramUserID: userID,
+                currentGeneration: target.generation
+            ) {
+                try target.send(request)
+            }
+            if !accepted, case .typing(let key) = command {
+                typingActionPolicy.retryTypingAction(for: key)
+            }
+        } catch {
+            if case .typing(let key) = command { typingActionPolicy.retryTypingAction(for: key) }
+        }
     }
 
     private func scheduleVisibleReadReceiptEvaluation() {
@@ -3389,6 +3452,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard let runtime, let chatID = selectedChatByAccount[runtime.account],
               topicPickerIDs.indices.contains(topicPicker.indexOfSelectedItem) else { return }
         let topicID = topicPickerIDs[topicPicker.indexOfSelectedItem]
+        stopTypingAction()
         selectedForumTopicIDsByAccount[runtime.account, default: [:]][chatID] = topicID
         selectedConversationTopicsByAccount[runtime.account]?.removeValue(forKey: chatID)
         let conversation = currentConversationKey(for: runtime.account, chatID: chatID)
@@ -3475,13 +3539,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard !suppressDraftUpdate, !lockState, let runtime,
               let chatID = selectedChatByAccount[runtime.account] else { return }
         let key = currentConversationKey(for: runtime.account, chatID: chatID)
+        draftsByConversation[key] = composer.string
+        updateTypingAction(for: composer.string, runtime: runtime, conversation: key)
         guard !unavailableDraftAccounts.contains(runtime.account) else {
-            draftsByConversation[key] = composer.string
             dirtyDraftAccounts.insert(runtime.account)
             setStatus("Черновики недоступны из-за ошибки защищённого хранилища.")
             return
         }
-        draftsByConversation[key] = composer.string
         persistDrafts(for: runtime.account)
     }
 
@@ -3518,6 +3582,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             setStatus("Отправка заблокирована: нет подтверждённых прав, отправителя или допустимого типа чата.")
             return
         }
+        stopTypingAction()
         historyRequestCounter &+= 1
         let extra = "send-\(historyRequestCounter)"
         let input: [String: Any] = [
@@ -3589,6 +3654,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             caption: composer.string,
             privacyEpoch: privacyDispatchBarrier.currentEpoch()
         )
+        stopTypingAction()
         let panel = NSOpenPanel()
         panel.title = "Выберите фотографию"
         panel.message = "Будет отправлено одно фото. Подпись берётся из поля сообщения."
@@ -5777,6 +5843,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     @objc private func closeWindow() { window.performClose(nil) }
     @objc private func lock() {
         guard !lockState else { return }
+        stopTypingAction()
         visibleReadReceiptTask?.cancel()
         visibleReadReceiptTask = nil
         visibleReadReceiptRegistry.removeAll()

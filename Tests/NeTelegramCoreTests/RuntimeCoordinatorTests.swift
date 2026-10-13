@@ -1061,6 +1061,39 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(counter.next() == 3)
 }
 
+@Test func typingActionIsRateLimitedAndStoppedWhenComposerClears() {
+    let conversation = ConversationKey(account: AccountUUID(), chatID: 82, topic: .forum(topicID: 9))
+    var policy = TypingActionPolicy()
+
+    #expect(policy.update(conversation: conversation, hasText: true, now: 10) == [.typing(conversation)])
+    #expect(policy.update(conversation: conversation, hasText: true, now: 12) == [])
+    #expect(policy.update(conversation: conversation, hasText: true, now: 14) == [.typing(conversation)])
+    #expect(policy.update(conversation: conversation, hasText: false, now: 15) == [.cancel(conversation)])
+    #expect(policy.update(conversation: conversation, hasText: false, now: 16) == [])
+}
+
+@Test func typingActionCancelsThePreviousTypedTopicBeforeStartingAnother() {
+    let account = AccountUUID()
+    let first = ConversationKey(account: account, chatID: 82, topic: .forum(topicID: 9))
+    let second = ConversationKey(account: account, chatID: 82, topic: .forum(topicID: 10))
+    var policy = TypingActionPolicy()
+
+    #expect(policy.update(conversation: first, hasText: true, now: 10) == [.typing(first)])
+    #expect(policy.update(conversation: second, hasText: true, now: 11) == [.cancel(first), .typing(second)])
+    #expect(policy.stop() == .cancel(second))
+    #expect(policy.stop() == nil)
+}
+
+@Test func typingActionRetriesAfterDispatchFailureAndHandlesMonotonicClockReset() {
+    let conversation = ConversationKey(account: AccountUUID(), chatID: 82)
+    var policy = TypingActionPolicy()
+
+    #expect(policy.update(conversation: conversation, hasText: true, now: 10) == [.typing(conversation)])
+    policy.retryTypingAction(for: conversation)
+    #expect(policy.update(conversation: conversation, hasText: true, now: 10.5) == [.typing(conversation)])
+    #expect(policy.update(conversation: conversation, hasText: true, now: 2) == [.typing(conversation)])
+}
+
 @Test func updateBufferPreservesFIFOAndBackpressuresAtCapacity() async {
     let buffer = TDLibUpdateBuffer(capacity: 1)
     let first = Data("first".utf8)
