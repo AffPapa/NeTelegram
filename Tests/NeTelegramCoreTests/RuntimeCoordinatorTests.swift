@@ -2682,6 +2682,34 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(AuthorizationStep(tdlibType: "authorizationStateReady").uiAvailability == .nonInteractive)
 }
 
+@Test func authorizationAnnouncementsAreStaticAndDeduplicatedByAccountGenerationAndStep() {
+    let steps: [AuthorizationStep] = [
+        .phoneNumber, .code, .password, .emailAddress, .emailCode, .registration, .qrConfirmation,
+    ]
+    let messages = steps.compactMap(AuthorizationAnnouncement.message(for:))
+    #expect(messages.count == steps.count)
+    #expect(AuthorizationAnnouncement.message(for: .parameters) == nil)
+    #expect(AuthorizationAnnouncement.message(for: .premiumPurchase) == nil)
+    #expect(AuthorizationAnnouncement.message(for: .unknown) == nil)
+    #expect(messages.allSatisfy { !$0.isEmpty })
+
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let phoneStep = AuthorizationAnnouncementContext(
+        account: accountA,
+        generation: RuntimeGeneration(1),
+        step: .phoneNumber
+    )
+    #expect(phoneStep.shouldAnnounce(after: nil))
+    #expect(!phoneStep.shouldAnnounce(after: phoneStep))
+    #expect(AuthorizationAnnouncementContext(account: accountA, generation: RuntimeGeneration(1), step: .code)
+        .shouldAnnounce(after: phoneStep))
+    #expect(AuthorizationAnnouncementContext(account: accountA, generation: RuntimeGeneration(2), step: .phoneNumber)
+        .shouldAnnounce(after: phoneStep))
+    #expect(AuthorizationAnnouncementContext(account: accountB, generation: RuntimeGeneration(1), step: .phoneNumber)
+        .shouldAnnounce(after: phoneStep))
+}
+
 @Test func forumTopicCatalogKeepsTypedIDsAndPlacesGeneralFirst() {
     let topics: [[String: Any]] = [
         ["info": ["forum_topic_id": 8, "name": "Работа"]],

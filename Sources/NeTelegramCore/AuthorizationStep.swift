@@ -70,6 +70,43 @@ public enum AuthorizationStep: String, CaseIterable, Sendable {
     }
 }
 
+/// Static VoiceOver copy for authorization states. It accepts only the typed
+/// state, never TDLib's full payload, so entered credentials and destinations
+/// cannot accidentally enter an announcement.
+public enum AuthorizationAnnouncement {
+    public static func message(for step: AuthorizationStep) -> String? {
+        switch step {
+        case .phoneNumber: "Вход: введите номер телефона. Поле номера выбрано."
+        case .code: "Вход: введите код подтверждения. Поле кода выбрано."
+        case .password: "Вход: введите пароль двухэтапной проверки. Поле пароля выбрано."
+        case .emailAddress: "Вход: введите адрес электронной почты. Поле адреса выбрано."
+        case .emailCode: "Вход: введите код из письма. Поле кода выбрано."
+        case .registration: "Вход: завершите регистрацию, указав имя и согласие с условиями."
+        case .qrConfirmation: "Вход по QR: отсканируйте код в Telegram на телефоне для подтверждения."
+        case .parameters, .premiumPurchase, .ready, .loggingOut, .closing, .closed, .unknown:
+            nil
+        }
+    }
+}
+
+/// Suppresses repeated announcements from duplicate updates while allowing
+/// the same state to be announced after switching account or client generation.
+public struct AuthorizationAnnouncementContext: Hashable, Sendable {
+    public let account: AccountUUID
+    public let generation: RuntimeGeneration
+    public let step: AuthorizationStep
+
+    public init(account: AccountUUID, generation: RuntimeGeneration, step: AuthorizationStep) {
+        self.account = account
+        self.generation = generation
+        self.step = step
+    }
+
+    public func shouldAnnounce(after previous: AuthorizationAnnouncementContext?) -> Bool {
+        AuthorizationAnnouncement.message(for: step) != nil && previous != self
+    }
+}
+
 /// Builds the short instruction shown while TDLib waits for a login code.
 /// The destination is deliberately masked because this screen can be visible
 /// during support or screen sharing.

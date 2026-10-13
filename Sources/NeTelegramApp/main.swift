@@ -62,6 +62,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
     private var runtimesByAccount: [AccountUUID: LocalAccountRuntime] = [:]
     private var pendingAuthorizationType: String?
+    private var lastAuthorizationAnnouncementContext: AuthorizationAnnouncementContext?
     private var pendingInitialAuthorizationAction: InitialAuthorizationAction?
     private var initialAccountCreationInProgress = false
     private var lockState = false
@@ -5670,6 +5671,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             showAuthorizationProgress(title: "Профиль закрыт", subtitle: "Состояние профиля сохранено.")
         default: showUnsupportedAuthorization(authorizationType)
         }
+        announceAuthorizationStep(authorizationType)
+    }
+
+    private func announceAuthorizationStep(_ authorizationType: String?) {
+        guard !lockState, let window, window.isVisible, NSApp.isActive, let runtime else {
+            lastAuthorizationAnnouncementContext = nil
+            return
+        }
+        let step = AuthorizationStep(tdlibType: authorizationType)
+        guard let message = AuthorizationAnnouncement.message(for: step) else {
+            lastAuthorizationAnnouncementContext = nil
+            return
+        }
+        let context = AuthorizationAnnouncementContext(
+            account: runtime.account,
+            generation: runtime.generation,
+            step: step
+        )
+        guard context.shouldAnnounce(after: lastAuthorizationAnnouncementContext) else { return }
+        lastAuthorizationAnnouncementContext = context
+        NSAccessibility.post(
+            element: window,
+            notification: .announcementRequested,
+            userInfo: [
+                .announcement: message,
+                .priority: NSAccessibilityPriorityLevel.medium.rawValue,
+            ]
+        )
     }
 
     private func showAuthorizationProgress(title: String, subtitle: String) {
@@ -5952,6 +5981,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // rejected after it; it cannot slip through while drafts are flushed.
         privacyDispatchBarrier.setLocked(true)
         lockState = true
+        lastAuthorizationAnnouncementContext = nil
         stopTypingAction()
         visibleReadReceiptTask?.cancel()
         visibleReadReceiptTask = nil
