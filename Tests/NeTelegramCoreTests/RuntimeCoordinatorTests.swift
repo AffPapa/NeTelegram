@@ -1088,6 +1088,50 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(counter.next() == 3)
 }
 
+@MainActor
+@Test func networkTypeFanoutReconcilesAllTwentyRuntimesAndRejectsStaleWork() {
+    let accounts = (1...20).map { index in
+        AccountUUID(UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", index))!)
+    }
+    var coordinator = NetworkTypeFanoutCoordinator()
+    var applied: [AccountUUID: [String]] = [:]
+    let generations = Dictionary(uniqueKeysWithValues: accounts.map { ($0, RuntimeGeneration(7)) })
+
+    let acceptedPathA = coordinator.accept(revision: 1) // Initial path A.
+    let appliedPathA = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) {
+        applied[$0, default: []].append($1)
+    }
+    #expect(acceptedPathA)
+    #expect(appliedPathA)
+
+    let acceptedPathB = coordinator.accept(revision: 2) // Route B, still Wi-Fi.
+    let rejectedSupersededPathA = !coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) {
+        applied[$0, default: []].append($1)
+    } // Debounced path A was superseded.
+    let appliedPathB = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 2, accounts: accounts) {
+        applied[$0, default: []].append($1)
+    }
+    let rejectedDuplicate = !coordinator.accept(revision: 2) // Duplicate observation.
+    let rejectedLatePath = !coordinator.accept(revision: 1) // Late older observation.
+    #expect(acceptedPathB)
+    #expect(rejectedSupersededPathA)
+    #expect(appliedPathB)
+    #expect(rejectedDuplicate)
+    #expect(rejectedLatePath)
+
+    let acceptedWake = coordinator.accept(revision: 3, force: true) // Wake: reapply current path.
+    let appliedWake = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 3, force: true, accounts: accounts) {
+        applied[$0, default: []].append($1)
+    }
+    #expect(acceptedWake)
+    #expect(appliedWake)
+
+    #expect(applied.count == 20)
+    #expect(applied.values.allSatisfy { $0 == ["networkTypeWiFi", "networkTypeWiFi", "networkTypeWiFi"] })
+    #expect(generations.count == 20)
+    #expect(generations.values.allSatisfy { $0 == RuntimeGeneration(7) })
+}
+
 @Test func typingActionIsRateLimitedAndStoppedWhenComposerClears() {
     let conversation = ConversationKey(account: AccountUUID(), chatID: 82, topic: .forum(topicID: 9))
     var policy = TypingActionPolicy()

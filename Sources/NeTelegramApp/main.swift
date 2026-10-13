@@ -161,8 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private let networkMonitor = NWPathMonitor()
     private let networkMonitorQueue = DispatchQueue(label: "org.affpapa.netelegram.network-monitor", qos: .utility)
     private let networkPathRevisionCounter = NetworkPathRevisionCounter()
-    private var networkPathRevisionGate = NetworkPathRevisionGate()
-    private var currentAppliedNetworkPathRevision: UInt64 = 0
+    private var networkTypeFanoutCoordinator = NetworkTypeFanoutCoordinator()
     private var currentTDLibNetworkType = "networkTypeNone"
     private var networkTypeUpdateTask: Task<Void, Never>?
     private var pendingProfileStorageWarnings = 0
@@ -732,25 +731,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func scheduleNetworkTypeUpdate(_ type: String, revision: UInt64, force: Bool = false) {
-        let accepted = networkPathRevisionGate.accept(revision)
-        guard accepted || (force && networkPathRevisionGate.isLatest(revision)) else { return }
+        guard networkTypeFanoutCoordinator.accept(revision: revision, force: force) else { return }
         networkTypeUpdateTask?.cancel()
         networkTypeUpdateTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled, let self else { return }
-            guard self.networkPathRevisionGate.isLatest(revision) else { return }
-            guard NetworkTypeUpdatePolicy.shouldApply(
-                currentRevision: self.currentAppliedNetworkPathRevision,
-                nextRevision: revision,
-                force: force
-            ) else { return }
-            self.currentAppliedNetworkPathRevision = revision
-            self.currentTDLibNetworkType = type
-            for accountRuntime in self.runtimesByAccount.values {
+            let applied = self.networkTypeFanoutCoordinator.applyIfCurrent(
+                type: type,
+                revision: revision,
+                force: force,
+                accounts: Array(self.runtimesByAccount.keys)
+            ) { account, type in
+                guard let accountRuntime = self.runtimesByAccount[account] else { return }
                 do { try accountRuntime.applyNetworkType(type) }
                 catch where accountRuntime === self.runtime { self.setStatus("Не удалось обновить сетевое состояние TDLib для выбранного аккаунта.") }
                 catch { }
             }
+            if applied { self.currentTDLibNetworkType = type }
         }
     }
 

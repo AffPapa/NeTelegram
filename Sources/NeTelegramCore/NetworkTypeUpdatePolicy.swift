@@ -55,3 +55,50 @@ public struct NetworkPathRevisionGate: Sendable {
         revision == latestRevision
     }
 }
+
+/// Coordinates debounced path observations and wake reconciliation before
+/// broadcasting TDLib's process-wide network type to every live account.
+/// Runtime creation, sends, and notification work are deliberately outside
+/// this coordinator: its only effect is one network-type callback per account.
+@MainActor
+public struct NetworkTypeFanoutCoordinator {
+    private var revisionGate = NetworkPathRevisionGate()
+    private var appliedRevision: UInt64 = 0
+
+    public init() {}
+
+    /// Accepts a new observation or a wake reapplication of the current one.
+    @discardableResult
+    public mutating func accept(revision: UInt64, force: Bool = false) -> Bool {
+        let accepted = revisionGate.accept(revision)
+        return accepted || (force && revisionGate.isLatest(revision))
+    }
+
+    /// Applies only the latest accepted observation, in stable account order.
+    /// Returns false when the work was duplicated or superseded.
+    @discardableResult
+    public mutating func applyIfCurrent(
+        type: String,
+        revision: UInt64,
+        force: Bool = false,
+        accounts: [AccountUUID],
+        apply: (AccountUUID, String) -> Void
+    ) -> Bool {
+        guard revisionGate.isLatest(revision),
+              NetworkTypeUpdatePolicy.shouldApply(
+                currentRevision: appliedRevision,
+                nextRevision: revision,
+                force: force
+              ) else { return false }
+
+        appliedRevision = revision
+        for account in accounts.sorted(by: { $0.id.uuidString < $1.id.uuidString }) {
+            apply(account, type)
+        }
+        return true
+    }
+
+    public func isLatest(_ revision: UInt64) -> Bool {
+        revisionGate.isLatest(revision)
+    }
+}
