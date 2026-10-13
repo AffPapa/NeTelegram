@@ -1,20 +1,22 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app Swift source 62a75087e8c37ff07fa327613ff765f07c1d229a. APP01 focused tests and exact-SHA CI passed. Public Site v128 is deployed after stale asset cleanup. No signed app release; real-account and 20-runtime coverage remain unverified.",
+  "status": "implementation_in_progress; app Swift source 6434b101b8bd7124321858e79beb8535536b1aca. Three focused local tests passed; exact-SHA macOS CI 38417637060 and pinned TDLib/isolated Dev.app lifecycle smoke 38417637092 passed. Public Site v129 is deployed. No authorized accounts or 20-runtime certification; no signed app release.",
   "current_evidence": {
-    "app_source_commit": "62a75087e8c37ff07fa327613ff765f07c1d229a",
-    "app_tests": "Targeted APP16 queue shutdown test updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput passed locally 1/1; exact-SHA macOS CI run 38409529115 succeeded for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a. Synthetic buffered JSON only; no real TDLib, TTL expiry, 20-client overload or real-account certification. New test: twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1; exact-SHA macOS CI 38412386934 passed for test commit 5879143cc420cb0047606d099aa49810a609060e. APP01 startup-filter local tests restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains and pendingStartupSelectionKeepsTwentyCandidatesAndExcludesOnlyRunningOrStartingProfiles passed 2/2 on Xcode 27.0 / Swift 6.4. Exact-SHA macOS CI 38415556054 passed for 62a75087e8c37ff07fa327613ff765f07c1d229a. These synthetic tests do not launch TDLib, use real accounts, or measure twenty-runtime load.",
+    "app_source_commit": "6434b101b8bd7124321858e79beb8535536b1aca",
+    "app_tests": "Three focused APP01 tests passed locally on Xcode 27.0 / Swift 6.4: restore-plan/scheduler composition, pending selection among 20 profiles, and production-used enqueue dispatch while first startup is synthetically stalled. Full configured macOS CI 38417637060 passed for exact app-source SHA 6434b101b8bd7124321858e79beb8535536b1aca. The tests do not start authorized TDLib sessions or measure twenty runtimes.",
     "github_workflows": [
       "https://github.com/AffPapa/NeTelegram/actions/runs/38407467618",
       "https://github.com/AffPapa/NeTelegram/actions/runs/38407466662",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38415556054"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38415556054",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38417637060",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38417637092"
     ],
-    "native_smoke": "Correction: exact app-source CI 38407466662 launched isolated Dev.app, verified window close/reopen using the same PID and normal Cmd+Q. It captured a screenshot, but visual inspection is not evidenced. No account was entered.",
+    "native_smoke": "Pinned TDLib/Dev.app workflow 38417637092 passed exact app-source SHA 6434b101b8bd7124321858e79beb8535536b1aca: isolated Dev.app was launched, screenshot captured, window closed with process alive, reopened through LaunchServices in the same PID, then quit. No account or real runtime activity. Screenshot not visually reviewed.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v128 deployment succeeded at https://netelegram.iryadom.chatgpt.site; Site source bcf5b46502c04681d20ef20eb3193d4384a7cec3, app-source 62a75087e8c37ff07fa327613ff765f07c1d229a, deployment appgdep_6ace458edd8081919c27948f7f12730b, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_38c2dad3ad848191a56aa2ec29a9ff4a. The archive excludes two unreferenced stale Neridian PNG assets. Direct route fetch was blocked by DNS; no v128 route-level PASS. Downloads remain NO RELEASE.",
+    "site": "Public Site v129 deployment succeeded at https://netelegram.iryadom.chatgpt.site; Site source 3d8768a41c35c2a58155af796fdce93e1742ff59, app source 6434b101b8bd7124321858e79beb8535536b1aca, deployment appgdep_6ace47b7829481919509682da8984d45, version appgprj_6acba85192e08191acdf7011928848cf~appgver_06de39ff88d481919aa752aa7254b159. The bilingual devlog records the tested APP01 queue-dispatch milestone and exact coverage. Direct URL HTTP fetch is blocked by DNS in this environment; no v129 route-level PASS. Downloads remain NO RELEASE.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -458,34 +460,34 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "62a75087e8c37ff07fa327613ff765f07c1d229a",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app01-startup-filter --filter '.*(restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains|pendingStartupSelectionKeepsTwentyCandidatesAndExcludesOnlyRunningOrStartingProfiles).*'",
-    "local_result": "Two focused Swift tests passed 2/2. AppDelegate now delegates filtering of existing/in-flight startup accounts to AccountRestorePlanner.pendingStartupProfiles; twenty free candidates are preserved, and only one running plus one starting are excluded.",
-    "hosted_ci": "Exact-SHA macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38415556054 passed for 62a75087e8c37ff07fa327613ff765f07c1d229a.",
-    "native_dev_app_smoke": "No new native Dev.app smoke was run for this Core/AppDelegate filter change; prior accountless window smoke applies only to app-source 816bbb4ab2a61817cc3da0780f47219b1f8f52e9.",
-    "scope": "Synthetic restore-selection boundary only. Does not invoke AppDelegate restoreProfiles, construct TDLib clients, read account Keychain entries, or certify real account/20-runtime behavior.",
+    "source_commit": "6434b101b8bd7124321858e79beb8535536b1aca",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app01-dispatch --filter '.*(restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains|pendingStartupSelectionKeepsTwentyCandidatesAndExcludesOnlyRunningOrStartingProfiles|startupDispatchQueuesAllFreeProfilesWhileFirstStartupIsStalled).*'",
+    "local_result": "Three focused startup tests passed 3/3. Production-used enqueue dispatch is called by AppDelegate; a gated first startup does not prevent enqueuing the remaining eligible profiles.",
+    "hosted_ci": "Full macOS CI 38417637060 passed for exact source 6434b101b8bd7124321858e79beb8535536b1aca.",
+    "native_dev_app_smoke": "Pinned TDLib/Dev.app workflow 38417637092 passed for exact source 6434b101b8bd7124321858e79beb8535536b1aca; app launched, last-window close kept the same process alive, LaunchServices reopen restored the same PID, and Cmd+Q quit. No account login; screenshot captured but not visually inspected.",
+    "scope": "Synthetic account-startup dispatch plus accountless native window-lifecycle smoke. Does not authenticate accounts or certify twenty runtimes, resource use, or protocol notifications.",
     "branding": "NeTelegram; v127 Site uses original accessible SVG illustration, bilingual product copy, and direct non-affiliation disclosure.",
     "seo": "Homepage includes natural RU/EN alternative/unofficial Telegram client phrases; no volume/rank dataset was used.",
-    "publication": "Public Site v128 saved from bcf5b46502c04681d20ef20eb3193d4384a7cec3 and deployed as appgdep_6ace458edd8081919c27948f7f12730b at https://netelegram.iryadom.chatgpt.site; archive SHA-256 759cfd6a80e0f96013e661f73439eed56dd5442eac69e38bdf8479f37cbdcf37; Sites content hash sha256:d02292ba21045dcd3b4fa03a301ec782cf9a7766d3747bafa4d682109fce7ae7, 12 files / 215040 bytes. Direct public HTTP verification was blocked by DNS, so no route-level PASS is claimed.",
+    "publication": "Public Site v129 deployed (appgdep_6ace47b7829481919509682da8984d45) from 3d8768a41c35c2a58155af796fdce93e1742ff59; app commit 6434b101b8bd7124321858e79beb8535536b1aca; archive SHA-256 4a67fa0b8983f984b12aa6452d25ca8a93f7e94894bb9ed51d79c46b0df60acf, 12 files / 225280 bytes. Independent direct HTTP check blocked by DNS; no route-level PASS.",
     "release_preflight": "No app binary release; no valid Developer ID identity; real account and 20-runtime evidence remain unverified.",
     "site_source_cleanup": "Two unreferenced stale screenshots with old Neridian Dev branding removed from current Site source and deployment archive. Static scan confirms no Neridian in served HTML/CSS/XML; archive excludes both old asset paths."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 128,
-    "source_commit": "bcf5b46502c04681d20ef20eb3193d4384a7cec3",
-    "app_repository_commit": "62a75087e8c37ff07fa327613ff765f07c1d229a",
-    "deployment_id": "appgdep_6ace458edd8081919c27948f7f12730b",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_38c2dad3ad848191a56aa2ec29a9ff4a",
+    "version": 129,
+    "source_commit": "3d8768a41c35c2a58155af796fdce93e1742ff59",
+    "app_repository_commit": "6434b101b8bd7124321858e79beb8535536b1aca",
+    "deployment_id": "appgdep_6ace47b7829481919509682da8984d45",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_06de39ff88d481919aa752aa7254b159",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "759cfd6a80e0f96013e661f73439eed56dd5442eac69e38bdf8479f37cbdcf37",
-    "sites_archive_content_hash": "sha256:d02292ba21045dcd3b4fa03a301ec782cf9a7766d3747bafa4d682109fce7ae7",
-    "archive_bytes": 215040,
+    "archive_sha256": "4a67fa0b8983f984b12aa6452d25ca8a93f7e94894bb9ed51d79c46b0df60acf",
+    "sites_archive_content_hash": "sha256:1405033d04e1eb84b9ad7f93fb398b02b777c5176b642c6b4becdd45c91c717a",
+    "archive_bytes": 225280,
     "archive_file_count": 12,
-    "description": "Removed two unreferenced old Neridian Dev screenshot assets; landing design and factual product status remain unchanged.",
-    "public_verification": "Sites deployment succeeded at https://netelegram.iryadom.chatgpt.site; supplied archive checks passed. Direct HTTP fetch was unavailable because this environment could not resolve the Site hostname. No route-level PASS is claimed for v128."
+    "description": "Publishes exact-source APP01 queue-dispatch evidence after synthetic tests, full macOS CI and accountless Dev.app lifecycle smoke. Download status remains NO RELEASE.",
+    "public_verification": "Sites deployment succeeded and the exact archive was checked. Direct public HTTP fetch was unavailable due DNS; routes were not independently fetched after v129."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -511,5 +513,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue APP01 by extracting a small production-used startup dispatch seam so a deterministic test can cover enqueue order and duplicate/running profiles without constructing TDLib. Then run focused local tests and exact-SHA macOS CI. Real account login remains deferred; do not claim 20-runtime certification."
+  "next_action": "Choose the next single APP01/APP02 integration slice by inspecting the current acceptance gaps; avoid repeating the exact 3 local tests, CI run or native smoke unless relevant source inputs change. Real Telegram login remains deferred by the user."
 }
