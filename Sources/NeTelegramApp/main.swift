@@ -1251,8 +1251,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         forumTopicsByAccount.removeValue(forKey: account)
         forumChatsByAccount.removeValue(forKey: account)
         selectedForumTopicIDsByAccount.removeValue(forKey: account)
-        let notificationIDs = notificationIDsByAccount.removeValue(forKey: account) ?? []
-        notificationTargets = notificationTargets.filter { !notificationIDs.contains($0.key) }
+        let notificationIDs = AccountNotificationCleanup.remove(
+            account: account,
+            identifiersByAccount: &notificationIDsByAccount,
+            targetsByIdentifier: &notificationTargets
+        )
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
         photoPipeline.cancelPreviews(for: account)
@@ -2051,6 +2054,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)
+                if !confirmedLogout {
+                    // A closed runtime cannot reconcile its old notification
+                    // set. Remove its previews and click routes immediately;
+                    // otherwise stale message text can remain in Notification Center.
+                    let notificationIDs = AccountNotificationCleanup.remove(
+                        account: target.account,
+                        identifiersByAccount: &notificationIDsByAccount,
+                        targetsByIdentifier: &notificationTargets
+                    )
+                    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
+                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
+                }
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
                 _ = pendingSearchRequests.remove(account: target.account, runtimeGeneration: target.generation)
                 _ = pendingHistoryRequests.remove(account: target.account, runtimeGeneration: target.generation)

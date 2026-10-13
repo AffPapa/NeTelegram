@@ -5,6 +5,53 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func accountNotificationCleanupRemovesOnlyClosedAccountsRoutes() {
+    let closedAccount = AccountUUID()
+    let activeAccount = AccountUUID()
+    let closedNotification = RoutedTDLibNotification(
+        account: closedAccount,
+        groupID: 1,
+        notificationID: 10,
+        conversation: ConversationKey(account: closedAccount, chatID: 100),
+        messageID: 11,
+        date: 12,
+        isSilent: false,
+        showsPreview: true,
+        preview: "closed account preview"
+    )
+    let activeNotification = RoutedTDLibNotification(
+        account: activeAccount,
+        groupID: 2,
+        notificationID: 20,
+        conversation: ConversationKey(account: activeAccount, chatID: 200),
+        messageID: 21,
+        date: 22,
+        isSilent: false,
+        showsPreview: true,
+        preview: "active account preview"
+    )
+    var identifiersByAccount = [
+        closedAccount: Set([closedNotification.systemIdentifier]),
+        activeAccount: Set([activeNotification.systemIdentifier]),
+    ]
+    var targetsByIdentifier = [
+        closedNotification.systemIdentifier: closedNotification,
+        activeNotification.systemIdentifier: activeNotification,
+    ]
+
+    let removed = AccountNotificationCleanup.remove(
+        account: closedAccount,
+        identifiersByAccount: &identifiersByAccount,
+        targetsByIdentifier: &targetsByIdentifier
+    )
+
+    #expect(removed == [closedNotification.systemIdentifier])
+    #expect(identifiersByAccount[closedAccount] == nil)
+    #expect(identifiersByAccount[activeAccount] == [activeNotification.systemIdentifier])
+    #expect(targetsByIdentifier[closedNotification.systemIdentifier] == nil)
+    #expect(targetsByIdentifier[activeNotification.systemIdentifier] == activeNotification)
+}
+
 @Test func privacyLockPurgesPresentationDraftsButRetainsDirtyRecoveryUntilUnlock() {
     let dirtyAccount = AccountUUID()
     let persistedAccount = AccountUUID()
