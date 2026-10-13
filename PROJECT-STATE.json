@@ -12,7 +12,7 @@
     "repository_id": 1415421574,
     "branch": "main",
     "commit": "6c6fff49d6c43746b3990de178b723d1eaf75172",
-    "working_tree_clean": false,
+    "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
       "run_id": 38395900507,
@@ -73,13 +73,13 @@
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_site": "Public Site version 116 deployed successfully from Site source c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc; deployment appgdep_6ace1e5aa3e48191958f3aaed3b43932. Anonymous public HTTPS returned 200 for six HTML routes and two valid empty updater RSS feeds. No downloads.",
+    "current_head_site": "Public Site v117 deployed successfully from Site source fb9b464c8ae2cbfc687e261cdf3f23237a72152e; deployment appgdep_6ace2262df1481919c809da66416f943. Anonymous system-curl checks returned 200 with expected markers for /, /features/, /roadmap/, /devlog/, /downloads/ and /updates/stable.xml. Site remains public; downloads show NO RELEASE; feed is empty valid RSS.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection.",
     "current_head_native_workflow": "Pinned TDLib and arm64 Dev.app workflow 38395900428 succeeded for exact app-source SHA 6c6fff49d6c43746b3990de178b723d1eaf75172. Built/verified Dev.app using the updated C bridge and smoke; accountless only, no phone number or code entered.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": "Exact-SHA CI Dev.app launch/screenshot/quit passed in workflow 38390951049 for app-source d57d569c08ca5273435fdb2e95a51629e1527df5. This is an accountless first-run smoke; the new removal menu path itself was not clicked and no TDLib profile close was exercised.",
-    "publication": "GitHub app source 6c6fff49d6c43746b3990de178b723d1eaf75172 pushed to main. Exact-source macOS CI and pinned TDLib/Dev.app workflow both succeeded. No app binary release/download. Public Site remains v116 pending devlog synchronization.",
+    "publication": "GitHub app source 6c6fff49d6c43746b3990de178b723d1eaf75172 pushed to main; exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 succeeded. Public Site v117 is live from source fb9b464c8ae2cbfc687e261cdf3f23237a72152e; deployment appgdep_6ace2262df1481919c809da66416f943; anonymous public-route checks passed. No app binary release/download.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified."
   },
   "site": {
@@ -87,18 +87,18 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 116,
-    "source_commit": "c0bbe3f16d49e2fe0205e1adfc6f684e2c94f7cc",
-    "deployment_id": "appgdep_6ace1e5aa3e48191958f3aaed3b43932",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_f9c832ceb6548191aea37fb70fbfe809",
+    "latest_version": 117,
+    "source_commit": "fb9b464c8ae2cbfc687e261cdf3f23237a72152e",
+    "deployment_id": "appgdep_6ace2262df1481919c809da66416f943",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_fc454aa46d24819186ce0f8e6adf2a66",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous curl/system-trust HTTPS checks on 2026-10-13: /, /features/, /downloads/, /devlog/, /privacy/, /source/ returned 200 text/html with expected titles; bilingual non-affiliation disclosure and current brand milestone present; downloads explicitly NO RELEASE; /updates/stable.xml and /updates/alpha.xml returned 200 text/xml and parsed as valid empty RSS.",
-    "archive_local_sha256": "37a16ef56d86b9291e56fc5359834de1b51640b9757d8b07c01b61978c154f1f",
-    "archive_sites_reported_content_hash": "sha256:2f1b5bebbc220e1cbd3a923904411b22da1b1ed88af97e550f1cd117e749283e",
+    "public_route_verified": "Anonymous system-curl on 2026-10-13: /, /features/, /roadmap/, /devlog/, /downloads/ returned 200 text/html with current source and factual status; /updates/stable.xml returned 200 text/xml with valid empty RSS. Download page says NO RELEASE.",
+    "archive_local_sha256": "f3eb746950bfc65bf0d72309ddb5026eed7028d28eb4a88bd715f3320577bad4",
+    "archive_sites_reported_content_hash": "sha256:e6fba23d3b2d06873f394483357eafb6a9a0889679014a9e0727a27a80de16b8",
     "archive_file_count": 14,
     "sites_reported_archive_size_bytes": 440320,
-    "local_archive_size_bytes": 272546
+    "local_archive_size_bytes": 273073
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -109,7 +109,7 @@
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified."
   ],
-  "next_action": "Next bounded milestone: APP04 close-last-window and Dock reopen on one exact-SHA Dev.app; assert same PID survives zero windows, reopen yields exactly one window, Cmd+Q exits. Do not repeat queue fix, rename/SEO, 136-test suite, or workflows unchanged. Real login remains deferred; no 20-account certification, Developer ID/notarization, or app release. Site remains v116 until this milestone journal update is published.",
+  "next_action": "Next bounded milestone: APP04 close-last-window and Dock reopen on one exact-SHA Dev.app; assert the same PID survives zero windows, reopen yields exactly one window, Cmd+Q exits. Do not repeat queue fix, rename/SEO, 136-test suite, or workflows unchanged. Real login remains deferred; no 20-account certification, Developer ID/notarization, or app release.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
@@ -118,7 +118,7 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "65537b78b4663a93852bc3cb87ef83f63b00b1bd",
+    "repo_head_before_checkpoint": "38f813b9eec0b3f9f16dab11b66846079a15cc5b",
     "app_source_commit_authority": "source.commit",
     "app_source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172"
   },
@@ -130,6 +130,7 @@
     "Preserve the old dirty NeTelegram checkout; build and commit only from the canonical checkout from the project context index unless a separate reconciliation is planned.",
     "Do not rerun full suites or rebuild unchanged app source. Tie each validation to the changed app-source SHA and keep accountless CI evidence separate from real Telegram coverage.",
     "Before build, launch, or publish: verify canonical path, remote, branch, full repo HEAD, upstream, dirty state, and app-source SHA. If checkpoint and Git disagree, reconcile state first; do not build. Keep app-source, docs HEAD, Site-source/version/deployment, and any built-bundle SHA as separate fields.",
-    "On resume read PROJECT-STATE, the newest RUN-LOG entry, and only relevant ACCEPTANCE cases. Reuse PASS only for matching source/input, harness, and environment; after two identical failures diagnose before retrying. On verifier anomalies inspect the raw artifact/HTTP response first."
+    "On resume read PROJECT-STATE, the newest RUN-LOG entry, and only relevant ACCEPTANCE cases. Reuse PASS only for matching source/input, harness, and environment; after two identical failures diagnose before retrying. On verifier anomalies inspect the raw artifact/HTTP response first.",
+    "Run Sites helper only from the dedicated Site checkout returned by its opening result, never from the app repository; on DNS denial, keep the same helper/remote and retry with authorized network access."
   ]
 }
