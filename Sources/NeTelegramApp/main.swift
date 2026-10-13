@@ -1871,7 +1871,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 // checks credentials before creating any account state.
                 pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
                 showPhoneEntry()
-                setStatus("Выберите страну и введите номер. Для начала входа задайте API hash приложения в меню NeTelegram.")
+                setStatus("Выберите страну и введите номер телефона.")
                 refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()
                 return
