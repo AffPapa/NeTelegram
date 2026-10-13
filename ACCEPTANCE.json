@@ -1,21 +1,22 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 2285792bd360b392c79e4fe9da70dd7d70b86be7. APP03 shared snapshot-restoration policy passed a targeted local 1000-selection synthetic test; exact-source CI 38404936494 and pinned TDLib/Dev.app build 38404936522 succeeded. GitHub README/About copy and public Site v121 are synchronized to current product name and scope. Native UI account switching, real login, 20 real runtimes, and app release remain unverified.",
+  "status": "implementation_in_progress; app source 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. APP25 opt-in policy test passed locally and exact-source CI/build passed; real macOS Login Items behavior remains unverified. OPS02 source and Site archive scan found no known secret patterns; release assets/receipts remain unverified. Public Site v122 is live; application downloads remain unavailable and real account/20-runtime coverage is unverified.",
   "current_evidence": {
-    "app_source_commit": "2285792bd360b392c79e4fe9da70dd7d70b86be7",
-    "app_tests": "One targeted synthetic test passed locally on Xcode 27.0 / Swift 6.4. It exercises the exact AccountConversationSnapshot.restoredDraft policy used by AppKit for 1000 alternating account selections, same numeric chat ID with distinct account/topic/draft, and rejects mismatched account, generation, and topic. Exact-SHA macOS CI 38404936494 and pinned TDLib/Dev.app build 38404936522 succeeded. The native workflow assembled/verified the app bundle but did not launch it; no GUI account switch or authorized session was used.",
+    "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
+    "app_tests": "Targeted APP25 policy test passed 1/1 locally on Xcode 27.0 / Swift 6.4. It covers eight combinations of requested state and SMAppService-derived state (not registered, requires approval, enabled, unavailable). Exact-source CI 38407467618 succeeded; pinned TDLib/Dev.app workflow 38407466662 succeeded and assembled/verified an arm64 bundle but did not launch the app. macOS Login Items registration persistence/removal was not exercised; APP25 remains partial.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38404936494",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38404936522"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38407467618",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38407466662"
     ],
-    "native_smoke": "Runtime/AppKit source did not change in the test-only commit; latest native lifecycle smoke remains pinned TDLib/Dev.app workflow 38399172724 on app-source 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3. Accountless close/reopen/Cmd+Q only; no account updates tested.",
+    "native_smoke": "Pinned TDLib/Dev.app workflow 38407466662 passed for exact app source 816bbb4ab2a61817cc3da0780f47219b1f8f52e9: TDLib and arm64 Dev.app were built/verified; app was not launched. No Login Items changes, Telegram login, or account operations were performed.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v121 live at https://netelegram.iryadom.chatgpt.site; Site source 98208c1042c06f64cd112f8894861cf7ddf7f802, deployment appgdep_6ace333a26f88191b1fe8b6a4ba9c0ee, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_769a13e3472c8191851a46d9a8e4823e. Anonymous HTTPS validation returned 200 for 8 HTML pages and 2 XML feeds with expected MIME; homepage and devlog contain current app source 2285792bd360b392c79e4fe9da70dd7d70b86be7. Downloads remains NO RELEASE.",
+    "site": "Public Site v122 live at https://netelegram.iryadom.chatgpt.site; source c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b, deployment appgdep_6ace36ed4f988191aad661fa4bb63ff6, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_67852fdff6788191a59e7b785d19b7d8. Anonymous HTTPS GET returned 200 for eight HTML pages and two valid XML feeds with expected MIME. Homepage/features/roadmap/devlog show current app source 816bbb4; downloads remain NO RELEASE.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
-    "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source."
+    "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
+    "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -241,8 +242,8 @@
       "expected": "Только user opt-in; disable реально отменяет регистрацию; no hidden daemon.",
       "method": "native supported OS",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Targeted APP25 policy test passed 1/1 locally on Xcode 27.0 / Swift 6.4. It covers eight combinations of requested state and SMAppService-derived state (not registered, requires approval, enabled, unavailable). Exact-source CI 38407467618 succeeded; pinned TDLib/Dev.app workflow 38407466662 succeeded and assembled/verified an arm64 bundle but did not launch the app. macOS Login Items registration persistence/removal was not exercised; APP25 remains partial."
     },
     {
       "id": "APP26",
@@ -394,8 +395,8 @@
       "expected": "Source/dist/archive/devlog исключают credentials, sessions, messages, raw logs и private receipt.",
       "method": "allowlist+secret scan",
       "required_for": "all public actions",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review."
     },
     {
       "id": "AUTH01",
@@ -454,31 +455,31 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-oversize-check",
-    "local_result": "136/136 Swift tests passed on Xcode 27.0 / Swift 6.4 / macOS 27 SDK; AppKit and C bridge targets compiled.",
-    "hosted_ci": "Exact-source macOS CI 38395900507 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172.",
-    "native_dev_app_smoke": "Pinned TDLib and Dev.app workflow 38395900428 succeeded for exact source 6c6fff49d6c43746b3990de178b723d1eaf75172: arm64 Dev.app built, first-run UI launched, screenshot captured, app quit; no credentials or Telegram account.",
-    "scope": "Synthetic source/build verification only. Real update overload, real login, 20-account coverage, Developer ID/notarization, and app release remain unverified.",
-    "branding": "NeTelegram restored as public product/repository name in app UI, GitHub README, and Site copy. Telegram API Terms §2.3 title condition remains open; the non-affiliation note does not waive it.",
-    "seo": "Live search-result wording reviewed for RU/EN alternatives and unofficial macOS Telegram client phrases; volumes/rankings not measured.",
-    "publication": "GitHub app source 6c6fff49d6c43746b3990de178b723d1eaf75172 and docs/checkpoint 38f813b pushed. Public Site v117 saved/deployed from fb9b464c8ae2cbfc687e261cdf3f23237a72152e; deployment appgdep_6ace2262df1481919c809da66416f943; anonymous route checks passed. App downloads remain absent."
+    "source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app25-policy-check --filter loginItemPreferencePolicyOnlyRegistersAfterExplicitOptIn",
+    "local_result": "1/1 targeted APP25 policy test passed on Xcode 27.0 / Swift 6.4; AppKit executable target compiled as part of SwiftPM build.",
+    "hosted_ci": "Exact-source macOS CI 38407467618 succeeded for 816bbb4ab2a61817cc3da0780f47219b1f8f52e9; pinned TDLib/Dev.app workflow 38407466662 succeeded.",
+    "native_dev_app_smoke": "The pinned workflow assembled and verified arm64 Dev.app but did not launch it and did not exercise Login Items.",
+    "scope": "Synthetic status/action policy test only. Real OS registration persistence/removal, disposable-user login-item smoke, Telegram login, and account coverage remain unverified.",
+    "branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
+    "seo": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
+    "publication": "Public Site v122 live at https://netelegram.iryadom.chatgpt.site; source c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b, deployment appgdep_6ace36ed4f988191aad661fa4bb63ff6, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_67852fdff6788191a59e7b785d19b7d8. Anonymous HTTPS GET returned 200 for eight HTML pages and two valid XML feeds with expected MIME. Homepage/features/roadmap/devlog show current app source 816bbb4; downloads remain NO RELEASE."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 117,
-    "source_commit": "fb9b464c8ae2cbfc687e261cdf3f23237a72152e",
-    "deployment_id": "appgdep_6ace2262df1481919c809da66416f943",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_fc454aa46d24819186ce0f8e6adf2a66",
+    "version": 122,
+    "source_commit": "c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b",
+    "deployment_id": "appgdep_6ace36ed4f988191aad661fa4bb63ff6",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_67852fdff6788191a59e7b785d19b7d8",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "f3eb746950bfc65bf0d72309ddb5026eed7028d28eb4a88bd715f3320577bad4",
-    "sites_archive_content_hash": "sha256:e6fba23d3b2d06873f394483357eafb6a9a0889679014a9e0727a27a80de16b8",
-    "archive_bytes": 273073,
+    "archive_sha256": "bab59f286f6fcfa40fcf03a91607597d290cd77773d05c9ec84bdb2283e4435e",
+    "sites_archive_content_hash": "sha256:b3f0e2f29a37f01e86d47571b48c3061d761a86630caca3270bc4436dc4fe19b",
+    "archive_bytes": 450560,
     "archive_file_count": 14,
-    "description": "NeTelegram bilingual public development pages. The download route clearly says there is no app release; empty alpha/stable RSS feeds remain valid. No binary was uploaded. The RU/EN devlog records the 16 MiB TDLib event bound and exact-SHA test evidence.",
-    "public_verification": "Anonymous system-curl: /, /features/, /roadmap/, /devlog/, /downloads/ returned 200 text/html; /updates/stable.xml returned 200 text/xml and valid empty RSS. Public audience preserved."
+    "description": "Site v122 publishes the APP25 policy milestone and scoped secret-scan evidence; downloads remain unavailable.",
+    "public_verification": "Anonymous HTTPS GET verified 8 HTML routes (200 text/html) and /updates/stable.xml plus /updates/alpha.xml (200 text/xml, valid empty XML). Current app-source SHA appears on homepage, features, roadmap, and devlog."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -489,11 +490,11 @@
   },
   "latest_source_audit": {
     "date": "2026-10-13",
-    "source_commit": "6c6fff49d6c43746b3990de178b723d1eaf75172",
-    "change": "C receive bridge rejects TDLib JSON above 16 MiB before copying; update buffer rejects a single event larger than byteCapacity; gateway closes fail-closed and refuses later commands. Current project documentation uses NeTelegram consistently, and prior alternate-name wording is marked superseded.",
-    "local_checks": "136/136 serial Swift tests; JSON checkpoint validation and git diff --check passed.",
-    "hosted_checks": "macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 succeeded for exact source 6c6fff49d6c43746b3990de178b723d1eaf75172.",
-    "site_check": "Public Site v117 https://netelegram.iryadom.chatgpt.site, source fb9b464c8ae2cbfc687e261cdf3f23237a72152e, deployment appgdep_6ace2262df1481919c809da66416f943; anonymous routes verified."
+    "source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
+    "change": "Added a shared opt-in macOS Login Item policy, explicit post-register/unregister status checks, and APP25 policy tests. No hidden LaunchAgent is added.",
+    "local_checks": "1/1 focused APP25 test passed; Gitleaks 8.30.1 scanned all 241 commits and the current 218.92 MB source tree with no matches; exact v122 archive scan found no matches; 99 tracked-path review found no account/session/log data paths.",
+    "hosted_checks": "Exact-source macOS CI 38407467618 and pinned TDLib/Dev.app workflow 38407466662 succeeded. The latter assembled/verified but did not launch the app.",
+    "site_check": "Public Site v122 https://netelegram.iryadom.chatgpt.site, source c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b, deployment appgdep_6ace36ed4f988191aad661fa4bb63ff6; 8 HTML pages + 2 valid XML feeds returned 200 with expected MIME."
   },
   "latest_access_audit": {
     "date": "2026-10-13",
