@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public main is 0bca2e4. Exact-source local 82/82 tests, macOS CI 38332820495, and pinned TDLib/Dev.app workflow 38332820502 passed. The Dev bundle now verifies and displays source identity. Public Site v66 still describes earlier app code and must be synchronized. Real accounts, all-20, Telegram compatibility, signing/notarization, updater and stable release gates remain open.",
+  "status": "implementation_in_progress; app source 24c1f31 passed 101/101 local Swift tests, exact-source macOS CI 38348346825, and pinned TDLib/Dev.app smoke 38348346880. Public Site v88 and full website mirror 66ff0df are live. Real accounts, 20-session measurements, Telegram compatibility, Developer ID/notarization, updater and stable release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -63,7 +63,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "TDLib notification routing preserves account/chat/typed-topic identity; privacy lock reconciliation tests remain in the exact-source 73/73 suite on af0909144eee2e4c79d22e2afc1bc88ad75ea1dc. macOS CI 38326759399 and native clean-launch CI 38326759481 pass. Native Notification Center clicks, real notifications, OS permission behavior and duplicate-sound behavior remain unverified."
+      "evidence": "TDLib notification routing preserves account/chat/typed-topic identity. Exact-source 101/101 suite passed; app commit 24c1f31 passed macOS CI 38348346825 and pinned TDLib/isolated Dev.app workflow 38348346880. Native Notification Center clicks, real notifications, OS permission behavior and duplicate sounds remain unverified."
     },
     {
       "id": "APP08",
@@ -72,7 +72,7 @@
       "method": "fault+native Notification Center",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "notificationPublicationIsSerializedWithPrivacyLock and lockedNotificationHandoff tests remain in exact-source 73/73 suite on af0909144eee2e4c79d22e2afc1bc88ad75ea1dc. Native UNUserNotificationCenter removal/reconcile races and real preview observation remain unrun."
+      "evidence": "Notification publication remains serialized with the privacy barrier. New AccountNotificationCleanup removes only the closed account IDs/routes; accountNotificationCleanupRemovesOnlyClosedAccountsRoutes passes in exact-source 101/101 suite at 24c1f31. Native Notification Center removal/reconcile races and a real account close remain unverified."
     },
     {
       "id": "APP09",
@@ -410,37 +410,37 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "a90ab3da92ee97ff8f74413beae222fb2ad81908",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-swift-cache/build",
-    "local_result": "84/84 Swift Testing tests passed on arm64 macOS; git diff --check passed. New test verifies conversation restoration routing for authorized identity versus empty/reauth states. Synthetic only; no local app launch.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38334933662 ; https://github.com/AffPapa/NeTelegram/actions/runs/38334933666",
-    "hosted_result": "Both workflows completed successfully for exact source commit a90ab3da92ee97ff8f74413beae222fb2ad81908. macOS CI passed; pinned TDLib/arm64 Dev.app workflow passed. Review artifact only; no local app launch or login.",
+    "source_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
+    "local_command": "swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
+    "local_result": "101/101 Swift Testing tests passed; app and test products compiled; git diff --check passed. New deterministic test verifies account-scoped notification route cleanup.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38348346825 ; https://github.com/AffPapa/NeTelegram/actions/runs/38348346880",
+    "hosted_result": "Both exact-source workflows succeeded. Pinned workflow built TDLib, verified and launched a clean isolated Dev.app, captured a first-run screenshot, and quit; this is accountless CI smoke, not real Telegram coverage.",
     "artifact": {
-      "workflow_run": 38334933666,
-      "source_commit": "a90ab3da92ee97ff8f74413beae222fb2ad81908",
-      "status": "review-only CI Dev.app artifact; not public distribution",
+      "workflow_run": 38348346880,
+      "source_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
+      "status": "review-only development artifact; not public distribution",
       "signature": "development CI; not a release"
     },
-    "scope": "No real Telegram login/read/send/logout (user deferred login); no real A→B→A or 20-account lifecycle/resource matrix, sleep/wake soak, full accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram title/basic-functionality/sponsored-video compatibility remain open.",
-    "publication": "App source a90ab3da92ee97ff8f74413beae222fb2ad81908 is public on AffPapa/NeTelegram main. Public Site v69 describes a90ab3d and 84/84 tests. No app tag or public binary download exists.",
-    "next_action": "Continue from the same canonical checkout and single Dev.app identity. Triage one evidence-backed P0 defect, implement once, run local checks, publish via the existing Git credential helper, verify exact-source CI, and synchronize the Site after CI. Keep APP03 partial until actual sequence/runtime checks are executed."
+    "scope": "No real Telegram login/read/send/logout (user deferred login); no live Notification Center, 20-account lifecycle/resource matrix, sleep/wake soak, full accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram title/basic-functionality/sponsored-video compatibility remain open.",
+    "publication": "App source 24c1f3191c861fca234bab5ded52503dee9c4205 is public on AffPapa/NeTelegram main; website-only mirror 66ff0dfe52f71566063e1b373c21c0ee1266583e. Public Site v88 describes current source. No app tag or public binary download exists.",
+    "next_action": "Continue from the canonical checkout, keep the user-deferred login deferred, and take the next evidence-backed native correctness issue through one regression, full suite, exact-source CI/Dev.app smoke, factual Site update and complete website mirror. Keep APP07/08 partial until real Notification Center behavior is exercised."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 69,
-    "source_commit": "3312f1e6e7e1bd16194d60497498c978e2ebdc34",
-    "deployment_id": "appgdep_6acd9228e0648191afc409ff95aa1932",
+    "version": 88,
+    "source_commit": "7b07c68696599dc3fa3e12021eeafe3e54095fc3",
+    "deployment_id": "appgdep_6acdb925875881919d281fb9a5282010",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "description": "Devlog/home/features reference app a90ab3d and 84/84 tests. Anonymous /, /features/, /devlog/, /downloads/ returned HTTP 200 text/html. No installable app link."
+    "description": "Homepage, features and devlog describe app 24c1f31, 101/101 local tests, exact workflow results and remaining real-account limits. Anonymous home/features/devlog/downloads returned 200 text/html; alpha/stable feeds returned 200 text/xml and parsed. No installable app link."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "base_commit": "d3868b8793083ac28bde17dc0247ffef5e4e9453",
-    "tests": "84/84 Swift Testing tests passed on arm64 macOS; account restoration routing test added; git diff --check passed.",
-    "hosted_ci": "Both exact-source workflows passed: https://github.com/AffPapa/NeTelegram/actions/runs/38334933662 and https://github.com/AffPapa/NeTelegram/actions/runs/38334933666.",
-    "site": "Public Site v69 describes app source a90ab3d and 84/84.",
-    "scope": "Returning to an authorized account with a remembered chat calls existing openChat; no native A→B→A test or real accounts. No local app launch."
+    "base_commit": "24c1f3191c861fca234bab5ded52503dee9c4205",
+    "tests": "101/101 Swift Testing tests passed; NeTelegram executable/test products compiled; git diff --check passed.",
+    "hosted_ci": "Exact-source workflows passed: https://github.com/AffPapa/NeTelegram/actions/runs/38348346825 and https://github.com/AffPapa/NeTelegram/actions/runs/38348346880.",
+    "site": "Public Site v88 and GitHub website mirror 66ff0df describe 24c1f31 and 101/101.",
+    "scope": "Closed-runtime notification cleanup is unit-tested and CI Dev.app clean-launch smoke passed; real Notification Center/account lifecycle and all-20 runtime coverage remain unverified. No local sign/notarize or public installer."
   }
 }
