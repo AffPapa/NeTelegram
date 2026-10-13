@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 24c1f31 passed 101/101 local Swift tests, exact-source macOS CI 38348346825, and pinned TDLib/Dev.app smoke 38348346880. App-source 1f1615e corrects/pins build-only gperf 3.0.3; exact-source macOS CI 38349233905 passed while pinned TDLib/Dev.app build 38349233892 remains in progress. Public Site v89 and full website mirror are live. Real accounts, 20-session measurements, Telegram compatibility, Developer ID/notarization, updater and stable release gates remain open.",
+  "status": "implementation_in_progress; app-source 24c1f31 passed 101/101 local Swift tests and exact workflows. App-source 1f1615e pins/verifies build-only gperf 3.0.3; exact-source macOS CI 38349233905 and pinned TDLib/arm64 Dev.app workflow 38349233892 succeeded. Public Site v90 and full website mirror are live. Real-account coverage, 20-session measurements, Telegram compatibility, Developer ID/notarization, updater and stable release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -423,19 +423,29 @@
     },
     "scope": "No real Telegram login/read/send/logout (user deferred login); no live Notification Center, 20-account lifecycle/resource matrix, sleep/wake soak, full accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram title/basic-functionality/sponsored-video compatibility remain open.",
     "publication": "App source 24c1f3191c861fca234bab5ded52503dee9c4205 is public on AffPapa/NeTelegram main; website-only mirror 66ff0dfe52f71566063e1b373c21c0ee1266583e. Public Site v88 describes current source. No app tag or public binary download exists.",
-    "next_action": "Poll the existing exact-SHA pinned TDLib/Dev.app workflow 38349233892 without rerunning it. Keep its status factual in Site/GitHub evidence; continue one native correctness slice after it completes, then real login remains user-deferred."
+    "next_action": "Continue one native correctness slice from the canonical checkout, run focused regression plus exact-source CI/Dev.app workflow. Real Telegram login remains deferred at user request; do not initiate it."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 89,
-    "source_commit": "cc02d02445d70e94fe7235f8266babdb494ec1ae",
-    "deployment_id": "appgdep_6acdbfb7210c8191990f2385ea6191e7",
+    "version": 90,
+    "source_commit": "2f8e5c195006c43db486640aa75bc4033b3eb735",
+    "deployment_id": "appgdep_6acdc0a71f0c8191ad141663d632a78f",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "f349d706f8744d2e03ed780b37825e4dc6a7b5d08543c6295964ed21917d1337",
-    "sites_archive_content_hash": "sha256:42598c9f0fbc9319d47b17446d8fef89b261cd8adbc93ce77ce8ecd58c9b330d",
-    "description": "Devlog records gperf inventory/build pin and clearly says exact-source macOS CI passed while pinned TDLib/Dev.app rebuild remained in progress. Roadmap and source/license page updated. Anonymous HTTPS validation: /, /features/, /devlog/, /downloads/, /roadmap/, /source/ returned 200 text/html; /updates/alpha.xml and /updates/stable.xml returned 200 text/xml and parsed as XML. Downloads explicitly says NO RELEASE. Full dist is mirrored in website/dist; this commit is the pending GitHub mirror commit."
+    "archive_sha256": "a7125607a481e2dac000ce601b705e2117374daee2199f1832368c3d774d8ba4",
+    "sites_archive_content_hash": "sha256:cfcad2adf91d2aec7d149a2c196edfce3d896322a683540e9d8c99327a976020",
+    "public_page_sha256": {
+      "/": "e8ebed5f12f4e0c5f5115c20efb420db6d08999902b09e0219d55a0009505440",
+      "/features/": "05f8728794147ce1bb3ec38cb306f4a175d81010e3874ba080987f92dcc350ef",
+      "/devlog/": "fefbabef567281409a6085c8401925e846de052927f0eadd562c92a2e0b84b1d",
+      "/downloads/": "5fb99a22a57d463cd3591dec65b22fbc0d9f1e15b3351415c7a60902ae9decca",
+      "/roadmap/": "59efc6d41d58925f7bb4be104eedfee3dc0343e1bb91221df9a62c53f4672da7",
+      "/source/": "2285ae8f7d0b5ecf7ac22a9495dc546838edccd5e6dafe5605f176309dad8e07",
+      "/updates/alpha.xml": "23cced0c8efd2d323d6b1ed32258999b285d153b94c1f907f3fa0334404008ec",
+      "/updates/stable.xml": "f4a2bfb6f913dce21dc63590fad66ae926189a8e8beda1cf871fa1fd03e91555"
+    },
+    "description": "Anonymous HTTPS checks after v90: six HTML routes returned 200 text/html; alpha/stable feeds returned 200 text/xml and parsed. Devlog records successful exact-source macOS CI and pinned TDLib/Dev.app accountless smoke. Downloads explicitly says NO RELEASE. Entire Site dist is mirrored in website/dist; public app remains unreleased."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -457,7 +467,7 @@
     },
     "pinned_tdlib_devapp": {
       "run_id": 38349233892,
-      "status": "in_progress at 2026-10-13T05:17:44Z; build and verify pinned TDLib step",
+      "status": "success for exact SHA; pinned TDLib built, arm64 Dev.app verified, clean first run screenshot captured, app quit successfully; accountless smoke only",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38349233892"
     },
     "scope": "No account login or release verification; pinned native rebuild is not yet a pass."
