@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; product source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51. Workflow baseline 40ca82e5065456b1ab98f675963682bf846da9a4 passed 151 serial Swift tests; separate metadata validation passed. Pinned TDLib/arm64 Dev.app lifecycle smoke passed accountlessly on the same product source. Public Site v150. Real accounts, 20-runtime certification, signed distribution and Telegram compatibility gates remain open.",
+  "status": "implementation_in_progress; app source 78d96212b45df18f5a5aea206a467ff397d273b4. Exact local build, 151 serial CI tests, metadata validation, and pinned TDLib/arm64 Dev.app lifecycle smoke passed; native smoke is accountless. Public Site v150. Telegram title/sponsored video/basic-functionality gates, real accounts/20-runtime certification and signed distribution remain open.",
   "current_evidence": {
-    "app_source_commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
-    "app_tests": "Exact repository/workflow commit 40ca82e5065456b1ab98f675963682bf846da9a4 passed 151/151 serial Swift tests in GitHub Actions run 38452464811 in 47 seconds (macOS 15 / Xcode 16.4 / Swift 6.1.2). Dedicated metadata run 38452464851 validated JSON. Local serial 151/151 in 1.27 seconds on Xcode 27 / Swift 6.4 remains valid for its recorded source. Docs-only updates are excluded from Swift CI.",
+    "app_source_commit": "78d96212b45df18f5a5aea206a467ff397d273b4",
+    "app_tests": "Exact-source GitHub macOS CI run 38453959840 passed 151/151 Swift tests serially in 53 seconds on macOS 15 / Xcode 16.4 / Swift 6.1.2. Local AppKit/Core build on Xcode 27 / Swift 6.4 passed in 5.69 seconds. Dedicated metadata validator run 38453959743 passed.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38452464811",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38452464851",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38451242039"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38453959840",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38453959743",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38453959931"
     ],
-    "native_smoke": "Pinned TDLib/arm64 Dev.app run 38451242039 succeeded for app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51 at workflow commit e032b497d4e9d2eb12718dfb4f0c500b7acbaffc. Dependency build, isolated bundle assembly, close/reopen/quit smoke and artifact upload passed; accountless only.",
+    "native_smoke": "Exact-source pinned TDLib/arm64 Dev.app workflow 38453959931 succeeded: pinned dependency, isolated bundle verification, first-run image capture, last-window close, LaunchServices reopen/same PID, normal quit and artifact upload. Accountless; screenshot image was captured but not visually reviewed.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
@@ -22,7 +22,8 @@
     "github_release_inventory": "GitHub REST GET https://api.github.com/repos/AffPapa/NeTelegram/releases?per_page=100 returned an empty release list. No public application release exists.",
     "native_dev_app_smoke": "Exact-source pinned TDLib/arm64 Dev.app workflow 38444116358 succeeded for app-source 86855e4599ae4dc9d00274c07331617ddc5b3684. Pinned dependency and isolated app assembly/verification passed; it is accountless packaging evidence, not a real login or 20-runtime test.",
     "previous_native_smoke_correction": "Workflow 38431733910 did run Scripts/window-lifecycle-smoke.sh: its logs report last-window close, LaunchServices reopen in the same PID, one-window state and quit. This is accountless only.",
-    "app_build": "Exact HEAD AppKit build passed: swift build using /private/tmp/netelegram-swiftpm-cache on Xcode 27.0 / Swift 6.4 (4.69 seconds). The only code change since 0fc9e86 clarifies non-affiliation text on the sign-in screen; no local account data or Telegram clients were opened."
+    "app_build": "Exact HEAD AppKit build passed: swift build using /private/tmp/netelegram-swiftpm-cache on Xcode 27.0 / Swift 6.4 (4.69 seconds). The only code change since 0fc9e86 clarifies non-affiliation text on the sign-in screen; no local account data or Telegram clients were opened.",
+    "telegram_api_compatibility": "Primary current Terms and exact pinned TDLib schema rechecked 2026-10-14. App intro now says it uses Telegram API/TDLib and belongs to the Telegram ecosystem, while stating no direct affiliation. Terms §2.3 title conflict remains; §3.3 sponsored video is required for channel access, and user declined a video player; stable channel access is deferred. Terms §§1.3/1.4 basic functionality review remains open."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -294,7 +295,7 @@
       "method": "primary docs+implementation review",
       "required_for": "all public app releases",
       "status": "partial",
-      "evidence": "Historical identity/name evidence has been superseded by the user's later direction that the product name is NeTelegram; a quick web collision search is not trademark clearance. Telegram API Terms §1.3/1.4 base-functionality review is not complete. The local candidate adds text/photo sponsored cards and reporting, and now sends TDLib viewMessages for supported sponsored cards only after the complete text block is in the viewport. The pinned TDLib schema has no dedicated viewSponsoredMessage function; viewMessages is the supported abstraction and its pinned implementation forwards the sponsored view call. Sponsored animation/video handling, Telegram deep-link routing, and mandatory sponsored-video playback/timing remain incomplete. The user declined a scoped sponsored-video player and authorized deferring channel access or stable release. Channel support and stable compatibility are therefore release-blocked. No Telegram compatibility or stable-release pass is claimed. Official references: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, pinned TDLib schema and SponsoredMessageManager.cpp at c15d3f5a5de6e3ba5839822c451152e5e18bb700. On 2026-10-14, rechecked the primary current Terms page and the exact pinned TDLib v1.8.68 schema at c15d3f5a5de6e3ba5839822c451152e5e18bb700. Terms §2.2 requires a prominent statement that the app uses Telegram API and is part of the Telegram ecosystem; the auth intro now states both ecosystem membership and API/TDLib use while retaining the no-affiliation disclosure. Terms §2.3 still conflicts with the requested exact public title NeTelegram. The pinned TDLib schema supports sponsored channel message, video media, and timed video-message advertisements (`getChatSponsoredMessages`, `getVideoMessageAdvertisements`, view/click/report methods); because the user declined a video player, channel access/stable release remains deferred. Terms §1.3/1.4 provide no enumerated minimum-feature checklist on the page, so basic-functionality compatibility remains an open review rather than a guessed PASS. Official sources: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, https://raw.githubusercontent.com/tdlib/td/c15d3f5a5de6e3ba5839822c451152e5e18bb700/td/generate/scheme/td_api.tl."
+      "evidence": "Historical identity/name evidence has been superseded by the user's later direction that the product name is NeTelegram; a quick web collision search is not trademark clearance. Telegram API Terms §1.3/1.4 base-functionality review is not complete. The local candidate adds text/photo sponsored cards and reporting, and now sends TDLib viewMessages for supported sponsored cards only after the complete text block is in the viewport. The pinned TDLib schema has no dedicated viewSponsoredMessage function; viewMessages is the supported abstraction and its pinned implementation forwards the sponsored view call. Sponsored animation/video handling, Telegram deep-link routing, and mandatory sponsored-video playback/timing remain incomplete. The user declined a scoped sponsored-video player and authorized deferring channel access or stable release. Channel support and stable compatibility are therefore release-blocked. No Telegram compatibility or stable-release pass is claimed. Official references: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, pinned TDLib schema and SponsoredMessageManager.cpp at c15d3f5a5de6e3ba5839822c451152e5e18bb700. On 2026-10-14, rechecked the primary current Terms page and the exact pinned TDLib v1.8.68 schema at c15d3f5a5de6e3ba5839822c451152e5e18bb700. Terms §2.2 requires a prominent statement that the app uses Telegram API and is part of the Telegram ecosystem; the auth intro now states both ecosystem membership and API/TDLib use while retaining the no-affiliation disclosure. Terms §2.3 still conflicts with the requested exact public title NeTelegram. The pinned TDLib schema supports sponsored channel message, video media, and timed video-message advertisements (`getChatSponsoredMessages`, `getVideoMessageAdvertisements`, view/click/report methods); because the user declined a video player, channel access/stable release remains deferred. Terms §1.3/1.4 provide no enumerated minimum-feature checklist on the page, so basic-functionality compatibility remains an open review rather than a guessed PASS. Official sources: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, https://raw.githubusercontent.com/tdlib/td/c15d3f5a5de6e3ba5839822c451152e5e18bb700/td/generate/scheme/td_api.tl. Exact-source local build, all 151 serial hosted tests, JSON validation, and pinned TDLib/arm64 accountless Dev.app lifecycle smoke passed for app source 78d96212b45df18f5a5aea206a467ff397d273b4 (runs 38453959840, 38453959743, 38453959931). This verifies the disclosure change compiles and the native app launches/closes; it does not satisfy the title, sponsored-video, basic-feature, account, or stable-release gates."
     },
     {
       "id": "REL02",
@@ -461,14 +462,14 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "40ca82e5065456b1ab98f675963682bf846da9a4",
-    "app_source_commit": "4e96a1556e6cd5f74d0cabeb651e21fa64793b51",
-    "local_command": "env SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --no-parallel --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "Previously recorded exact base serial suite passed 151/151 in 1.27 seconds on Xcode 27 / Swift 6.4; not rerun for workflow-only changes.",
-    "hosted_ci": "Exact repository/workflow commit 40ca82e5065456b1ab98f675963682bf846da9a4 passed all 151 Swift tests in serial mode in run 38452464811; job duration 47 seconds.",
-    "metadata_validation": "Dedicated JSON-only workflow run 38452464851 passed all configured JSON syntax checks.",
-    "native_dev_app_smoke": "Pinned TDLib/arm64 Dev.app run 38451242039 passed for app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51 at workflow commit e032b497d4e9d2eb12718dfb4f0c500b7acbaffc; accountless close/reopen/quit.",
-    "scope": "Workflow trigger optimization and checkpoint reconciliation only. No app code, profile data, login credentials, Site, or release assets changed."
+    "source_commit": "78d96212b45df18f5a5aea206a467ff397d273b4",
+    "app_source_commit": "78d96212b45df18f5a5aea206a467ff397d273b4",
+    "local_command": "env SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift build --scratch-path /private/tmp/netelegram-swiftpm-cache",
+    "local_result": "AppKit/Core build passed on Xcode 27 / Swift 6.4 in 5.69 seconds.",
+    "hosted_ci": "Exact source 78d96212b45df18f5a5aea206a467ff397d273b4 passed 151/151 serial tests in 53 seconds on macOS 15 / Xcode 16.4 / Swift 6.1.2, run 38453959840.",
+    "metadata_validation": "Run 38453959743 passed dedicated metadata checks.",
+    "native_dev_app_smoke": "Run 38453959931 passed pinned TDLib/arm64 Dev.app bundle verification, first-run capture, accountless last-window close/reopen/same-PID and normal quit for exact source 78d96212b45df18f5a5aea206a467ff397d273b4.",
+    "scope": "Clarified in-app Telegram ecosystem disclosure; refreshed compatibility-gate evidence. No real account or private account data accessed. No Site deploy or app release."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -507,5 +508,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Review the exact-source Dev.app screenshot artifact for app source 4e96a155, then capture/review accountless code, 2FA, QR and registration states if harness supports those states. Only change AUTH03 layout where the native screenshots show a concrete defect; real account login remains user-deferred."
+  "next_action": "Continue the next concrete P0 app implementation from source 78d9621; do not rerun these passed gates absent changed inputs. AUTH03 native screenshot visual review remains pending. Preserve explicit blockers for real authorized accounts, 20-runtime measurements, Developer ID/notarization, Telegram title, sponsored video and basic functionality."
 }
