@@ -125,3 +125,10 @@
 - Gitleaks 8.30.1 scanned 241 commits (~5.15 MB), the current source tree (~218.91 MB), and saved Site v121/v122 archives (184,529 / 187,375 bytes); no known secret-pattern matches. A 99-file tracked-path inventory found no account sessions, databases, raw logs, certificates, or profile data. This is scanner and filename evidence, not a guarantee against arbitrary sensitive content. OPS02 stays partial pending a release-time asset/receipt allowlist review.
 - Public Site v122 is live: source `c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b`, saved version `appgprj_6acba85192e08191acdf7011928848cf~appgver_67852fdff6788191a59e7b785d19b7d8`, deployment `appgdep_6ace36ed4f988191aad661fa4bb63ff6`. Local archive SHA-256 `bab59f286f6fcfa40fcf03a91607597d290cd77773d05c9ec84bdb2283e4435e`; Sites content hash `sha256:b3f0e2f29a37f01e86d47571b48c3061d761a86630caca3270bc4436dc4fe19b`.
 - Anonymous validation returned 200 for all 8 HTML pages and both valid empty XML feeds, with expected MIME. The current app-source SHA is on homepage/features/roadmap/devlog. The download route still reports no release.
+
+## 2026-10-13 — Release preflight correction
+
+- Evidence: read-only `security find-identity -v -p codesigning` exited 0 and reported 0 valid identities / 0 Developer ID Application identities. Public GitHub REST releases endpoint returned an empty list.
+- Correction: supersedes the stale REL03 statement that four identities (including two Developer ID identities) were available. No key material or notary credentials were read.
+- Result: release remains unavailable; no signed/notarized build, Gatekeeper result, or public application download is claimed.
+- Also reconciled public Site state to v123; its download page still correctly says NO RELEASE.
