@@ -1,5 +1,10 @@
 # NeTelegram run log
 
+## 2026-10-13 — Native smoke checkpoint wording corrected
+
+- Re-read `.github/workflows/native-app.yml` and `Scripts/window-lifecycle-smoke.sh`, then checked the exact-source workflow artifact metadata. Workflow `38407466662` for app-source `816bbb4ab2a61817cc3da0780f47219b1f8f52e9` did launch the isolated Dev.app, capture a first-run screenshot, verify last-window close and same-PID LaunchServices reopen, and issue normal Cmd+Q.
+- Corrected APP04, AUTH03, and `PROJECT-STATE.json`: the smoke used temporary CI Application Support and no account; it does not prove live TDLib, real login, 20-profile operation, Keychain persistence, or visual quality of the captured screenshot. The previous “did not launch” checkpoint sentence was wrong.
+
 ## 2026-10-13 — Site v123 deployed and anonymously checked
 
 - Existing public Site project retained: `appgprj_6acba85192e08191acdf7011928848cf`; version 123 source `bbfa7c7df93f9bf2974291109a71f11ccaad80a4`, deployment `appgdep_6ace3a2734c881918019aefea91f33ee`, saved version `appgprj_6acba85192e08191acdf7011928848cf~appgver_4a7ee91928508191b97b4eb69d1e62ad`.

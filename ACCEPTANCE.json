@@ -54,7 +54,7 @@
       "method": "native AppKit",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At exact app-source SHA 13625c702e6dbd5d14b2f6d7d2acbf210806a8f3, pinned TDLib/Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38399172724 passed an accountless native AppKit lifecycle smoke: close the last titled user-facing window, confirm same PID survives with zero titled windows, open through LaunchServices, confirm exactly one titled window in the same PID, and normal Cmd+Q exits. Local Swift suite passed 136/136; exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38399172699 passed. Status remains partial: there was no authorized Telegram account, so continued background processing, notifications, and real 20-account lifecycle were not exercised."
+      "evidence": "Exact-source pinned TDLib workflow 38407466662 ran Dev.app built from app-source SHA 816bbb4ab2a61817cc3da0780f47219b1f8f52e9 with isolated CI Application Support. The smoke captured a first-run screenshot, verified one visible window, last-window close with the same process still alive and zero user-facing windows, LaunchServices reopen to one window in the same PID, then normal Cmd+Q. Status stays partial because this accountless CI smoke does not verify live TDLib runtimes, window behavior with authorized profiles, or actual save/close barriers for real accounts."
     },
     {
       "id": "APP05",
@@ -441,7 +441,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App source 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462 adds a centered adaptive AppKit card around phone/code/2FA/QR/registration and a Keychain-backed API hash setup entry point. Local Swift suite 128/128 passed. Exact-source CI 38384029589 and pinned TDLib/Dev.app workflow 38384029582 passed; the CI first-run screen was visually reviewed and published with SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45. It contains no profile UUID or user account. API hash entry is secure-field based and input validation is unit tested; actual macOS Keychain persistence and login are not tested. Dark appearance, minimum window, code/2FA/QR/registration, high contrast, VoiceOver and IME remain unverified."
+      "evidence": "App-source SHA 816bbb4ab2a61817cc3da0780f47219b1f8f52e9 contains a centered adaptive AppKit authentication card and the exact-source pinned TDLib/Dev.app workflow 38407466662 captured its accountless first-run screen in isolated CI. The screenshot was not visually re-reviewed in this checkpoint. Earlier source-matched first-run screen review is historical for 1b3d910. Dark appearance, minimum supported window, code/2FA/QR/registration layouts, high contrast, native VoiceOver and IME remain unverified; actual macOS Keychain persistence and login are not tested. Status stays partial."
     },
     {
       "id": "AUTH04",
