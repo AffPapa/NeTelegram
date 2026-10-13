@@ -603,3 +603,9 @@
 - Corrected `DEV-WORKFLOW.md`: exact cold/warm cache runs 38481765351 and 38481987804 both passed the probe and 157/157 suite; compile step measured 48.43s then 17.50s with a restored 51 MB cache. The result is explicitly not a guarantee of later cache hits.
 - Added a changed-path-to-check mapping so unchanged gates are reused and failures are investigated at the failing stage before retry. Documentation-only change; no Swift build, app launch, or Site deployment was needed.
 - Checks: `git diff --check`; `PROJECT-STATE.json` and `ACCEPTANCE.json` parsed successfully. CI trigger review confirms this file change does not run the Swift suite.
+
+## 2026-10-14 — Removed misattributed historical Site screenshot
+
+- Public devlog previously embedded an authentic but obsolete screenshot whose binary title showed a former working name; its alt text incorrectly called it the current NeTelegram UI. Removed the image and its packaged asset, retaining a brief bilingual explanation in the historical entry. No app source or app bundle changed.
+- Sites version 164 source `458e535ef2a81ff1a8ffe35a0428711d2a469d37` was saved and deployed to the existing public project `appgprj_6acba85192e08191acdf7011928848cf` as deployment `appgdep_6acebc95df188191a0a76fe5b408adbc`. Anonymous `/devlog/` returned 200 `text/html`; live content includes the correction and excludes the obsolete image path/name. Archive SHA-256 `604bcd6645f27b49b27e894db078968a486e45c3f2f938f6854769d7fb4dca88`, 185332 bytes; Sites saved archive hash `sha256:3959c3f17d243017cfe88cd6d82afced055bd4f44686343ed4686b40f2ed30df`, 419840 bytes.
+- Mirrored the two changed devlog files and removed asset into the NeTelegram app repository. This is Site content/checkpoint work only; no Swift build/test or Dev.app rebuild was run.

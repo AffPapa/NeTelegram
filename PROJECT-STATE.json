@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "App source 209be94 passes local and hosted serial suites 157/157; warm CI cache reduced the compile step from 48.43s to 17.50s in two measured runs. Public development Site v163 now records those exact results; anonymous /devlog returned 200 text/html. No app binary release.",
-  "verified_at": "2026-10-14T06:13:14+07:00",
+  "verified_at": "2026-10-14T06:20:42+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -288,7 +288,7 @@
     "github_releases": "empty list via public GitHub REST API",
     "result": "No release readiness; supersedes stale claim of four code-signing identities / two Developer ID identities."
   },
-  "latest_site_source_commit": "6e1d7be28feb32c651f60e352971a3f8d493a1ad",
+  "latest_site_source_commit": "458e535ef2a81ff1a8ffe35a0428711d2a469d37",
   "pending_publication": null,
   "latest_checkpoint_ci": {
     "run_id": 38470536609,
@@ -300,20 +300,20 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 162,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9487e710ff248191b1f497281a7797ff",
-    "source_commit": "6e1d7be28feb32c651f60e352971a3f8d493a1ad",
-    "app_repository_commit": "7f95e03c12457d522f2e7e50b3baa497db6e731d",
+    "version": 164,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_eb3a0b7bd7f081918427d509fff4a766",
+    "source_commit": "458e535ef2a81ff1a8ffe35a0428711d2a469d37",
+    "app_repository_commit": "dc9921f0cd2968e25b3d91156481eec72f172b34",
     "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-    "deployment_id": "appgdep_6aceb5a92a448191a0f3cf120850b40c",
+    "deployment_id": "appgdep_6acebc95df188191a0a76fe5b408adbc",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "local_archive_path": "/private/tmp/NeTelegram-site-v162.tar.gz",
-    "local_archive_sha256": "4d01f8f646db834a84ddc6160deea4fc9e91facb78d30223f342207a77293b80",
-    "local_archive_size_bytes": 295795,
-    "saved_archive_content_hash": "sha256:d02427da812a53a2d2eceb6f3d70960311edcf2617a808b7e59225e35234acc2",
-    "saved_archive_size_bytes": 542720,
-    "archive_file_count": 15,
-    "public_verification": "Deployment succeeded; anonymous HTTPS returned 200 text/html on all eight routes. Devlog corrects quit evidence for 7f95e03 and distinguishes unverified Cmd+Q. Downloads has no binary URL."
+    "local_archive_path": "/private/tmp/netelegram-site-v164.tar.gz",
+    "local_archive_sha256": "604bcd6645f27b49b27e894db078968a486e45c3f2f938f6854769d7fb4dca88",
+    "local_archive_size_bytes": 185332,
+    "saved_archive_content_hash": "sha256:3959c3f17d243017cfe88cd6d82afced055bd4f44686343ed4686b40f2ed30df",
+    "saved_archive_size_bytes": 419840,
+    "archive_file_count": 14,
+    "public_verification": "Deployment succeeded. Anonymous HTTPS /devlog/ returned 200 text/html; NeTelegram wording is present, and the superseded screenshot path and old working name are absent from the live page and packaged Site."
   }
 }
