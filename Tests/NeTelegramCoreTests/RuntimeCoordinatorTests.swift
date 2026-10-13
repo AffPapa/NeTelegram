@@ -1319,6 +1319,30 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func verifiedIdentityGateKeepsProfileBoundAcrossReauthorization() {
+    var gate = VerifiedIdentityGate(expectedUserID: 7101)
+    #expect(gate.verify(7101) == .accepted(7101))
+    #expect(gate.verifiedUserID == 7101)
+
+    gate.beginAuthorizationCycle()
+    #expect(gate.verifiedUserID == nil)
+    #expect(gate.expectedUserID == 7101)
+    #expect(gate.verify(8202) == .mismatch(expected: 7101, actual: 8202))
+    #expect(gate.verifiedUserID == nil)
+    #expect(gate.expectedUserID == 7101)
+    #expect(gate.verify(7101) == .accepted(7101))
+}
+
+@Test func verifiedIdentityGateBindsNewProfileOnlyToPositiveServerIdentity() {
+    var gate = VerifiedIdentityGate(expectedUserID: nil)
+    #expect(gate.verify(0) == .invalid)
+    #expect(gate.expectedUserID == nil)
+    #expect(gate.verify(9103) == .accepted(9103))
+    gate.beginAuthorizationCycle()
+    #expect(gate.verify(9103) == .accepted(9103))
+    #expect(gate.verify(9104) == .mismatch(expected: 9103, actual: 9104))
+}
+
 @Test func twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges() async throws {
     let profiles = (1...20).map { n in
         AccountProfile(

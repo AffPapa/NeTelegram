@@ -2055,34 +2055,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 )
             }
             guard !Task.isCancelled, !closingForTermination else { return }
-            do {
-                let draftStore = try EncryptedDraftStore(account: profile.id, stateDirectory: prepared.paths.appState, key: prepared.appStateKey)
-                draftStoresByAccount[profile.id] = draftStore
-                for (conversation, text) in try draftStore.load() { draftsByConversation[conversation] = text }
-                unavailableDraftAccounts.remove(profile.id)
-            } catch {
-                // Keep unreadable ciphertext intact and refuse edits that could overwrite it.
-                unavailableDraftAccounts.insert(profile.id)
-                setStatus("Черновики этого аккаунта не открыты; сохранённые данные не изменены.")
-            }
-            let outgoingPhotoStore = OutgoingPhotoManifestStore(
-                stateDirectory: prepared.paths.appState,
-                accountFilesDirectory: prepared.paths.files
-            )
-            outgoingPhotoManifestStoresByAccount[profile.id] = outgoingPhotoStore
-            do {
-                pendingStagedPhotoPaths[profile.id] = try outgoingPhotoStore.load()
-                unavailableOutgoingPhotoManifestAccounts.remove(profile.id)
-            } catch {
-                // Preserve the manifest and staged files; refuse new staged sends
-                // until the user can recover the account storage safely.
-                pendingStagedPhotoPaths[profile.id] = []
-                unavailableOutgoingPhotoManifestAccounts.insert(profile.id)
-                setStatus("Не удалось прочитать очередь фотографий аккаунта. Данные отправки сохранены.")
-            }
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
             guard !Task.isCancelled, !closingForTermination else { return }
-            let runtime = LocalAccountRuntime(account: profile.id, paths: prepared.paths, databaseKey: prepared.databaseKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
+            let runtime = LocalAccountRuntime(account: profile.id, expectedTelegramUserID: profile.telegramUserID, paths: prepared.paths, databaseKey: prepared.databaseKey, appStateKey: prepared.appStateKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
             startupRuntime = runtime
             let route = try runtime.registerRoute()
             try await runtimeCoordinator.registerBeforeFirstRequest(route)
@@ -2173,6 +2148,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
+    private func hydratePrivateAppState(for target: LocalAccountRuntime) {
+        guard !lockState,
+              target.telegramUserID != nil,
+              !target.identityMismatchDetected,
+              target.beginPrivateAppStateHydration() else { return }
+        do {
+            let store = try EncryptedDraftStore(
+                account: target.account,
+                stateDirectory: target.paths.appState,
+                key: target.appStateKey
+            )
+            draftStoresByAccount[target.account] = store
+            for (conversation, text) in try store.load() {
+                draftsByConversation[conversation] = text
+            }
+            unavailableDraftAccounts.remove(target.account)
+        } catch {
+            unavailableDraftAccounts.insert(target.account)
+            setStatus("Черновики этого аккаунта не открыты; сохранённые данные не изменены.")
+        }
+
+        let photoStore = OutgoingPhotoManifestStore(
+            stateDirectory: target.paths.appState,
+            accountFilesDirectory: target.paths.files
+        )
+        outgoingPhotoManifestStoresByAccount[target.account] = photoStore
+        do {
+            pendingStagedPhotoPaths[target.account] = try photoStore.load()
+            unavailableOutgoingPhotoManifestAccounts.remove(target.account)
+        } catch {
+            pendingStagedPhotoPaths[target.account] = []
+            unavailableOutgoingPhotoManifestAccounts.insert(target.account)
+            setStatus("Не удалось прочитать очередь фотографий аккаунта. Данные отправки сохранены.")
+        }
+    }
+
     private func receive(_ event: TDLibPipelineEvent, decodedDocument: TDLibJSONDocument? = nil) async {
         switch event {
         case .routingFailure(let error):
@@ -2192,6 +2203,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let previousError = target.lastTDLibError
             let previousIdentityPersistenceFailure = target.identityPersistenceFailed
             await target.consume(object)
+            if previousTelegramUserID != nil,
+               target.telegramUserID == nil,
+               !target.isLogoutRequested {
+                clearRevokedIdentityPresentation(for: target)
+            }
             if let verifiedUserID = target.telegramUserID,
                var profile = knownProfilesByAccount[target.account],
                profile.telegramUserID != verifiedUserID || profile.displayName != target.displayName {
@@ -2222,14 +2238,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     return
                 }
             }
-            if target === runtime, target.takeIdentityPersistenceFailureNotice() {
+            if target.takeIdentityPersistenceFailureNotice() {
                 if target.identityMismatchDetected {
-                    setStatus("Этот профиль связан с другой Telegram identity. Старые данные не переназначены; для новой учётной записи создайте отдельный профиль.")
-                } else {
+                    if target === runtime {
+                        setStatus("Этот профиль связан с другой Telegram identity. Старые данные не переназначены; для новой учётной записи создайте отдельный профиль.")
+                    }
+                    if let client = target.route?.client.value, target.requestCloseAfterIdentityMismatch() {
+                        pendingClosures.insert(client)
+                        await runtimeCoordinator.setState(.closing, for: target.account)
+                    }
+                } else if target === runtime {
                     setStatus("Аккаунт вошёл, но его серверная identity не сохранена. Повторный запуск не сможет восстановить этот профиль автоматически.")
                 }
             }
             if target.takeIdentityReadyTransition() {
+                hydratePrivateAppState(for: target)
                 configureNotifications(for: target)
                 if target === runtime {
                     target.loadMainChats()
@@ -2245,6 +2268,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         tdlibReceiveFailed = true
         refreshComposerState()
         setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите \(ProductIdentity.displayName) после освобождения памяти.")
+    }
+
+    private func clearRevokedIdentityPresentation(for target: LocalAccountRuntime) {
+        let account = target.account
+        persistDrafts(for: account)
+        target.invalidateMainChatSnapshot()
+        photoPipeline.cancelPreviews(for: account)
+        photoPipeline.removeCachedPreviews(for: account)
+        let notificationIDs = AccountNotificationCleanup.remove(
+            account: account,
+            identifiersByAccount: &notificationIDsByAccount,
+            targetsByIdentifier: &notificationTargets
+        )
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
+        chatRowsByAccount.removeValue(forKey: account)
+        chatOrderByAccount.removeValue(forKey: account)
+        messagesByConversation = messagesByConversation.filter { $0.key.account != account }
+        replyTargetsByConversation = replyTargetsByConversation.filter { $0.key.account != account }
+        selectedChatByAccount.removeValue(forKey: account)
+        forumTopicsByAccount.removeValue(forKey: account)
+        forumChatsByAccount.removeValue(forKey: account)
+        selectedForumTopicIDsByAccount.removeValue(forKey: account)
+        sendEligibilityByAccount.removeValue(forKey: account)
+        if target === runtime {
+            messageReadViewsByID.removeAll()
+            clearStack(chatList)
+            clearStack(messageList)
+            chatPane.isHidden = true
+            setComposerText("")
+            window.title = ProductIdentity.displayName
+            refreshComposerState()
+        }
     }
 
     private func handle(_ object: [String: Any], from target: LocalAccountRuntime) async {
@@ -6457,11 +6513,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.notificationUnlockHandoff.clear()
                     return
                 }
+                self.lockState = false
+                for accountRuntime in self.runtimesByAccount.values {
+                    self.hydratePrivateAppState(for: accountRuntime)
+                }
                 DraftPrivacyCache.unlock(
                     presentationDrafts: &self.draftsByConversation,
                     lockedDirtyDrafts: &self.lockedDirtyDraftRecovery
                 )
-                self.lockState = false
                 self.privacyDispatchBarrier.setLocked(false)
                 self.lockedView.isHidden = true
                 let pendingNotification = self.notificationUnlockHandoff.pending
@@ -6616,6 +6675,7 @@ private struct PhotoSendContext: Sendable {
 @MainActor
 private final class LocalAccountRuntime {
     let account: AccountUUID
+    let appStateKey: Data
     let paths: AccountStoragePaths
     let databaseKey: Data
     let apiHash: String
@@ -6630,6 +6690,10 @@ private final class LocalAccountRuntime {
     private(set) var isUnverifiedProfileRemovalRequested = false
     private var logoutFailureNotice = false
     private var didRequestCurrentUser = false
+    private var currentUserRequestExtra: String?
+    private var identityGate: VerifiedIdentityGate
+    private var privateAppStateHydrationAttempted = false
+    private var identityMismatchCloseRequested = false
     private var mainChatLoadState = ChatListLoadState()
     private var didSendTDLibParameters = false
     fileprivate var initializationRequestWasQueued: Bool { didSendTDLibParameters }
@@ -6642,10 +6706,12 @@ private final class LocalAccountRuntime {
     private(set) var telegramUserID: Int64?
     private(set) var displayName: String?
 
-    init(account: AccountUUID, paths: AccountStoragePaths, databaseKey: Data, apiHash: String, gateway: TDLibGateway, catalogue: AccountCatalogue, generation: RuntimeGeneration) {
+    init(account: AccountUUID, expectedTelegramUserID: Int64?, paths: AccountStoragePaths, databaseKey: Data, appStateKey: Data, apiHash: String, gateway: TDLibGateway, catalogue: AccountCatalogue, generation: RuntimeGeneration) {
         self.account = account
+        self.identityGate = VerifiedIdentityGate(expectedUserID: expectedTelegramUserID)
         self.paths = paths
         self.databaseKey = databaseKey
+        self.appStateKey = appStateKey
         self.apiHash = apiHash
         self.gateway = gateway
         self.catalogue = catalogue
@@ -6656,6 +6722,18 @@ private final class LocalAccountRuntime {
         let route = RuntimeRoute(account: account, generation: generation, client: try gateway.createClientID())
         self.route = route
         return route
+    }
+
+    func beginPrivateAppStateHydration() -> Bool {
+        guard !privateAppStateHydrationAttempted else { return false }
+        privateAppStateHydrationAttempted = true
+        return true
+    }
+
+    func requestCloseAfterIdentityMismatch() -> Bool {
+        guard identityMismatchDetected, !identityMismatchCloseRequested else { return false }
+        identityMismatchCloseRequested = close()
+        return identityMismatchCloseRequested
     }
 
     func send(_ request: [String: Any]) throws {
@@ -6729,13 +6807,35 @@ private final class LocalAccountRuntime {
         if object["@type"] as? String == "updateAuthorizationState",
            let authorization = object["authorization_state"] as? [String: Any],
            let state = authorization["@type"] as? String {
+            let previousState = authorizationState
+            if previousState == "authorizationStateReady",
+               state != "authorizationStateReady",
+               state != "authorizationStateLoggingOut",
+               !isLogoutRequested {
+                identityGate.beginAuthorizationCycle()
+                telegramUserID = nil
+                displayName = nil
+                didRequestCurrentUser = false
+                currentUserRequestExtra = nil
+                identityReadyTransitionConsumed = false
+                identityPersistenceFailed = false
+                identityMismatchDetected = false
+                identityPersistenceFailureNoticeShown = false
+            }
             authorizationState = state
             if state == "authorizationStateLoggingOut", isLogoutRequested {
                 logoutWasAccepted = true
             }
             if state == "authorizationStateReady", !didRequestCurrentUser {
-                didRequestCurrentUser = true
-                try? send(["@type": "getMe"])
+                let extra = "identity-\(account.id.uuidString.lowercased())-\(generation.value)-\(UUID().uuidString.lowercased())"
+                do {
+                    try send(["@type": "getMe", "@extra": extra])
+                    didRequestCurrentUser = true
+                    currentUserRequestExtra = extra
+                } catch {
+                    lastTDLibError = "Current Telegram identity request could not be queued"
+                    identityPersistenceFailed = true
+                }
             }
         } else if object["@type"] as? String == "ok",
                   object["@extra"] as? String == logoutExtra {
@@ -6749,12 +6849,25 @@ private final class LocalAccountRuntime {
             }
             lastTDLibError = "TDLib error \(object["code"] ?? "unknown")"
         } else if object["@type"] as? String == "user" {
+            guard authorizationState == "authorizationStateReady",
+                  let expectedExtra = currentUserRequestExtra,
+                  object["@extra"] as? String == expectedExtra else { return }
+            currentUserRequestExtra = nil
             let names = [object["first_name"] as? String, object["last_name"] as? String]
                 .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
             guard let telegramUserID = (object["id"] as? NSNumber)?.int64Value, telegramUserID > 0 else {
                 lastTDLibError = "Telegram returned a user without a positive numeric identity"
                 identityPersistenceFailed = true
+                return
+            }
+            switch identityGate.verify(telegramUserID) {
+            case .accepted:
+                break
+            case .mismatch, .invalid:
+                lastTDLibError = "Telegram identity mismatch for this local profile"
+                identityPersistenceFailed = true
+                identityMismatchDetected = true
                 return
             }
             do {
