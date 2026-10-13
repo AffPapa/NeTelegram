@@ -31,7 +31,10 @@ jobs:
     # This suite contains cancellation/continuation scheduling tests. Keep
     # test execution serialized so runner scheduling cannot strand a test.
     runs-on: macos-15
-    timeout-minutes: 10
+    # The serial suite normally completes in under a minute. Bound silent
+    # Swift Testing startup stalls so a wedged runner fails fast enough to
+    # diagnose rather than consuming ten minutes without test output.
+    timeout-minutes: 5
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,4 +46,6 @@ jobs:
           uname -m
 
       - name: Build app and run core tests
-        run: swift test --no-parallel
+        # Keep the concurrency-sensitive suite serial. Verbose driver output
+        # makes the handoff from build/link to test-runner startup observable.
+        run: swift test --no-parallel --verbose

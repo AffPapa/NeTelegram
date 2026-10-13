@@ -5,10 +5,19 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 ## Test cadence
 
 1. Complete one related vertical slice before rebuilding.
-2. Run the existing `swift test` suite once at that boundary; do not rerun it when inputs have not changed.
-3. Launch the canonical development bundle only for auth, lifecycle, or visible UI changes. Record its build fingerprint and the single scenario checked. Do not use `swift run` to start a second app instance.
-4. Keep real-account checks separate from synthetic tests. Never seed fake Telegram identities or read installed Telegram app data.
-5. Report test count and scenario coverage accurately. A passing synthetic suite does not prove real login, send, multi-account behavior, sleep/wake recovery, or a signed release.
+2. Use the lightest check that answers the current question while editing; run the full existing serial `swift test` suite once after the slice is complete and before commit. Do not repeat it when source and harness inputs are unchanged.
+3. The hosted macOS suite is the exact-source test gate. Its normal elapsed time is about 50 seconds; it stays serial because parallel execution stranded a continuation test. If a runner stalls, inspect the exact job log first. One same-SHA rerun is appropriate only after diagnosis; do not repeat runs or make product edits without failure evidence.
+4. Launch the canonical development bundle only for auth, lifecycle, or visible UI changes. Record its build fingerprint and the single scenario checked. Do not use `swift run` to start a second app instance.
+5. The pinned TDLib/Dev.app workflow is the expensive packaging/lifecycle gate. Run it for app/runtime changes that need native bundle evidence, dependency/build-script changes, and release candidates; skip it for documentation/checkpoint-only edits. The macOS Swift workflow covers `Sources/**`, tests, package, TDLib pin, and its own workflow; the Ubuntu metadata workflow covers machine-readable checkpoint/template changes.
+6. Keep real-account checks separate from synthetic tests. Never seed fake Telegram identities or read installed Telegram app data.
+7. Report test count and scenario coverage accurately. A passing synthetic suite does not prove real login, send, multi-account behavior, sleep/wake recovery, or a signed release.
+
+## Fast feedback and release boundary
+
+- One canonical checkout, one source SHA, and one Dev.app path are used for a milestone. Do not switch among stale bundles or rebuild the same candidate after a Site-only failure.
+- Docs and static website edits use their relevant validators; metadata edits use `metadata.yml`; Swift changes use the full serial suite once. Native bundle smoke is a separate candidate gate, not another way to rerun unit tests.
+- Freeze one release candidate from a clean source SHA. Build/sign/notarize that candidate once, verify its final bytes, publish those immutable bytes, and then update the Site from the verified manifest. Site fixes do not trigger app rebuilds.
+- Keep each milestone's evidence in `PROJECT-STATE.json`, `ACCEPTANCE.json`, and the append-only `RUN-LOG.md`; never mark a timeout, access denial, or unrun scenario as PASS.
 
 ## Current evidence
 
