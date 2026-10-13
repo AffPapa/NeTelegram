@@ -425,24 +425,24 @@
     "hosted_ci": "Exact-source macOS CI 38360568318 and pinned TDLib/isolated Dev.app workflow 38360568267 both succeeded for 84ce26148dfd9623c35d579fcb2dae8db413a94e.",
     "hosted_result": "macOS CI passed. Pinned TDLib workflow built and verified the isolated Apple Silicon development bundle. No real account login, notarization, or release is represented.",
     "scope": "Public UI strings, notifications and Dev.app display name use Neridian. ProductIdentity regression test enforces the public title without Telegram and preserves NeTelegram as codename. The quick name collision scan is not trademark clearance. Channel reading and stable release remain blocked under the user approved policy until sponsored-media obligations and Telegram Terms §1.3/1.4 are resolved. No real Telegram accounts or 20-runtime coverage were tested.",
-    "publication": "Public Neridian Development Site v98 is live at https://netelegram.iryadom.chatgpt.site. Sites source 48b4a269d7ce26a5698463e7f24ad2e8a8d03887; deployment appgdep_6acdd930f9c48191b9913c71cc6b12e4 succeeded; audience public. Anonymous HTTPS returned 200 for all 10 HTML/XML routes with expected MIME types. Downloads still says NO RELEASE and stable/alpha feeds contain no entries. The Site title is Neridian Development. No app binary is published.",
-    "next_action": "Publish the prepared Site content via its own source helper and verify anonymous routes. Continue source/runtime work; no signed downloads until compatibility and release gates close."
+    "publication": "Public Neridian Development Site v99 is live at https://netelegram.iryadom.chatgpt.site. Sites source 8a6cfd57c25159bee211e298f38a8e76fe3ee400; deployment appgdep_6ac6dda3e88ec8191b6a591c97e2c257e succeeded; audience public. Anonymous HTTPS returned 200 for all 10 HTML/XML routes with expected MIME types. Homepage/features/roadmap reflect 84ce261 and 117/117; downloads says NO RELEASE and stable/alpha feeds remain empty. No app binary is published.",
+    "next_action": "Continue source/runtime work from the single canonical checkout. Do not run another local Dev.app; real Telegram account login remains deferred. Keep channels and stable release blocked until API Terms compatibility is resolved and release gates close."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 98,
-    "source_commit": "48b4a269d7ce26a5698463e7f24ad2e8a8d03887",
-    "deployment_id": "appgdep_6acdd930f9c48191b9913c71cc6b12e4",
+    "version": 99,
+    "source_commit": "8a6cfd57c25159bee211e298f38a8e76fe3ee400",
+    "deployment_id": "appgdep_6ac6dda3e88ec8191b6a591c97e2c257e",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "8d1d8771b5cee7982bbfa9974bf3787d329387825b07a83ebf5439c4d9ae924d",
-    "sites_archive_content_hash": "sha256:026153ac02d16bbcf87e5204f714b725af0d51ab37dfbedfc8d8990c14239c4b",
+    "archive_sha256": "e2871b8f06632e3197327e64fa3330e1cac5d31e057bde5878164e077a9eb5a2",
+    "sites_archive_content_hash": "sha256:2c576104dafa8ad1f4ea4a60b2f321bbcabb5dcf465b73dacf055a9f194c1db6",
     "archive_bytes": 184320,
     "archive_file_count": 12,
-    "github_mirror_commit": "4acd66829612f83e1b8ec5d7e2a3c7221dbf5165",
-    "description": "Neridian Development public Site v98 reflects the Neridian public app display name, NeTelegram repository codename, deferred channel access/stable compatibility gate, current 117/117 local Swift test evidence, successful exact-source macOS CI and pinned TDLib/isolated Dev.app workflow. It contains no app downloads; stable/alpha appcasts remain empty.",
-    "public_verification": "TLS-validating Node fetch checked /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/stable.xml and /updates/alpha.xml: all 200; HTML and XML content types are correct. Downloads includes NO RELEASE; both feeds have no entries. Sites metadata reports active/public/version 98/title Neridian Development."
+    "github_mirror_commit": "e9749e743a68dede85c57bce1d14469c9387987b",
+    "description": "Neridian Development public Site v99 reflects the Neridian public app display name, NeTelegram repository codename, deferred channel access/stable compatibility gate, current 117/117 local Swift test evidence, successful exact-source macOS CI and pinned TDLib/isolated Dev.app workflow. It contains no app downloads; stable/alpha appcasts remain empty.",
+    "public_verification": "TLS-validating Node fetch checked /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/stable.xml and /updates/alpha.xml: all returned 200; HTML and XML content types are correct. Homepage/features/roadmap include source 84ce261 and 117/117. Downloads says NO RELEASE. Sites metadata confirms active/public/version 99/title Neridian Development."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
