@@ -1,15 +1,16 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 6145b0156068f784e1eea3bf70df77a8b834bf83. Exact local AppKit build and 151 serial tests passed; hosted CI rerun and pinned TDLib/arm64 Dev.app smoke passed. Native smoke is accountless. Public Site v150. Telegram title/sponsored video/basic-functionality gates, real accounts/20-runtime certification and signed distribution remain open.",
+  "status": "implementation_in_progress; app source 2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb. Local AppKit build and 151 serial tests passed; canonical accountless auth screen visually inspected. Hosted exact-source CI pending. Public Site v151; no app release. Telegram title/sponsored-video/basic-functionality gates, real accounts/all-20 certification, and signed distribution remain open.",
   "current_evidence": {
-    "app_source_commit": "6145b0156068f784e1eea3bf70df77a8b834bf83",
-    "app_tests": "Exact-source local swift build passed on Xcode 27 / Swift 6.4 in 5.27 seconds; local serial suite passed 151/151 (test execution 0.202 seconds). Hosted macOS 15 / Xcode 16.4 / Swift 6.1.2 CI run 38457814445, successful rerun, passed 151 tests in 0.468 seconds after a 36.31-second build; successful job duration about 52 seconds. The first attempt built successfully but the Swift Testing runner emitted no tests for 5 minutes and was canceled; the one same-SHA rerun passed.",
+    "app_source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
+    "app_tests": "Exact source tree for 2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb: Xcode 27.0 / Swift 6.4; AppKit Dev.app build 10.69 s; swift test --no-parallel built in 5.30 s and passed 151/151 in 0.203 s. Hosted exact-source CI pending.",
     "github_workflows": [
       "https://github.com/AffPapa/NeTelegram/actions/runs/38457814445",
       "https://github.com/AffPapa/NeTelegram/actions/runs/38457814416",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38459557354"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38459557354",
+      "https://github.com/AffPapa/NeTelegram/actions"
     ],
-    "native_smoke": "Exact-source pinned TDLib/arm64 Dev.app workflow 38457814416 succeeded: pinned dependency, isolated bundle verification, first-run image capture, last-window close, LaunchServices reopen/same PID, normal quit and artifact upload. Artifact screenshot was visually reviewed: centered phone sign-in card and API/TDLib + non-affiliation disclosure are visible; disclosure is small/low-contrast and the CI environment has no API hash configured. Accountless only; no login was attempted.",
+    "native_smoke": "Current source tree fingerprint 3038c01c875af925bdf39eb7134cdd3f861bd14597d53c1138a7ecfdf0f51e1c built into the single canonical arm64 Dev.app with pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700; app launched and accessibility tree exposed phone-entry form and no local-profile list. Screenshot /private/tmp/netelegram-auth-ui.png SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c; visual inspection found no clipping and improved disclosure contrast. No credentials entered. Last-window/reopen lifecycle was not repeated for this UI-only edit.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
@@ -462,13 +463,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "6145b0156068f784e1eea3bf70df77a8b834bf83",
-    "app_source_commit": "6145b0156068f784e1eea3bf70df77a8b834bf83",
-    "local_command": "swift build --scratch-path /private/tmp/netelegram-swiftpm-cache; swift test --no-parallel --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "AppKit/Core build passed in 5.27 seconds; serial Swift suite passed 151/151 (test execution 0.202 seconds) on Xcode 27 / Swift 6.4.",
-    "hosted_ci": "Exact-source run 38457814445 successful on its single rerun: 151 tests passed in 0.468 seconds after a 36.31-second build; macOS 15 / Xcode 16.4 / Swift 6.1.2. First attempt had a silent test-runner startup stall and hit the 5-minute timeout.",
-    "native_dev_app_smoke": "Exact-source pinned TDLib/arm64 Dev.app workflow 38457814416 passed pinned dependency, bundle verification, accountless first-run capture, close/reopen same-PID and normal quit. Screenshot visually reviewed; disclosure is small/low-contrast. No login.",
-    "scope": "Sign-in disclosure copy/layout and Telegram ecosystem statement. No real account or private account data accessed; no Site deploy or app release."
+    "source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
+    "app_source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
+    "local_command": "swift test --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-swiftpm-cache --no-parallel (SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swiftpm-module-cache); NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-auth-ui-support scripts/dev-app.sh --launch",
+    "local_result": "AppKit Dev.app build passed in 10.69 seconds; SwiftPM test build passed in 5.30 seconds; serial test suite passed 151/151 (execution 0.203 seconds) on Xcode 27.0 / Swift 6.4. A sandbox escalation was required after the managed environment rejected module-cache sandboxing; no test failure occurred.",
+    "hosted_ci": "Pending after source push; no hosted PASS claimed.",
+    "native_dev_app_smoke": "Canonical arm64 Dev.app, pinned TDLib, isolated empty support root; phone-entry accessibility tree and screenshot visually checked. Source fingerprint 3038c01c875af925bdf39eb7134cdd3f861bd14597d53c1138a7ecfdf0f51e1c; executable SHA-256 2ba1f7c3adc0d9214b3fa62051959e38f84849058a4c173ed2c00676ead52259; screenshot SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c. Accountless; no real login or close/reopen lifecycle test in this run.",
+    "scope": "Increase sign-in disclosure from 11pt tertiary to 12pt secondary label color for legibility. No auth behavior, profiles, account data, Site, or release assets changed yet."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -491,11 +492,12 @@
     "public_verification": "Anonymous curl HTTPS GET: /devlog/ and /downloads/ both returned HTTP/2 200 with content-type text/html. Live devlog contains the exact source and workflow links; downloads page states no verified build and has zero ZIP/DMG URLs."
   },
   "latest_local_candidate": {
-    "date": "2026-10-13",
-    "source_commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
-    "tests": "124/124 Swift tests passed locally; AppKit target compiled.",
-    "hosted_ci": "Exact-source macOS CI 38372557522 and pinned TDLib/isolated Dev.app workflow 38372557539 succeeded for the same SHA.",
-    "scope": "One canonical arm64 Dev.app from ff3da44 launched locally and displayed the empty phone-entry screen. No phone/code entered, no real account or 20-runtime coverage, no controlled Keychain-stall fault injection, no Developer ID, notarization or release."
+    "date": "2026-10-14",
+    "source_commit": "2cd13c2bd97431ab4e6f7f0b03fa9a6e5f2cfbb",
+    "source_fingerprint_sha256": "3038c01c875af925bdf39eb7134cdd3f861bd14597d53c1138a7ecfdf0f51e1c",
+    "tests": "151/151 serial Swift tests passed locally; AppKit arm64 Dev.app built.",
+    "hosted_ci": "pending exact-source macOS run after push.",
+    "scope": "Accountless sign-in UI only; disclosure legibility improved. Screenshot /private/tmp/netelegram-auth-ui.png SHA-256 f3a8b27087f3b559168352debee1e97a4a122d03d1be1cb635d3f38def84c36c. No login, real accounts, 20-runtime certification, signing, notarization, or release."
   },
   "latest_source_audit": {
     "date": "2026-10-13",
@@ -514,5 +516,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue one concrete P0 app slice from source 6145b015; do not repeat successful local/hosted/native gates without changed inputs. Public Site v151 is synchronized; no app downloads exist until signed/notarized release assets are verified. Preserve real-account/all-20, Developer ID/notarization, Telegram title, sponsored-video and basic-functionality gates."
+  "next_action": "Push source and checkpoint together; consume one hosted exact-source macOS CI run and metadata validation. Then update the existing public Site devlog once. Continue into the next P0 slice without repeating these gates for unchanged inputs."
 }
