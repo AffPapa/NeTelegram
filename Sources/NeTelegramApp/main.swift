@@ -27,6 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var actionButton: NSButton!
     private var addAccountButton: NSButton!
     private var accountPicker: NSPopUpButton!
+    private var accountProfileHint: NSTextField!
     private var accountPickerAccounts: [AccountUUID] = []
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
@@ -326,6 +327,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountPicker.setAccessibilityLabel("Локальный профиль и статус входа")
         accountPicker.setAccessibilityHelp("Это профили, созданные внутри NeTelegram на этом Mac. Сессии и файлы других Telegram-приложений не импортируются.")
 
+        accountProfileHint = NSTextField(wrappingLabelWithString: "Локальные профили NeTelegram на этом Mac. Сессии из других приложений не импортируются.")
+        accountProfileHint.font = .systemFont(ofSize: 11)
+        accountProfileHint.textColor = .secondaryLabelColor
+        accountProfileHint.maximumNumberOfLines = 2
+        accountProfileHint.setAccessibilityLabel("О профилях NeTelegram")
+
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.isHidden = true
         countryPicker.target = self
@@ -477,10 +484,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         sidebarTitleLabel.frame = NSRect(x: 20, y: 674, width: 280, height: 30)
         sidebarPane.addSubview(sidebarTitleLabel)
         accountPicker.frame = NSRect(x: 16, y: 625, width: 298, height: 30)
-        addAccountButton.frame = NSRect(x: 16, y: 590, width: 298, height: 28)
+        accountProfileHint.frame = NSRect(x: 16, y: 582, width: 298, height: 36)
+        addAccountButton.frame = NSRect(x: 16, y: 548, width: 298, height: 26)
         sidebarPane.addSubview(accountPicker)
+        sidebarPane.addSubview(accountProfileHint)
         sidebarPane.addSubview(addAccountButton)
-        searchField = NSSearchField(frame: NSRect(x: 16, y: 548, width: 298, height: 30))
+        searchField = NSSearchField(frame: NSRect(x: 16, y: 506, width: 298, height: 30))
         searchField.placeholderString = "Поиск аккаунтов, чатов и сообщений"
         searchField.target = self
         searchField.action = #selector(searchFieldChanged)
@@ -492,9 +501,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         chatList.alignment = .leading
         chatList.spacing = 4
         chatList.translatesAutoresizingMaskIntoConstraints = false
-        // Keep the list below account controls and search; the prior 660pt
-        // frame overlapped the sidebar header controls.
-        chatListScroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 330, height: 535))
+        // Keep the list below account controls, profile hint, and search.
+        chatListScroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 330, height: 495))
         chatListScroll.hasVerticalScroller = true
         chatListScroll.drawsBackground = false
         chatListScroll.setAccessibilityLabel("Список переписок и результатов поиска")
@@ -686,9 +694,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         sidebarPane.frame = NSRect(x: 0, y: 0, width: sidebarWidth, height: size.height)
         sidebarTitleLabel.frame = NSRect(x: 20, y: size.height - 46, width: sidebarWidth - 40, height: 30)
         accountPicker.frame = NSRect(x: 16, y: size.height - 95, width: sidebarWidth - 32, height: 30)
-        addAccountButton.frame = NSRect(x: 16, y: size.height - 130, width: sidebarWidth - 32, height: 28)
-        searchField.frame = NSRect(x: 16, y: size.height - 172, width: sidebarWidth - 32, height: 30)
-        chatListScroll.frame = NSRect(x: 0, y: 0, width: sidebarWidth, height: max(180, size.height - 185))
+        accountProfileHint.frame = NSRect(x: 16, y: size.height - 138, width: sidebarWidth - 32, height: 36)
+        addAccountButton.frame = NSRect(x: 16, y: size.height - 172, width: sidebarWidth - 32, height: 26)
+        searchField.frame = NSRect(x: 16, y: size.height - 214, width: sidebarWidth - 32, height: 30)
+        chatListScroll.frame = NSRect(x: 0, y: 0, width: sidebarWidth, height: max(180, size.height - 225))
 
         let mainX = sidebarWidth + 20
         let mainWidth = max(200, size.width - mainX - 20)
