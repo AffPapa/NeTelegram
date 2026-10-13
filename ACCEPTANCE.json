@@ -1,19 +1,19 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Two targeted local APP02 tests passed; exact-SHA macOS CI 38425731506 and pinned TDLib/Dev.app build 38425731851 passed. Public Site v141 is live. Real Telegram login and twenty authorized-runtime certification remain open; no signed app release.",
+  "status": "implementation_in_progress; app-source 14565217d47645248390853f1d7a7e495c3270dd. APP14 identity gate has 2 focused local tests and exact-source macOS CI/pinned TDLib build passing; real account revocation/reauth remains untested. Public Site v144 is live. Real Telegram login, twenty authorized-runtime certification, signed app distribution, and compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "26abae365b4eec54882ae69cc1274e20ddabb276",
-    "app_tests": "Two targeted tests passed on Xcode 27.0 / Swift 6.4. AppDelegate calls the production-used ProfileStoragePreparer before TDLib runtime creation. With 20 synthetic startup attempts, one injected errSecInteractionNotAllowed failed while 19 prepared; existing DB/draft files remained unchanged and no replacement key was added. This did not touch the system Keychain.",
+    "app_source_commit": "14565217d47645248390853f1d7a7e495c3270dd",
+    "app_tests": "APP14 identity gate: 2 focused tests passed on Xcode 27.0 / Swift 6.4. Profile identity is bound only after verified Telegram user ID; getMe response is matched via @extra; private app-state hydration waits for verified identity and unlocked UI; mismatched identity closes its runtime. Synthetic tests only; no real account/revocation/reauth or 20-account coverage.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38425731506",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38425731851"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38431733861",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38431733910"
     ],
-    "native_smoke": "Exact-SHA pinned TDLib workflow 38425731851 built the pinned dependency and assembled/verified an isolated arm64 Dev.app. It did not perform GUI lifecycle smoke or login. The window close/reopen smoke remains on earlier app-source 6434b10 (run 38417637092).",
+    "native_smoke": "Exact-source pinned TDLib/Dev.app run 38431733910 passed for app source 14565217d47645248390853f1d7a7e495c3270dd: dependency build and arm64 Dev.app assembly/verification. No GUI lifecycle or account login in this run.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
-    "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
+    "twenty_authorized_runtime_coverage": "none; synthetic tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v141 at https://netelegram.iryadom.chatgpt.site; source 4f99890bb6e01872e0e13dc02f975981c103abd7; deployment appgdep_6ace5c143c2c819182fe7243ce9a7c42. Shared build-time shell/template drives all eight static routes; content stays separate and pages do not require JavaScript. Public homepage, downloads and dense devlog were visually checked; route/metadata/internal-link validator passed. Downloads remain unavailable; app-source remains 26abae365b4eec54882ae69cc1274e20ddabb276.",
+    "site": "Public Site v144 at https://netelegram.iryadom.chatgpt.site; source dc015ddca81330db297f13d4289cf1c40a43faca; deployment appgdep_6ace60f0033081918e279cc45c848e65. All eight static routes are generated from the shared shell/template and separate content fragments. Site validator passed all eight routes. Public browser verification at v144 confirmed APP14 evidence and links to exact-source CI; at 390px viewport document width was 375px and at 1440px it was 1425px, so neither had horizontal overflow. No app download or release is available.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -145,8 +145,8 @@
       "expected": "Отзыв A не влияет на19; другой userID не наследует прежнее private app-state.",
       "method": "authorized real accounts",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "Implementation on app source 14565217d47645248390853f1d7a7e495c3270dd: verified Telegram userID gates identity-bound profile state; getMe is correlated by @extra; private state hydration is delayed until verified identity and UI unlock; mismatched IDs close that runtime. Two focused local tests passed. Exact-source [macOS CI](https://github.com/AffPapa/NeTelegram/actions/runs/38431733861) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38431733910) passed. No real Telegram account, revocation/reauth, or 20 authorized accounts were tested; APP14 remains partial."
     },
     {
       "id": "APP15",
@@ -457,31 +457,31 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "26abae365b4eec54882ae69cc1274e20ddabb276",
-    "local_command": "CLANG_MODULECACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-profile-startup-isolation --filter '.*(oneProfileStorageKeychainFailurePreservesItsDataAndDoesNotBlockOtherProfiles|stalledKeychainReadDoesNotBlockOtherProfileStartupAttempts).*'",
-    "local_result": "2/2 targeted tests passed. Production-used account storage preparation failed closed for one synthetic account while 19 other profiles prepared. Prior DB/draft bytes were preserved and no replacement key was added.",
-    "hosted_ci": "Exact-SHA macOS CI 38425731506 passed for 26abae365b4eec54882ae69cc1274e20ddabb276.",
-    "native_dev_app_smoke": "Pinned TDLib/Dev.app workflow 38425731851 passed for 26abae365b4eec54882ae69cc1274e20ddabb276; it built and assembled an arm64 development bundle but did not perform GUI interaction or account login.",
-    "scope": "Synthetic Keychain backend and scheduler only. No system Keychain access, Telegram account login, real 20 runtime, memory/performance measurement, Developer ID signing or notarization.",
-    "publication": "Site v141 deployed from exact Site source 4f99890bb6e01872e0e13dc02f975981c103abd7; app-source 26abae365b4eec54882ae69cc1274e20ddabb276. Shared template/build generator and all route fragments are mirrored into website/. Focused checks passed for 8 static routes; public browser visually reviewed home, downloads and devlog. No app downloads or release.",
+    "source_commit": "14565217d47645248390853f1d7a7e495c3270dd",
+    "local_command": "CLANG_MODULECACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app14-identity-gate --filter 'verifiedIdentityGate'",
+    "local_result": "2/2 focused verifiedIdentityGate tests passed on Xcode 27.0 / Swift 6.4.",
+    "hosted_ci": "Exact-source macOS CI run 38431733861 passed for 14565217d47645248390853f1d7a7e495c3270dd; pinned TDLib/Dev.app run 38431733910 passed for the same app source.",
+    "native_dev_app_smoke": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed. No GUI interaction or account login.",
+    "scope": "Synthetic identity/auth-state tests and exact-SHA build workflows only. No real Telegram login, revocation/reauth, 20 real runtimes, performance or release signing.",
+    "publication": "Site v144 is public at https://netelegram.iryadom.chatgpt.site. Site source dc015ddca81330db297f13d4289cf1c40a43faca; deployment appgdep_6ace60f0033081918e279cc45c848e65; archive Sites hash sha256:98081fb347d51b72a87a4ac3804c31e9d090195265f46772901d0042c584c422. The app-repository website/ mirror and this checkpoint are being synchronized; no app download is published.",
     "release_preflight": "No signed/notarized application, real account, or twenty-account runtime certification."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 141,
-    "source_commit": "4f99890bb6e01872e0e13dc02f975981c103abd7",
-    "app_repository_commit": "26abae365b4eec54882ae69cc1274e20ddabb276",
-    "deployment_id": "appgdep_6ace5c143c2c819182fe7243ce9a7c42",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_89adc85509388191a024b0ec32faf360",
+    "version": 144,
+    "source_commit": "dc015ddca81330db297f13d4289cf1c40a43faca",
+    "app_repository_commit": "14565217d47645248390853f1d7a7e495c3270dd",
+    "deployment_id": "appgdep_6ace60f0033081918e279cc45c848e65",
+    "version_id": "appgprj_6acba85192e08191baff6d10d81d5e71",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "390ea6353ec63a6c6bc319adb943282d5e77aec22d8c0faa49d0cca8d802b16d",
-    "sites_archive_content_hash": "sha256:157432c3b19cf4bfabfe1f85a0c3aa951d09305779300996f8b99885674c82bb",
+    "archive_sha256": "sha256:98081fb347d51b72a87a4ac3804c31e9d090195265f46772901d0042c584c422",
+    "sites_archive_content_hash": "sha256:98081fb347d51b72a87a4ac3804c31e9d090195265f46772901d0042c584c422",
     "archive_bytes": 522240,
-    "archive_file_count": 15,
-    "description": "All eight routes now use one static build-time shell and independent content fragments. Shared navigation includes an accessible native mobile disclosure; titles, descriptions, Open Graph and canonical metadata are generated centrally. A public visual pass corrected the legacy status card and constrained the dense devlog to the reading measure. No app download was added.",
-    "public_verification": "Sites confirmed successful public deployment. Focused local validator checked all eight routes, one H1 each, shared shell, active navigation, canonical metadata, internal links and assets. Browser screenshots verified homepage, downloads status card and devlog reading width. Download page truthfully shows no app release."
+    "archive_file_count": null,
+    "description": "Shared static layout/template and eight route sources; updated factual APP14 status and exact CI links. Responsive image constraint prevents historical screenshots from causing horizontal overflow. No app download CTA.",
+    "public_verification": "Deployment succeeded. Public devlog confirmed exact CI links and current identity-gate status. At 390px viewport document width was 375px; at 1440px it was 1425px. Local validator passed all eight routes. Downloads truthfully show no release."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
@@ -507,5 +507,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue from one distinct app acceptance gap. Do not repeat APP02 or Site v141 checks without changed input. Real Telegram login remains deferred; prioritize a bounded Core/runtime gap, then verify only its changed surface and exact-source CI."
+  "next_action": "Continue one distinct app acceptance gap from app source 14565217d47645248390853f1d7a7e495c3270dd; do not repeat APP14 or Site v144 checks without changed input. Real login remains deferred; 20 authorized runtime coverage, Developer ID/notarization, Gatekeeper/updater, and Telegram compatibility gates remain open."
 }

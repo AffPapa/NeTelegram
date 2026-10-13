@@ -238,3 +238,5 @@ body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system
 /* Keep route section content inside the 800px reading measure. */
 .content-page .section{display:block}.content-page .section-body{width:100%;max-width:800px;min-width:0}.content-page .journal-entry{grid-template-columns:140px minmax(0,1fr);gap:22px;min-width:0}.content-page .journal-entry>div{min-width:0;overflow-wrap:anywhere}.content-page .journal-entry a{overflow-wrap:anywhere}
 @media(max-width:600px){.content-page .journal-entry{grid-template-columns:1fr;gap:8px}.content-page .journal-entry time{padding-top:0}}
+/* Prevent historical screenshots from expanding narrow pages. */
+.content-page img{display:block;max-width:100%;height:auto;}
