@@ -6249,7 +6249,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 #if DEBUG
     private var visibleApplicationWindowCount: Int {
-        NSApp.windows.filter(\.isVisible).count
+        NSApp.windows.filter { $0.isVisible && $0.styleMask.contains(.titled) }.count
     }
 
     private func configureWindowLifecycleSmokeIfRequested() {
