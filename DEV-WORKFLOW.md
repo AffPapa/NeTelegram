@@ -1,6 +1,6 @@
 # Development build and verification
 
-Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-Dev.app`. Its default account catalogue is `/private/tmp/netelegram-dev-support`; set `NETELEGRAM_SUPPORT_ROOT` only when an isolated QA run explicitly needs a separate catalogue. `Scripts/dev-app.sh` builds intermediates under the repository's ignored `.build/` directory, writes the bundle to the canonical path, and records source and binary fingerprints. It refuses to replace a running NeTelegram process and opens the existing app instance without forcing a second process. The catalogue belongs only to this development app; it is never discovered from an installed Telegram client or shared with a release bundle.
+Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-Dev.app`. Its default account catalogue is the isolated `/private/tmp/netelegram-dev-support-clean`; set `NETELEGRAM_SUPPORT_ROOT` only when a specifically named QA run needs a separate catalogue. The former `/private/tmp/netelegram-dev-support` is preserved and is not used by routine builds. `Scripts/dev-app.sh` builds intermediates under the repository's ignored `.build/` directory, writes the bundle to the canonical path, and records source and binary fingerprints. It refuses to replace a running NeTelegram process and opens the existing app instance without forcing a second process. The catalogue belongs only to this development app; it is never discovered from an installed Telegram client or shared with a release bundle.
 
 ## Test cadence
 
