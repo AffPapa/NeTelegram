@@ -511,6 +511,55 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     ) == .authorization)
 }
 
+@Test func accountConversationSnapshotRestoresCorrectAccountTopicAndDraftAcrossABA() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let generationA = RuntimeGeneration(4)
+    let generationB = RuntimeGeneration(9)
+    let conversationA = ConversationKey(account: accountA, chatID: 77, topic: .forum(topicID: 11))
+    let conversationB = ConversationKey(account: accountB, chatID: 77, topic: .forum(topicID: 22))
+    let snapshots = [
+        accountA: AccountConversationSnapshot(
+            account: accountA,
+            generation: generationA,
+            conversation: conversationA,
+            draft: "draft belonging to A"
+        ),
+        accountB: AccountConversationSnapshot(
+            account: accountB,
+            generation: generationB,
+            conversation: conversationB,
+            draft: "draft belonging to B"
+        ),
+    ]
+
+    // A -> B -> A uses the same server chat ID; account namespace and typed
+    // topic keep the restored composer and conversation attached to A.
+    let selectedB = snapshots[accountB]!
+    #expect(selectedB.conversation == conversationB)
+    #expect(selectedB.draft == "draft belonging to B")
+    let restoredA = snapshots[accountA]!
+    #expect(AccountPresentation.conversationRestoration(
+        telegramUserID: 501,
+        authorizationState: "authorizationStateReady",
+        snapshot: restoredA,
+        expectedAccount: accountA,
+        expectedGeneration: generationA
+    ) == .reopen(chatID: 77))
+    #expect(restoredA.account == accountA)
+    #expect(restoredA.generation == generationA)
+    #expect(restoredA.conversation == conversationA)
+    #expect(restoredA.draft == "draft belonging to A")
+    #expect(conversationA != conversationB)
+    #expect(AccountPresentation.conversationRestoration(
+        telegramUserID: 501,
+        authorizationState: "authorizationStateReady",
+        snapshot: restoredA,
+        expectedAccount: accountA,
+        expectedGeneration: generationB
+    ) == .authorization)
+}
+
 @Test func tdlibReceiveCopyFailureDrainsAcceptedEventsThenFailsClosed() async throws {
     let coordinator = RuntimeCoordinator(startupParallelism: 2)
     let account = AccountUUID()

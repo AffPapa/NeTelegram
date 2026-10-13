@@ -1135,10 +1135,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField.isHidden = true
         actionButton.isEnabled = false
         setStatus("Выбран аккаунт \(safeAccountName(selected) ?? "Аккаунт"). Остальные авторизованные аккаунты продолжают работу.")
+        let selectedConversation = selectedChatByAccount[selected.account].map {
+            currentConversationKey(for: selected.account, chatID: $0)
+        }
+        let presentationSnapshot = AccountConversationSnapshot(
+            account: selected.account,
+            generation: selected.generation,
+            conversation: selectedConversation,
+            draft: selectedConversation.flatMap { draftsByConversation[$0] } ?? ""
+        )
         switch AccountPresentation.conversationRestoration(
             telegramUserID: selected.telegramUserID,
             authorizationState: selected.authorizationState,
-            selectedChatID: selectedChatByAccount[selected.account]
+            snapshot: presentationSnapshot,
+            expectedAccount: selected.account,
+            expectedGeneration: selected.generation
         ) {
         case .reopen(let chatID):
             selected.loadMainChats()
@@ -1147,7 +1158,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // selectAccount closed the previous account's visible chat. Restore
             // this account through the same TDLib openChat path so the restored
             // UI and TDLib's displayed-chat state cannot diverge.
-            openChat(chatID: chatID, in: selected)
+            openChat(chatID: chatID, in: selected, presentationSnapshot: presentationSnapshot)
         case .emptyConversation:
             selected.loadMainChats()
             showAuthenticatedChatUI()
@@ -3525,7 +3536,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         openChat(chatID: id, in: runtime)
     }
 
-    private func openChat(chatID id: Int64, in runtime: LocalAccountRuntime) {
+    private func openChat(
+        chatID id: Int64,
+        in runtime: LocalAccountRuntime,
+        presentationSnapshot: AccountConversationSnapshot? = nil
+    ) {
         closePhotoViewer()
         if let previous = selectedChatByAccount[runtime.account], previous != id {
             stopTypingAction()
@@ -3550,7 +3565,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             renderMessages(cached)
         }
         let conversation = currentConversationKey(for: runtime.account, chatID: id)
-        setComposerText(draftsByConversation[conversation] ?? "")
+        let restoredDraft: String
+        if let presentationSnapshot,
+           presentationSnapshot.account == runtime.account,
+           presentationSnapshot.generation == runtime.generation,
+           presentationSnapshot.conversation == conversation {
+            restoredDraft = presentationSnapshot.draft
+        } else {
+            restoredDraft = draftsByConversation[conversation] ?? ""
+        }
+        setComposerText(restoredDraft)
         refreshReplyStatus(for: conversation)
         do {
             try runtime.send(["@type": "openChat", "chat_id": id])

@@ -84,6 +84,31 @@ public enum AccountConversationRestoration: Sendable, Equatable {
     case reopen(chatID: Int64)
 }
 
+/// Immutable view state for one account selection. Conversation identity includes
+/// the account and typed topic so identical chat IDs in different accounts never
+/// share drafts or presentation state.
+public struct AccountConversationSnapshot: Sendable, Equatable {
+    public let account: AccountUUID
+    public let generation: RuntimeGeneration
+    public let conversation: ConversationKey?
+    public let draft: String
+
+    public init(
+        account: AccountUUID,
+        generation: RuntimeGeneration,
+        conversation: ConversationKey?,
+        draft: String
+    ) {
+        precondition(conversation == nil || conversation?.account == account)
+        self.account = account
+        self.generation = generation
+        self.conversation = conversation
+        self.draft = draft
+    }
+
+    public var selectedChatID: Int64? { conversation?.chatID }
+}
+
 /// Produces a human-facing account label only after TDLib has confirmed the
 /// server identity. Local AccountUUIDs are storage keys and must never leak
 /// into account pickers or window titles as if they were Telegram profiles.
@@ -113,6 +138,22 @@ public enum AccountPresentation {
         ) else { return .authorization }
         guard let selectedChatID else { return .emptyConversation }
         return .reopen(chatID: selectedChatID)
+    }
+
+    public static func conversationRestoration(
+        telegramUserID: Int64?,
+        authorizationState: String?,
+        snapshot: AccountConversationSnapshot,
+        expectedAccount: AccountUUID,
+        expectedGeneration: RuntimeGeneration
+    ) -> AccountConversationRestoration {
+        guard snapshot.account == expectedAccount,
+              snapshot.generation == expectedGeneration else { return .authorization }
+        return conversationRestoration(
+            telegramUserID: telegramUserID,
+            authorizationState: authorizationState,
+            selectedChatID: snapshot.selectedChatID
+        )
     }
 
     public static func verifiedDisplayName(telegramUserID: Int64?, candidate: String?) -> String? {
