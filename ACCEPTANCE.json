@@ -216,7 +216,7 @@
       "method": "isolated test DB/native",
       "required_for": "updates",
       "status": "partial",
-      "evidence": "AccountStorageLease acquires an exclusive advisory file lock before catalogue/profile reads and remains held while the app process owns the account root; the kernel releases it when the owner exits. AccountStorageUpgradeGate atomically records the highest numeric CFBundleVersion before TDLib can open account DBs; production requires a positive build number, while only the isolated .dev debug bundle may use zero. Lower builds, invalid build metadata and corrupt/future markers fail closed without deleting the marker or account data. Lease/reopen, advance/same-build/downgrade, corrupt-marker and build-number policy tests pass; full local suite is 116/116 at 6b085f194941393db5aaa9dd761648b8e809bcd8. Exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38359578679 and pinned TDLib/isolated Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38359578673 succeeded for this SHA; Dev.app smoke was accountless and used the CI isolated support root. No real multi-process install race, TDLib schema migration, backup/restore of account DBs, or real-account upgrade/reopen was exercised; status remains partial."
+      "evidence": "At exact app-source SHA da32684614573590484d5a7b1027bec42ede9ae6, AccountStorageLease canonicalizes the requested storage path after directory creation and owns the exclusive lock. The monotonic downgrade gate is callable through the held lease and uses that same canonical root; lower builds/corrupt marker states fail closed. A symlink-alias regression proves two names for one physical root cannot take separate locks. Full local Swift suite passed 118/118 and built the AppKit target. Exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38362045819 and pinned TDLib/isolated Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38362045885 succeeded; the latter was accountless. Still untested: real concurrent app-process install/upgrade, TDLib schema migration, crash/power-loss durability, backup/restore, disk-full and real-account upgrade/reopen; status remains partial."
     },
     {
       "id": "APP25",
@@ -419,14 +419,14 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "84ce26148dfd9623c35d579fcb2dae8db413a94e",
+    "source_commit": "da32684614573590484d5a7b1027bec42ede9ae6",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache/clang SWIFT_MODULECACHE_PATH=/private/tmp/netelegram-swift-cache/modules swift test --disable-sandbox --manifest-cache local --cache-path .build/cache --disable-dependency-cache",
-    "local_result": "117/117 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable. ACCEPTANCE.json parsed and git diff --check passed.",
-    "hosted_ci": "Exact-source macOS CI 38360568318 and pinned TDLib/isolated Dev.app workflow 38360568267 both succeeded for 84ce26148dfd9623c35d579fcb2dae8db413a94e.",
-    "hosted_result": "macOS CI passed. Pinned TDLib workflow built and verified the isolated Apple Silicon development bundle. No real account login, notarization, or release is represented.",
-    "scope": "Public UI strings, notifications and Dev.app display name use Neridian. ProductIdentity regression test enforces the public title without Telegram and preserves NeTelegram as codename. The quick name collision scan is not trademark clearance. Channel reading and stable release remain blocked under the user approved policy until sponsored-media obligations and Telegram Terms §1.3/1.4 are resolved. No real Telegram accounts or 20-runtime coverage were tested.",
+    "local_result": "118/118 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable. ACCEPTANCE.json parsed and git diff --check passed.",
+    "hosted_ci": "Exact-source macOS CI 38362045819 and pinned TDLib/isolated Dev.app workflow 38362045885 both succeeded for da32684614573590484d5a7b1027bec42ede9ae6.",
+    "hosted_result": "macOS CI passed. Pinned TDLib workflow built and verified the isolated Apple Silicon development bundle; smoke was accountless. No real account login, schema migration, notarization or release is represented.",
+    "scope": "APP24 source now binds build downgrade admission to the exclusive canonical storage lease and denies independent locks through symlink aliases. Local suite 118/118; real database migration, backup/restore, crash/power-loss, real Keychain and real-account upgrade remain unverified. All 20 real authorized runtimes and performance remain unverified. Stable/channel release gates remain open per user decision and Telegram compatibility requirements.",
     "publication": "Public Neridian Development Site v99 is live at https://netelegram.iryadom.chatgpt.site. Sites source 8a6cfd57c25159bee211e298f38a8e76fe3ee400; deployment appgdep_6ac6dda3e88ec8191b6a591c97e2c257e succeeded; audience public. Anonymous HTTPS returned 200 for all 10 HTML/XML routes with expected MIME types. Homepage/features/roadmap reflect 84ce261 and 117/117; downloads says NO RELEASE and stable/alpha feeds remain empty. No app binary is published.",
-    "next_action": "Continue source/runtime work from the single canonical checkout. Do not run another local Dev.app; real Telegram account login remains deferred. Keep channels and stable release blocked until API Terms compatibility is resolved and release gates close."
+    "next_action": "Continue source/runtime implementation in the one canonical checkout. Real Telegram login is deferred. Do not launch another local Dev.app. Site v99 is live; update its factual devlog and source summaries for this implementation milestone after exact-source CI."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
