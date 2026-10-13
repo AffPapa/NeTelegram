@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f6f7f3">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="NeTelegram — независимый проект неофициального альтернативного клиента Telegram для macOS. Нативный интерфейс на Swift и AppKit, открытая разработка и честные сведения о возможностях и ограничениях. Приложение пока в разработке, загрузки нет.">
   <meta property="og:title" content="NeTelegram — альтернативный клиент Telegram для macOS">
   <meta property="og:description" content="NeTelegram — независимый проект неофициального альтернативного клиента Telegram для macOS. Нативный интерфейс на Swift и AppKit, открытая разработка и честные сведения о возможностях и ограничениях. Приложение пока в разработке, загрузки нет.">
@@ -85,7 +85,7 @@
 
     <section class="proof-bar" id="status" aria-label="Текущий статус проекта">
       <div><span class="proof-label">КОД</span><strong>Открыт</strong><a href="https://github.com/AffPapa/NeTelegram" aria-label="Исходный код на GitHub">↗</a></div>
-      <div><span class="proof-label">ПРИЛОЖЕНИЕ</span><strong>В разработке</strong><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506" aria-label="Текущий macOS CI">↗</a></div>
+      <div><span class="proof-label">ПРИЛОЖЕНИЕ</span><strong>В разработке</strong><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38447978740" aria-label="Последний macOS CI">↗</a></div>
       <div><span class="proof-label">ЗАГРУЗКИ</span><strong>Пока нет сборки</strong><a href="/downloads/" aria-label="Подробности о загрузках">↗</a></div>
     </section>
 
@@ -95,7 +95,7 @@
         <div><h2 id="focus-title">Мессенджер для Mac.<br>С понятными границами.</h2><p>Мы строим отдельный нативный интерфейс к облачным чатам. Вот на чём сосредоточена разработка — и где заканчиваются подтверждённые сегодня факты.</p></div>
       </div>
       <div class="focus-grid">
-        <article class="focus-card focus-card-native"><span class="focus-mark" aria-hidden="true">⌘</span><p class="state-label state-code">СБОРКА В CI ПРОВЕРЕНА</p><h3>Нативная среда macOS</h3><p>Исходник и тесты прошли macOS CI; отдельный workflow собрал закреплённую TDLib и Dev.app. Smoke закрытия окна и возврата из Dock есть на более раннем commit; реальный вход не выполнялся.</p><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506">Проверить CI <span aria-hidden="true">↗</span></a></article>
+        <article class="focus-card focus-card-native"><span class="focus-mark" aria-hidden="true">⌘</span><p class="state-label state-code">151 ТЕСТ ПРОШЁЛ В CI</p><h3>Нативная среда macOS</h3><p>Точный workflow commit прошёл macOS CI: все 151 теста и проверка JSON. Закреплённые TDLib и Apple Silicon Dev.app собраны отдельным workflow. Реальный вход не выполнялся.</p><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38447978740">Проверить последний CI <span aria-hidden="true">↗</span></a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38444116358">Сборка Dev.app <span aria-hidden="true">↗</span></a></article>
         <article class="focus-card focus-card-data"><span class="focus-mark" aria-hidden="true">◫</span><p class="state-label state-detail">АРХИТЕКТУРНЫЙ ПРИНЦИП</p><h3>Данные профилей отдельно</h3><p>Для каждого аккаунта проектируются отдельные локальные данные. NeTelegram не импортирует сессии из других клиентов. Это описание проекта, а не проверка реального входа.</p><a href="/privacy/">Как устроена приватность <span aria-hidden="true">↗</span></a></article>
         <article class="focus-card focus-card-runtime"><span class="focus-mark" aria-hidden="true">↗</span><p class="state-label state-synthetic">ЦЕЛЬ · НЕ СЕРТИФИЦИРОВАНО</p><h3>Подключённые аккаунты работают в фоне</h3><p>Цель — одновременно обрабатывать обновления всех доступных профилей. Тест постановки 20 профилей в очередь синтетический; двадцать авторизованных аккаунтов и ресурсы Mac ещё не проверены.</p><a href="/features/">Все возможности и ограничения <span aria-hidden="true">↗</span></a></article>
       </div>
@@ -112,8 +112,8 @@
         <div><div class="journal-heading"><h2 id="journal-title">Что изменилось</h2><a href="/devlog/">Весь журнал <span aria-hidden="true">↗</span></a></div><p>Каждая запись указывает исходный код и проверки. Синтетические результаты не выдаются за настоящий пользовательский сценарий.</p></div>
       </div>
       <article class="latest-entry">
-        <time datetime="2026-10-13"><span>13</span> ОКТЯБРЯ 2026</time>
-        <div><p class="journal-tag">СТАРТ ПРОФИЛЕЙ</p><h3>Подготовка каждого профиля проходит отдельно</h3><p>Подготовка каталогов и двух ключей вынесена в проверяемый Core-шаг, который AppDelegate выполняет до создания TDLib runtime. В синтетической проверке 19 профилей прошли подготовку, а ошибка Keychain у одного не создала ключ и не повредила его прежние файлы. Реальный Keychain и авторизованные аккаунты не проверялись.</p><div class="journal-links"><a href="https://github.com/AffPapa/NeTelegram/commit/26abae365b4eec54882ae69cc1274e20ddabb276">Исходный commit ↗</a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731506">macOS CI ↗</a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38425731851">Сборка Dev.app ↗</a></div></div>
+        <time datetime="2026-10-14"><span>14</span> ОКТЯБРЯ 2026</time>
+        <div><p class="journal-tag">ДИЗАЙН САЙТА</p><h3>Восемь страниц теперь используют одну дизайн-систему</h3><p>Общий шаблон и CSS задают навигацию, типографику, карточки и адаптивные состояния всех маршрутов. Статическая проверка подтвердила восемь страниц; в браузере проверены главная на desktop и все маршруты при ширине 375 px без горизонтального переполнения. Это обновление сайта, оно не меняет статус сборки приложения.</p><div class="journal-links"><a href="https://github.com/AffPapa/NeTelegram/tree/main/website">Исходники сайта ↗</a><a href="/devlog/">Журнал проверок ↗</a><a href="/downloads/">Статус загрузок ↗</a></div></div>
       </article>
     </section>
 
