@@ -258,7 +258,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
 public final class TDLibUpdatePipeline: @unchecked Sendable {
     private let gateway: TDLibGateway
     private let coordinator: RuntimeCoordinator
-    private let buffer: TDLibUpdateBuffer
+    let buffer: TDLibUpdateBuffer
     private let delivery = TDLibUpdateDeliveryScheduler()
     private let lock = NSLock()
     private let reducerExited = DispatchGroup()

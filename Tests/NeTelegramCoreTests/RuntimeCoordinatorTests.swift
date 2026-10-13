@@ -2055,6 +2055,84 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(gateway.receiveWorkerHasExited)
 }
 
+@Test func twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates() async throws {
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    var routes: [RuntimeRoute] = []
+    for value in 1...20 {
+        let route = RuntimeRoute(
+            account: AccountUUID(UUID(uuidString: String(format: "41000000-0000-0000-0000-%012d", value))!),
+            generation: RuntimeGeneration(1),
+            client: ClientID(Int32(value))
+        )
+        try await coordinator.registerBeforeFirstRequest(route)
+        routes.append(route)
+    }
+
+    let clientIDs = routes.map(\.client)
+    let pollIndex = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let index = pollIndex.get()
+        pollIndex.set(index + 1)
+        if clientIDs.indices.contains(index) {
+            let client = clientIDs[index].value
+            return .update(Data("{\"@client_id\":\(client),\"sequence\":1}".utf8))
+        }
+        if index == clientIDs.count {
+            return .update(Data("{\"@client_id\":1,\"sequence\":2}".utf8))
+        }
+        return .timeout
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator, capacity: 1, byteCapacity: 4_096)
+    let stalledCallback = AsyncTestGate()
+    let completed = LockedTestValue<[String]>([])
+    let finishReturned = LockedTestValue(false)
+
+    pipeline.start(onEvent: { event in
+        guard case .routed(let update) = event,
+              let object = try? JSONSerialization.jsonObject(with: update.json) as? [String: Any],
+              let sequence = object["sequence"] as? Int else { return }
+        let label = "\(update.route.client.value):\(sequence)"
+        if label == "1:1" { await stalledCallback.wait() }
+        completed.mutate { $0.append(label) }
+    })
+
+    let otherClients = Set((2...20).map { "\($0):1" })
+    let clock = ContinuousClock()
+    let blockedDeadline = clock.now.advanced(by: .seconds(3))
+    while (pipeline.buffer.blockedProducerCount == 0 ||
+           !Set(completed.get()).isSuperset(of: otherClients)) && clock.now < blockedDeadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(Set(completed.get()).isSuperset(of: otherClients), "All other account lanes must make progress while account 1 is stalled")
+    #expect(pipeline.buffer.blockedProducerCount == 1, "The next account-1 update must backpressure the sole receive worker")
+    #expect(pipeline.buffer.queuedByteCount <= 4_096 + 1_024)
+
+    pipeline.requestInputStop()
+    let exitDeadline = clock.now.advanced(by: .seconds(2))
+    while !gateway.receiveWorkerHasExited && clock.now < exitDeadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(gateway.receiveWorkerHasExited, "Stopping input must wake the blocked receive append and let its thread exit")
+    #expect(pipeline.buffer.count == 2, "The stalled callback and the one already-received final update remain accounted for")
+    #expect(pipeline.buffer.admit(Data("{\"@client_id\":1,\"sequence\":3}".utf8)) == .stopped)
+
+    let drain = Task.detached {
+        pipeline.finishInputAndDrain()
+        finishReturned.set(true)
+    }
+    try? await Task.sleep(for: .milliseconds(25))
+    #expect(!finishReturned.get(), "The shared drain must wait for the stalled accepted callback")
+
+    await stalledCallback.open()
+    #expect(await waitForTrue(finishReturned, timeout: .seconds(2)))
+    await drain.value
+    #expect(completed.get().count == 21)
+    #expect(Set(completed.get()) == Set((2...20).map { "\($0):1" } + ["1:1", "1:2"]))
+    #expect(completed.get().filter { $0.hasPrefix("1:") } == ["1:1", "1:2"], "The final accepted update must follow account 1's earlier update")
+    #expect(pipeline.buffer.count == 0)
+    #expect(pipeline.buffer.queuedByteCount == 0)
+}
+
 @Test func tdlibGatewayFailsClosedWhenPinnedLibraryIsUnavailable() {
     let missingLibrary = FileManager.default.temporaryDirectory
         .appendingPathComponent("netelegram-missing-\(UUID().uuidString).dylib")
