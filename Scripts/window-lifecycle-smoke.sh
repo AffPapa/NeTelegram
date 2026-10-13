@@ -56,7 +56,15 @@ except (OSError, ValueError):
     raise SystemExit(1)
 for event in events:
     if event.get('phase') == phase:
-        raise SystemExit(0 if str(event.get('pid')) == pid and event.get('visibleWindowCount') == int(count) else 2)
+        if str(event.get('pid')) == pid and event.get('visibleWindowCount') == int(count):
+            raise SystemExit(0)
+        print(
+            f"Observed {phase}: pid={event.get('pid')!r}, "
+            f"visibleWindowCount={event.get('visibleWindowCount')!r}; "
+            f"expected pid={pid!r}, visibleWindowCount={count}",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
 raise SystemExit(1)
 PY
     then
