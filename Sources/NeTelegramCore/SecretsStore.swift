@@ -44,10 +44,13 @@ public enum SecretsStoreError: Error, Equatable {
 
 /// Keychain access for local project credentials and per-account encryption keys.
 public struct SecretsStore: Sendable {
-    private static let keychainReadQueueKey = DispatchSpecificKey<Bool>()
-    private static let keychainReadQueue: DispatchQueue = {
-        let queue = DispatchQueue(label: "org.affpapa.netelegram.keychain-read", qos: .utility)
-        queue.setSpecific(key: keychainReadQueueKey, value: true)
+    private static let keychainOperationQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "org.affpapa.netelegram.keychain-operations"
+        queue.qualityOfService = .utility
+        // A wedged SecItem call must not hold every account's key lookup, while
+        // total blocking work remains bounded and cannot fan out to 20 threads.
+        queue.maxConcurrentOperationCount = 2
         return queue
     }()
 
@@ -69,13 +72,13 @@ public struct SecretsStore: Sendable {
     }
 
     /// SecItem calls are synchronous and may block while Keychain resolves
-    /// access. Keep that work on a dedicated serial queue, outside both the
-    /// AppKit main thread and Swift's cooperative executor.
+    /// access. Keep them off AppKit and Swift's cooperative executor, with two
+    /// bounded slots so one stalled profile cannot hold every other profile.
     public static func performKeychainOperation<Value: Sendable>(
         _ operation: @escaping @Sendable () throws -> Value
     ) async throws -> Value {
         try await withCheckedThrowingContinuation { continuation in
-            keychainReadQueue.async {
+            keychainOperationQueue.addOperation {
                 do {
                     continuation.resume(returning: try operation())
                 } catch {
@@ -86,7 +89,7 @@ public struct SecretsStore: Sendable {
     }
 
     static var isExecutingOnKeychainReadQueue: Bool {
-        DispatchQueue.getSpecific(key: keychainReadQueueKey) == true
+        OperationQueue.current === keychainOperationQueue
     }
 
     public func telegramAPIHash() throws -> String {

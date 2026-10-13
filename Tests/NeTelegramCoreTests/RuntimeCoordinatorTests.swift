@@ -2989,40 +2989,50 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
 }
 
-@Test func stalledKeychainReadDoesNotBlockOtherProfileStartupAttempts() async {
-    let scheduler = RuntimeStartupScheduler(parallelism: 2)
-    let keychainEntered = LockedTestValue(false)
-    let completedProfiles = LockedTestValue(0)
-    let releaseKeychain = DispatchSemaphore(value: 0)
-
-    let stalledProfile = Task {
-        try await scheduler.withPermit {
-            try await SecretsStore.performKeychainOperation {
-                keychainEntered.set(true)
-                releaseKeychain.wait()
-                return true
-            }
-        }
-    }
-    defer { releaseKeychain.signal() }
-
-    #expect(await waitForTrue(keychainEntered, timeout: .seconds(2)))
-    let otherProfiles = (0..<19).map { _ in
-        Task {
-            await scheduler.withPermit {
-                completedProfiles.mutate { $0 += 1 }
-            }
-        }
+@Test func stalledKeychainOperationDoesNotBlockOtherAccountsAndRemainsBounded() async throws {
+    let firstEntered = LockedTestValue(false)
+    let secondEntered = LockedTestValue(false)
+    let thirdEntered = LockedTestValue(false)
+    let releaseFirst = DispatchSemaphore(value: 0)
+    let releaseSecond = DispatchSemaphore(value: 0)
+    defer {
+        releaseFirst.signal()
+        releaseSecond.signal()
     }
 
-    #expect(await waitForCount(completedProfiles, atLeast: 19, timeout: .seconds(2)))
-    #expect(keychainEntered.get(), "The injected Keychain stall should still be active while other profiles start")
+    let first = Task {
+        try await SecretsStore.performKeychainOperation {
+            firstEntered.set(true)
+            releaseFirst.wait()
+            return 1
+        }
+    }
+    #expect(await waitForTrue(firstEntered, timeout: .seconds(2)))
 
-    releaseKeychain.signal()
-    #expect((try? await stalledProfile.value) == true)
-    for profile in otherProfiles { await profile.value }
-    #expect(await scheduler.activeStarts() == 0)
-    #expect(await scheduler.queuedStarts() == 0)
+    let second = Task {
+        try await SecretsStore.performKeychainOperation {
+            secondEntered.set(true)
+            releaseSecond.wait()
+            return 2
+        }
+    }
+    #expect(await waitForTrue(secondEntered, timeout: .seconds(2)), "The second account must proceed while the first Keychain call is stalled")
+
+    let third = Task {
+        try await SecretsStore.performKeychainOperation {
+            thirdEntered.set(true)
+            return 3
+        }
+    }
+    try await Task.sleep(for: .milliseconds(100))
+    #expect(!thirdEntered.get(), "Keychain blocking work must stay within its two-operation bound")
+
+    releaseFirst.signal()
+    #expect(try await first.value == 1)
+    #expect(await waitForTrue(thirdEntered, timeout: .seconds(2)), "A queued account must advance when one bounded slot becomes free")
+    releaseSecond.signal()
+    #expect(try await second.value == 2)
+    #expect(try await third.value == 3)
 }
 
 @Test func oneProfileStorageKeychainFailurePreservesItsDataAndDoesNotBlockOtherProfiles() async throws {
