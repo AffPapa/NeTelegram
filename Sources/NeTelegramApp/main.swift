@@ -3217,7 +3217,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard let groupID = (group["id"] as? NSNumber)?.int32Value,
                   let chatID = (group["chat_id"] as? NSNumber)?.int64Value else { continue }
             for item in group["notifications"] as? [[String: Any]] ?? [] {
-                guard let value = TDLibNotificationRouter.route(account: target.account, groupID: groupID, groupChatID: chatID, notification: item) else { continue }
+                guard let value = TDLibNotificationRouter.route(
+                    account: target.account,
+                    groupID: groupID,
+                    groupChatID: chatID,
+                    notification: item,
+                    isPrivacyLocked: lockState
+                ) else { continue }
                 next.insert(value.systemIdentifier)
                 routed[value.systemIdentifier] = value
             }
@@ -3254,7 +3260,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removedIDs))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removedIDs))
         for item in update["added_notifications"] as? [[String: Any]] ?? [] {
-            guard let value = TDLibNotificationRouter.route(account: target.account, groupID: groupID, groupChatID: chatID, notification: item) else { continue }
+            guard let value = TDLibNotificationRouter.route(
+                account: target.account,
+                groupID: groupID,
+                groupChatID: chatID,
+                notification: item,
+                isPrivacyLocked: lockState
+            ) else { continue }
             active.insert(value.systemIdentifier)
             notificationTargets[value.systemIdentifier] = value
             deliverNotification(value, for: target)
@@ -3272,7 +3284,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             notificationID: notificationID
         )
 
-        guard let routed = TDLibNotificationRouter.routeUpdate(account: target.account, update: update) else {
+        guard let routed = TDLibNotificationRouter.routeUpdate(
+            account: target.account,
+            update: update,
+            isPrivacyLocked: lockState
+        ) else {
             // The content may have changed to an unsupported notification kind
             // (for example a call). Remove any old message preview and route;
             // never leave stale message text visible under the reused ID.
@@ -6496,6 +6512,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         visibleReadReceiptTask = nil
         visibleReadReceiptRegistry.removeAll()
         messageReadViewsByID.removeAll()
+        notificationTargets = notificationTargets.mapValues { $0.redactedForPrivacyLock() }
+        notificationUnlockHandoff.clear()
         searchDebounceTask?.cancel()
         searchDebounceTask = nil
         searchGeneration &+= 1

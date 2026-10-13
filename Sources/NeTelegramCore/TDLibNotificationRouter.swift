@@ -17,6 +17,23 @@ public struct RoutedTDLibNotification: Hashable, Sendable {
         Self.systemIdentifier(account: account, groupID: groupID, notificationID: notificationID)
     }
 
+    /// Keeps the click destination while dropping message text from the app's
+    /// notification cache during the privacy lock. This is a best-effort
+    /// presentation-cache purge, not secure erasure of prior RAM copies.
+    public func redactedForPrivacyLock() -> Self {
+        Self(
+            account: account,
+            groupID: groupID,
+            notificationID: notificationID,
+            conversation: conversation,
+            messageID: messageID,
+            date: date,
+            isSilent: isSilent,
+            showsPreview: false,
+            preview: nil
+        )
+    }
+
     public static func systemIdentifier(account: AccountUUID, groupID: Int32, notificationID: Int32) -> String {
         "netelegram.\(account.id.uuidString.lowercased()).\(groupID).\(notificationID)"
     }
@@ -40,11 +57,21 @@ public enum TDLibNotificationRouter {
     /// Routes an update that replaces the content of an active notification.
     /// A NewPushMessage may not yet contain enough information to open a
     /// conversation; TDLib can later send this update with a full NewMessage.
-    public static func routeUpdate(account: AccountUUID, update: [String: Any]) -> RoutedTDLibNotification? {
+    public static func routeUpdate(
+        account: AccountUUID,
+        update: [String: Any],
+        isPrivacyLocked: Bool = false
+    ) -> RoutedTDLibNotification? {
         guard update["@type"] as? String == "updateNotification",
               let groupID = (update["notification_group_id"] as? NSNumber)?.int32Value,
               let notification = update["notification"] as? [String: Any] else { return nil }
-        return route(account: account, groupID: groupID, groupChatID: 0, notification: notification)
+        return route(
+            account: account,
+            groupID: groupID,
+            groupChatID: 0,
+            notification: notification,
+            isPrivacyLocked: isPrivacyLocked
+        )
     }
 
     public static func presentation(
@@ -68,7 +95,8 @@ public enum TDLibNotificationRouter {
         account: AccountUUID,
         groupID: Int32,
         groupChatID: Int64,
-        notification: [String: Any]
+        notification: [String: Any],
+        isPrivacyLocked: Bool = false
     ) -> RoutedTDLibNotification? {
         guard let notificationID = (notification["id"] as? NSNumber)?.int32Value,
               let type = notification["type"] as? [String: Any],
@@ -97,7 +125,8 @@ public enum TDLibNotificationRouter {
         let chatID = (message["chat_id"] as? NSNumber)?.int64Value ?? groupChatID
         guard chatID != 0,
               let topic = topicKey(message["topic_id"] as? [String: Any]) else { return nil }
-        let preview = showsPreview ? previewText(message["content"] as? [String: Any]) : nil
+        let mayShowPreview = showsPreview && !isPrivacyLocked
+        let preview = mayShowPreview ? previewText(message["content"] as? [String: Any]) : nil
         return RoutedTDLibNotification(
             account: account,
             groupID: groupID,
@@ -106,7 +135,7 @@ public enum TDLibNotificationRouter {
             messageID: messageID,
             date: (notification["date"] as? NSNumber)?.int64Value ?? 0,
             isSilent: notification["is_silent"] as? Bool ?? true,
-            showsPreview: showsPreview,
+            showsPreview: mayShowPreview,
             preview: preview
         )
     }

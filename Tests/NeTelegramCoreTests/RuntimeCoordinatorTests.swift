@@ -3721,6 +3721,84 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(routed.conversation == ConversationKey(account: account, chatID: 44, topic: .main))
 }
 
+@Test func privacyLockRedactsCachedNotificationTextButKeepsExactRoute() throws {
+    let account = AccountUUID()
+    let raw: [String: Any] = [
+        "id": 9,
+        "date": 123,
+        "is_silent": true,
+        "type": [
+            "@type": "notificationTypeNewMessage",
+            "show_preview": true,
+            "message": [
+                "id": 77,
+                "chat_id": -44,
+                "topic_id": ["@type": "messageTopicForum", "forum_topic_id": 12],
+                "content": ["@type": "messageText", "text": ["text": "Unique sensitive preview"]],
+            ],
+        ],
+    ]
+    let routed = try #require(TDLibNotificationRouter.route(
+        account: account,
+        groupID: 3,
+        groupChatID: -44,
+        notification: raw
+    ))
+    let lockedCache = routed.redactedForPrivacyLock()
+
+    #expect(routed.preview == "Unique sensitive preview")
+    #expect(lockedCache.preview == nil)
+    #expect(!lockedCache.showsPreview)
+    #expect(lockedCache.account == account)
+    #expect(lockedCache.groupID == 3)
+    #expect(lockedCache.notificationID == 9)
+    #expect(lockedCache.conversation == ConversationKey(account: account, chatID: -44, topic: .forum(topicID: 12)))
+    #expect(lockedCache.messageID == 77)
+    #expect(lockedCache.systemIdentifier == routed.systemIdentifier)
+    #expect(TDLibNotificationRouter.presentation(
+        for: lockedCache,
+        isPrivacyLocked: false,
+        chatTitle: "Private topic",
+        isReconciliation: true
+    ).body == "Новое сообщение")
+}
+
+@Test func notificationUpdatesReceivedWhileLockedNeverCacheMessageText() throws {
+    let account = AccountUUID()
+    let update: [String: Any] = [
+        "@type": "updateNotification",
+        "notification_group_id": 7,
+        "notification": [
+            "id": 19,
+            "type": [
+                "@type": "notificationTypeNewMessage",
+                "show_preview": true,
+                "message": [
+                    "id": 88,
+                    "chat_id": -44,
+                    "content": ["@type": "messageText", "text": ["text": "Locked arrival secret"]],
+                ],
+            ],
+        ],
+    ]
+    let routed = try #require(TDLibNotificationRouter.routeUpdate(
+        account: account,
+        update: update,
+        isPrivacyLocked: true
+    ))
+
+    #expect(routed.preview == nil)
+    #expect(!routed.showsPreview)
+    #expect(routed.conversation == ConversationKey(account: account, chatID: -44, topic: .main))
+    #expect(routed.messageID == 88)
+    #expect(TDLibNotificationRouter.presentation(
+        for: routed,
+        isPrivacyLocked: true,
+        chatTitle: "Private chat",
+        isReconciliation: true
+    ).body == "Новое сообщение")
+}
+
 @Test func lockedNotificationHandoffOpensExactCurrentTopicAfterVerifiedUnlock() {
     let account = AccountUUID()
     let notification = RoutedTDLibNotification(
