@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 1de5720 passes 157/157 exact-source macOS CI and 3/3 focused local Keychain tests. Canonical Dev.app exposes an explicit Keychain restore status but remains waiting in Security; native startup is partial. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
+  "status": "implementation_in_progress; app-source 1de5720 passes 157/157 exact-source macOS CI and 3/3 focused local Keychain tests. Canonical Dev.app clean first-run presentation passes in isolated support root; restoring old local saved profiles remains partial. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
   "current_evidence": {
     "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
     "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 157/157 passed for 1de572048aec9ecb6fa04f2f7c6ed786473888df (run 38475546446). Three focused local Keychain tests passed. An initial focused run exposed a deadlock in the newly written test semaphore ordering; that test bug was fixed before the passing reruns. No real Telegram account or 20-runtime certification.",
@@ -33,12 +33,12 @@
         "scope": "Pinned TDLib arm64 build, bundle verification, accountless UI and window close/reopen/normal quit smoke on GitHub macOS runner."
       }
     },
-    "native_smoke": "Canonical Dev.app at /private/tmp/NeTelegram-Dev.app built once from exact source 1de572048aec9ecb6fa04f2f7c6ed786473888df in 9.26s, ad-hoc nested code signature verified. AX shows accountless welcome/phone/Continue/QR. Status remains at explicit Keychain restore step >20 seconds; startup is partial, not PASS. No phone/code entered; local support preserved.",
+    "native_smoke": "Canonical Dev.app from checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 / application source 1de572048aec9ecb6fa04f2f7c6ed786473888df; build 9.26s, fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3, executable 0bdc4bbf9effd0ddb374fbc9f6b9ddc3628333e0e4ecc4fb2f9845ea8eb7b40a, pinned TDJSON 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc signature verifies. With a new isolated support root, AX shows country selector Thailand +66, phone field, Continue, QR, neutral status and no UUID profile. No phone/code entered. The prior default support root was preserved; its saved-profile Keychain restore remains stuck >20s and is partial.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
-    "site": "Public Site v158 at https://netelegram.iryadom.chatgpt.site; source 02a5dbdde3d877e3791397b392c183453b03fa50; deployment appgdep_6acea846c16c8191b1db071a9eb334c0. Anonymous /, /features/, /devlog/, /downloads/ returned HTTP 200 text/html; devlog verifies be4707d and CI 38473154528. Downloads has no installer links.",
+    "site": "Public Site v159 at https://netelegram.iryadom.chatgpt.site; Site source a37d2b74b9deda24ed0ee47c5459c94f871b4684; app checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400; app source 1de572048aec9ecb6fa04f2f7c6ed786473888df; deployment appgdep_6aceadfed7b48191bb0a6b4852fbbba3. Anonymous /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/ each returned HTTP 200 text/html. Devlog carries current CI/native scope and Keychain limitation. Downloads has no DMG/ZIP link.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -490,7 +490,7 @@
       "method": "AppKit empty-catalogue UI + deterministic catalog/phone tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified."
+      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial."
     }
   ],
   "last_verification": {
@@ -500,30 +500,28 @@
     "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter secretsStoreReadQueryDisallows|keychainReadsRunOutside|blockedKeychainOperation",
     "local_result": "Focused tests 3/3 passed. First attempt had a test-only deadlock because the semaphore release happened after awaiting the blocked operation; corrected ordering then passed. No local full-suite PASS claimed.",
     "hosted_ci": "GitHub macOS CI 38475546446 passed the exact-source serial Swift suite 157/157 on macOS 15 arm64 (Xcode 16.4 / Swift 6.1.2).",
-    "native_dev_app_smoke": "Canonical Dev.app built in 9.26s from clean source 1de5720; source fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3; executable SHA-256 0bdc4bbf9effd0ddb374fbc9f6b9ddc3628333e0e4ecc4fb2f9845ea8eb7b40a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc nested codesign passed. One app instance. AX has phone entry/Continue/QR and explicit Keychain restore status, still waiting after >20s. No credentials entered; existing support preserved. Partial only.",
+    "native_dev_app_smoke": "PASS for isolated first-run UI only. The single canonical app at /private/tmp/NeTelegram-Dev.app was built from source 1de5720 and checkpoint 43980cf using /private/tmp/netelegram-first-run-1de5720-support. AX shows country/phone/Continue/QR with neutral status and no UUID profile; no phone/code entered. The prior default support root was preserved and not inspected/deleted; its saved-profile restore remains partial because SecItemCopyMatching waits >20s.",
     "scope": "Synthetic code/test and exact hosted suite pass. Live Keychain startup is still partial; real login, all-20 accounts, distribution signing/notarization and updater remain open.",
-    "checkpoint_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df"
+    "checkpoint_commit": "43980cf0f654d7d0d38c71b5ec73154871c26400"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 158,
-    "source_commit": "02a5dbdde3d877e3791397b392c183453b03fa50",
-    "app_repository_commit": "c9ef6f728e1e999ef311e726709f8f7753839d7e",
-    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-    "deployment_id": "appgdep_6acea846c16c8191b1db071a9eb334c0",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_042a2e3e757881919cdfd4e1ba0d6c2b",
+    "version": 159,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_601f305ae44881918025fe7bc1c16337",
+    "source_commit": "a37d2b74b9deda24ed0ee47c5459c94f871b4684",
+    "app_repository_commit": "43980cf0f654d7d0d38c71b5ec73154871c26400",
+    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "deployment_id": "appgdep_6aceadfed7b48191bb0a6b4852fbbba3",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "local_archive_path": "/private/tmp/netelegram-site-privacy-v158.tar",
-    "local_archive_sha256": "320c16dc1960daacfb27f16c9488c236e59d33db99c527e658fbdc09a95929fc",
-    "local_archive_size_bytes": 293899,
-    "saved_archive_content_hash": "sha256:7ee8dcf223331b8ae32405033935c0b72509235434276cf13699b98ef6eda36b",
-    "saved_archive_size_bytes": 532480,
-    "archive_file_count": 15,
-    "github_ci_run_id": 38473154528,
-    "metadata_validation_run_id": 38473446842,
-    "public_verification": "Anonymous HTTPS /, /features/, /devlog/, /downloads/ each returned HTTP 200 text/html. Devlog has be4707d/CI markers; downloads shows no release, with no installer links."
+    "local_archive_path": "/private/tmp/netelegram-site-v159.tar",
+    "local_archive_sha256": "6f357ac798e3ac65a0ea2581fe32a9b07d3a81537393c3e89f4c22de9e1f0ac4",
+    "local_archive_size_bytes": 294495,
+    "saved_archive_content_hash": "sha256:d9e794f34c4e272b3e14bdad76ce273abedfc7af90c74dd45edc47b65f6b8f88",
+    "saved_archive_size_bytes": 542720,
+    "github_ci_run_id": 38475546446,
+    "public_verification": "Anonymous HTTPS check: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/ all HTTP 200 text/html. Devlog includes app-source 1de5720, CI run 38475546446, no-phone/code caveat, and unresolved old-support Keychain status. Downloads page contains no DMG/ZIP installer link."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
