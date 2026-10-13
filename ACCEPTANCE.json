@@ -1,12 +1,12 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source HEAD 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. APP16 synthetic 20-client pipeline/backpressure/shutdown coverage: 2 focused and full local Swift suite 151/151 passed; hosted exact-SHA macOS CI status is unverified due GitHub API connectivity; pinned TDLib/Dev.app workflow was cancelled before steps. Public Site v147 is live. Real accounts, 20 authorized-runtime certification, signed distribution, and Telegram compatibility gates remain open.",
+  "status": "implementation_in_progress; source 86855e4599ae4dc9d00274c07331617ddc5b3684 clarifies sign-in non-affiliation copy; exact AppKit build passed. Exact-SHA macOS CI and pinned TDLib/Dev.app workflow are still running. Site v147 remains live. Real accounts, 20-runtime certification, signed distribution, and Telegram compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "0fc9e8604a851ce8ab2968f5b2623a1417a7e350",
-    "app_tests": "APP16 synthetic shared TDLib pipeline/backpressure/shutdown coverage: 2 focused tests and full local suite 151/151 passed on Xcode 27.0 / Swift 6.4 at 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. Independent read-only review confirmed the callback handshake avoids timing-only synchronization. This does not certify real TDLib or 20 authorized accounts.",
+    "app_source_commit": "86855e4599ae4dc9d00274c07331617ddc5b3684",
+    "app_tests": "Full local Swift suite 151/151 passed at base app-source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. Not rerun for the single AppKit disclosure string change; exact HEAD AppKit build passed. Exact-SHA CI is running.",
     "github_workflows": [
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38440068849",
-      "https://github.com/AffPapa/NeTelegram/actions/runs/38440068795"
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38444116182",
+      "https://github.com/AffPapa/NeTelegram/actions/runs/38444116358"
     ],
     "native_smoke": "Exact-SHA pinned TDLib/Dev.app workflow 38440068795 was cancelled before any steps; it provides no build/smoke evidence for HEAD. Prior accountless GUI lifecycle smoke 38437335165 passed for product-code commit 15cb93b63c1654f256403b793ff05995a4907a09.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
@@ -20,7 +20,8 @@
     "code_signing_preflight": "Read-only check on 2026-10-13: security find-identity -v -p codesigning exited 0 and reported 0 valid code-signing identities, including 0 Developer ID Application identities. This supersedes the stale REL03 assertion of four identities/two Developer ID identities. No private keys or credentials were read.",
     "github_release_inventory": "GitHub REST GET https://api.github.com/repos/AffPapa/NeTelegram/releases?per_page=100 returned an empty release list. No public application release exists.",
     "native_dev_app_smoke": "Pinned TDLib/arm64 Dev.app workflow 38437335165 succeeded for product code 15cb93b; lifecycle smoke was accountless and verified last-window close, same-PID reopen and quit.",
-    "previous_native_smoke_correction": "Workflow 38431733910 did run Scripts/window-lifecycle-smoke.sh: its logs report last-window close, LaunchServices reopen in the same PID, one-window state and quit. This is accountless only."
+    "previous_native_smoke_correction": "Workflow 38431733910 did run Scripts/window-lifecycle-smoke.sh: its logs report last-window close, LaunchServices reopen in the same PID, one-window state and quit. This is accountless only.",
+    "app_build": "Exact HEAD AppKit build passed: swift build using /private/tmp/netelegram-swiftpm-cache on Xcode 27.0 / Swift 6.4 (4.69 seconds). The only code change since 0fc9e86 clarifies non-affiliation text on the sign-in screen; no local account data or Telegram clients were opened."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -445,7 +446,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App-source SHA 816bbb4ab2a61817cc3da0780f47219b1f8f52e9 contains a centered adaptive AppKit authentication card and the exact-source pinned TDLib/Dev.app workflow 38407466662 captured its accountless first-run screen in isolated CI. The screenshot was not visually re-reviewed in this checkpoint. Earlier source-matched first-run screen review is historical for 1b3d910. Dark appearance, minimum supported window, code/2FA/QR/registration layouts, high contrast, native VoiceOver and IME remain unverified; actual macOS Keychain persistence and login are not tested. Status stays partial."
+      "evidence": "App-source SHA 816bbb4ab2a61817cc3da0780f47219b1f8f52e9 contains a centered adaptive AppKit authentication card and the exact-source pinned TDLib/Dev.app workflow 38407466662 captured its accountless first-run screen in isolated CI. The screenshot was not visually re-reviewed in this checkpoint. Earlier source-matched first-run screen review is historical for 1b3d910. Dark appearance, minimum supported window, code/2FA/QR/registration layouts, high contrast, native VoiceOver and IME remain unverified; actual macOS Keychain persistence and login are not tested. Status stays partial. Current source commit 86855e4599ae4dc9d00274c07331617ddc5b3684 replaces the contradictory sign-in subtitle with a clear statement that NeTelegram is an independent unofficial client using Telegram API/TDLib and has no direct relationship with Telegram Messenger LLP; exact-HEAD AppKit build passed. This validates compilation and copy only, not native visual contrast, dark appearance, VoiceOver, IME, minimum window layout, or live login. Case remains partial."
     },
     {
       "id": "AUTH04",
@@ -459,13 +460,13 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "0fc9e8604a851ce8ab2968f5b2623a1417a7e350",
-    "local_command": "env SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "2/2 focused APP16 pipeline tests and complete local suite 151/151 passed on Xcode 27.0 / Swift 6.4.",
-    "hosted_ci": "Exact-source macOS CI run 38440068849 status unverified: fresh GitHub API request could not connect; prior Site entry captured it beyond configured timeout, but no current terminal status was established.",
-    "native_dev_app_smoke": "Pinned TDLib/Dev.app run 38440068795 cancelled before steps; no exact-HEAD app smoke. Prior accountless lifecycle smoke 38437335165 covered product-code commit 15cb93b63c1654f256403b793ff05995a4907a09 only.",
-    "scope": "Synthetic 20-client pipeline/backpressure/shutdown test. No real login, authorized profiles, 20-runtime resource use, or physical performance acceptance.",
-    "publication": "Public Site v147 source a445eedc691d66943746781ad13384dd89304050, deployment appgdep_6ace70fe25388191816150f1949f6d64, version ID appgprj_6acba85192e08191acdf7011928848cf~appgver_cbd5c1d62f088191bb98de8b500ac9d7; archive SHA-256 19729a5a2921eff625b05e87c03b9a7c50752a9655d63973beb09eafb5ba6186 (286675 bytes), Sites content hash sha256:4c9685a0fab6ac72c5fccfae8683683edc693465af704ef18c15f67982861ffd. Anonymous browser rendered home, /devlog/, /downloads/ at 390px; no app download."
+    "source_commit": "86855e4599ae4dc9d00274c07331617ddc5b3684",
+    "local_command": "env SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift build --scratch-path /private/tmp/netelegram-swiftpm-cache",
+    "local_result": "AppKit target build passed in 4.69 seconds on Xcode 27.0 / Swift 6.4. Full suite was previously 151/151 at base 0fc9e86; not repeated for copy-only change.",
+    "hosted_ci": "Exact-SHA macOS CI run 38444116182 was in progress at checkpoint; no terminal result yet.",
+    "native_dev_app_smoke": "Exact-SHA pinned TDLib/Dev.app workflow 38444116358 was in progress at checkpoint; no terminal result yet. No local Dev.app launch or login occurred.",
+    "scope": "AppKit compile and non-affiliation copy correction. No visual QA, real login, authorized profiles, or 20-runtime acceptance.",
+    "publication": "Site v147 remains live at https://netelegram.iryadom.chatgpt.site; no Site change in this code-only milestone."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -509,5 +510,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue from a distinct P0 runtime acceptance gap at source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350. Do not repeat APP16 tests or Site v147 checks absent changed inputs. Real login is user-deferred; 20 authorized runtimes, signing/notarization and Telegram compatibility remain open."
+  "next_action": "Poll exact runs 38444116182 and 38444116358 to terminal status. Continue from a distinct P0 runtime acceptance gap; do not rerun full Swift suite for this copy-only change or repeat Site v147 checks. User deferred real login; 20 authorized runtimes, signing/notarization and Telegram compatibility remain open."
 }
