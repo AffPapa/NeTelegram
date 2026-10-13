@@ -1864,6 +1864,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             rememberProfiles(profiles)
             refreshAccountPicker()
+            if profiles.isEmpty {
+                // The first-run country list is bundled and needs neither an
+                // API hash nor a placeholder profile/runtime. Show it before
+                // consulting Keychain; the explicit Continue/QR action still
+                // checks credentials before creating any account state.
+                pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+                showPhoneEntry()
+                setStatus("Выберите страну и введите номер. Для начала входа задайте API hash приложения в меню NeTelegram.")
+                refreshOutgoingPhotoRecoveryStatus()
+                refreshStatusMenu()
+                return
+            }
             let apiHash = try await SecretsStore.performKeychainRead {
                 try SecretsStore().telegramAPIHash()
             }
@@ -1905,11 +1917,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
             )
             if queuedAccountIDs.isEmpty {
-                if profiles.isEmpty {
-                    pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
-                    showPhoneEntry()
-                    setStatus("Введите номер и нажмите «Продолжить», чтобы начать вход.")
-                } else if profiles.contains(where: { $0.logoutCleanupPending == true }) {
+                if profiles.contains(where: { $0.logoutCleanupPending == true }) {
                     setStatus("Очистка после подтверждённого выхода ожидает. Выберите этот профиль, чтобы безопасно продолжить.")
                 } else if profiles.contains(where: { $0.unverifiedRemovalPending == true }) {
                     setStatus("Удаление незавершённого входа ожидает. Выберите этот профиль, чтобы безопасно повторить.")
