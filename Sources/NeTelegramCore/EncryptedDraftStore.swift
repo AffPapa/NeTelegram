@@ -1,4 +1,5 @@
 import CryptoKit
+import Darwin
 import Foundation
 
 public enum EncryptedDraftStoreError: Error, Equatable {
@@ -6,6 +7,34 @@ public enum EncryptedDraftStoreError: Error, Equatable {
     case accountMismatch
     case corruptOrUnauthenticatedData
     case persistence
+}
+
+enum AtomicDraftCiphertextFile {
+    static func replace(
+        _ data: Data,
+        at destination: URL,
+        prepareStagingFile: (URL) throws -> Void = { url in
+            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: url.path)
+        }
+    ) throws {
+        let staging = destination.deletingLastPathComponent()
+            .appendingPathComponent(".\(destination.lastPathComponent).\(UUID().uuidString).tmp")
+        defer { try? FileManager.default.removeItem(at: staging) }
+
+        // The parent directory is private (0700); prepare permissions before
+        // replacing the last known-good ciphertext.
+        try data.write(to: staging, options: .atomic)
+        try prepareStagingFile(staging)
+        let result = staging.path.withCString { sourcePath in
+            destination.path.withCString { destinationPath in
+                Darwin.rename(sourcePath, destinationPath)
+            }
+        }
+        guard result == 0 else {
+            let code = POSIXErrorCode(rawValue: errno) ?? .EIO
+            throw POSIXError(code)
+        }
+    }
 }
 
 /// Stores app-owned drafts independently from TDLib's database and file cache.
@@ -108,8 +137,7 @@ public final class EncryptedDraftStore: @unchecked Sendable {
             let clearData = try JSONEncoder().encode(entries)
             let box = try AES.GCM.seal(clearData, using: key)
             guard let sealedData = box.combined else { throw EncryptedDraftStoreError.persistence }
-            try sealedData.write(to: fileURL, options: .atomic)
-            try FileManager.default.setAttributes([.posixPermissions: 0o600], ofItemAtPath: fileURL.path)
+            try AtomicDraftCiphertextFile.replace(sealedData, at: fileURL)
         } catch let error as EncryptedDraftStoreError {
             throw error
         } catch {
