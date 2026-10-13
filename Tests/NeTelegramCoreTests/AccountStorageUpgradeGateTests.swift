@@ -50,4 +50,18 @@ import Testing
             bundleBuildNumber: "1.2"
         )
     }
+    #expect(throws: AccountStorageUpgradeError.invalidBuildNumber) {
+        try AccountStorageUpgradeGate.prepare(
+            rootURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
+            bundleBuildNumber: "0"
+        )
+    }
+    let developmentRoot = FileManager.default.temporaryDirectory
+        .appendingPathComponent("netelegram-development-build-gate-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: developmentRoot) }
+    #expect(try AccountStorageUpgradeGate.prepare(
+        rootURL: developmentRoot,
+        bundleBuildNumber: "0",
+        allowDevelopmentZeroBuild: true
+    ) == 0)
 }

@@ -1437,9 +1437,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if accountStorageLease == nil {
             accountStorageLease = try AccountStorageLease(rootURL: root)
         }
+#if DEBUG
+        let allowDevelopmentZeroBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+#else
+        let allowDevelopmentZeroBuild = false
+#endif
         _ = try AccountStorageUpgradeGate.prepare(
             rootURL: root,
-            bundleBuildNumber: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+            bundleBuildNumber: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
+            allowDevelopmentZeroBuild: allowDevelopmentZeroBuild
         )
         return root
     }

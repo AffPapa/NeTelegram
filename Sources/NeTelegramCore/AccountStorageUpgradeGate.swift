@@ -86,11 +86,16 @@ public enum AccountStorageUpgradeGate {
         let highestOpenedBuild: Int
     }
 
-    public static func prepare(rootURL: URL, bundleBuildNumber: String?) throws -> Int {
+    public static func prepare(
+        rootURL: URL,
+        bundleBuildNumber: String?,
+        allowDevelopmentZeroBuild: Bool = false
+    ) throws -> Int {
         guard let bundleBuildNumber,
               !bundleBuildNumber.isEmpty,
               bundleBuildNumber.utf8.allSatisfy({ $0 >= 48 && $0 <= 57 }),
-              let currentBuild = Int(bundleBuildNumber), currentBuild >= 0 else {
+              let currentBuild = Int(bundleBuildNumber),
+              currentBuild > 0 || (currentBuild == 0 && allowDevelopmentZeroBuild) else {
             throw AccountStorageUpgradeError.invalidBuildNumber
         }
 
