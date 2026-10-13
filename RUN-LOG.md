@@ -431,3 +431,21 @@
 - Built current source 94740d3 locally with Xcode 27 / Swift 6.4 in 5.38s and ran only two filtered tests: `cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable` passed in 0.002s; `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` passed in 0.001s. These are synthetic Core tests; they do not invoke AppDelegate restoration or real TDLib accounts. No full suite PASS is claimed.
 - Initial targeted launch under the default sandbox failed before the test runner because `sandbox-exec` was denied; the authorized host execution completed the two focused commands. No app source changed and no full-suite retry was made.
 - DNS still fails for `github.com` and `git.chatgpt-team.site`. The app checkpoint is local/ahead and the Site homepage/features/devlog edits remain uncommitted locally; no external source push, Site version save, or deployment occurred.
+
+
+### 2026-10-14 — make account startup queue failures visible
+
+- `AccountRestorePlanner.enqueueStartupProfiles` now returns queued and rejected account UUIDs. `AppDelegate` records rejected starts as per-profile failures and keeps the other eligible profiles running; status text reports partial queue rejection instead of implying all were restored.
+- Added a 20-candidate regression test: 17 accepted, one explicitly rejected, one already-running and one already-starting are accounted for, and the last candidate remains queued.
+- Exact app-source commit: `4d6820da73f2790c73a35177b8f9c1d1ecf8685c`. Focused serial `swift test` on Xcode 27 / Swift 6.4 built in 18.37s; both `restoreEnqueueReportsOneRejectedProfileWithoutDroppingOtherEligibleProfiles` and `startupDispatchQueuesAllFreeProfilesWhileFirstStartupIsStalled` passed (0.001s each). These synthetic Core checks do not prove real TDLib accounts or 20-account lifecycle. The full suite was not run.
+- `git diff --check` and JSON parsing passed for the reconciled checkpoint. Fresh DNS checks still fail for `github.com`, `netelegram.iryadom.chatgpt.site`, and the Sites helper host. `gh auth status` reports its stored tokens invalid; no new credential was created. App source and checkpoint remain local; public Site v154 remains unchanged.
+- Efficient next sequence: one DNS recheck; once available, push source + checkpoint once and wait for exact-source CI once; then publish the already-prepared Site correction once through the official helper. Do not repeat these focused tests unchanged or build an app bundle for Site-only copy.
+
+
+### 2026-10-14 — full serial suite confirms startup rejection slice
+
+- Current app-source commit `4d6820da73f2790c73a35177b8f9c1d1ecf8685c` passed the complete serial Swift suite: 153/153 on Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK. With the test bundle warm, build took 0.23s and test execution took 0.200s. The run includes both startup queue tests; no real Telegram account or TDLib session was used.
+- Exact command: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --verbose`. The sandbox denied SwiftPM manifest setup; the same selected host execution then completed successfully.
+- This establishes a local full-suite PASS for this source, not a hosted CI PASS. Exact-source CI has not run because the source is still unpushed. Parent-source CI 38466197778 (94740d3) remains cancelled in runner phase with initiator unknown.
+- Site homepage/features/devlog were updated locally to source 4d6820d and exact coverage; static validation passes all 8 routes. Sites confirms the existing public deployment remains v154. No app binaries or downloads.
+- External checks still show DNS failure for github.com; do one DNS/remote check on resume, then push source + checkpoint once, let CI/metadata run together, and publish the prepared Site once after the hosted result. Do not repeat 153/153 unchanged.

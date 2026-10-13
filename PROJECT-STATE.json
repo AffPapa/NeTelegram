@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "phase": "Current source 94740d3: exact-source accountless Dev.app smoke passed; two focused synthetic scheduler tests passed in 5.38s build + 0.002/0.001s tests under Xcode 27 / Swift 6.4. Full suite not passed. macOS CI 38466197778 built test bundle then was cancelled during runner phase at configured five-minute job limit with no result; initiator unknown. Site v154 public; status correction prepared locally but DNS blocked pushes.",
-  "verified_at": "2026-10-14T04:00:00+0700",
+  "phase": "Current app source 4d6820d: startup queue rejects are explicit, and the complete serial Swift suite passed 153/153 on Xcode 27 / Swift 6.4 / arm64. Warm build 0.23s; test execution 0.200s. This is synthetic Core coverage, not real TDLib/account certification. The previous exact-source CI 38466197778 was cancelled during runner phase on parent source 94740d3; cancellation initiator unknown. Site v154 remains public; a correction is prepared locally.",
+  "verified_at": "2026-10-14T16:25:00+0700",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04"
+    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -39,7 +39,7 @@
       },
       "note": "App source and the documentation/site-mirror checkpoint were pushed to origin/main using the existing Git credential helper. The final pushed checkpoint commit is recorded in RUN-LOG.md. No token was created or printed."
     },
-    "repo_head_policy": "At each resume, git rev-parse HEAD and origin/main are authoritative. The checkpoint records the last audited parent and its prior cleanliness, not a self-referential commit ID. App-source SHA, docs/checkpoint commits, Site source/version/deployment, and built bundle fingerprints are separate.",
+    "repo_head_policy": "At each resume, git rev-parse HEAD and origin/main are authoritative. Current local app source commit is 4d6820da73f2790c73a35177b8f9c1d1ecf8685c; checkpoint commits, Site source/version/deployment, and built bundle fingerprints remain separate. Working tree was clean after source commit; origin/main was not refreshed because DNS cannot resolve github.com.",
     "latest_checkpoint_ci": {
       "run_id": 38466847617,
       "status": "success",
@@ -56,7 +56,7 @@
       "scope": "Pinned TDLib and isolated arm64 Dev.app build, bundle verification, accountless first-run capture and window close/reopen/quit smoke passed; screenshot visually reviewed, disclosure small/low-contrast.",
       "status_scope": "Historical baseline for app source 6145b015; no pinned native workflow rerun for 2cd13c2 because this was a text-style-only source change."
     },
-    "last_audited_checkpoint_commit": "d2df61bddfab87fa1f2c3507b41b8493193cfec3",
+    "last_audited_checkpoint_commit": "4d9989c04f07875dbed7218c77c33b60a1f5e1c6",
     "pre_edit_working_tree_clean": true
   },
   "local_development_candidate": {
@@ -75,12 +75,13 @@
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Current app source 94740d38bfa845919ac2863ad0e78d1a7d494a04: focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally under Xcode 27 / Swift 6.4 (test durations 0.002s and 0.001s; build 5.38s). Core synthetic coverage only; no current full-suite PASS. Exact-source CI 38466197778 built test bundle in 47.20s on Xcode 16.4 then was cancelled during the test-runner phase at the configured 5-minute job limit; no test output, cancellation cause unknown.",
-      "xcode": "Local Xcode 27.0 / Swift 6.4; arm64",
-      "tested_checkpoint_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
-      "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
-      "run_id": 38466197778,
-      "hosted_ci": "pending"
+      "result": "Current app source 4d6820da73f2790c73a35177b8f9c1d1ecf8685c: full serial suite passed 153/153 on Xcode 27 / Swift 6.4, arm64, macOS 27 SDK. Warm build completed in 0.23s; all tests completed in 0.200s. Includes restoreEnqueueReportsOneRejectedProfileWithoutDroppingOtherEligibleProfiles and startupDispatchQueuesAllFreeProfilesWhileFirstStartupIsStalled. Synthetic Core tests only; no real TDLib accounts.",
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --verbose",
+      "toolchain": "Xcode 27.0 / Apple Swift 6.4 / arm64 / macOS 27 SDK",
+      "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+      "suite": "153/153 passed",
+      "build_seconds": 0.23,
+      "test_seconds": 0.2
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -100,7 +101,7 @@
     "current_head_app16_ci": "Exact-source run 38456932580 passed all 151 tests on macOS 15 / Xcode 16.4 / Swift 6.1.2. Verbose runner output plus the 5-minute job ceiling is validated; hosted job completed in about 59s.",
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
-    "latest_exact_source_ci": "Exact-source run 38466197778: test bundle built in 47.20s, then job ended cancelled during test runner at configured five-minute job limit; no test result/failure output, cancellation initiator unknown. Two targeted current-source Core tests pass locally; no full-suite PASS.",
+    "latest_exact_source_ci": "No CI run for app-source 4d6820d yet; its source commit is local and unpushed. Parent-source run 38466197778 for 94740d3 ended cancelled during runner at five-minute timeout with no test result; initiator unknown.",
     "current_head_native_build": "Exact-source pinned TDLib/arm64 Dev.app workflow 38457814416 passed for 6145b0156068f784e1eea3bf70df77a8b834bf83; accountless lifecycle smoke and screenshot capture verified.",
     "latest_local_appkit_build": {
       "result": "App source 94740d38bfa845919ac2863ad0e78d1a7d494a04; `scripts/dev-app.sh --launch` built arm64 canonical Dev.app in 9.12s, ad-hoc nested signature verification passed. AX and screenshot show welcome form, locale-suggested Thailand +66, number field, Continue and QR. No account/number/code entered.",
@@ -149,7 +150,8 @@
     "app_repository_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
     "asset_cleanup": "No app downloads were added because no verified signed/notarized release exists.",
     "latest_site_source_commit": "6242beb8ecd26008e235b46b7f922c37010b14b2",
-    "current_head_site": "Public Site v154; project appgprj_6acba85192e08191acdf7011928848cf; source 6242beb8ecd26008e235b46b7f922c37010b14b2; deployment appgdep_6ace9add32348191ad8bf25dc41140bf; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_0e843b0b1ca08191a89301eb4a734108."
+    "current_head_site": "Public Site v154; project appgprj_6acba85192e08191acdf7011928848cf; source 6242beb8ecd26008e235b46b7f922c37010b14b2; deployment appgdep_6ace9add32348191ad8bf25dc41140bf; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_0e843b0b1ca08191a89301eb4a734108.",
+    "fresh_provider_check": "2026-10-14: Sites get_site confirmed same existing project, active, public audience, owner access, latest live version 154 at https://netelegram.iryadom.chatgpt.site. No new version/deployment created."
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -161,7 +163,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "DNS currently prevents GitHub/Sites Git transport. Resume with one status check, push the single local checkpoint commit and deploy the already validated Site content once through its official helper. Focused source tests passed; do not repeat. Diagnose the silent CI runner before scheduling one full-suite attempt.",
+  "next_action": "After DNS recovers, fetch origin/main once, verify it remains an ancestor, and fast-forward push current source plus checkpoint once. Let exact-source macOS CI and metadata checks run from that single push. Do not repeat the passing 153-test local suite unchanged. Then sync the Site status to the hosted CI result, use the existing official source helper once, save/deploy one public version, and check anonymous routes. Continue with real-account, 20-runtime, signing, updater and Telegram compatibility gates; none are complete.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -203,8 +205,8 @@
     "app_checkpoint": {
       "branch": "main",
       "pushed": false,
-      "reason": "git push failed before transport: DNS could not resolve github.com. No retry made.",
-      "state": "Local main HEAD is one metadata-only commit ahead of origin/main; resolve HEAD at resume. Avoid self-referential SHA in checkpoint."
+      "reason": "Current DNS lookup fails for github.com before transport; local source commit 4d6820d is not published. Recheck once before attempting push.",
+      "state": "Current app source is committed locally; the reconciled checkpoint commit follows it. The last known origin/main was 4d9989c04f07875dbed7218c77c33b60a1f5e1c6; local main has three commits ahead of that cached ref. Resolve live origin/main before any push when DNS returns."
     },
     "site": {
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -219,12 +221,12 @@
         "dist/features/index.html",
         "dist/devlog/index.html"
       ],
-      "validation": "build_site.py and validate_site.py passed for all 8 static routes; git diff --check passed. Current-source CI status was corrected and two focused test passes added to status cards/devlog.",
+      "validation": "Updated locally for app source 4d6820d and 153/153 current-source serial Core tests; build_site.py and validate_site.py pass all 8 routes; git diff --check passes. It distinguishes the 94740d3 accountless Dev.app smoke and prior CI cancellation from current-source evidence.",
       "archive_created": false,
       "pushed": false,
       "deployed": false,
       "reason": "Official source helper failed before commit/push because DNS could not resolve git.chatgpt-team.site. No deployment or source push occurred."
     },
-    "next": "When DNS is available, push app checkpoint 6ee3a83 once, then run the official Site helper once to commit/push/package the prepared Site edits, save/deploy one version and anonymously verify the three changed routes. Do not rerun app build or Swift suite for this status-only Site correction."
+    "next": "When DNS is available, inspect live origin/main once and fast-forward push the local source plus checkpoint commits once. Wait for exact-source CI once, then use the official Sites helper once to publish the prepared copy and verify public routes. Do not repeat focused tests or rebuild for Site-only copy."
   }
 }
