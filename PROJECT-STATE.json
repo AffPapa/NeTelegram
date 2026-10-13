@@ -11,40 +11,41 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "8274a5ad3344bfdad54e5462e3aec761345a5fbd",
-    "working_tree_clean": true,
+    "commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
+    "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38370730565,
+      "run_id": 38372557522,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38370730565"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38372557522"
     },
     "published_application_releases": []
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "build_info_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
-    "application_source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "build_info_commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
+    "application_source_commit": "ff3da446adb5d1ab1ce4ffd9ce1797a2e77beacf",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development signature",
     "distribution_ready": false,
-    "process_state": "PID 28662; sole canonical Dev.app; source 8098e82; still running after graceful Quit request; not replaced or duplicated."
+    "process_state": "PID 34517; sole canonical Dev.app; arm64; ad-hoc development signature; empty phone-entry screen; no phone/code entered."
   },
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 122,
+      "count": 124,
       "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache swift test --scratch-path /private/tmp/netelegram-spm-test-run"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38370730581 succeeded for exact source 8274a5a: arm64 app built, accountless first-run screenshot, graceful quit.",
-    "current_head_site": "Site v104 public and active; deployment appgdep_6acdef85c1c08191b8c911ec27152556 succeeded. Anonymous GET /devlog/ verified 105440 bytes and expected milestone source/limitation."
+    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38372557539 passed for exact source ff3da44. Local canonical Dev.app from exact SHA passed codesign verify and CUA shows empty phone-entry form.",
+    "current_head_site": "Site v104 public and active; deployment appgdep_6acdef85c1c08191b8c911ec27152556 succeeded. Anonymous GET /devlog/ verified 105440 bytes and expected milestone source/limitation.",
+    "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -69,6 +70,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue implementation and acceptance work; no real account, 20 runtime, Developer ID, notarization, Gatekeeper, updater or download release verified.",
+  "next_action": "Publish factual devlog and checkpoint. Continue native lifecycle and data flows; do not launch a second app or replace ff3da44 unless source changes and this sole process is safely closed.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
