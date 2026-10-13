@@ -476,5 +476,13 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38349233892"
     },
     "scope": "No account login or release verification; pinned native rebuild is not yet a pass."
+  },
+  "latest_access_audit": {
+    "date": "2026-10-13",
+    "repository": "AffPapa/NeTelegram",
+    "gh_cli": "2.88.1; authenticated user AffPapa; repository API reports admin=true and push=true",
+    "github_connector": "authenticated user AffPapa; repository metadata reports admin=true and push=true",
+    "result": "GitHub publication access is available through existing credentials. No token creation or browser login is required. A collaborator-permission endpoint returned 403 for the integration, which does not negate repository metadata access or gh API permissions.",
+    "secrets": "No credential values were printed or stored."
   }
 }

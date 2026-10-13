@@ -19,7 +19,24 @@
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38372557522"
     },
-    "published_application_releases": []
+    "published_application_releases": [],
+    "github_access": {
+      "verified_at": "2026-10-13",
+      "authenticated_account": "AffPapa",
+      "repo": "AffPapa/NeTelegram",
+      "gh_version": "2.88.1",
+      "gh_api_permissions": {
+        "admin": true,
+        "push": true
+      },
+      "github_connector_account": "AffPapa",
+      "github_connector_repo_permissions": {
+        "admin": true,
+        "push": true
+      },
+      "credential_material_recorded": false,
+      "note": "Use existing authenticated gh/Git and installed GitHub connector. No new PAT/OAuth or browser authorization required. Collaborator-permission endpoint 403 is not a repository access failure."
+    }
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
