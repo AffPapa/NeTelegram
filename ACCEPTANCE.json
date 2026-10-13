@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; local implementation commit fd4586d adds validated incoming URL/textUrl/email entities, UTF-16-safe parsing and AppKit link/formatted-text display for messages and photo captions; unknown authorization states now fail closed. Exact local Swift suite 103/103 passed and AppKit target compiled. Push is currently blocked by local DNS resolution for github.com; no remote CI or Site update yet.",
+  "status": "implementation_in_progress; app source 19ebb00 adds a spoken name and instructions to the QR authorization image and hides empty image state. Exact local suite 110/110 and exact-source macOS CI pass; pinned TDLib/Dev.app workflow is still running. Site v93 remains public; devlog update waits for the pinned workflow result. No release binary.",
   "cases": [
     {
       "id": "APP01",
@@ -198,7 +198,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Incoming text messages and photo captions now parse TDLib formattedText entity ranges using UTF-16 offsets, render supported text styling and clickable HTTP(S)/mailto/tg links in a selectable AppKit text view, and reject malformed ranges/unsafe URL schemes. Exact local suite 103/103 passes for source commit fd4586d. Native VoiceOver/keyboard/link-click interaction, RTL/IME, and real-account formatted text remain unverified; status remains partial."
+      "evidence": "Incoming TDLib text entities and photo captions use validated UTF-16 ranges and safe links. The AppKit login screen exposes an accessible name and instructions for its QR image; the empty QR view is hidden while TDLib has not supplied a link or when image generation fails. Single-line authorization text fields already submit through the window text-command delegate on Return. Exact source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c builds and passes 110/110 local Swift tests. No native VoiceOver interaction, keyboard-only journey, RTL/IME, QR login, or real-account auth was tested; status remains partial."
     },
     {
       "id": "APP23",
@@ -410,19 +410,19 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
+    "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache swift test --scratch-path /private/tmp/netelegram-swiftpm-cache",
-    "local_result": "103/103 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
-    "hosted_ci": "GitHub Actions run 38352840920 succeeded on docs commit 74763937567283412de62487732ebf835f2fa7a0, which contains app-source fd4586d; run 38352970473 also succeeded on checkpoint commit 0c447f49000e4969d8ff396630470a9d9a34f7bb.",
-    "hosted_result": "Swift tests (Apple Silicon) passed. No new Dev.app artifact/smoke for this code slice; no release binary.",
+    "local_result": "110/110 Swift Testing tests passed; SwiftPM built NeTelegramCore, NeTelegramCoreTests and the NeTelegram AppKit executable; git diff --check passed.",
+    "hosted_ci": "Exact-source macOS CI 38356823153 completed successfully for 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c; pinned TDLib/Dev.app run 38356822970 is still assembling the isolated bundle.",
+    "hosted_result": "Swift tests (Apple Silicon) passed for exact source SHA. Pinned TDLib and isolated Dev.app build/smoke remains in progress; do not claim its result yet.",
     "artifact": {
-      "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
-      "status": "local development source only; no new Dev.app, release, installer, or public binary",
+      "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
+      "status": "local development source only; no release artifact or public binary",
       "signature": "not a release"
     },
-    "scope": "Two deterministic incoming entity regressions cover UTF-16 offsets, web and textUrl destinations, invalid ranges and disallowed file URLs. Unknown/future authorization states fail closed even when a previous TelegramUserID exists. AppKit code compiles. Native link clicking/accessibility, login/read/send/logout, 20 real accounts, performance matrix, sleep/wake, Developer ID/notarization, Gatekeeper, updater and Telegram compatibility decisions remain open. The running canonical Dev.app was not touched.",
-    "publication": "App-source fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1 is on public main. Documentation/checkpoint commits 74763937567283412de62487732ebf835f2fa7a0 and 0c447f49000e4969d8ff396630470a9d9a34f7bb passed GitHub Actions. Public Site v91 at https://netelegram.iryadom.chatgpt.site now reflects the source and test evidence; no app release or download exists.",
-    "next_action": "Continue implementation with the next protocol-visible runtime slice; keep native Dev.app smoke separate from CI and never launch a second local copy."
+    "scope": "VoiceOver name/help are assigned to the QR image and it is hidden when absent. Native VoiceOver traversal, actual QR auth and keyboard interaction remain unverified. No real accounts, 20-runtime certification, Developer ID/notarization, Gatekeeper or updater tests are claimed; existing local canonical Dev.app was not touched.",
+    "publication": "App source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c is pushed to public main. Site devlog update is pending exact-source CI completion; no release/download exists.",
+    "next_action": "Wait for exact-SHA macOS CI and pinned TDLib/Dev.app workflow. If green, publish factual APP22 devlog on the existing Site; if failed, fix the source issue and rerun before claiming completion."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -440,12 +440,11 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "source_commit": "fd4586dee27af5a5a823b0e6aaaa1c4c223dfac1",
-    "docs_commit": "74763937567283412de62487732ebf835f2fa7a0",
-    "tests": "103/103 Swift Testing tests passed locally; AppKit target and tests compiled; git diff --check passed.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38352840920 succeeded for docs commit containing this source; checkpoint documentation run https://github.com/AffPapa/NeTelegram/actions/runs/38352970473 also succeeded.",
-    "site": "Public Site v91 at https://netelegram.iryadom.chatgpt.site records source, test evidence, and limitations; no application download.",
-    "scope": "Incoming TDLib entities render with safe links; unknown authorization states fail closed. Native link/VoiceOver, real Telegram sessions, 20 real account coverage and distribution remain unverified."
+    "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
+    "tests": "110/110 Swift Testing tests passed locally; AppKit target compiled; git diff --check passed.",
+    "hosted_ci": "macOS CI 38356823153 succeeded for exact SHA; pinned TDLib/Dev.app 38356822970 remains in progress.",
+    "site": "Current public Site v93. Devlog v94 update waits for exact-source CI.",
+    "scope": "VoiceOver label/help on QR image; missing/generated-no-image states hide the image and report status. No native assistive-technology or real QR login proof."
   },
   "latest_source_audit": {
     "date": "2026-10-13",
