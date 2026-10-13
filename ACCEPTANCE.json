@@ -483,7 +483,7 @@
       "method": "AppKit empty-catalogue UI + deterministic catalog/phone tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Implemented in the current uncommitted source candidate: 245 region/calling-code pairs are generated from Google libphonenumber v9.0.41 pinned by commit and SHA in COUNTRY-DATA.lock.json; Apache-2.0 notice retained. Before any account/runtime exists, the sign-in UI shows a bundled country list with macOS locale only as a suggestion; it no longer assumes +1. Full international numbers beginning with + validate without a country selection; national numbers require an explicit country. Empty catalogue still creates no profile/runtime until Continue or QR. Generator reproduced the checked-in Swift table byte-for-byte; data/license hashes and JSON checks passed; git diff --check passed. Local serial Swift suite passed 152/152 on Xcode 27.0 / Swift 6.4. Native GUI smoke of this new bundle, server-country reconciliation, real login and profile creation remain unverified; old Dev.app stayed running and was not overwritten. Hosted exact-source and metadata CI pending push."
+      "evidence": "Bundled 245-region calling-code table pinned to libphonenumber v9.0.41/commit and source/license hashes in COUNTRY-DATA.lock.json. Generator byte-for-byte check, license/source SHA checks, JSON validation, and git diff --check passed. Local serial suite passed 152/152 on Xcode 27.0 / Swift 6.4. Source be58d831aaa1d53c3d47e1313758feb7f9e32384 pushed. Metadata CI 38464148278 passed for checkpoint 1ff4cf578e634623bbcdd5d876041f100f9290f0. Hosted macOS CI 38464148650 build completed but test step was cancelled at its five-minute workflow timeout; connector denied rerun (403). Dev.app GUI, server-country replacement, profile creation, and real login remain unverified. Public Site v153 contains honest bilingual devlog and was anonymously checked."
     }
   ],
   "last_verification": {
@@ -492,10 +492,10 @@
     "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
     "local_command": "python3 Scripts/generate-country-catalog.py /private/tmp/netelegram-PhoneNumberMetadata-v9.0.41.xml /private/tmp/netelegram-generated-country-catalog.swift; cmp Sources/NeTelegramCore/CountryCallingCodeCatalog.swift /private/tmp/netelegram-generated-country-catalog.swift; python3 -m json.tool COUNTRY-DATA.lock.json; git diff --check; swift test --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-swiftpm-cache --no-parallel",
     "local_result": "Country catalog was reproduced byte-for-byte; locked upstream and license SHA-256 checks passed; JSON and git diff checks passed. Local serial Swift suite passed 152/152 on Xcode 27.0 / Swift 6.4 (4.88s build; 0.200s test execution).",
-    "hosted_ci": "Pending the single push of this candidate. GitHub CLI credentials currently report invalid; Git transport credential helper is the previously successful route. Query exact-source macOS CI and metadata workflow after push; do not rerun local suite absent source changes.",
-    "native_dev_app_smoke": "Not run for this candidate: the older canonical Dev.app remained running after a graceful Cmd+Q attempt; the launcher correctly refuses replacement. No account or credentials were entered. Prior screenshot does not prove this candidate's UI.",
-    "scope": "Pre-account country selector and phone validation only, with pinned generated data and license. No profile/session data accessed; no app release or Site deployment. Site v152 still reflects earlier milestone.",
-    "checkpoint_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384"
+    "hosted_ci": "Run 38464148650 for checkpoint 1ff4cf578e634623bbcdd5d876041f100f9290f0 / app source be58d831aaa1d53c3d47e1313758feb7f9e32384 was cancelled at the five-minute workflow timeout during the test step; no hosted PASS. GitHub rerun API denied with 403 Resource not accessible by integration. Metadata validation 38464148278 passed.",
+    "native_dev_app_smoke": "Not run for this candidate. Old canonical bundle stayed running after Cmd+Q and the launcher refused to replace it; no force quit or second bundle. No credentials entered.",
+    "scope": "Pre-account country/calling-code selection only. Local serial suite passed 152/152 and metadata CI passed; hosted Swift CI timed out/cancelled. Site v153 publicly records the same limitation. No real account, profile/session data, or app release.",
+    "checkpoint_commit": "1ff4cf578e634623bbcdd5d876041f100f9290f0"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
