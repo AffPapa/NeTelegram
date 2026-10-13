@@ -265,6 +265,12 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
     private var started = false
     private var drainRequested = false
 
+    var isDrainRequested: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return drainRequested
+    }
+
     public init(
         gateway: TDLibGateway,
         coordinator: RuntimeCoordinator,

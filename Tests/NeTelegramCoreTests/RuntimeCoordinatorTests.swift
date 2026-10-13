@@ -2084,6 +2084,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
     let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator, capacity: 1, byteCapacity: 4_096)
     let stalledCallback = AsyncTestGate()
+    let stalledCallbackEntered = LockedTestValue(false)
     let completed = LockedTestValue<[String]>([])
     let finishReturned = LockedTestValue(false)
 
@@ -2092,10 +2093,14 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
               let object = try? JSONSerialization.jsonObject(with: update.json) as? [String: Any],
               let sequence = object["sequence"] as? Int else { return }
         let label = "\(update.route.client.value):\(sequence)"
-        if label == "1:1" { await stalledCallback.wait() }
+        if label == "1:1" {
+            stalledCallbackEntered.set(true)
+            await stalledCallback.wait()
+        }
         completed.mutate { $0.append(label) }
     })
 
+    #expect(await waitForTrue(stalledCallbackEntered, timeout: .seconds(2)), "Account 1 must be inside the stalled callback before shutdown starts")
     let otherClients = Set((2...20).map { "\($0):1" })
     let clock = ContinuousClock()
     let blockedDeadline = clock.now.advanced(by: .seconds(3))
@@ -2120,7 +2125,11 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         pipeline.finishInputAndDrain()
         finishReturned.set(true)
     }
-    try? await Task.sleep(for: .milliseconds(25))
+    let drainDeadline = clock.now.advanced(by: .seconds(2))
+    while !pipeline.isDrainRequested && clock.now < drainDeadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(pipeline.isDrainRequested, "The drain worker must enter the pending shutdown barrier")
     #expect(!finishReturned.get(), "The shared drain must wait for the stalled accepted callback")
 
     await stalledCallback.open()
