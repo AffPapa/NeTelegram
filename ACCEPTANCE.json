@@ -1,16 +1,16 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; exact app-source be4707d passes hosted macOS CI 155/155; synthetic privacy notification-cache fix verified. Prior accountless Dev.app and Site v157 remain separate evidence. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
+  "status": "implementation_in_progress; app-source 1de5720 passes 157/157 exact-source macOS CI and 3/3 focused local Keychain tests. Canonical Dev.app exposes an explicit Keychain restore status but remains waiting in Security; native startup is partial. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
   "current_evidence": {
-    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-    "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 155/155 passed for be4707d2876c183fa5760f7264ee0fd51c740461 (run 38473154528, 41s). Two focused local privacy notification tests also passed. The local full-suite attempt stalled in an existing blocked-receive drain test; no local full-suite PASS is claimed. Synthetic coverage only; no real TDLib accounts or 20-runtime certification.",
+    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 157/157 passed for 1de572048aec9ecb6fa04f2f7c6ed786473888df (run 38475546446). Three focused local Keychain tests passed. An initial focused run exposed a deadlock in the newly written test semaphore ordering; that test bug was fixed before the passing reruns. No real Telegram account or 20-runtime certification.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38473154528,
-        "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-        "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+        "run_id": 38475546446,
+        "workflow_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+        "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
         "result": "success",
-        "scope": "Exact-source macOS 15 Apple Silicon serial Swift suite passed 155/155."
+        "scope": "Exact-source macOS 15 Apple Silicon serial Swift suite passed 157/157."
       },
       "current_checkpoint_metadata": {
         "run_id": 38473446842,
@@ -33,10 +33,10 @@
         "scope": "Pinned TDLib arm64 build, bundle verification, accountless UI and window close/reopen/normal quit smoke on GitHub macOS runner."
       }
     },
-    "native_smoke": "Current canonical accountless Dev.app checkpoint c028bd3, app source 4d6820d; AX verified country/phone, Continue, QR and neutral status. CUA confirms same app identity remains running. No credentials or session.",
+    "native_smoke": "Canonical Dev.app at /private/tmp/NeTelegram-Dev.app built once from exact source 1de572048aec9ecb6fa04f2f7c6ed786473888df in 9.26s, ad-hoc nested code signature verified. AX shows accountless welcome/phone/Continue/QR. Status remains at explicit Keychain restore step >20 seconds; startup is partial, not PASS. No phone/code entered; local support preserved.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
     "real_account_coverage": "none; user deferred login",
-    "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
+    "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
     "site": "Public Site v158 at https://netelegram.iryadom.chatgpt.site; source 02a5dbdde3d877e3791397b392c183453b03fa50; deployment appgdep_6acea846c16c8191b1db071a9eb334c0. Anonymous /, /features/, /devlog/, /downloads/ returned HTTP 200 text/html; devlog verifies be4707d and CI 38473154528. Downloads has no installer links.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
@@ -256,7 +256,7 @@
       "method": "native fault cases",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "SecretsStore key lookup policy is explicitly tested: a new key may be generated only after errSecItemNotFound and only when createIfMissing is true; errSecInteractionNotAllowed, errSecAuthFailed, other Keychain errors, and malformed existing key data fail closed without replacement. Focused tests passed 3/3 and the full local suite passed 113/113 at 46770828b1b7d3cef022bdbc051cb81180c0680d. Exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38358474196 succeeded; pinned TDLib/isolated Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38358474186 also succeeded, accountless. Source review confirms LocalAuthentication unlocks only on success while lockState remains true; cancellation/failure leaves the UI locked and clears pending notification handoff. No real locked-Keychain fault, Keychain replacement attempt, native owner-auth cancellation, or local account data was exercised; status remains partial."
+      "evidence": "SecretsStore Security reads now attach LAContext with interactionNotAllowed=true; synchronous Security operations use a dedicated serial DispatchQueue, outside AppKit and the Swift cooperative executor. Three focused local tests and exact-source CI 38475546446 passed (157/157). A test-only semaphore ordering deadlock was diagnosed and fixed before those passes. Current canonical Dev.app still awaits SecItemCopyMatching for >20 seconds while visibly reporting the Keychain restore step; actual local Keychain ACL/access cause, interaction result, system biometric flow and user login remain unverified. No profiles/keys were reset or read during diagnosis; status stays partial."
     },
     {
       "id": "APP24",
@@ -495,14 +495,14 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-    "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter privacyLockRedacts|notificationUpdatesReceivedWhileLocked",
-    "local_result": "Focused tests 2/2 passed. A full local run stalled in existing twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates and was interrupted after diagnosis; exact-source hosted suite then passed 155/155.",
-    "hosted_ci": "GitHub macOS CI 38473154528 passed the serial Swift suite 155/155 for exact app-source/checkpoint SHA be4707d2876c183fa5760f7264ee0fd51c740461 (job elapsed 41s).",
-    "native_dev_app_smoke": "Canonical Dev.app at /private/tmp/NeTelegram-Dev.app built from clean checkpoint e7ee13a87275140615da8328244964b1b5faad48 in 9.20s; source fingerprint 0d26a0d079dc72136b29f31f72079329c73238c488c315fae493434e0bdabca0; executable SHA-256 580aa2cec16857a043381660bd331424129f8b9cb880b476cf55ad36ffb613a5; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc nested codesign verification passed. One process launched and AX exposed welcome, phone field, Continue and QR; no UUID profile visible and no phone/code entered. After >=5 seconds the status still said \"Подключаю экран входа…\". A one-second process sample observed restoreProfiles waiting in Security SecItemCopyMatching on a utility task; main thread was idle. Cause of the keychain wait is undiagnosed; this is partial smoke only.",
-    "scope": "Synthetic privacy-cache fix passed exact-source tests; current-source app builds and launches, but startup status remains on connecting during an observed Keychain read wait. Real login/all-20 accounts, distribution signing/notarization and updater remain open.",
-    "checkpoint_commit": "e7ee13a87275140615da8328244964b1b5faad48"
+    "source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter secretsStoreReadQueryDisallows|keychainReadsRunOutside|blockedKeychainOperation",
+    "local_result": "Focused tests 3/3 passed. First attempt had a test-only deadlock because the semaphore release happened after awaiting the blocked operation; corrected ordering then passed. No local full-suite PASS claimed.",
+    "hosted_ci": "GitHub macOS CI 38475546446 passed the exact-source serial Swift suite 157/157 on macOS 15 arm64 (Xcode 16.4 / Swift 6.1.2).",
+    "native_dev_app_smoke": "Canonical Dev.app built in 9.26s from clean source 1de5720; source fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3; executable SHA-256 0bdc4bbf9effd0ddb374fbc9f6b9ddc3628333e0e4ecc4fb2f9845ea8eb7b40a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc nested codesign passed. One app instance. AX has phone entry/Continue/QR and explicit Keychain restore status, still waiting after >20s. No credentials entered; existing support preserved. Partial only.",
+    "scope": "Synthetic code/test and exact hosted suite pass. Live Keychain startup is still partial; real login, all-20 accounts, distribution signing/notarization and updater remain open.",
+    "checkpoint_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",

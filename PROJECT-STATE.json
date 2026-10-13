@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "phase": "App-source be4707d passed 155/155 exact-source CI; Site v158 is live. Current exact-source Dev.app e7ee13a builds, launches once, and exposes a clean phone/QR login UI, but startup remains on its connecting status while restoreProfiles waits in Security SecItemCopyMatching. No account login attempted.",
-  "verified_at": "2026-10-14T22:12:00Z",
+  "phase": "App-source 1de5720 passes exact-source macOS CI 157/157 and focused local Keychain tests 3/3. Canonical Dev.app builds and launches on the same bundle; startup now exposes the Keychain restore step instead of a generic connecting message, but the restore is still waiting in Security after more than 20 seconds. No auth data entered; no real account or 20-runtime evidence.",
+  "verified_at": "2026-10-13T22:08:30Z",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c"
+    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -14,12 +14,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38473154528,
+      "run_id": 38475546446,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38473154528",
-      "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-      "scope": "GitHub macos-15 Swift tests (Apple Silicon), 155/155 passed in 41s."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38475546446",
+      "workflow_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+      "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+      "scope": "GitHub macos-15 Apple Silicon serial Swift suite, 157/157 passed."
     },
     "published_application_releases": [],
     "github_access": {
@@ -57,30 +57,30 @@
       "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
       "scope": "Pinned TDLib arm64 Dev.app build, bundle verification, accountless UI and last-window/LaunchServices reopen/normal-quit smoke completed successfully on GitHub macOS runner after native trigger filter correction."
     },
-    "last_audited_checkpoint_commit": "e7ee13a87275140615da8328244964b1b5faad48",
+    "last_audited_checkpoint_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
     "pre_edit_working_tree_clean": true
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "build_info_commit": "c028bd3859d76b6abf31634a4bb62f071d5e9f57",
-    "application_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+    "build_info_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "application_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development signature",
     "distribution_ready": false,
-    "process_state": "CUA confirms canonical /private/tmp/NeTelegram-Dev.app remains running at accountless phone-entry form. Shell-side pgrep/LaunchServices lifecycle rerun was unavailable; do not count as local lifecycle PASS.",
+    "process_state": "One canonical Dev.app is running at accountless phone entry. AX status remains “Проверяю доступ к Связке ключей macOS для восстановления сохранённых профилей…” after >20s. No phone/code entered.",
     "historical_only": false,
-    "note": "Canonical accountless Dev.app. Source fingerprint d4a02f5339d4d87b9f79ab6d4df9f9ca56639e6f09366e3520e1afc66c9586d8; executable SHA-256 e9a30f6e2413e2b2cbc163ce3f5ce82462c431a546e258e7b513a9843bf2fa35; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; isolated support root /private/tmp/netelegram-c028-dev-support. No phone/OTP/profile/session."
+    "note": "Build 9.26s on Apple Swift 6.4, source fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3, executable SHA-256 0bdc4bbf9effd0ddb374fbc9f6b9ddc3628333e0e4ecc4fb2f9845ea8eb7b40a, pinned TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. Existing isolated support root preserved; no profile data inspected, reset, or deleted."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "PASS: exact-source hosted serial Swift suite 155/155 for be4707d; two new privacy-lock notification tests included. Targeted local tests passed 2/2. A separate local full-suite attempt stalled in the existing blocked-receive drain test and was interrupted; hosted exact-SHA suite passed.",
-      "command": "swift test --no-parallel --verbose (GitHub macos-15 runner); local focused: swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter privacyLockRedacts|notificationUpdatesReceivedWhileLocked",
-      "toolchain": "GitHub macos-15 Apple Silicon; local focused build Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK",
-      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-      "suite": "155/155 hosted; 2/2 focused local"
+      "result": "PASS: exact-source hosted serial Swift suite 157/157 for 1de5720 (run 38475546446); three focused local Keychain query/queue tests passed. The first focused run hung because the new test released its semaphore in defer after awaiting that same blocked operation; corrected, no repeat of the unchanged failing command. Native smoke remains partial because the live Keychain restore is still waiting.",
+      "command": "Local: swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter secretsStoreReadQueryDisallows|keychainReadsRunOutside|blockedKeychainOperation; Hosted: swift test --no-parallel --verbose",
+      "toolchain": "GitHub macos-15 Apple Silicon, Xcode 16.4 / Swift 6.1.2; local Xcode 27.0 / Swift 6.4 / arm64",
+      "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+      "suite": "157/157 hosted; 3/3 focused local"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -97,18 +97,16 @@
       "saved_archive_content_hash": "sha256:7ee8dcf223331b8ae32405033935c0b72509235434276cf13699b98ef6eda36b",
       "public_verification": "Anonymous /, /features/, /devlog/, /downloads/ all HTTP 200 text/html. Devlog contains exact app-source/CI markers. Downloads keeps honest no-release state. No installer links."
     },
-    "keychain_main_thread": "Actual SecretsStore backend is now injectable; five focused fake-backend tests pass without touching system Keychain. Real macOS Keychain blocking/ACL behavior, user interaction and credential access remain unverified.",
+    "keychain_main_thread": "Synchronous Security operations run on a dedicated serial DispatchQueue outside AppKit and Swift cooperative executors. Three focused tests plus exact-source CI 157/157 pass. In the canonical Dev.app, restoreProfiles still waits in SecItemCopyMatching for >20 seconds and UI reports the precise Keychain step; the actual local Keychain/ACL cause remains unresolved. No credential or profile data was read in the diagnostic.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": {
-      "result": "PARTIAL: one canonical Dev.app instance launched from e7ee13a. Accessibility confirms welcome/phone entry, Continue and QR, with no UUID profile visible and no phone/code entered. After at least 5 seconds status still says \"Подключаю экран входа…\". A one-second sample of the current process shows restoreProfiles awaiting Security SecItemCopyMatching on a cooperative utility task while the AppKit main thread is idle. Why this Keychain read is awaiting is not diagnosed. No real auth/account was exercised.",
-      "pid_at_check": 68532,
+      "result": "PARTIAL: one canonical Dev.app was replaced only after verifying the old app process exited and CI passed. New bundle launches and AX shows welcome/phone, Continue and QR. Status changes from the old generic connecting label to the explicit Keychain restore step, but remains there after >20 seconds. This is not a successful first-run or accountless-ready PASS. No phone/code entered; no Telegram account data inspected.",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_sha": "e7ee13a87275140615da8328244964b1b5faad48",
-      "source_fingerprint_sha256": "0d26a0d079dc72136b29f31f72079329c73238c488c315fae493434e0bdabca0",
-      "app_executable_sha256": "580aa2cec16857a043381660bd331424129f8b9cb880b476cf55ad36ffb613a5",
+      "source_sha": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+      "source_fingerprint_sha256": "be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3",
+      "app_executable_sha256": "0bdc4bbf9effd0ddb374fbc9f6b9ddc3628333e0e4ecc4fb2f9845ea8eb7b40a",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "sample_path": "/tmp/NeTelegram_2026-10-14_045808_vkX3.sample.txt",
       "support_root": "/private/tmp/netelegram-dev-support",
       "signature": "ad-hoc; codesign --verify --deep --strict passed"
     },
@@ -123,11 +121,10 @@
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
     "latest_exact_source_ci": {
       "result": "PASS",
-      "run_id": 38473154528,
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38473154528",
-      "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
-      "scope": "macOS 15 / Apple Silicon serial Swift test suite; 155 tests passed in 0.439s, workflow job 41s."
+      "run_id": 38475546446,
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38475546446",
+      "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+      "scope": "Exact-source GitHub macOS 15 Apple Silicon serial suite 157/157 passed."
     },
     "current_head_native_build": {
       "result": "PASS: canonical arm64 org.affpapa.netelegram.dev built from clean checkpoint e7ee13a in 9.20s; ad-hoc nested codesign verification passed. This is development only, not Developer ID distribution or notarization.",
@@ -218,7 +215,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Diagnose why this current-source accountless Dev.app waits in SecItemCopyMatching during profile restore and replace the indefinite connecting status with actionable state; do not inspect or import installed Telegram data or reuse the chat-exposed API hash. Keep this one canonical Dev.app instance. Then resume one acceptance gap at a time; real login is deferred, all-20 real accounts, API compatibility, Developer ID/notarization and updater gates remain open.",
+  "next_action": "Diagnose why SecItemCopyMatching for the existing local NeTelegram profile catalogue still waits despite non-interactive LAContext and off-cooperative-queue dispatch. Preserve the support directory and never inspect imported Telegram app state. The current native screen remains partial until phone-entry or an explicit safe Keychain failure is observed. Keep login user-driven and real 20-account/release gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
