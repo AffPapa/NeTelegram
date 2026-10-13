@@ -1271,7 +1271,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(buffer.count == 0)
 }
 
-@Test func updateBufferBackpressuresByBytesAndAdmitsOneOversizedUpdateAlone() async {
+@Test func updateBufferBackpressuresByBytesAndRejectsAnOversizedUpdateAlone() async {
     let buffer = TDLibUpdateBuffer(capacity: 8, byteCapacity: 5)
     let first = Data("1234".utf8)
     let second = Data("56".utf8)
@@ -1296,21 +1296,45 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(buffer.queuedByteCount == 0)
 
     let oversized = Data(repeating: 0x7f, count: 9)
-    #expect(buffer.append(oversized))
-    #expect(buffer.queuedByteCount == oversized.count)
-    let following = Task.detached { buffer.append(Data("x".utf8)) }
-    let oversizedDeadline = clock.now.advanced(by: .seconds(1))
-    while buffer.blockedProducerCount == 0 && clock.now < oversizedDeadline {
-        await Task.yield()
-    }
-    #expect(buffer.blockedProducerCount == 1)
-    let oversizedUpdate = buffer.take()
-    #expect(oversizedUpdate?.json == oversized)
-    if let oversizedUpdate { buffer.complete(oversizedUpdate) }
-    #expect(await following.value)
+    #expect(buffer.admit(oversized) == .oversized(maximumBytes: 5))
+    #expect(buffer.queuedByteCount == 0)
+    #expect(buffer.append(Data("x".utf8)))
     let followingUpdate = buffer.take()
     #expect(followingUpdate?.json == Data("x".utf8))
     if let followingUpdate { buffer.complete(followingUpdate) }
+}
+
+@Test func oversizedSoleReceiveUpdateFailsClosedWithoutEnteringTheReducerQueue() async throws {
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    let account = AccountUUID()
+    let route = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(17))
+    try await coordinator.registerBeforeFirstRequest(route)
+
+    let pollCount = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let current = pollCount.get()
+        pollCount.set(current + 1)
+        return current == 0 ? .update(Data(repeating: 0x7f, count: 9)) : .timeout
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator, byteCapacity: 8)
+    let failureReceived = LockedTestValue(false)
+    let failure = LockedTestValue<TDLibGatewayError?>(nil)
+    pipeline.start(onEvent: { _ in }, onReceiveFailure: { error in
+        failure.set(error)
+        failureReceived.set(true)
+    })
+
+    #expect(await waitForTrue(failureReceived, timeout: .seconds(2)))
+    #expect(failure.get() == .updateTooLarge(maximumBytes: 8))
+    #expect(gateway.receiveWorkerHasExited)
+    do {
+        try gateway.send("{}", to: route.client)
+        Issue.record("Gateway must reject sends after an oversized update fails the receive pipeline")
+    } catch let error as TDLibGatewayError {
+        #expect(error == .updateTooLarge(maximumBytes: 8))
+    } catch {
+        Issue.record("Unexpected gateway error: \\(error)")
+    }
 }
 
 @Test func updateBufferRoundRobinsClientsAndPreservesEachClientFIFO() {

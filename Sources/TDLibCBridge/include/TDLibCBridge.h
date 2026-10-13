@@ -10,10 +10,11 @@ int nt_tdlib_send(int32_t client_id, const char *request);
 typedef enum nt_tdlib_receive_status {
     NT_TDLIB_RECEIVE_ERROR = -1,
     NT_TDLIB_RECEIVE_TIMEOUT = 0,
-    NT_TDLIB_RECEIVE_UPDATE = 1
+    NT_TDLIB_RECEIVE_UPDATE = 1,
+    NT_TDLIB_RECEIVE_TOO_LARGE = 2
 } nt_tdlib_receive_status;
 
-nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, char **output);
+nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, size_t maximum_bytes, char **output, size_t *actual_bytes);
 void nt_tdlib_free(void *buffer);
 
 int nt_lock_file_exclusive(int file_descriptor);

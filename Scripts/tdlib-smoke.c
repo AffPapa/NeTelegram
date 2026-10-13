@@ -32,12 +32,18 @@ int main(int argc, char **argv) {
     int got_closed = 0;
     for (int attempt = 0; attempt < 25 && !got_closed; attempt++) {
         char *json = NULL;
-        nt_tdlib_receive_status receive_status = nt_tdlib_receive_copy(1.0, &json);
+        size_t json_bytes = 0;
+        nt_tdlib_receive_status receive_status = nt_tdlib_receive_copy(1.0, 16u * 1024u * 1024u, &json, &json_bytes);
+        (void)json_bytes;
         if (receive_status == NT_TDLIB_RECEIVE_ERROR) {
             fputs("TDLib receive-copy failed during smoke test\n", stderr);
             return 1;
         }
         if (receive_status == NT_TDLIB_RECEIVE_TIMEOUT) continue;
+        if (receive_status == NT_TDLIB_RECEIVE_TOO_LARGE) {
+            fputs("TDLib update exceeded the bounded receive size during smoke test\n", stderr);
+            return 1;
+        }
         if (json == NULL) {
             fputs("TDLib returned update status without a copied buffer\n", stderr);
             return 1;

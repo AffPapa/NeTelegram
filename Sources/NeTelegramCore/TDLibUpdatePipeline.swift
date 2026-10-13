@@ -5,6 +5,12 @@ public enum TDLibPipelineEvent: Sendable {
     case routingFailure(TDLibRoutingError)
 }
 
+public enum TDLibUpdateAdmission: Equatable, Sendable {
+    case accepted
+    case stopped
+    case oversized(maximumBytes: Int)
+}
+
 /// A bounded fair queue between the one blocking td_receive worker and the
 /// reducer. Each client keeps FIFO order; ready clients take turns so a busy
 /// account cannot indefinitely starve sparse accounts. A small, byte-limited
@@ -97,6 +103,12 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     /// Blocks until capacity is available. Returns false once shutdown starts.
     @discardableResult
     public func append(_ json: Data) -> Bool {
+        if case .accepted = admit(json) { return true }
+        return false
+    }
+
+    func admit(_ json: Data) -> TDLibUpdateAdmission {
+        guard json.count <= byteCapacity else { return .oversized(maximumBytes: byteCapacity) }
         let incoming = BufferedTDLibUpdate(json: json)
         let lane = lane(for: incoming)
         condition.lock()
@@ -107,7 +119,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         }
         guard !closed || (allowFinalInFlightAppend && !finalInFlightAppendUsed) else {
             condition.unlock()
-            return false
+            return .stopped
         }
         // The receive worker calls append synchronously and is the sole producer.
         // During shutdown, it may already hold one JSON result (including while
@@ -132,7 +144,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         storedByteCount += update.json.count
         condition.signal()
         condition.unlock()
-        return true
+        return .accepted
     }
 
     /// Returns nil after close and after every already accepted item is drained.
@@ -300,7 +312,7 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
 
         gateway.startSingleReceiveWorker(
             onUpdate: { [buffer] update in
-                buffer.append(update)
+                buffer.admit(update)
             },
             onFailure: { [buffer, reducerExited] failure in
                 // The receive worker has returned from td_receive and cannot

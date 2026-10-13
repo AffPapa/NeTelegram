@@ -6,18 +6,21 @@ public enum TDLibGatewayError: Error, Equatable, Sendable {
     case clientCreation
     case requestRejected
     case receiveCopyFailed
+    case updateTooLarge(maximumBytes: Int)
 }
 
 enum TDLibReceivePollResult: Sendable {
     case timeout
     case update(Data)
+    case updateTooLarge
     case copyFailure
 }
 
 /// Thin adapter for the pinned TDLib JSON C API. The single receive loop runs
 /// on a dedicated Foundation Thread, never on the main or cooperative executor.
 public final class TDLibGateway: @unchecked Sendable {
-    public typealias UpdateHandler = @Sendable (Data) -> Void
+    public typealias UpdateHandler = @Sendable (Data) -> TDLibUpdateAdmission
+    private static let maximumUpdateBytes = 16 * 1_024 * 1_024
 
     private let sendLock = NSLock()
     private let receiveLock = NSLock()
@@ -40,14 +43,17 @@ public final class TDLibGateway: @unchecked Sendable {
         }
         receivePoll = { timeoutSeconds in
             var pointer: UnsafeMutablePointer<CChar>?
-            let status = nt_tdlib_receive_copy(timeoutSeconds, &pointer)
+            var actualBytes = 0
+            let status = nt_tdlib_receive_copy(timeoutSeconds, Self.maximumUpdateBytes, &pointer, &actualBytes)
             switch status {
             case NT_TDLIB_RECEIVE_TIMEOUT:
                 return .timeout
             case NT_TDLIB_RECEIVE_UPDATE:
                 guard let pointer else { return .copyFailure }
                 defer { nt_tdlib_free(pointer) }
-                return .update(Data(bytes: pointer, count: strlen(pointer)))
+                return .update(Data(bytes: pointer, count: actualBytes))
+            case NT_TDLIB_RECEIVE_TOO_LARGE:
+                return .updateTooLarge
             default:
                 return .copyFailure
             }
@@ -94,7 +100,24 @@ public final class TDLibGateway: @unchecked Sendable {
                 case .timeout:
                     continue
                 case .update(let data):
-                    onUpdate(data)
+                    switch onUpdate(data) {
+                    case .accepted:
+                        continue
+                    case .stopped:
+                        if self.shouldStop { return }
+                        let failure = self.markReceiveFailed()
+                        onFailure(failure)
+                        return
+                    case .oversized(let maximumBytes):
+                        if self.shouldStop { return }
+                        let failure = self.markReceiveFailed(error: .updateTooLarge(maximumBytes: maximumBytes))
+                        onFailure(failure)
+                        return
+                    }
+                case .updateTooLarge:
+                    let failure = self.markReceiveFailed(error: .updateTooLarge(maximumBytes: Self.maximumUpdateBytes))
+                    onFailure(failure)
+                    return
                 case .copyFailure:
                     let failure = self.markReceiveFailed()
                     onFailure(failure)
@@ -134,12 +157,12 @@ public final class TDLibGateway: @unchecked Sendable {
         return receiveFailure
     }
 
-    private func markReceiveFailed() -> TDLibGatewayError {
+    private func markReceiveFailed(error: TDLibGatewayError = .receiveCopyFailed) -> TDLibGatewayError {
         // Serialize the fail-stop state with user sends. Once the failure is
         // visible, no further TDLib command may be accepted by this gateway.
         sendLock.lock()
         stopLock.lock()
-        let failure = receiveFailure ?? TDLibGatewayError.receiveCopyFailed
+        let failure = receiveFailure ?? error
         receiveFailure = failure
         stopping = true
         stopLock.unlock()

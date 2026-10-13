@@ -96,17 +96,22 @@ int nt_tdlib_send(int32_t client_id, const char *request) {
     return 1;
 }
 
-nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, char **output) {
-    if (output == NULL) return NT_TDLIB_RECEIVE_ERROR;
+nt_tdlib_receive_status nt_tdlib_receive_copy(double timeout_seconds, size_t maximum_bytes, char **output, size_t *actual_bytes) {
+    if (output == NULL || actual_bytes == NULL || maximum_bytes == 0) return NT_TDLIB_RECEIVE_ERROR;
     *output = NULL;
+    *actual_bytes = 0;
     pthread_mutex_lock(&load_mutex);
     receive_fn function = receive_update;
     pthread_mutex_unlock(&load_mutex);
     if (function == NULL) return NT_TDLIB_RECEIVE_ERROR;
     const char *borrowed = function(timeout_seconds);
     if (borrowed == NULL) return NT_TDLIB_RECEIVE_TIMEOUT;
+    size_t length = strnlen(borrowed, maximum_bytes + 1);
+    *actual_bytes = length;
+    if (length > maximum_bytes) return NT_TDLIB_RECEIVE_TOO_LARGE;
     char *copy = strdup(borrowed);
     if (copy == NULL) return NT_TDLIB_RECEIVE_ERROR;
+    *actual_bytes = length;
     *output = copy;
     return NT_TDLIB_RECEIVE_UPDATE;
 }
