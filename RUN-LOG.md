@@ -365,3 +365,10 @@
 - Anonymous system `curl` verified `/devlog/` and `/downloads/` as HTTP/2 200, `text/html`. Devlog contains app source `2cd13c2`, CI run `38461168203`, metadata run `38461168216`, and the accountless test scope. Downloads still have zero ZIP/DMG links and state that no verified app build is available.
 - A Python HTTPS probe failed TLS certificate validation because its local CA bundle could not build a trust chain; standard system `curl` verified the same public routes with normal certificate validation. No TLS bypass was used.
 - No app release, release asset or user account changed. Real login/all-20 coverage, Developer ID/notarization, updater, and Telegram API compatibility remain open.
+
+### 2026-10-14 — remove stale evidence pointers from the checkpoint
+
+- Consolidated evidence labels after review: pinned native workflow `38457814416` is now explicitly a historical baseline for app source `6145b015`, while the current source `2cd13c2` has separate accountless local Dev.app UI evidence. No Swift tests or TDLib build were repeated.
+- Current Site acceptance evidence now points to public v152/source `e671ff0` and deployment `appgdep_6ace91b5…`. Anonymous live checks cover only `/devlog/` and `/downloads/`; local static validation covers all eight routes. Other public routes/feeds were not claimed as live-checked. SITE03/04/05 remain partial because downloads, accessibility/browser coverage and signed-byte/updater coherence are incomplete.
+- Removed duplicate Site archive size/hash aliases and renamed the stale top-level devlog pointer to `latest_site_source_commit`. Acceptance workflow evidence is now structured by current app-source CI, checkpoint metadata, and historical native baseline.
+- This is checkpoint hygiene only. The already-passed app CI `38461168203` remains valid for unchanged app source `2cd13c2`; one metadata validation will run for this consolidated JSON, with no source or package rebuild.
