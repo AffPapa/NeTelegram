@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; QR authorization image accessibility improvement 19ebb00 passed local 110/110, exact-source macOS CI and pinned TDLib/isolated Dev.app smoke. Public Site v94 was deployed and all key routes checked. No native VoiceOver/real QR account, 20-account validation or release evidence.",
+  "status": "implementation_in_progress; QR accessibility Site v94 is public. Release preflight corrected stale identity evidence: Developer ID Application signing identities are available locally, but notarization profile and candidate are unverified and no signed release exists.",
   "cases": [
     {
       "id": "APP01",
@@ -287,8 +287,8 @@
       "expected": "DeveloperID/HR/entitlements, Accepted, staple, final hashes and layout.",
       "method": "build/release tools",
       "required_for": "signed app releases",
-      "status": "blocked",
-      "evidence": "Current host Xcode 27.0 / arm64: security find-identity -v -p codesigning returned 0 valid identities. No Developer ID-signed or notarized candidate exists."
+      "status": "partial",
+      "evidence": "Read-only preflight on arm64 host: Xcode 27.0 and notarytool are available; `security find-identity -v -p codesigning` reports 4 valid identities including 2 Developer ID Application identities. No credentials or private keys were read. Repository/environment scan found no notarization profile reference; whether a suitable NeTelegram notary profile exists in Keychain remains unverified. No Developer ID-signed candidate, notarization submission/Accepted result, stapling, or Gatekeeper install smoke exists; no release pass is claimed."
     },
     {
       "id": "REL04",
