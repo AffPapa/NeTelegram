@@ -5708,12 +5708,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func openPhotoViewer(_ key: PhotoPresentationKey, fileURL: URL) {
-        guard !lockState, runtime?.account == key.account,
+        guard !lockState,
+              let accountRuntime = runtimesByAccount[key.account],
+              runtime === accountRuntime,
+              let expectedTelegramUserID = accountRuntime.telegramUserID,
               selectedChatByAccount[key.account] == key.chatID,
               photoViews[key] != nil else { return }
         closePhotoViewer()
         let viewGeneration = photoPresentationGeneration
         let privacyEpoch = privacyDispatchBarrier.currentEpoch()
+        let runtimeGeneration = accountRuntime.generation
         photoViewerKey = key
         photoViewerPrivacyEpoch = privacyEpoch
         photoButtons[key]?.isEnabled = false
@@ -5730,7 +5734,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 guard let self, !self.lockState,
                       self.photoPresentationGeneration == viewGeneration,
                       self.privacyDispatchBarrier.currentEpoch() == privacyEpoch,
-                      self.runtime?.account == key.account,
+                      self.runtime === accountRuntime,
+                      self.runtimesByAccount[key.account] === accountRuntime,
+                      accountRuntime.generation == runtimeGeneration,
+                      accountRuntime.telegramUserID == expectedTelegramUserID,
                       self.selectedChatByAccount[key.account] == key.chatID,
                       self.photoViewerKey == key else { return }
                 guard let data, let image = NSImage(data: data) else {
@@ -5742,6 +5749,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     return
                 }
                 self.presentPhotoViewer(image)
+                // TDLib must be told when the user actually opens photo
+                // content. Bind the call to the exact account/runtime and
+                // privacy epoch just like other user-originated commands.
+                do {
+                    let accepted = try self.privacyDispatchBarrier.dispatchBoundUserCommand(
+                        account: key.account,
+                        expectedTelegramUserID: expectedTelegramUserID,
+                        runtimeGeneration: runtimeGeneration,
+                        privacyEpoch: privacyEpoch,
+                        currentAccount: accountRuntime.account,
+                        currentTelegramUserID: expectedTelegramUserID,
+                        currentGeneration: accountRuntime.generation
+                    ) {
+                        try accountRuntime.send([
+                            "@type": "openMessageContent",
+                            "chat_id": key.chatID,
+                            "message_id": key.messageID,
+                        ])
+                    }
+                    if !accepted {
+                        self.closePhotoViewer()
+                        return
+                    }
+                } catch {
+                    self.setStatus("Не удалось передать TDLib факт открытия фотографии.")
+                }
                 self.photoViewerToken = nil
                 self.photoButtons[key]?.isEnabled = true
                 self.photoButtons[key]?.title = "Полный размер"

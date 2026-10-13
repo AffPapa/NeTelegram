@@ -205,7 +205,7 @@
       "method": "native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial."
+      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial. Static review found that the current v1.8.68 TDLib schema requires `openMessageContent` when photo content is actually opened, but the AppKit full-size photo viewer did not issue it. The viewer now sends that request only after the full-size image is successfully decoded and presented; the call is bound to the selected account, expected Telegram identity, runtime generation, and privacy epoch through PrivacyDispatchBarrier. Final exact-worktree serial suite passed 151/151 in 0.207 seconds; AppKit/Core build completed in 5.33 seconds on Xcode 27 / Swift 6.4. Exact hosted CI, pinned Dev.app compile/smoke, and real-account photo interaction remain pending; APP20 stays partial."
     },
     {
       "id": "APP21",
