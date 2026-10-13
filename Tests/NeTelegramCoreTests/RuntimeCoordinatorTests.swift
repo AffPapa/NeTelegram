@@ -1933,6 +1933,16 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(sendCount.get() == 1)
 }
 
+@Test func notificationPermissionIsRequestedOnceAcrossAccountStartup() {
+    var gate = NotificationAuthorizationRequestGate()
+    let first = gate.claimRequest()
+    let second = gate.claimRequest()
+    let third = gate.claimRequest()
+    #expect(first)
+    #expect(!second)
+    #expect(!third)
+}
+
 @Test func notificationPublicationIsSerializedWithPrivacyLock() async {
     let barrier = PrivacyDispatchBarrier()
     let publicationEntered = LockedTestValue(false)

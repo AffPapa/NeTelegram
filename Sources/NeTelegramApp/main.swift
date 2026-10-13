@@ -197,6 +197,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var notificationIDsByAccount: [AccountUUID: Set<String>] = [:]
     private var notificationTargets: [String: RoutedTDLibNotification] = [:]
     private var notificationUnlockHandoff = NotificationUnlockHandoff()
+    private var notificationAuthorizationRequestGate = NotificationAuthorizationRequestGate()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
@@ -2762,6 +2763,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // permission result; these limits bound only its active notification set.
         try? target.send(["@type": "setOption", "name": "notification_group_count_max", "value": ["@type": "optionValueInteger", "value": 10]])
         try? target.send(["@type": "setOption", "name": "notification_group_size_max", "value": ["@type": "optionValueInteger", "value": 10]])
+        guard notificationAuthorizationRequestGate.claimRequest() else { return }
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { _, _ in }
     }
 
