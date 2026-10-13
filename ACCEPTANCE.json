@@ -1,22 +1,22 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 94740d38bfa845919ac2863ad0e78d1a7d494a04. Exact-source Dev.app build/first-run GUI smoke passed; core suite 152/152 applies only to prior source be58d83. Current-source macOS CI 38466197778 was cancelled at timeout without a test result. Metadata validation for checkpoint 4d9989c passed. Public Site v154 is live. No real login, 20-runtime certification, Developer ID/notarization, updater or app release.",
+  "status": "implementation_in_progress; app-source 4d6820d passed local full serial synthetic Core suite 153/153. GitHub macOS CI 38469520583 and metadata validation 38469520931 passed on checkpoint c9dd915. Public Site v156 deployed and all 4 public routes returned HTTP 200 text/html with content checks. No real login, 20-account certification, Developer ID/notarization, updater, or stable app release.",
   "current_evidence": {
-    "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
-    "app_tests": "Current app source 94740d38bfa845919ac2863ad0e78d1a7d494a04: the test target and app target built locally in 5.38s with Xcode 27 / Swift 6.4. Two focused tests passed: cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges (1/1 each, 0.002s and 0.001s). These are Core synthetic tests; they do not invoke AppDelegate restoration, TDLib accounts, or certify 20 real runtimes. The full current-source suite has no PASS. Exact-source CI 38466197778 built the package in 47.20s, then was cancelled during the test-runner phase at the configured five-minute job limit; its log reports operation cancelled and no test result. Cancellation initiator/cause is not independently identified.",
+    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+    "app_tests": "App-source 4d6820da73f2790c73a35177b8f9c1d1ecf8685c: full serial Swift suite passed 153/153 on Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK. Warm build 0.23s; test execution 0.200s. Synthetic Core coverage only; no real TDLib accounts or 20-runtime certification.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38466197778,
-        "workflow_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
-        "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
-        "result": "cancelled",
-        "scope": "macOS 15 / Xcode 16.4 exact-source run 38466197778 built the test bundle in 47.20s, then ended cancelled during the test-runner phase at the configured five-minute job limit. No test result or failing assertion was emitted; cancellation initiator is unknown."
+        "run_id": 38469520583,
+        "workflow_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
+        "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+        "result": "success",
+        "scope": "Swift tests (Apple Silicon) job completed successfully on macos-15 for checkpoint c9dd915 containing app-source 4d6820d."
       },
       "current_checkpoint_metadata": {
-        "run_id": 38466847617,
-        "workflow_commit": "4d9989c04f07875dbed7218c77c33b60a1f5e1c6",
+        "run_id": 38469520931,
+        "workflow_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
         "result": "success",
-        "scope": "Metadata validation for checkpoint 4d9989c completed successfully."
+        "scope": "Metadata validation completed successfully for checkpoint c9dd915."
       },
       "previous_native_bundle_baseline": {
         "run_id": 38457814416,
@@ -31,7 +31,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; current APP16 tests are synthetic and do not certify real sessions or performance",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
-    "site": "Public Site v154 at https://netelegram.iryadom.chatgpt.site; Site source 6242beb8ecd26008e235b46b7f922c37010b14b2, deployment appgdep_6ace9add32348191ad8bf25dc41140bf. Anonymous /devlog/ and /downloads/ returned HTTP/2 200 text/html; downloads have no app binary links.",
+    "site": "Public Site v156 at https://netelegram.iryadom.chatgpt.site; source 5e9651446a4bfbae4bd3bc0f086c9d481f9560d5; deployment appgdep_6acea15c55f881918a6f848cac79f7a6. Anonymous /, /features/, /devlog/, and /downloads/ all returned HTTP 200 text/html and factual content checks passed. Downloads has no installer links because no signed/notarized app release exists.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -488,34 +488,36 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+    "source_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
     "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --verbose",
-    "local_result": "Full serial Swift suite passed 153/153 on Xcode 27 / Swift 6.4 / arm64 / macOS 27 SDK. Warm build 0.23s; test execution 0.200s. This includes both startup queue tests and validates synthetic Core behavior, not real TDLib accounts. Two selected tests also passed earlier on the same source in 18.37s cold build + 0.001s each. Exact-source hosted CI for this commit has not run because it is not pushed.",
-    "hosted_ci": "Run 38466197778 built test bundle in 47.20s on macOS 15 / Xcode 16.4, then was cancelled during the test-runner phase at the configured five-minute job limit; no test result or failure output. Cancellation initiator is unknown.",
-    "native_dev_app_smoke": "PASS: canonical arm64 Dev.app source 94740d3, fingerprint e79a341bdfc0c7cd1c7da64c68b0a42112af892000c42c01bac16fed836d32b6. AX/screenshot show country picker Thailand +66 suggested, phone, Continue/QR, neutral status. No login/profile.",
-    "scope": "Current-source Dev.app build and accountless first-run UI smoke passed. Two focused Core tests pass on current app source; full suite has no PASS. Prior 152/152 applies only to be58d83. Site v154 remains live; prepared status correction is local/unpublished. No real login, 20-runtime certification, signed distribution or downloads.",
-    "checkpoint_commit": "4d9989c04f07875dbed7218c77c33b60a1f5e1c6"
+    "local_result": "Full serial suite passed 153/153 on Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK. Warm build 0.23s; tests 0.200s. Synthetic Core only. No rerun after unchanged app source.",
+    "hosted_ci": "GitHub macOS CI run 38469520583 and metadata validation 38469520931 both passed for checkpoint c9dd915; app-source is 4d6820d.",
+    "native_dev_app_smoke": "PASS remains limited to parent source 94740d3 accountless UI; no credentials, profile, or runtime were created. Current source 4d6820d has no new Dev.app GUI smoke.",
+    "scope": "Current app source local suite and hosted CI are PASS. All-20 authorized Telegram accounts, real login, current-source native GUI, Developer ID/notarization, updater and Telegram API compatibility remain unverified/open.",
+    "checkpoint_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 154,
-    "source_commit": "6242beb8ecd26008e235b46b7f922c37010b14b2",
-    "app_repository_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
-    "deployment_id": "appgdep_6ace9add32348191ad8bf25dc41140bf",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_0e843b0b1ca08191a89301eb4a734108",
+    "version": 156,
+    "source_commit": "5e9651446a4bfbae4bd3bc0f086c9d481f9560d5",
+    "app_repository_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
+    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+    "deployment_id": "appgdep_6acea15c55f881918a6f848cac79f7a6",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_212182ce60108191a1ff10f6ee9be9d2",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "description": "Bilingual factual first-run country selector milestone; current source UI smoke and prior-source test result are distinguished; no app download claims.",
-    "local_archive_path": "/private/tmp/netelegram-site-v154.tar",
-    "local_archive_sha256": "a9f68baeb47fbb9d59f9e06d86917d1a2084919329fc2e7da5c28c8b61c77836",
-    "local_archive_size_bytes": 290346,
-    "saved_archive_content_hash": "sha256:4c62478ca725e7d990ef4829ba912136ca34990d0c4236197532f900434390e2",
-    "saved_archive_size_bytes": 522240,
+    "description": "Bilingual development Site updated with current app-source, local suite, successful hosted CI, and explicit non-release/coverage limits. No download buttons for nonexistent binaries.",
+    "local_archive_path": "/private/tmp/netelegram-site-v156.tar",
+    "local_archive_sha256": "0c473115004e34a4119b8d9eae36a295e08c571a78ae0465131f0d095e3e1fab",
+    "local_archive_size_bytes": null,
+    "saved_archive_content_hash": "sha256:f96442371e6bf138335de9f090bcec6cdf07b4e6a225ebfdb7f000cd13de79ac",
+    "saved_archive_size_bytes": 532480,
     "archive_file_count": 15,
-    "metadata_validation_run_id": 38466847617,
-    "public_verification": "Anonymous /devlog/ and /downloads/ returned HTTP/2 200 text/html; downloads contain no app binary URL."
+    "github_ci_run_id": 38469520583,
+    "metadata_validation_run_id": 38469520931,
+    "public_verification": "Anonymous /, /features/, /devlog/, /downloads/ returned HTTP 200 text/html after v156; content markers for current CI/source passed; downloads contains no .dmg/.zip installer links."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
@@ -542,5 +544,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Current source 4d6820da73f2790c73a35177b8f9c1d1ecf8685c passed the complete serial synthetic Core suite 153/153 on Xcode 27 / Swift 6.4; warm build 0.23s, test execution 0.200s. Do not rerun unchanged. Local main contains source plus checkpoint commits; last verified origin/main is 4d9989c. DNS still needs a fresh check before one Git push. Exact-source CI and metadata checks should start from that single push, then publish the prepared Site status once through the official helper. Existing public Site is v154. Real login/all-20, signed notarized distribution, updater and Telegram compatibility remain open."
+  "next_action": "Continue with one isolated native AppKit/TDLib vertical slice against app-source 4d6820d, first checking current checkpoint and running only its targeted tests; run the full suite once after a meaningful source change. Do not rebuild/replace Dev.app unless process and bundle identity are safely verified. Real login waits for user-entered credentials in NeTelegram. Keep all-20 real runtime, compatibility, Developer ID/notarization, updater, signed release and downloads marked open until evidenced."
 }

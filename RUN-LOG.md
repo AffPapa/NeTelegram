@@ -449,3 +449,12 @@
 - This establishes a local full-suite PASS for this source, not a hosted CI PASS. Exact-source CI has not run because the source is still unpushed. Parent-source CI 38466197778 (94740d3) remains cancelled in runner phase with initiator unknown.
 - Site homepage/features/devlog were updated locally to source 4d6820d and exact coverage; static validation passes all 8 routes. Sites confirms the existing public deployment remains v154. No app binaries or downloads.
 - External checks still show DNS failure for github.com; do one DNS/remote check on resume, then push source + checkpoint once, let CI/metadata run together, and publish the prepared Site once after the hosted result. Do not repeat 153/153 unchanged.
+
+
+### 2026-10-14 — exact app CI and public Site v156 reconciled
+
+- Verified canonical app repo `/private/tmp/netelegram-cli-work`, branch `main`, clean before publication; live `origin/main` was `4d9989c04f07875dbed7218c77c33b60a1f5e1c6`. Existing Git transport pushed the three reviewed commits fast-forward to checkpoint `c9dd915e5e79dd9027db568c68c8a2e3283950e5`; no token creation or auth login.
+- GitHub macOS CI `38469520583` and metadata validation `38469520931` both completed successfully on the checkpoint; product app-source remains `4d6820da73f2790c73a35177b8f9c1d1ecf8685c`. Local full serial suite remains 153/153 on Xcode 27 / Swift 6.4; tests were not repeated unchanged.
+- Official Sites helper initially failed inside sandbox on DNS for `git.chatgpt-team.site`; same helper succeeded through approved host network using credential only over hidden stdin. No Site origin was replaced and no token was printed. Site source `7590ad7` saved/deployed as v155, then anonymous QA found that the intended new devlog marker had not landed. Corrected the source and published v156 from `5e9651446a4bfbae4bd3bc0f086c9d481f9560d5` (deployment `appgdep_6acea15c55f881918a6f848cac79f7a6`).
+- Public v156 checks: `/`, `/features/`, `/devlog/`, `/downloads/` each returned HTTP 200 `text/html`; current CI/source markers pass, and downloads contains no installer links. Local v156 archive SHA-256 `0c473115004e34a4119b8d9eae36a295e08c571a78ae0465131f0d095e3e1fab`; Sites archive receipt `sha256:f96442371e6bf138335de9f090bcec6cdf07b4e6a225ebfdb7f000cd13de79ac`.
+- No app bundle was rebuilt or launched. No real Telegram account was entered. All-20 runtime, current-source native GUI smoke, Developer ID/notarization, updater and compatibility gates remain open; no binary release/download is claimed.
