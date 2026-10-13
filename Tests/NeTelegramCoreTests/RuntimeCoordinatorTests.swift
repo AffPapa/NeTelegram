@@ -1164,6 +1164,32 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(throws: EncryptedDraftStoreError.accountMismatch) { try storeB.save([conversationA: "cross-account"]) }
 }
 
+@Test func encryptedDraftStoreReconcilesAcceptedSendAfterPresentationCachePurge() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let store = try EncryptedDraftStore(account: account, stateDirectory: root, key: Data(repeating: 0x2A, count: 32))
+    let conversation = ConversationKey(account: account, chatID: 42)
+    try store.save([conversation: "accepted text"])
+
+    // The lock clears UI memory, but TDLib's later success still removes the
+    // matching persisted draft so it cannot reappear on unlock.
+    #expect(try store.removeDraftIfMatching(conversation, text: "accepted text"))
+    #expect(try store.load().isEmpty)
+}
+
+@Test func encryptedDraftStoreKeepsNewerDraftWhenOldSendCompletes() throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let account = AccountUUID()
+    let store = try EncryptedDraftStore(account: account, stateDirectory: root, key: Data(repeating: 0x2B, count: 32))
+    let conversation = ConversationKey(account: account, chatID: 43)
+    try store.save([conversation: "newer unsent text"])
+
+    #expect(!(try store.removeDraftIfMatching(conversation, text: "older sent text")))
+    #expect(try store.load() == [conversation: "newer unsent text"])
+}
+
 @Test func photoPipelineDownsamplesToViewportBoundAndCapsConcurrency() throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }

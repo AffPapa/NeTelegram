@@ -3005,6 +3005,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 if mayPresent, !lockState, currentConversationKey() == pending.intent.conversation {
                     setComposerText("")
                 }
+            } else if let store = draftStoresByAccount[pending.intent.account],
+                      !unavailableDraftAccounts.contains(pending.intent.account) {
+                // Privacy Lock may have purged the presentation cache after
+                // TDLib accepted this send. Reconcile the encrypted durable
+                // draft by value, so a newer draft is never removed and no
+                // unrelated drafts are overwritten from an empty cache.
+                do {
+                    _ = try store.removeDraftIfMatching(pending.intent.conversation, text: pending.text)
+                } catch {
+                    unavailableDraftAccounts.insert(pending.intent.account)
+                    setStatus("Отправка подтверждена, но черновик не удалось сверить с хранилищем.")
+                }
             }
             if let replyID = pending.intent.replyToMessageID,
                replyTargetsByConversation[pending.intent.conversation] == replyID {

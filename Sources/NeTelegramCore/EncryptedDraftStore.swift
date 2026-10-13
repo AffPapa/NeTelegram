@@ -41,6 +41,38 @@ public final class EncryptedDraftStore: @unchecked Sendable {
     public func load() throws -> [ConversationKey: String] {
         lock.lock()
         defer { lock.unlock() }
+        return try loadUnlocked()
+    }
+
+    /// Atomic authenticated-encryption write. A failure leaves the previous
+    /// ciphertext intact so the caller can retain an in-memory dirty barrier.
+    public func save(_ drafts: [ConversationKey: String]) throws {
+        lock.lock()
+        defer { lock.unlock() }
+        guard drafts.keys.allSatisfy({ $0.account == account }) else {
+            throw EncryptedDraftStoreError.accountMismatch
+        }
+        try saveUnlocked(drafts)
+    }
+
+    /// Removes a draft only when the durable value still matches the text
+    /// accepted by TDLib. This lets send acknowledgements reconcile storage
+    /// after the privacy lock has purged presentation memory, without deleting
+    /// a newer draft written for the same conversation.
+    @discardableResult
+    public func removeDraftIfMatching(_ conversation: ConversationKey, text: String) throws -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard conversation.account == account else { throw EncryptedDraftStoreError.accountMismatch }
+        let drafts = try loadUnlocked()
+        guard drafts[conversation] == text else { return false }
+        var updated = drafts
+        updated.removeValue(forKey: conversation)
+        try saveUnlocked(updated)
+        return true
+    }
+
+    private func loadUnlocked() throws -> [ConversationKey: String] {
         guard FileManager.default.fileExists(atPath: fileURL.path) else { return [:] }
         do {
             let sealedData = try Data(contentsOf: fileURL)
@@ -62,14 +94,7 @@ public final class EncryptedDraftStore: @unchecked Sendable {
         }
     }
 
-    /// Atomic authenticated-encryption write. A failure leaves the previous
-    /// ciphertext intact so the caller can retain an in-memory dirty barrier.
-    public func save(_ drafts: [ConversationKey: String]) throws {
-        lock.lock()
-        defer { lock.unlock() }
-        guard drafts.keys.allSatisfy({ $0.account == account }) else {
-            throw EncryptedDraftStoreError.accountMismatch
-        }
+    private func saveUnlocked(_ drafts: [ConversationKey: String]) throws {
         do {
             let entries = drafts
                 .filter { !$0.value.isEmpty }
