@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. Latest APP16 targeted queue test and exact-SHA CI passed. Release signing identities: 0; no public app release. Public Site v123 is live with downloads correctly unavailable. Real-account and 20-runtime coverage remain unverified.",
+  "status": "implementation_in_progress; app Swift source remains 816bbb4ab2a61817cc3da0780f47219b1f8f52e9. APP16 targeted test and APP01 Core composition CI passed; app has no public release and 0 Developer ID identities. Public Site v126 is live; no application download. Real-account and 20-runtime coverage remain unverified.",
   "current_evidence": {
     "app_source_commit": "816bbb4ab2a61817cc3da0780f47219b1f8f52e9",
     "app_tests": "Targeted APP16 queue shutdown test updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput passed locally 1/1; exact-SHA macOS CI run 38409529115 succeeded for test/evidence commit 04279b967c8296a8c73719ce79030286dfe4570a. Synthetic buffered JSON only; no real TDLib, TTL expiry, 20-client overload or real-account certification. New test: twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1; exact-SHA macOS CI 38412386934 passed for test commit 5879143cc420cb0047606d099aa49810a609060e.",
@@ -13,7 +13,7 @@
     "real_account_coverage": "none; user deferred login",
     "twenty_authorized_runtime_coverage": "none; synthetic scheduler/fault tests do not count as real accounts",
     "release_status": "no public application release; Developer ID/notarization/Gatekeeper/Sparkle not verified",
-    "site": "Public Site v123 live at https://netelegram.iryadom.chatgpt.site; source bbfa7c7df93f9bf2974291109a71f11ccaad80a, deployment appgdep_6ace3a2734c881918019aefea91f33ee, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_4a7ee91928508191b97b4eb69d1e62ad. Anonymous HTTPS checks: devlog/downloads 200 HTML; stable/alpha feeds 200 text/xml and valid XML. Downloads remain NO RELEASE.",
+    "site": "Public Site v126 live at https://netelegram.iryadom.chatgpt.site; Site source 6ce2199219b8adb692afb6b21780a42c436b0314, app repository docs commit d63250d8c3a4805144e0498d358d2608b0751a07, deployment appgdep_6ace41cb6cb081918195dc7caef7ee8e, saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_853bf475c108819182b4c3e60068279b. Anonymous browser checks: 8 HTML routes 200 text/html, stable/alpha feeds 200 text/xml. Desktop/mobile visual QA at 1440px/375px confirmed no horizontal overflow and no console errors. Downloads remain NO RELEASE.",
     "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
     "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
@@ -471,18 +471,19 @@
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 122,
-    "source_commit": "c0d0b70c25a9f5517ec9a55a87e5f885bda34a5b",
-    "deployment_id": "appgdep_6ace36ed4f988191aad661fa4bb63ff6",
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_67852fdff6788191a59e7b785d19b7d8",
+    "version": 126,
+    "source_commit": "6ce2199219b8adb692afb6b21780a42c436b0314",
+    "app_repository_commit": "d63250d8c3a4805144e0498d358d2608b0751a07",
+    "deployment_id": "appgdep_6ace41cb6cb081918195dc7caef7ee8e",
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_853bf475c108819182b4c3e60068279b",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "bab59f286f6fcfa40fcf03a91607597d290cd77773d05c9ec84bdb2283e4435e",
-    "sites_archive_content_hash": "sha256:b3f0e2f29a37f01e86d47571b48c3061d761a86630caca3270bc4436dc4fe19b",
-    "archive_bytes": 450560,
+    "archive_sha256": "6683e8cd6f18344de07c3306b116943816a12c08ccffb15dbc0d3919cbe8dc7e",
+    "sites_archive_content_hash": "sha256:0fa30ac22043981779ac8fdb34aeb4efdc8e9714a7213a807c876df0017ef276",
+    "archive_bytes": 471040,
     "archive_file_count": 14,
-    "description": "Site v122 publishes the APP25 policy milestone and scoped secret-scan evidence; downloads remain unavailable.",
-    "public_verification": "Anonymous HTTPS GET verified 8 HTML routes (200 text/html) and /updates/stable.xml plus /updates/alpha.xml (200 text/xml, valid empty XML). Current app-source SHA appears on homepage, features, roadmap, and devlog."
+    "description": "Site v126 publishes the redesigned RU-first homepage with original accessible SVG illustration, evidence-labeled features, bilingual overview, factual no-download status, and non-affiliation disclosure. v125 visual review found an oversized wrapped headline; v126 contains the final correction.",
+    "public_verification": "Playwright checked 8 HTML routes (200 text/html) plus both updater XML feeds (200 text/xml). Desktop 1440px and mobile 375px screenshots inspected; clientWidth=scrollWidth, heading heights 119px desktop / 74px mobile, original SVG and disclosure visible, console reports 0 errors and 0 warnings."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",

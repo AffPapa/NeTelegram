@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "implementation_in_progress",
-  "verified_at": "2026-10-13T14:14:17Z",
+  "verified_at": "2026-10-13T14:37:43Z",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
@@ -101,21 +101,22 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 123,
-    "source_commit": "bbfa7c7df93f9bf2974291109a71f11ccaad80a4",
-    "deployment_id": "appgdep_6ace3a2734c881918019aefea91f33ee",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_4a7ee91928508191b97b4eb69d1e62ad",
+    "latest_version": 126,
+    "source_commit": "6ce2199219b8adb692afb6b21780a42c436b0314",
+    "deployment_id": "appgdep_6ace41cb6cb081918195dc7caef7ee8e",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_853bf475c108819182b4c3e60068279b",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous HTTPS curl with TLS verification: /devlog/ 200 text/html (new 04279b9 entry), /downloads/ 200 text/html (NO RELEASE and no release-download link), /updates/stable.xml 200 text/xml valid XML, /updates/alpha.xml 200 text/xml valid XML.",
-    "archive_local_sha256": "23f329caf27bf679b3863498fe27da8693c99bd9c35e913df45d7208a2707c5b",
-    "archive_sites_reported_content_hash": "sha256:fff05212b572d4aebe8f9f0e6f2b98780828fceeb00ced58589d49a49e9ccc1e",
+    "public_route_verified": "Public Playwright fetch: /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/ returned 200 text/html; /updates/stable.xml and /updates/alpha.xml returned 200 text/xml. Final homepage visually inspected at desktop 1440px and mobile 375px; scrollWidth equals clientWidth, no console errors/warnings, status/disclaimer/accessible original SVG present. Downloads still unavailable.",
+    "archive_local_sha256": "6683e8cd6f18344de07c3306b116943816a12c08ccffb15dbc0d3919cbe8dc7e",
+    "archive_sites_reported_content_hash": "sha256:0fa30ac22043981779ac8fdb34aeb4efdc8e9714a7213a807c876df0017ef276",
     "archive_file_count": 14,
-    "sites_reported_archive_size_bytes": 450560,
-    "local_archive_size_bytes": 276931,
-    "archive_local_path": "/private/tmp/netelegram-site-v123.tar.gz",
-    "saved_archive_content_hash": "sha256:fff05212b572d4aebe8f9f0e6f2b98780828fceeb00ced58589d49a49e9ccc1e",
-    "saved_archive_size_bytes": 450560
+    "sites_reported_archive_size_bytes": 471040,
+    "local_archive_size_bytes": 280158,
+    "archive_local_path": "/private/tmp/netelegram-site-v126.tar.gz",
+    "saved_archive_content_hash": "sha256:0fa30ac22043981779ac8fdb34aeb4efdc8e9714a7213a807c876df0017ef276",
+    "saved_archive_size_bytes": 471040,
+    "app_repository_commit": "d63250d8c3a4805144e0498d358d2608b0751a07"
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -127,7 +128,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "APP01 Core composition regression passed locally and exact-SHA CI 38412386934; development-log entry is prepared for the existing Site and must be published/anonymous-checked. Then close the remaining gap between Core contracts and production AppDelegate restore/startup, and proceed to real-account coverage when the user completes in-app login.",
+  "next_action": "APP01 Core composition regression passed locally 1/1 and exact-SHA CI 38412386934; public Site v126 is live and anonymously/visually checked. Next: close the gap between Core contracts and production AppDelegate restore/startup, then run focused exact-source verification. Real Telegram login was deferred; no real-account or 20-session certification.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
