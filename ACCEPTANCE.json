@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; QR authorization image now has a VoiceOver name/help and empty QR state is hidden. Exact local Swift 110/110, exact-source macOS CI, and pinned TDLib/isolated Dev.app smoke succeeded for 19ebb00. Site v93 remains public until factual devlog v94 is deployed. No real QR login or app release.",
+  "status": "implementation_in_progress; QR authorization image accessibility improvement 19ebb00 passed local 110/110, exact-source macOS CI and pinned TDLib/isolated Dev.app smoke. Public Site v94 was deployed and all key routes checked. No native VoiceOver/real QR account, 20-account validation or release evidence.",
   "cases": [
     {
       "id": "APP01",
@@ -421,29 +421,29 @@
       "signature": "not a release"
     },
     "scope": "VoiceOver name/help are assigned to the QR image and it is hidden when absent. Native VoiceOver traversal, actual QR auth and keyboard interaction remain unverified. No real accounts, 20-runtime certification, Developer ID/notarization, Gatekeeper or updater tests are claimed; existing local canonical Dev.app was not touched.",
-    "publication": "App source 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c is on public main. Factual Site devlog publication remains to be completed; no application download exists.",
+    "publication": "Factual Site v94 devlog is public at https://netelegram.iryadom.chatgpt.site; Site source 48d2ab8d626fc67dcdbac791ca14baf1093109e6, deployment appgdep_6acdd03397f08191bbdc706bcea61901. Public routes and exact devlog content were checked; no app release or download exists.",
     "next_action": "Wait for exact-SHA macOS CI and pinned TDLib/Dev.app workflow. If green, publish factual APP22 devlog on the existing Site; if failed, fix the source issue and rerun before claiming completion."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 91,
-    "source_commit": "7831d8f740beaab27588e6119da89de3d64a90b8",
-    "deployment_id": "appgdep_6acdc669ee948191b1f170f953944414",
+    "version": 94,
+    "source_commit": "48d2ab8d626fc67dcdbac791ca14baf1093109e6",
+    "deployment_id": "appgdep_6acdd03397f08191bbdc706bcea61901",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_sha256": "5371bdb2f1c31b9ef601e8fdd823417cdebfc6416d80da7776364e47f02d0890",
-    "sites_archive_content_hash": "sha256:6fb156e703a05800a2232bfdede8676bc5c2115f1e92406bf788d92df0963bb1",
-    "description": "Development Site v91 states current app-source fd4586d and exact CI evidence, documents the 103/103 local suite and limits, and keeps downloads at NO RELEASE.",
-    "github_mirror_commit": "This ACCEPTANCE.json update and website/dist mirror are included together in the current NeTelegram main push.",
-    "public_verification": "Sites reports public audience; anonymous HTTPS curl returned 200 text/html for /, /features/, /devlog/, /downloads/. Live body includes fd4586d, 7476393, CI 38352840920, and 103/103; download page says NO RELEASE and no app download exists."
+    "archive_sha256": "b4ee9878268a2a9a46844384131f28c20dc6a022c5b841fa9838818b010ac66f",
+    "sites_archive_content_hash": "sha256:d46c43badcb48f736ab9877e684673bf2652129ed7166bc4fb7b0639cd3aabbb",
+    "description": "Development Site v94 records the accessible QR authorization image change for app source 19ebb00, exact-source local 110/110 tests and successful macOS/Dev.app CI. It continues to state there is no signed app download. Local helper archive SHA-256: b4ee9878268a2a9a46844384131f28c20dc6a022c5b841fa9838818b010ac66f; Sites stored archive content hash is a separate value.",
+    "github_mirror_commit": "App repo main commit 29a49a354dc112a004b6e6eef5c021fdf310c926 contains the exact dist/devlog source.",
+    "public_verification": "Sites reports succeeded and public audience. Anonymous HTTPS routes /, /features/, /downloads/, /changelog/, /devlog/, /roadmap/, /privacy/, /source/, /updates/stable.xml, and /updates/alpha.xml returned 200 with HTML/XML content types. Live devlog normalized after removing the Cloudflare-injected 938-byte script matches GitHub raw source SHA-256 1f5822c7c52baf7715644b82c1f909ed414cf0cc67e9cf09c77ae5f3df732a15. Downloads still says NO RELEASE."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
     "source_commit": "19ebb00990a3d9f4eed8ee78a8e6d18d5001851c",
     "tests": "110/110 Swift Testing tests passed locally; AppKit target compiled; git diff --check passed.",
     "hosted_ci": "Exact-source macOS CI 38356823153 and pinned TDLib/Dev.app workflow 38356822970 both succeeded for SHA 19ebb00990a3d9f4eed8ee78a8e6d18d5001851c.",
-    "site": "Current public Site v93. Devlog v94 update waits for exact-source CI.",
+    "site": "Public Site v94 source 48d2ab8d626fc67dcdbac791ca14baf1093109e6; deployment appgdep_6acdd03397f08191bbdc706bcea61901; local archive sha256 b4ee9878268a2a9a46844384131f28c20dc6a022c5b841fa9838818b010ac66f; Sites content hash d46c43badcb48f736ab9877e684673bf2652129ed7166bc4fb7b0639cd3aabbb. Anonymous route checks and normalized exact GitHub/live devlog match passed; download page remains NO RELEASE.",
     "scope": "VoiceOver label/help on QR image; missing/generated-no-image states hide the image and report status. No native assistive-technology or real QR login proof."
   },
   "latest_source_audit": {
