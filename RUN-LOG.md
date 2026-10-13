@@ -483,3 +483,10 @@
 - Kept source-only Swift edits off the expensive pinned-TDLib workflow: `ci.yml` already runs the serial macOS tests for `Sources/**` and `Tests/**`; dispatch the native workflow only for TDLib/runtime integration, native packaging inputs, or a frozen candidate. This preserves fast iteration without dropping source test coverage.
 - Local validation passed: Ruby YAML parse; case-sensitive existence and inclusion of each native script in both filters; `git diff --check`. No Swift code changed, so the 153/153 suite was not repeated.
 - Current Dev.app lifecycle script was not claimed as a pass: the shell process/LaunchServices route could not control the already-running app (`pgrep` reports sysmond unavailable; `open -n` returns `kLSNoExecutableErr`). CUA independently confirms the existing canonical c028bd3 window is running on the accountless phone form. No replacement instance, profile, or login data was created.
+
+## 2026-10-14 — Privacy Lock notification-cache redaction
+
+- App-source commit `be4707d2876c183fa5760f7264ee0fd51c740461` redacts plaintext previews already held in the app's notification route cache on lock, clears the pending locked-notification handoff, and avoids copying preview text from notifications arriving while locked. Exact account/chat/topic/message routing is preserved.
+- Focused local privacy tests passed 2/2. Exact-SHA [GitHub macOS CI run 38473154528](https://github.com/AffPapa/NeTelegram/actions/runs/38473154528) passed the complete Apple Silicon serial suite, 155/155 (41 seconds).
+- A local full-suite attempt stalled in the existing blocked-receive drain test; it was interrupted and is not counted as a local PASS. The exact-source hosted full suite passed. No duplicate run was launched.
+- Synthetic route/cache evidence only. Native Notification Center behavior, secure RAM erasure, late image/picker callbacks and real-account send races remain unverified. No Dev.app build, login, release asset, or Site update was made.

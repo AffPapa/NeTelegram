@@ -1,22 +1,20 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 4d6820d passed local 153/153 and hosted macOS CI; current c028bd3 Dev.app has accountless AX evidence; pinned native bundle/window lifecycle workflow 38471657127 passed on checkpoint 8a0ecb5; public Site v157 routes verified. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
+  "status": "implementation_in_progress; exact app-source be4707d passes hosted macOS CI 155/155; synthetic privacy notification-cache fix verified. Prior accountless Dev.app and Site v157 remain separate evidence. No real auth/20-runtime certification, Developer ID/notarization, updater, or app downloads.",
   "current_evidence": {
-    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-    "app_tests": "App-source 4d6820da73f2790c73a35177b8f9c1d1ecf8685c: full serial Swift suite passed 153/153 on Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK. Warm build 0.23s; test execution 0.200s. Synthetic Core coverage only; no real TDLib accounts or 20-runtime certification.",
+    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 155/155 passed for be4707d2876c183fa5760f7264ee0fd51c740461 (run 38473154528, 41s). Two focused local privacy notification tests also passed. The local full-suite attempt stalled in an existing blocked-receive drain test; no local full-suite PASS is claimed. Synthetic coverage only; no real TDLib accounts or 20-runtime certification.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38469520583,
-        "workflow_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
-        "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
+        "run_id": 38473154528,
+        "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+        "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
         "result": "success",
-        "scope": "Swift tests (Apple Silicon) job completed successfully on macos-15 for checkpoint c9dd915 containing app-source 4d6820d."
+        "scope": "Exact-source macOS 15 Apple Silicon serial Swift suite passed 155/155."
       },
       "current_checkpoint_metadata": {
-        "run_id": 38471183730,
-        "workflow_commit": "5593c12620984874f9da90a3c74721cb914db361",
-        "result": "success",
-        "scope": "Metadata validation passed for checkpoint 5593c12; later workflow-only checkpoint 8a0ecb5 changed no JSON."
+        "result": "pending",
+        "scope": "JSON checkpoint changed after app-source CI; metadata workflow will validate the checkpoint commit."
       },
       "previous_native_bundle_baseline": {
         "run_id": 38457814416,
@@ -94,7 +92,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Tests lockingInvalidatesQueuedSendIntentsAcrossUnlock and privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent plus encryptedDraftStoreReconcilesAcceptedSendAfterPresentationCachePurge and encryptedDraftStoreKeepsNewerDraftWhenOldSendCompletes pass in 73/73 local tests on af0909144eee2e4c79d22e2afc1bc88ad75ea1dc; macOS CI 38326759399 and native Dev.app CI 38326759481 pass for this commit. The store-level regression covers exact-value deletion and preservation of newer text; native lock/decode/picker callbacks and real-account send races remain untested."
+      "evidence": "At app-source be4707d2876c183fa5760f7264ee0fd51c740461, Privacy Lock now redacts cached notification preview text while retaining exact account/chat/topic/message route, clears a queued unlock handoff, and routes locked incoming notifications without copying preview text. Focused local tests passed 2/2; exact-source GitHub macOS CI 38473154528 passed 155/155. This is synthetic route/cache evidence only: native Notification Center previews, secure RAM erasure, image/picker callback behavior and real-account send races remain untested; status stays partial."
     },
     {
       "id": "APP06",
@@ -495,14 +493,14 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "c028bd3859d76b6abf31634a4bb62f071d5e9f57",
-    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --verbose",
-    "local_result": "App-source 4d6820d full serial suite passed 153/153 on Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK; warm build 0.23s; tests 0.200s. Synthetic Core only; not rerun because app source unchanged.",
-    "hosted_ci": "App-source suite: GitHub macOS CI 38469520583 passed for checkpoint c9dd915 containing 4d6820d. Metadata: 38471183730 passed for checkpoint 5593c12. Pinned TDLib/Dev.app lifecycle: 38471657127 passed exact workflow checkpoint 8a0ecb5 (same app source 4d6820d).",
-    "native_dev_app_smoke": "PASS: Canonical arm64 org.affpapa.netelegram.dev bundle built from clean app repository HEAD c028bd3; source fingerprint d4a02f5339d4d87b9f79ab6d4df9f9ca56639e6f09366e3520e1afc66c9586d8; app executable SHA-256 e9a30f6e2413e2b2cbc163ce3f5ce82462c431a546e258e7b513a9843bf2fa35; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. Accessibility shows country/phone form, neutral status, Continue and QR. Isolated app support root; no phone, OTP, profile or session entered. Ad-hoc development signature only.",
-    "scope": "Current-source c028bd3 canonical Dev.app AX smoke passed without account data; product app-source 4d6820d local full suite 153/153 and GitHub macOS CI pass. Public Site v157 is live and all public routes are verified. Real login/all-20 accounts, distribution signing/notarization, updater, and Telegram API compatibility remain open.",
-    "checkpoint_commit": "8a0ecb5dc5d8dc7eddad606edbf4432605bbac70"
+    "source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter privacyLockRedacts|notificationUpdatesReceivedWhileLocked",
+    "local_result": "Focused tests 2/2 passed. A full local run stalled in existing twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates and was interrupted after diagnosis; exact-source hosted suite then passed 155/155.",
+    "hosted_ci": "GitHub macOS CI 38473154528 passed the serial Swift suite 155/155 for exact app-source/checkpoint SHA be4707d2876c183fa5760f7264ee0fd51c740461 (job elapsed 41s).",
+    "native_dev_app_smoke": "No Dev.app rebuilt or launched for this cache-only privacy change; previous accountless app evidence remains tied to its recorded older source and is not current-source GUI evidence.",
+    "scope": "Synthetic privacy-lock notification-cache behavior verified locally and by exact-source hosted full suite. Real login, notification-center integration, all-20 accounts, Developer ID/notarization and updater remain unverified.",
+    "checkpoint_commit": "be4707d2876c183fa5760f7264ee0fd51c740461"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -551,5 +549,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue one isolated native runtime slice using existing source 4d6820d; use targeted tests and one full suite after meaningful code changes. Preserve app-source SHA separately from docs checkpoint and Sites source/version/deployment. Dev.app from c028bd3 remains open at accountless login; do not rebuild or replace while running. Real login awaits the user entering credentials in NeTelegram. All-20, compatibility, Developer ID/notarization and updater gates remain open."
+  "next_action": "Continue one isolated runtime slice using exact-source CI 155/155 for be4707d. Inspect canonical Dev.app process and embedded BuildInfo before any rebuild; do not create a second app identity. User deferred real auth. All-20 real runtimes, API compatibility, Developer ID/notarization and updater gates remain open."
 }

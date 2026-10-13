@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "App-source 4d6820d passed local full suite 153/153 and hosted macOS CI. Current-source c028bd3 Dev.app accountless AX smoke passed; public Site v157 deployed and all routes verified. No app release/downloads.",
-  "verified_at": "2026-10-13T21:38:10Z",
+  "phase": "Privacy-lock notification-cache fix pushed at be4707d; exact-source Apple Silicon macOS CI passed 155/155. No real-account or distribution release evidence added.",
+  "verified_at": "2026-10-14T21:48:00Z",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
@@ -14,12 +14,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38469520583,
+      "run_id": 38473154528,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38469520583",
-      "workflow_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
-      "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-      "scope": "Swift tests (Apple Silicon) job completed successfully for checkpoint c9dd915; product code is app-source 4d6820d."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38473154528",
+      "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "scope": "GitHub macos-15 Swift tests (Apple Silicon), 155/155 passed in 41s."
     },
     "published_application_releases": [],
     "github_access": {
@@ -43,11 +43,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38471183730,
+      "run_id": 38473154528,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38471183730",
-      "workflow_commit": "5593c12620984874f9da90a3c74721cb914db361",
-      "scope": "Metadata validation passed for checkpoint 5593c12; later workflow-only checkpoint 8a0ecb5 changed no JSON metadata."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38473154528",
+      "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "scope": "Exact app-source commit passed macOS serial Swift tests; checkpoint JSON changes in the next docs commit require the separate metadata workflow."
     },
     "last_native_bundle_smoke": {
       "run_id": 38471657127,
@@ -57,7 +57,7 @@
       "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
       "scope": "Pinned TDLib arm64 Dev.app build, bundle verification, accountless UI and last-window/LaunchServices reopen/normal-quit smoke completed successfully on GitHub macOS runner after native trigger filter correction."
     },
-    "last_audited_checkpoint_commit": "8a0ecb5dc5d8dc7eddad606edbf4432605bbac70",
+    "last_audited_checkpoint_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
     "pre_edit_working_tree_clean": true
   },
   "local_development_candidate": {
@@ -76,11 +76,11 @@
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "PASS: full serial Swift suite 153/153 on app-source 4d6820d, Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK; warm build 0.23s, tests 0.200s. Synthetic Core only; no real TDLib accounts.",
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --verbose",
-      "toolchain": "Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK",
-      "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-      "suite": "153/153"
+      "result": "PASS: exact-source hosted serial Swift suite 155/155 for be4707d; two new privacy-lock notification tests included. Targeted local tests passed 2/2. A separate local full-suite attempt stalled in the existing blocked-receive drain test and was interrupted; hosted exact-SHA suite passed.",
+      "command": "swift test --no-parallel --verbose (GitHub macos-15 runner); local focused: swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter privacyLockRedacts|notificationUpdatesReceivedWhileLocked",
+      "toolchain": "GitHub macos-15 Apple Silicon; local focused build Xcode 27.0 / Swift 6.4 / arm64 / macOS 27 SDK",
+      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "suite": "155/155 hosted; 2/2 focused local"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -102,11 +102,11 @@
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
     "latest_exact_source_ci": {
       "result": "PASS",
-      "run_id": 38469520583,
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38469520583",
-      "workflow_commit": "c9dd915e5e79dd9027db568c68c8a2e3283950e5",
-      "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-      "scope": "macos-15 Swift tests (Apple Silicon) workflow succeeded."
+      "run_id": 38473154528,
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38473154528",
+      "workflow_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "scope": "macOS 15 / Apple Silicon serial Swift test suite; 155 tests passed in 0.439s, workflow job 41s."
     },
     "current_head_native_build": {
       "result": "PASS: canonical arm64 org.affpapa.netelegram.dev built from clean HEAD c028bd3 in 9.05s; bundle ad-hoc nested codesign verification passed. This is local Dev.app only, not Developer ID distribution or notarization.",
@@ -143,7 +143,21 @@
       "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
       "scope": "Pinned TDLib arm64 Dev.app build, bundle verification, accountless UI and last-window/LaunchServices reopen/normal-quit smoke completed successfully on GitHub macOS runner after native trigger filter correction."
     },
-    "current_head_site_release_note": "Site v157 current live from Site source 3c14efda4c204c0bb3ca57a95aca0b2b8f27b751; deployment appgdep_6acea2b8963481919ba43b8a1b5c0dfa6; all four public routes returned HTTP 200 text/html and current evidence markers passed. Downloads remains without binary links."
+    "current_head_site_release_note": "Site v157 current live from Site source 3c14efda4c204c0bb3ca57a95aca0b2b8f27b751; deployment appgdep_6acea2b8963481919ba43b8a1b5c0dfa6; all four public routes returned HTTP 200 text/html and current evidence markers passed. Downloads remains without binary links.",
+    "privacy_lock_notification_cache": {
+      "result": "PASS synthetic core tests; acceptance remains partial for native/real-account cases.",
+      "commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
+      "tests": [
+        "privacyLockRedactsCachedNotificationTextButKeepsExactRoute",
+        "notificationUpdatesReceivedWhileLockedNeverCacheMessageText"
+      ],
+      "run_id": 38473154528,
+      "scope": "Cached plaintext notification previews and locked incoming update previews are omitted while exact account/chat/topic/message routing is retained. This does not prove secure RAM erasure or native Notification Center behavior."
+    },
+    "latest_checkpoint_metadata": {
+      "result": "pending",
+      "scope": "PROJECT-STATE.json and ACCEPTANCE.json are updated in this checkpoint; validate with metadata.yml after push."
+    }
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -177,7 +191,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue one focused native runtime slice. Reuse current local/hosted test PASS for unchanged app-source 4d6820d; target changed behavior and run full suite only after a meaningful code edit. Current-source Dev.app c028bd3 is open with isolated support and no account entered. Wait for user-entered auth; do not inspect installed Telegram. Keep 20-real-account coverage, API compatibility, signing/notarization, updater, and stable release gates open.",
+  "next_action": "Select and implement the next isolated runtime slice from the current acceptance gaps. Reuse exact-source 155/155 CI for be4707d. Before any Dev.app build, inspect its process and embedded BuildInfo; current accountless Dev.app may be older. Do not start a second bundle. User deferred real Telegram login. Keep 20-real-account coverage, API compatibility, Developer ID/notarization, updater, and stable release gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -186,9 +200,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "5593c12620984874f9da90a3c74721cb914db361",
-    "app_source_commit_authority": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c",
-    "app_source_commit": "4d6820da73f2790c73a35177b8f9c1d1ecf8685c"
+    "repo_head_before_checkpoint": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "app_source_commit_authority": "be4707d2876c183fa5760f7264ee0fd51c740461",
+    "app_source_commit": "be4707d2876c183fa5760f7264ee0fd51c740461"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
