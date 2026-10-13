@@ -813,6 +813,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginSettings.target = self
         appMenu.addItem(loginSettings)
         appMenu.addItem(.separator())
+        let apiHashSettings = NSMenuItem(
+            title: "Настроить или заменить API hash приложения…",
+            action: #selector(configureTelegramAPIHash),
+            keyEquivalent: ""
+        )
+        apiHashSettings.target = self
+        appMenu.addItem(apiHashSettings)
+        appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Выйти", action: #selector(quit), keyEquivalent: "q")
         appMenu.items.forEach { $0.target = self }
         appMenuItem.submenu = appMenu
@@ -886,6 +894,44 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
         } catch {
             setStatus("macOS не изменила настройку автозапуска. Проверьте объекты входа в Системных настройках.")
+        }
+    }
+
+    @objc private func configureTelegramAPIHash() {
+        guard !lockState, !closingForTermination else {
+            setStatus("Разблокируйте приложение, чтобы изменить его Telegram API credentials.")
+            return
+        }
+        let field = NSSecureTextField(frame: NSRect(x: 0, y: 0, width: 340, height: 28))
+        field.placeholderString = "32 шестнадцатеричных символа"
+        field.setAccessibilityLabel("Telegram API hash приложения")
+        field.setAccessibilityHelp("Сохраняется только в Связке ключей macOS. Не вводите код входа или пароль Telegram сюда.")
+        let alert = NSAlert()
+        alert.messageText = "Настройка подключения Neridian"
+        alert.informativeText = "Введите API hash этого приложения из my.telegram.org. Значение хранится в Связке ключей macOS и не записывается в файлы проекта."
+        alert.accessoryView = field
+        alert.addButton(withTitle: "Сохранить в Связку ключей")
+        alert.addButton(withTitle: "Отмена")
+        guard alert.runModal() == .alertFirstButtonReturn else {
+            field.stringValue = ""
+            return
+        }
+        let value = field.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        field.stringValue = ""
+        guard SecretsStore.isValidTelegramAPIHash(value) else {
+            setStatus("API hash должен содержать ровно 32 шестнадцатеричных символа. Значение не сохранено.")
+            return
+        }
+        setStatus("Сохраняю API hash в Связку ключей macOS…")
+        Task { @MainActor [weak self] in
+            do {
+                try await SecretsStore.performKeychainRead {
+                    try SecretsStore().storeTelegramAPIHash(value)
+                }
+                self?.setStatus("API hash сохранён в Связке ключей. Введите номер и нажмите «Продолжить», чтобы начать новый вход.")
+            } catch {
+                self?.setStatus("Не удалось сохранить API hash в Связку ключей. Значение не записано в файлы проекта.")
+            }
         }
     }
 
@@ -1117,7 +1163,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
-                self.setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
+                self.setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
             } catch {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
@@ -1603,7 +1649,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
-                setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Вход не начат; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
         } catch {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
@@ -1675,7 +1721,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-                setStatus("Не найден API hash приложения \(ProductIdentity.displayName) в Связке ключей. Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню Neridian → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
         } catch let error as AccountStorageLeaseError {
             setStatus(error.localizedDescription)
         } catch let error as AccountStorageUpgradeError {

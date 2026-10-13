@@ -707,6 +707,14 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(query[kSecAttrAccessible as String] == nil)
 }
 
+@Test func telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters() {
+    #expect(SecretsStore.isValidTelegramAPIHash("0123456789abcdef0123456789ABCDEF"))
+    #expect(!SecretsStore.isValidTelegramAPIHash("0123456789abcdef0123456789ABCDE"))
+    #expect(!SecretsStore.isValidTelegramAPIHash("0123456789abcdef0123456789ABCDEG"))
+    #expect(!SecretsStore.isValidTelegramAPIHash("0123456789abcdef0123456789ABCDEＦ"))
+    #expect(!SecretsStore.isValidTelegramAPIHash(" 0123456789abcdef0123456789ABCDEF "))
+}
+
 @Test func secretsStoreCreatesKeysOnlyAfterExplicitKeychainNotFound() {
     #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: true) == .create)
     #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: false) == .missing)

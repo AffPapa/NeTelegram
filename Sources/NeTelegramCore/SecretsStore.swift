@@ -4,6 +4,7 @@ import Security
 public enum SecretsStoreError: Error, Equatable {
     case missing(String)
     case keychain(OSStatus)
+    case invalidTelegramAPIHash
 }
 
 /// Keychain access for local project credentials and per-account encryption keys.
@@ -40,6 +41,39 @@ public struct SecretsStore: Sendable {
             throw SecretsStoreError.missing("Telegram API hash")
         }
         return value
+    }
+
+    /// Stores an explicitly supplied project API hash in the macOS login
+    /// Keychain. This never reads or imports credentials from another client.
+    public func storeTelegramAPIHash(_ value: String) throws {
+        guard Self.isValidTelegramAPIHash(value) else {
+            throw SecretsStoreError.invalidTelegramAPIHash
+        }
+        let query = Self.itemQuery(
+            account: TelegramApplicationIdentity.keychainAccount,
+            service: TelegramApplicationIdentity.keychainService
+        )
+        let data = Data(value.utf8)
+        let updateStatus = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+        if updateStatus == errSecSuccess { return }
+        guard updateStatus == errSecItemNotFound else { throw SecretsStoreError.keychain(updateStatus) }
+
+        var addQuery = query
+        addQuery[kSecValueData as String] = data
+        let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
+        if addStatus == errSecSuccess { return }
+        if addStatus == errSecDuplicateItem {
+            let retryStatus = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
+            guard retryStatus == errSecSuccess else { throw SecretsStoreError.keychain(retryStatus) }
+            return
+        }
+        throw SecretsStoreError.keychain(addStatus)
+    }
+
+    public static func isValidTelegramAPIHash(_ value: String) -> Bool {
+        value.utf8.count == 32 && value.utf8.allSatisfy {
+            (48...57).contains($0) || (65...70).contains($0) || (97...102).contains($0)
+        }
     }
 
     /// Returns the stable 256-bit TDLib database key for this local namespace.
