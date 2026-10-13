@@ -156,7 +156,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var chatOrderByAccount: [AccountUUID: [Int64: UInt64]] = [:]
     private var selectedChatByAccount: [AccountUUID: Int64] = [:]
     private var messagesByConversation: [ConversationKey: [[String: Any]]] = [:]
-    private var pendingHistoryByExtra: [String: ConversationKey] = [:]
+    private var pendingHistoryRequests = ConversationHistoryRequestRegistry()
+    private var historyRequestGenerationByConversation: [ConversationKey: UInt64] = [:]
     private var sponsoredMessagesByKey: [SponsoredMessagesKey: [SponsoredMessageCard]] = [:]
     private var sponsoredMessagesBetweenByKey: [SponsoredMessagesKey: Int32] = [:]
     private var sponsoredMessagesFetchedAt: [SponsoredMessagesKey: Date] = [:]
@@ -1268,7 +1269,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter { $0.value.account != account }
         requestedOriginalPhotos = requestedOriginalPhotos.filter { $0.account != account }
         photoDownloadsByConversation = photoDownloadsByConversation.filter { $0.key.account != account }
-        pendingHistoryByExtra = pendingHistoryByExtra.filter { $0.value.account != account }
+        _ = pendingHistoryRequests.remove(account: account)
+        historyRequestGenerationByConversation = historyRequestGenerationByConversation.filter { $0.key.account != account }
         sponsoredMessagesByKey = sponsoredMessagesByKey.filter { $0.key.account != account }
         sponsoredMessagesBetweenByKey = sponsoredMessagesBetweenByKey.filter { $0.key.account != account }
         sponsoredMessagesFetchedAt = sponsoredMessagesFetchedAt.filter { $0.key.account != account }
@@ -1993,6 +1995,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 runtimesByAccount.removeValue(forKey: target.account)
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
                 _ = pendingSearchRequests.remove(account: target.account, runtimeGeneration: target.generation)
+                _ = pendingHistoryRequests.remove(account: target.account, runtimeGeneration: target.generation)
+                historyRequestGenerationByConversation = historyRequestGenerationByConversation.filter { $0.key.account != target.account }
                 searchResults.removeAll(for: target.account)
                 searchResultByControlID = searchResultByControlID.filter { $0.value.account != target.account }
                 startDeferredSearchIfReady()
@@ -2355,8 +2359,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
         } else if let type = object["@type"] as? String, type == "messages",
                   let messages = object["messages"] as? [[String: Any]],
-                  let extra = object["@extra"] as? String, let conversation = pendingHistoryByExtra.removeValue(forKey: extra) {
-            guard !lockState else { return }
+                  let extra = object["@extra"] as? String,
+                  let request = pendingHistoryRequests.take(for: extra) {
+            let conversation = request.conversation
+            guard request.acceptsResponse(
+                from: target.account,
+                runtimeGeneration: target.generation,
+                requestGeneration: historyRequestGenerationByConversation[conversation] ?? 0,
+                isLocked: lockState
+            ) else { return }
             let ordered = Array(messages.reversed().suffix(50))
             messagesByConversation[conversation] = ordered
             if target === runtime, currentConversationKey() == conversation {
@@ -2459,8 +2470,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 return
             }
             if let extra = object["@extra"] as? String,
-               pendingHistoryByExtra.removeValue(forKey: extra) != nil {
-                if !lockState, target === runtime { setStatus("Не удалось загрузить историю выбранной темы.") }
+               let request = pendingHistoryRequests.take(for: extra) {
+                if request.acceptsResponse(
+                    from: target.account,
+                    runtimeGeneration: target.generation,
+                    requestGeneration: historyRequestGenerationByConversation[request.conversation] ?? 0,
+                    isLocked: lockState
+                ), target === runtime {
+                    setStatus("Не удалось загрузить историю выбранной темы.")
+                }
                 return
             }
             if let extra = object["@extra"] as? String,
@@ -3108,14 +3126,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let anchorMessageID = historyAnchorByConversation.removeValue(forKey: conversation) ?? 0
         historyRequestCounter &+= 1
         let extra = "history-\(historyRequestCounter)"
-        pendingHistoryByExtra[extra] = conversation
+        let requestGeneration = (historyRequestGenerationByConversation[conversation] ?? 0) &+ 1
+        historyRequestGenerationByConversation[conversation] = requestGeneration
+        pendingHistoryRequests.register(
+            ConversationHistoryRequestContext(
+                conversation: conversation,
+                runtimeGeneration: runtime.generation,
+                requestGeneration: requestGeneration
+            ),
+            for: extra
+        )
         messagesByConversation[conversation] = messagesByConversation[conversation] ?? []
         do {
             var request = ConversationHistoryRequest.make(for: conversation, fromMessageID: anchorMessageID)
             request["@extra"] = extra
             try runtime.send(request)
         } catch {
-            pendingHistoryByExtra.removeValue(forKey: extra)
+            _ = pendingHistoryRequests.take(for: extra)
             setStatus("Не удалось загрузить историю выбранной темы.")
         }
     }
@@ -5356,7 +5383,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         for accountRuntime in runtimesByAccount.values {
             accountRuntime.invalidateMainChatSnapshot()
         }
-        pendingHistoryByExtra.removeAll()
+        pendingHistoryRequests.removeAll()
         sponsoredMessagesByKey.removeAll()
         sponsoredMessagesBetweenByKey.removeAll()
         sponsoredMessagesFetchedAt.removeAll()

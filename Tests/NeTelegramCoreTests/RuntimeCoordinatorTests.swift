@@ -1633,6 +1633,41 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(MessageKey(conversation: a, messageID: 10) != MessageKey(conversation: anotherTopic, messageID: 10))
 }
 
+@Test func conversationHistoryRequestsRejectStaleRuntimeAndOutOfOrderResponses() {
+    let first = AccountUUID()
+    let second = AccountUUID()
+    let conversation = ConversationKey(account: first, chatID: 77, topic: .forum(topicID: 12))
+    let old = ConversationHistoryRequestContext(
+        conversation: conversation,
+        runtimeGeneration: RuntimeGeneration(4),
+        requestGeneration: 8
+    )
+    #expect(old.acceptsResponse(from: first, runtimeGeneration: RuntimeGeneration(4), requestGeneration: 8, isLocked: false))
+    #expect(!old.acceptsResponse(from: first, runtimeGeneration: RuntimeGeneration(5), requestGeneration: 8, isLocked: false))
+    #expect(!old.acceptsResponse(from: first, runtimeGeneration: RuntimeGeneration(4), requestGeneration: 9, isLocked: false))
+    #expect(!old.acceptsResponse(from: second, runtimeGeneration: RuntimeGeneration(4), requestGeneration: 8, isLocked: false))
+    #expect(!old.acceptsResponse(from: first, runtimeGeneration: RuntimeGeneration(4), requestGeneration: 8, isLocked: true))
+
+    var pending = ConversationHistoryRequestRegistry()
+    pending.register(old, for: "history-old")
+    pending.register(
+        ConversationHistoryRequestContext(conversation: conversation, runtimeGeneration: RuntimeGeneration(4), requestGeneration: 9),
+        for: "history-new"
+    )
+    pending.register(
+        ConversationHistoryRequestContext(conversation: ConversationKey(account: second, chatID: 77), runtimeGeneration: RuntimeGeneration(1), requestGeneration: 1),
+        for: "history-other"
+    )
+    let removed = pending.remove(account: first, runtimeGeneration: RuntimeGeneration(4))
+    let oldRequest = pending.take(for: "history-old")
+    let newRequest = pending.take(for: "history-new")
+    let otherRequest = pending.take(for: "history-other")
+    #expect(removed == 2)
+    #expect(oldRequest == nil)
+    #expect(newRequest == nil)
+    #expect(otherRequest?.conversation.account == second)
+}
+
 @Test func accountSearchResultsAreDeduplicatedAndBoundedPerAccount() {
     let first = AccountUUID()
     let second = AccountUUID()
