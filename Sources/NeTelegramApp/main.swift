@@ -1874,12 +1874,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 pending: pending,
                 pendingWithStoredDatabase: pendingWithStoredDatabase
             )
-            let toRestore = AccountRestorePlanner.pendingStartupProfiles(
+            let queuedAccountIDs = AccountRestorePlanner.enqueueStartupProfiles(
                 candidates: candidates,
                 running: Set(runtimesByAccount.keys),
-                starting: Set(profileStartupTasks.keys)
+                starting: Set(profileStartupTasks.keys),
+                enqueue: { profile in
+                    _ = scheduleProfileStartup(profile, apiHash: apiHash)
+                }
             )
-            if toRestore.isEmpty {
+            if queuedAccountIDs.isEmpty {
                 if profiles.isEmpty {
                     pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
                     showPhoneEntry()
@@ -1897,9 +1900,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // Start every authorized profile through the bounded scheduler.
             // openProfile releases its permit after the first TDLib request,
             // before any phone/code/2FA network wait can begin.
-            for profile in toRestore {
-                _ = scheduleProfileStartup(profile, apiHash: apiHash)
-            }
             refreshAccountPicker()
             refreshOutgoingPhotoRecoveryStatus()
             if authorized.isEmpty {

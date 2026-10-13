@@ -955,6 +955,47 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     })
 }
 
+@Test func startupDispatchQueuesAllFreeProfilesWhileFirstStartupIsStalled() async {
+    let profiles = (1...20).map { n in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "71000000-0000-0000-0000-%012d", n))!),
+            telegramUserID: Int64(71_000 + n)
+        )
+    }
+    let running = profiles[1].id
+    let starting = profiles[3].id
+    let gate = AsyncTestGate()
+    let firstStartupWaiting = LockedTestValue(false)
+    let stalledStartup = LockedTestValue<Task<Void, Never>?>(nil)
+    var enqueued: [AccountUUID] = []
+
+    let enqueuedIDs = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: profiles,
+        running: [running],
+        starting: [starting]
+    ) { profile in
+        enqueued.append(profile.id)
+        if profile.id == profiles[0].id {
+            stalledStartup.set(Task {
+                firstStartupWaiting.set(true)
+                await gate.wait()
+            })
+        }
+    }
+
+    #expect(enqueuedIDs == enqueued)
+    #expect(enqueued.count == 18)
+    #expect(!enqueued.contains(running))
+    #expect(!enqueued.contains(starting))
+    #expect(await waitForTrue(firstStartupWaiting, timeout: .seconds(2)))
+    #expect(enqueued == profiles.compactMap { profile in
+        profile.id == running || profile.id == starting ? nil : profile.id
+    })
+
+    await gate.open()
+    await stalledStartup.get()?.value
+}
+
 @Test func runtimeGenerationChangesForEveryClientOfAnAccount() async {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()
