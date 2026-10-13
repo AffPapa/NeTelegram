@@ -206,8 +206,8 @@
       "expected": "Missing/locked/error отличаются; no reset/key overwrite; cancel owner-auth не unlock.",
       "method": "native fault cases",
       "required_for": "all releases",
-      "status": "not_run",
-      "evidence": null
+      "status": "partial",
+      "evidence": "SecretsStore key lookup policy is explicitly tested: a new key may be generated only after errSecItemNotFound and only when createIfMissing is true; errSecInteractionNotAllowed, errSecAuthFailed, other Keychain errors, and malformed existing key data fail closed without replacement. Focused tests passed 3/3 and the full local suite passed 113/113 at 46770828b1b7d3cef022bdbc051cb81180c0680d. Exact-source macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38358474196 succeeded; pinned TDLib/isolated Dev.app workflow https://github.com/AffPapa/NeTelegram/actions/runs/38358474186 also succeeded, accountless. Source review confirms LocalAuthentication unlocks only on success while lockState remains true; cancellation/failure leaves the UI locked and clears pending notification handoff. No real locked-Keychain fault, Keychain replacement attempt, native owner-auth cancellation, or local account data was exercised; status remains partial."
     },
     {
       "id": "APP24",
