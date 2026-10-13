@@ -46,6 +46,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var profileOrder: [AccountUUID] = []
     private var profileStartupFailures: Set<AccountUUID> = []
     private var profileOpenRequests: Set<AccountUUID> = []
+    private var closedProfileToRetry: AccountUUID?
     private var catalogueRoot: URL?
     private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
     private var runtimesByAccount: [AccountUUID: LocalAccountRuntime] = [:]
@@ -922,6 +923,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func presentRuntime(_ selected: LocalAccountRuntime) {
         runtime = selected
+        closedProfileToRetry = nil
+        actionButton.target = self
+        actionButton.action = #selector(primaryAction)
         pendingAuthorizationType = selected.authorizationState
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -994,6 +998,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             self.refreshAccountPicker(select: account)
         }
+    }
+
+    @objc private func retryClosedProfile() {
+        guard let account = closedProfileToRetry, !lockState else { return }
+        retryOpeningProfile(account)
+    }
+
+    private func showClosedProfileRecovery(_ account: AccountUUID) {
+        closedProfileToRetry = account
+        closePhotoViewer()
+        clearStack(messageList)
+        authStack.isHidden = false
+        chatPane.isHidden = true
+        loginHeading.stringValue = "Профиль временно закрыт"
+        loginSubtitle.stringValue = "Связь с Telegram для этого локального профиля закрылась. Профиль и база не удалены; можно повторно открыть именно этот профиль. Остальные аккаунты продолжают работу в фоне."
+        phoneField.isHidden = true
+        emailField.isHidden = true
+        countryPicker.isHidden = true
+        inputField.isHidden = true
+        secureInputField.isHidden = true
+        firstNameField.isHidden = true
+        lastNameField.isHidden = true
+        registrationTermsScroll.isHidden = true
+        registrationConsent.isHidden = true
+        qrImageView.isHidden = true
+        qrButton.isHidden = true
+        actionButton.title = "Повторить открытие профиля"
+        actionButton.setAccessibilityLabel("Повторно открыть этот локальный профиль")
+        actionButton.target = self
+        actionButton.action = #selector(retryClosedProfile)
+        actionButton.isEnabled = !profileRestoreInProgress && !closingForTermination
+        actionButton.isHidden = false
+        setStatus("Профиль закрыт. Локальные данные сохранены; повторный вход в другой аккаунт не выполняется.")
+        window.title = "Профиль временно закрыт — NeTelegram"
     }
 
     /// Clears the previous account's visible conversation before opening a
@@ -1788,7 +1826,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 target.finishClose()
                 runtimesByAccount.removeValue(forKey: target.account)
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
-                if wasSelected { runtime = runtimesByAccount.values.first }
+                // An unexpected close must not silently change the UI to another
+                // Telegram identity. A user-requested logout may return to an
+                // already-authorized account, as that transition was explicit.
+                if wasSelected { runtime = confirmedLogout ? runtimesByAccount.values.first : nil }
                 if confirmedLogout, let loggedOutUserID {
                     purgeInMemoryAccountState(target.account)
                     let cleanup = await finishLogoutProfile(target, expectedTelegramUserID: loggedOutUserID)
@@ -1804,9 +1845,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     if let route = target.route { await runtimeCoordinator.removeRouteAfterClosed(route.client) }
                     pendingClosures.remove(client)
                 }
-                if wasSelected, let next = runtime {
+                if wasSelected, confirmedLogout, let next = runtime {
                     refreshAccountPicker(select: next.account)
                     presentRuntime(next)
+                } else if wasSelected, !confirmedLogout, !closingForTermination {
+                    closedProfileToRetry = target.account
+                    profileStartupFailures.insert(target.account)
+                    if !lockState { showClosedProfileRecovery(target.account) }
+                    refreshAccountPicker()
                 } else if wasSelected, confirmedLogout, removedLogoutProfile, runtimesByAccount.isEmpty {
                     Task { @MainActor [weak self] in await self?.addAccountProfile() }
                 } else if wasSelected, confirmedLogout, runtimesByAccount.isEmpty {
@@ -5121,6 +5167,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     self.window.title = self.safeAccountName(selected).map { "\($0) — NeTelegram" } ?? "NeTelegram"
                 } else if let selected = self.runtime {
                     self.presentAuthorizationState(self.pendingAuthorizationType, info: self.authPresentationInfoByAccount[selected.account] ?? [:])
+                } else if let closedProfile = self.closedProfileToRetry {
+                    self.showClosedProfileRecovery(closedProfile)
                 }
             }
         }
