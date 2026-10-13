@@ -321,8 +321,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
         loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram использует Telegram API и TDLib и входит в экосистему Telegram. Это независимый проект, не связанный напрямую с Telegram Messenger LLP; сессии других приложений не импортируются.")
-        loginDisclosure.font = .systemFont(ofSize: 11)
-        loginDisclosure.textColor = .tertiaryLabelColor
+        loginDisclosure.font = .systemFont(ofSize: 12)
+        loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.alignment = .center
         loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
 
