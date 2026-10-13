@@ -1434,16 +1434,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private func prepareAccountStorage() throws -> URL {
         let root = try accountStorageRoot()
-        if accountStorageLease == nil {
-            accountStorageLease = try AccountStorageLease(rootURL: root)
+        let storageLease: AccountStorageLease
+        if let existingLease = accountStorageLease {
+            storageLease = existingLease
+        } else {
+            let newLease = try AccountStorageLease(rootURL: root)
+            accountStorageLease = newLease
+            storageLease = newLease
         }
 #if DEBUG
         let allowDevelopmentZeroBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
 #else
         let allowDevelopmentZeroBuild = false
 #endif
-        _ = try AccountStorageUpgradeGate.prepare(
-            rootURL: root,
+        _ = try storageLease.prepareUpgradeGate(
             bundleBuildNumber: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
             allowDevelopmentZeroBuild: allowDevelopmentZeroBuild
         )

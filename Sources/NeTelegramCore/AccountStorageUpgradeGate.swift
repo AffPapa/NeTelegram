@@ -20,15 +20,21 @@ public enum AccountStorageLeaseError: Error, Equatable, LocalizedError {
 /// The kernel releases the lock if the app exits or crashes.
 public final class AccountStorageLease {
     private let descriptor: Int32
+    private let rootURL: URL
 
     public init(rootURL: URL) throws {
+        let requestedRoot = rootURL.standardizedFileURL
         try FileManager.default.createDirectory(
-            at: rootURL,
+            at: requestedRoot,
             withIntermediateDirectories: true,
             attributes: [.posixPermissions: 0o700]
         )
-        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: rootURL.path)
-        let lockURL = rootURL.appendingPathComponent(".account-storage.lock")
+        try FileManager.default.setAttributes([.posixPermissions: 0o700], ofItemAtPath: requestedRoot.path)
+        // Resolve aliases before choosing the lock-file name. Otherwise the
+        // same physical account directory could acquire two independent locks
+        // through a symlinked parent or root path.
+        let canonicalRoot = requestedRoot.resolvingSymlinksInPath().standardizedFileURL
+        let lockURL = canonicalRoot.appendingPathComponent(".account-storage.lock")
         let opened = lockURL.path.withCString {
             Darwin.open($0, O_CREAT | O_RDWR | O_CLOEXEC | O_NOFOLLOW, mode_t(0o600))
         }
@@ -47,6 +53,22 @@ public final class AccountStorageLease {
             throw AccountStorageLeaseError.system(code)
         }
         descriptor = opened
+        self.rootURL = canonicalRoot
+    }
+
+    /// Records the monotonic build marker while this process still owns the
+    /// same exclusive lease that protects all account databases. Callers
+    /// cannot accidentally gate a different root or advance it without first
+    /// acquiring the process-level storage lease.
+    public func prepareUpgradeGate(
+        bundleBuildNumber: String?,
+        allowDevelopmentZeroBuild: Bool = false
+    ) throws -> Int {
+        try AccountStorageUpgradeGate.prepare(
+            rootURL: rootURL,
+            bundleBuildNumber: bundleBuildNumber,
+            allowDevelopmentZeroBuild: allowDevelopmentZeroBuild
+        )
     }
 
     deinit {
@@ -78,7 +100,7 @@ public enum AccountStorageUpgradeError: Error, Equatable, LocalizedError {
 /// Records the highest app build allowed to open the shared account data.
 /// Advance this marker before TDLib can open any account database so a crash
 /// during an upgrade cannot make an older binary reopen partially migrated DBs.
-public enum AccountStorageUpgradeGate {
+enum AccountStorageUpgradeGate {
     private static let stateFilename = ".account-storage-version.json"
 
     private struct State: Codable {
@@ -86,7 +108,7 @@ public enum AccountStorageUpgradeGate {
         let highestOpenedBuild: Int
     }
 
-    public static func prepare(
+    static func prepare(
         rootURL: URL,
         bundleBuildNumber: String?,
         allowDevelopmentZeroBuild: Bool = false

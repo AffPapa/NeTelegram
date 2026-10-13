@@ -18,16 +18,33 @@ import Testing
     withExtendedLifetime(reopened) {}
 }
 
+@Test func accountStorageLeaseDoesNotAllowAnAliasedSymlinkRoot() throws {
+    let parent = FileManager.default.temporaryDirectory
+        .appendingPathComponent("netelegram-storage-alias-\(UUID().uuidString)", isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: parent) }
+    let physicalRoot = parent.appendingPathComponent("accounts", isDirectory: true)
+    let aliasRoot = parent.appendingPathComponent("accounts-alias", isDirectory: true)
+    try FileManager.default.createDirectory(at: physicalRoot, withIntermediateDirectories: true)
+    try FileManager.default.createSymbolicLink(at: aliasRoot, withDestinationURL: physicalRoot)
+
+    let lease = try AccountStorageLease(rootURL: physicalRoot)
+    #expect(throws: AccountStorageLeaseError.alreadyInUse) {
+        _ = try AccountStorageLease(rootURL: aliasRoot)
+    }
+    withExtendedLifetime(lease) {}
+}
+
 @Test func accountStorageUpgradeGateRecordsAdvancesAndRejectsDowngrade() throws {
     let root = FileManager.default.temporaryDirectory
         .appendingPathComponent("netelegram-build-gate-\(UUID().uuidString)", isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }
 
-    #expect(try AccountStorageUpgradeGate.prepare(rootURL: root, bundleBuildNumber: "17") == 17)
-    #expect(try AccountStorageUpgradeGate.prepare(rootURL: root, bundleBuildNumber: "17") == 17)
-    #expect(try AccountStorageUpgradeGate.prepare(rootURL: root, bundleBuildNumber: "18") == 18)
+    let lease = try AccountStorageLease(rootURL: root)
+    #expect(try lease.prepareUpgradeGate(bundleBuildNumber: "17") == 17)
+    #expect(try lease.prepareUpgradeGate(bundleBuildNumber: "17") == 17)
+    #expect(try lease.prepareUpgradeGate(bundleBuildNumber: "18") == 18)
     #expect(throws: AccountStorageUpgradeError.downgrade(current: 17, highestOpened: 18)) {
-        try AccountStorageUpgradeGate.prepare(rootURL: root, bundleBuildNumber: "17")
+        try lease.prepareUpgradeGate(bundleBuildNumber: "17")
     }
 }
 
@@ -40,27 +57,22 @@ import Testing
     let corrupt = Data("not-json".utf8)
     try corrupt.write(to: marker)
 
+    let lease = try AccountStorageLease(rootURL: root)
     #expect(throws: AccountStorageUpgradeError.corruptState) {
-        try AccountStorageUpgradeGate.prepare(rootURL: root, bundleBuildNumber: "1")
+        try lease.prepareUpgradeGate(bundleBuildNumber: "1")
     }
     #expect(try Data(contentsOf: marker) == corrupt)
     #expect(throws: AccountStorageUpgradeError.invalidBuildNumber) {
-        try AccountStorageUpgradeGate.prepare(
-            rootURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
-            bundleBuildNumber: "1.2"
-        )
+        try lease.prepareUpgradeGate(bundleBuildNumber: "1.2")
     }
     #expect(throws: AccountStorageUpgradeError.invalidBuildNumber) {
-        try AccountStorageUpgradeGate.prepare(
-            rootURL: FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString),
-            bundleBuildNumber: "0"
-        )
+        try lease.prepareUpgradeGate(bundleBuildNumber: "0")
     }
     let developmentRoot = FileManager.default.temporaryDirectory
         .appendingPathComponent("netelegram-development-build-gate-\(UUID().uuidString)", isDirectory: true)
     defer { try? FileManager.default.removeItem(at: developmentRoot) }
-    #expect(try AccountStorageUpgradeGate.prepare(
-        rootURL: developmentRoot,
+    let developmentLease = try AccountStorageLease(rootURL: developmentRoot)
+    #expect(try developmentLease.prepareUpgradeGate(
         bundleBuildNumber: "0",
         allowDevelopmentZeroBuild: true
     ) == 0)
