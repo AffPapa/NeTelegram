@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "Photo-open TDLib reporting is implemented. Exact-source local 151/151, hosted macOS 151/151, metadata validation, and pinned TDLib/arm64 Dev.app lifecycle smoke passed. CI verbose output and a 5-minute timeout now expose startup failures and bound stalled feedback. Public Site v150. Telegram title/sponsored video/basic-functionality gates, real accounts/20-runtime certification and signed distribution remain open.",
-  "verified_at": "2026-10-14T03:00:30+0700",
+  "verified_at": "2026-10-14T03:04:45+0700",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
@@ -12,7 +12,7 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "6145b0156068f784e1eea3bf70df77a8b834bf83",
+    "commit": "3664214a842913ed03c5413a18beb39b95cc817e",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
@@ -52,11 +52,11 @@
     },
     "repo_head_policy": "On resume, git rev-parse HEAD and origin/main are authoritative. App source SHA and documentation/workflow checkpoint HEAD are recorded separately; a later metadata-only checkpoint may advance HEAD without changing app source. Site source, saved version and deployment are separate.",
     "latest_checkpoint_ci": {
-      "run_id": 38457141078,
+      "run_id": 38459557354,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38457141078",
-      "checkpoint_commit": "cd1fbe457ad8c14884bd781b84ef2ac007b88909",
-      "note": "Dedicated metadata-only workflow passed all configured JSON checks for the verified fast-CI checkpoint."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38459557354",
+      "checkpoint_commit": "3664214a842913ed03c5413a18beb39b95cc817e",
+      "note": "Dedicated metadata-only workflow passed all configured JSON checks after recording exact app and public Site evidence."
     }
   },
   "local_development_candidate": {
@@ -122,26 +122,26 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 150,
-    "source_commit": "92fdb0289165157b5f9ee8939dc96767c2915490",
-    "deployment_id": "appgdep_6ace7e38f5d881918fa29d7fa0ebbd18",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_50db2aac69548191bedc2057d6d3fcb5",
+    "latest_version": 151,
+    "source_commit": "08b31c8ca6a5a0c1957fa268abeba9b1c2366a24",
+    "deployment_id": "appgdep_6ace8ec76e4081918ae04844ab188b40",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_a312a23af0488191a049ebcca7047104",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Site v150 is public at https://netelegram.iryadom.chatgpt.site. Browser-checked all eight routes at 375px: one H1, correct canonical, no horizontal overflow. Homepage visually inspected at 1440px and 375px. Downloads route contains zero ZIP/DMG/release links. Stable and alpha appcasts returned HTTP 200, text/xml, valid XML. English overview remains on homepage. No app binary was released.",
-    "archive_local_sha256": "5a732c4596fde83acba720ee464b8bc51ef3d12f01e2d9278ac1a688f2dc64d8",
+    "public_route_verified": "Site v151 is public at https://netelegram.iryadom.chatgpt.site. Anonymous HTTPS GET returned 200 and text/html for /devlog/ and /downloads/. Live devlog contains the exact app source 6145b015 and current CI/native evidence links; downloads explicitly state that no verified app build exists and contain no ZIP, DMG or GitHub release links.",
+    "archive_local_sha256": "644bfe466d0557f269c645f36a0744f74bbc3f1eabb75d30775dbf999cc7d21b",
     "archive_sites_reported_content_hash": "sha256:de3218cd58bdfef61848d4b7f6840aeb88c780b37761298374ee457eafa4c0c0",
     "archive_file_count": 15,
     "sites_reported_archive_size_bytes": 512000,
     "local_archive_size_bytes": 288025,
-    "archive_local_path": "/private/tmp/netelegram-site-v150.tar",
-    "saved_archive_content_hash": "sha256:de3218cd58bdfef61848d4b7f6840aeb88c780b37761298374ee457eafa4c0c0",
+    "archive_local_path": "/private/tmp/netelegram-site-v151.tar.gz",
+    "saved_archive_content_hash": "sha256:4a651fc1aa376c021101ee64ccc46ab7976fe5cd4ba20d8157d468c757dbc001",
     "saved_archive_size_bytes": 512000,
-    "app_repository_commit": "33147b0fff262db4825c5aa11b0782015d7485f1",
+    "app_repository_commit": "3664214a842913ed03c5413a18beb39b95cc817e",
     "asset_cleanup": "One shared responsive design system serves all eight routes. Original homepage concept art remains clearly labelled as an illustration, not a product screenshot. App downloads remain absent until a verified release.",
-    "latest_devlog_commit": "33147b0fff262db4825c5aa11b0782015d7485f1",
-    "current_head_site": "Public Site v150 at https://netelegram.iryadom.chatgpt.site; Site source 92fdb0289165157b5f9ee8939dc96767c2915490; deployment appgdep_6ace7e38f5d881918fa29d7fa0ebbd18; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_50db2aac69548191bedc2057d6d3fcb5.",
-    "archive_local_size_bytes": 286941
+    "latest_devlog_commit": "08b31c8ca6a5a0c1957fa268abeba9b1c2366a24",
+    "current_head_site": "Public Site v151 at https://netelegram.iryadom.chatgpt.site; Site source 08b31c8ca6a5a0c1957fa268abeba9b1c2366a24; deployment appgdep_6ace8ec76e4081918ae04844ab188b40; saved version appgprj_6acba85192e08191acdf7011928848cf~appgver_a312a23af0488191a049ebcca7047104.",
+    "archive_local_size_bytes": 288543
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -153,7 +153,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue one concrete P0 app slice from exact source 6145b015. Do not repeat successful local, hosted or native gates without changed inputs. Site v150 still needs one factual devlog update if the supported source helper completes. Preserve the real-account, all-20, signing/notarization, Telegram title, sponsored video and basic-functionality gates as open.",
+  "next_action": "Continue one concrete P0 app slice from exact app source 6145b015. Do not repeat successful local/hosted/native gates without changed inputs. Public Site v151 is live and has no download links because no verified signed app release exists. Keep real-account, all-20, Developer ID/notarization, Telegram title, sponsored video and basic-functionality gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "Temporary canonical checkout; resolve its local path through the project context index.",
