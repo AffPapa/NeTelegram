@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "phase": "Country/calling-code selection is now available before profile creation. Local serial Swift suite passed 152/152 and metadata workflow passed; hosted macOS test step was cancelled at its 5-minute timeout. Site v153 is public with a factual RU/EN devlog entry. New Dev.app GUI smoke and real account remain unverified; no app downloads or release.",
-  "verified_at": "2026-10-14T03:50:00+0700",
+  "phase": "First-run country selector is now visible immediately on an empty catalogue, before API hash lookup; native arm64 Dev.app at source 94740d3 was visually and accessibly verified with Thailand +66 suggested, no number entered. App build and bundle signature check passed. Prior core suite passed 152/152 on source be58; a rerun after the AppKit-only startup change built successfully but the silent runner was interrupted after >60 seconds. Exact-source CI 38466197778 is pending. Public Site remains v153 and needs a correction/update; no stable release/downloads.",
+  "verified_at": "2026-10-14T03:52:50+0700",
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384"
+    "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -14,12 +14,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38464148650,
-      "status": "cancelled",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38464148650",
-      "workflow_commit": "1ff4cf578e634623bbcdd5d876041f100f9290f0",
-      "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
-      "scope": "Hosted macOS build completed, but serialized Swift test step was cancelled at the workflow 5-minute timeout. Exact job checked; logs were unavailable through the connector. Local exact-source suite passed 152/152. GitHub connector denied rerun with 403 Resource not accessible by integration."
+      "run_id": 38466197778,
+      "status": "pending",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38466197778",
+      "workflow_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
+      "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
+      "scope": "Automatic macOS CI is pending. Prior checkpoint run 38464148650 was cancelled at the 5-minute timeout for the pre-ordering-fix source be58d83; no hosted pass for current source yet."
     },
     "published_application_releases": [],
     "github_access": {
@@ -56,7 +56,7 @@
       "scope": "Pinned TDLib and isolated arm64 Dev.app build, bundle verification, accountless first-run capture and window close/reopen/quit smoke passed; screenshot visually reviewed, disclosure small/low-contrast.",
       "status_scope": "Historical baseline for app source 6145b015; no pinned native workflow rerun for 2cd13c2 because this was a text-style-only source change."
     },
-    "last_audited_checkpoint_commit": "1ff4cf578e634623bbcdd5d876041f100f9290f0",
+    "last_audited_checkpoint_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
     "pre_edit_working_tree_clean": true
   },
   "local_development_candidate": {
@@ -75,24 +75,23 @@
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Exact app source be58d831aaa1d53c3d47e1313758feb7f9e32384: local serial swift test passed 152/152 on Xcode 27.0 / Swift 6.4 (4.88s build, 0.200s execution). Metadata CI on checkpoint 1ff4cf578e634623bbcdd5d876041f100f9290f0 passed run 38464148278. Hosted macOS CI 38464148650 reached its five-minute workflow timeout and was cancelled; no hosted test pass claimed. Rerun API returned 403 Resource not accessible by integration; job logs unavailable through connector.",
-      "xcode": "Local Xcode 27.0 / Swift 6.4; hosted macOS runner is macos-15.",
-      "tested_checkpoint_commit": "1ff4cf578e634623bbcdd5d876041f100f9290f0",
-      "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
-      "run_id": 38464148650,
-      "duration_seconds": 305,
-      "hosted_ci": "cancelled"
+      "result": "Pre-ordering-fix source be58d831aaa1d53c3d47e1313758feb7f9e32384: local serial suite passed 152/152 on Xcode 27.0 / Swift 6.4. After the startup-order AppKit change, swift test compiled successfully in 5.14s but emitted no test result for over 60s and was interrupted; no current-source suite PASS. A final clean current-source Dev.app build succeeded in 9.12s and exact UI smoke passed. Hosted run 38466197778 is pending.",
+      "xcode": "Local Xcode 27.0 / Swift 6.4; arm64",
+      "tested_checkpoint_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
+      "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
+      "run_id": 38466197778,
+      "hosted_ci": "pending"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "Not verified; fresh read-only signing identity inventory found 0 valid code-signing identities and 0 Developer ID Application identities. Notary profile/credentials were not inspected. No signed/notarized app.",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_site": "Public Site v153 at https://netelegram.iryadom.chatgpt.site. Anonymous curl verified /devlog/ and /downloads/ as HTTP/2 200 text/html; live devlog contains country-selection milestone, source be58d83 and honest hosted-CI cancellation. Downloads still have no ZIP/DMG links.",
+    "current_head_site": "Public Site v153 at https://netelegram.iryadom.chatgpt.site. It still describes source be58d83, says current GUI smoke was not run, and does not yet include the fix/verified 94740d3 screen. No app binaries linked.",
     "keychain_main_thread": "Actual SecretsStore backend is now injectable; five focused fake-backend tests pass without touching system Keychain. Real macOS Keychain blocking/ACL behavior, user interaction and credential access remain unverified.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
-    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38454870134 passed for exact source 55dd12b5bbcfab871df3473dba0d9e5a03b51814: launch, last-window close, LaunchServices reopen/same PID, normal quit. Accountless only; screenshot artifact captured but not visually reviewed.",
-    "publication": "App source be58d831aaa1d53c3d47e1313758feb7f9e32384 and checkpoint 1ff4cf578e634623bbcdd5d876041f100f9290f0 pushed to AffPapa/NeTelegram. Metadata run 38464148278 passed. Hosted macOS run 38464148650 cancelled at five-minute timeout; exact rerun denied by connector 403. Site v153 deployed from 7790a235a570dd9923c58be9b714af91585732ab as appgdep_6ace9871f63c819180a67d58b1591c98; public routes verified anonymously. No app release/downloads.",
+    "current_head_native_smoke": "Exact source 94740d38bfa845919ac2863ad0e78d1a7d494a04 local canonical arm64 Dev.app launched successfully, build 9.12s, ad-hoc signature verified. Accessibility and screenshot show first-run country selector (Thailand +66 suggested by locale), phone field, Continue and QR; no number/code entered. Isolated empty support root /private/tmp/netelegram-first-run-smoke-94740d3. App is running. No login/read/send or lifecycle claim.",
+    "publication": "Country catalog source be58d83, metadata checkpoint 1ff4cf5, and subsequent AppKit startup/status commits 74265a3/94740d3 are pushed to AffPapa/NeTelegram. Current exact-source macOS CI 38466197778 pending. Site v153 contains source be58d83 and honest CI cancellation, but is stale relative to 94740d3; update once after CI status resolves. No app release or downloads.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
     "seo_keyword_research": "Live qualitative SERP wording: RU: неофициальный клиент Telegram для macOS; клиент Telegram для Mac; альтернативный клиент Telegram для Mac/macOS; приложение для Telegram на Mac. EN: unofficial Telegram client for macOS; Telegram client for Mac; alternative Telegram client for Mac/macOS; native macOS Telegram client; open-source Telegram client for Mac. No search volume/rank source was available.",
@@ -101,13 +100,20 @@
     "current_head_app16_ci": "Exact-source run 38456932580 passed all 151 tests on macOS 15 / Xcode 16.4 / Swift 6.1.2. Verbose runner output plus the 5-minute job ceiling is validated; hosted job completed in about 59s.",
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
-    "latest_exact_source_ci": "Hosted run 38464148650 for checkpoint 1ff4cf578e634623bbcdd5d876041f100f9290f0 / app source be58d831aaa1d53c3d47e1313758feb7f9e32384 timed out/cancelled at 5 minutes. Local serial tests passed 152/152. Rerun is blocked by GitHub integration 403; no hosted PASS.",
+    "latest_exact_source_ci": "Current-source macOS CI 38466197778 pending for 94740d38bfa845919ac2863ad0e78d1a7d494a04. Prior source be58d83 remote run 38464148650 cancelled at 5-minute timeout; connector retry returned 403. No hosted PASS for current source.",
     "current_head_native_build": "Exact-source pinned TDLib/arm64 Dev.app workflow 38457814416 passed for 6145b0156068f784e1eea3bf70df77a8b834bf83; accountless lifecycle smoke and screenshot capture verified.",
     "latest_local_appkit_build": {
-      "result": "App source be58d831aaa1d53c3d47e1313758feb7f9e32384: local serial suite passed 152/152. No current Dev.app build or GUI smoke; old canonical bundle remained running and was not overwritten.",
-      "toolchain": "Xcode 27.0 / Swift 6.4; arm64",
-      "native_gui_smoke": "Not run for country selector candidate. Previous auth screen evidence is historical and does not cover this source.",
-      "hosted_ci_run": 38464148650,
+      "result": "App source 94740d38bfa845919ac2863ad0e78d1a7d494a04; `scripts/dev-app.sh --launch` built arm64 canonical Dev.app in 9.12s, ad-hoc nested signature verification passed. AX and screenshot show welcome form, locale-suggested Thailand +66, number field, Continue and QR. No account/number/code entered.",
+      "toolchain": "Apple Swift 6.4, arm64, macOS 14 baseline",
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-first-run-smoke-94740d3",
+      "source_fingerprint_sha256": "e79a341bdfc0c7cd1c7da64c68b0a42112af892000c42c01bac16fed836d32b6",
+      "executable_sha256": "af309b5551f57682e86d8a521da99ae97f04606fbfc17d4df5d10cd101fc2a31",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "signing": "ad-hoc development only",
+      "native_gui_smoke": "Current exact source shown; country picker AX Value 🇹🇭 Thailand +66; status says choose country and enter phone number; no credentials, profile or runtime created.",
+      "hosted_ci_run": 38466197778,
       "metadata_validation_run": 38464148278
     },
     "telegram_api_compatibility": "Primary Terms page rechecked 2026-10-14. Sign-in intro now explicitly states Telegram API/TDLib use and ecosystem membership with a no-affiliation statement. Terms §2.3 still conflicts with requested public title NeTelegram; §3.3 requires sponsored channel messages/video behavior, which user declined to add; channel access/stable release remain deferred. §§1.3/1.4 basic functionality review remains open. Pinned schema c15d3f5a5de6e3ba5839822c451152e5e18bb700 exposes sponsored video and timed video ad APIs.",
@@ -154,7 +160,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Keep one source SHA and one running app identity. Current first-run country picker source is pushed and documented in Site v153. Investigate why hosted Swift CI cancels at 5 minutes; rerun same SHA only through a route with authorized Actions write access. Do not alter source to mask a runner hang. Next UI step: gracefully quit the old canonical Dev.app through its menu, then build that bundle once and inspect the country picker with no credentials. Real login requires the user to enter their own auth in NeTelegram; all-20, Developer ID/notary, updater and Telegram compatibility gates remain open.",
+  "next_action": "Check the single exact-source macOS run 38466197778 when terminal. Update current public Site once from v153 to v154 so its RU/EN devlog records source 94740d3, the immediate first-run form and test boundary. Do not rerun source tests unless current CI gives actionable failure; no force-quit or parallel app bundle. Next P0 needs user-entered real account login (previously deferred), then test read/send/close; all-20 certification, Developer ID/notary, updater and Telegram compatibility remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -163,9 +169,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "549c55a24a0f756050e4a21446a74050d86be217",
-    "app_source_commit_authority": "be58d831aaa1d53c3d47e1313758feb7f9e32384",
-    "app_source_commit": "be58d831aaa1d53c3d47e1313758feb7f9e32384"
+    "repo_head_before_checkpoint": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
+    "app_source_commit_authority": "94740d38bfa845919ac2863ad0e78d1a7d494a04",
+    "app_source_commit": "94740d38bfa845919ac2863ad0e78d1a7d494a04"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
