@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public main is 6d1fa2d; local candidate 352b3f9 adds initial sponsored-message reporting and passes 78/78 Swift tests. Candidate is not pushed or CI-verified. Native login/all-20, Telegram compatibility decisions, Developer ID/notarization, updater and stable-release gates remain open.",
+  "status": "implementation_in_progress; public main remains 6d1fa2d. Local sponsored reporting/photo candidate passes 79/79 Swift tests but is not pushed or CI-verified. Native login/all-20, Telegram compatibility decisions, Developer ID/notarization, updater and stable-release gates remain open.",
   "cases": [
     {
       "id": "APP01",
@@ -270,7 +270,7 @@
       "method": "primary docs+implementation review",
       "required_for": "all public app releases",
       "status": "partial",
-      "evidence": "Telegram API Terms §2.3: the requested public title NeTelegram does not meet the stated Unofficial-prefix condition; keep product-title approval open. Terms §1.3/1.4 base-functionality review is not complete. Local candidate 352b3f9 adds text-only sponsored cards and reportChatSponsoredMessage with localized two-step report reasons, but media is not yet fully downloaded/rendered, view reporting is unavailable in the pinned TDLib schema, in-app Telegram deep-link routing is unfinished, and sponsored video playback/timing is absent. No Telegram compatibility or stable-release pass is claimed. Official references: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, and pinned TDLib schema c15d3f5a5de6e3ba5839822c451152e5e18bb700."
+      "evidence": "Telegram API Terms §2.3: the requested public title NeTelegram does not meet the stated Unofficial-prefix condition; keep product-title approval open. Terms §1.3/1.4 base-functionality review is not complete. Local candidate adds text/photo sponsored cards, fully downloads a selected photo before presenting the ad and decodes through the bounded account-namespaced PhotoPipeline, and implements reportChatSponsoredMessage with localized two-step report reasons. Sponsored animation/video handling, view reporting (not exposed by pinned TDLib), in-app Telegram deep-link routing, and sponsored-video playback/timing remain incomplete. No Telegram compatibility or stable-release pass is claimed. Official references: https://core.telegram.org/api/terms, https://core.telegram.org/api/sponsored-messages, and pinned TDLib schema c15d3f5a5de6e3ba5839822c451152e5e18bb700."
     },
     {
       "id": "REL02",
@@ -438,11 +438,10 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "source_commit": "352b3f9f4042420e2172e3766072d1a7376c68db",
     "base_commit": "6d1fa2d35d83b4cba1637fe687aa46a44df99e65",
-    "tests": "78/78 Swift Testing tests passed; SwiftPM built app and test products; git diff --check passed.",
-    "hosted_ci": "not_run; commit is local and not pushed.",
+    "tests": "79/79 Swift Testing tests passed; SwiftPM built app and test products; git diff --check passed.",
+    "hosted_ci": "not_run; candidate is local and not pushed.",
     "site": "public Site v62 unchanged; no deployment.",
-    "scope": "Initial sponsored message text card and report flow only. Sponsored media download/render, sponsored view tracking, in-app Telegram deep links and video advertisement playback/timing remain incomplete."
+    "scope": "Sponsored text/photo card, selected-photo full download before display and bounded preview decoding, reporting flow. Sponsored animation/video, view reporting, and in-app Telegram deep links remain incomplete."
   }
 }

@@ -78,6 +78,27 @@ import Testing
     #expect(card?.text == "")
 }
 
+@Test func sponsoredPhotoCardSelectsFullTDLibPhotoVariantWithoutDownloadingIt() {
+    let card = SponsoredMessageCard(tdlibObject: [
+        "message_id": 19,
+        "title": "Photo sponsor",
+        "button_text": "Visit",
+        "content": [
+            "@type": "messagePhoto",
+            "caption": ["text": "Sponsored caption"],
+            "photo": ["sizes": [
+                ["width": 320, "height": 240, "photo": ["id": 201, "expected_size": 12000, "local": ["can_be_downloaded": true, "is_downloading_completed": false, "path": ""]]],
+                ["width": 1920, "height": 1440, "photo": ["id": 202, "expected_size": 420000, "local": ["can_be_downloaded": true, "is_downloading_completed": false, "path": ""]]],
+            ]],
+        ],
+        "sponsor": ["url": "https://example.org/"],
+    ])
+    #expect(card?.contentType == "messagePhoto")
+    #expect(card?.text == "Sponsored caption")
+    #expect(card?.photo?.fileID == 202)
+    #expect(card?.photo?.isDownloaded == false)
+}
+
 @Test func authenticationCodePromptUsesMaskedTDLibDestination() {
     let message = AuthenticationCodePrompt.message(
         codeType: "authenticationCodeTypeTelegramMessage",

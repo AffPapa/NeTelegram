@@ -164,6 +164,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var sponsoredBotKeys: Set<SponsoredMessagesKey> = []
     private var sponsoredActionByControlID: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
     private var sponsoredReportActionByControlID: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
+    private var pendingSponsoredPhotoByExtra: [String: SponsoredPhotoKey] = [:]
+    private var sponsoredPhotoURLs: [SponsoredPhotoKey: URL] = [:]
+    private var requestedSponsoredPhotos: Set<SponsoredPhotoKey> = []
+    private var failedSponsoredPhotos: Set<SponsoredPhotoKey> = []
+    private var sponsoredPhotoRetryByControlID: [String: (key: SponsoredMessagesKey, card: SponsoredMessageCard)] = [:]
     private var pendingForumTopicsByExtra: [String: Int64] = [:]
     private var forumTopicsByAccount: [AccountUUID: [Int64: [ForumTopicDescriptor]]] = [:]
     private var forumChatsByAccount: [AccountUUID: Set<Int64>] = [:]
@@ -1124,6 +1129,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingSponsoredReportsByExtra = pendingSponsoredReportsByExtra.filter { $0.value.key.account != account }
         sponsoredActionByControlID = sponsoredActionByControlID.filter { $0.value.key.account != account }
         sponsoredReportActionByControlID = sponsoredReportActionByControlID.filter { $0.value.key.account != account }
+        pendingSponsoredPhotoByExtra = pendingSponsoredPhotoByExtra.filter { $0.value.account != account }
+        sponsoredPhotoURLs = sponsoredPhotoURLs.filter { $0.key.account != account }
+        requestedSponsoredPhotos = Set(requestedSponsoredPhotos.filter { $0.account != account })
+        failedSponsoredPhotos = Set(failedSponsoredPhotos.filter { $0.account != account })
+        sponsoredPhotoRetryByControlID = sponsoredPhotoRetryByControlID.filter { $0.value.key.account != account }
         pendingForumTopicsByExtra.removeAll()
         pendingSearchByExtra = pendingSearchByExtra.filter { $0.value.account != account }
         searchResults.removeAll()
@@ -2245,6 +2255,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 if let button = photoButtons[key], !lockState {
                     button.isEnabled = true
                     button.title = "Повторить загрузку фото"
+                }
+                return
+            }
+            if let extra = object["@extra"] as? String,
+               let key = pendingSponsoredPhotoByExtra.removeValue(forKey: extra) {
+                photoDownloadsByConversation[ConversationKey(account: key.account, chatID: key.chatID)]?.remove(key.fileID)
+                requestedSponsoredPhotos.remove(key)
+                failedSponsoredPhotos.insert(key)
+                if !lockState, target === runtime, selectedChatByAccount[target.account] == key.chatID {
+                    setStatus("Не удалось загрузить рекламную фотографию; она не будет показана частично.")
+                    let conversation = currentConversationKey(for: target.account, chatID: key.chatID)
+                    clearStack(messageList)
+                    renderMessages(messagesByConversation[conversation] ?? [])
                 }
                 return
             }
@@ -3389,6 +3412,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let key = selected.flatMap { target in chatID.map { SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: $0) } }
         sponsoredActionByControlID.removeAll()
         sponsoredReportActionByControlID.removeAll()
+        sponsoredPhotoRetryByControlID.removeAll()
         if let selected, let chatID, let key,
            sponsoredEligibleChatKeys.contains(key), sponsoredBotKeys.contains(key) {
             loadSponsoredMessages(in: selected, chatID: chatID)
@@ -3425,6 +3449,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         cardView.translatesAutoresizingMaskIntoConstraints = false
         cardView.widthAnchor.constraint(lessThanOrEqualToConstant: 620).isActive = true
 
+        var sponsoredPhotoPresentation: PhotoPresentationKey?
+        var sponsoredPhotoURL: URL?
+        if card.contentType == "messagePhoto" {
+            guard let photo = card.photo else {
+                messageList.addArrangedSubview(NSTextField(wrappingLabelWithString: "Рекламное фото пока недоступно; карточка не показана частично."))
+                return
+            }
+            let photoKey = SponsoredPhotoKey(account: key.account, generation: key.generation, chatID: key.chatID, messageID: card.messageID, fileID: photo.fileID)
+            let presentationKey = PhotoPresentationKey(account: key.account, chatID: key.chatID, messageID: card.messageID, fileID: photo.fileID)
+            sponsoredPhotoPresentation = presentationKey
+            sponsoredPhotoURL = sponsoredPhotoURLs[photoKey]
+            if sponsoredPhotoURL == nil, photo.isDownloaded, let path = photo.localPath, !path.isEmpty {
+                sponsoredPhotoURL = URL(fileURLWithPath: path)
+                sponsoredPhotoURLs[photoKey] = sponsoredPhotoURL
+            }
+            if sponsoredPhotoURL == nil {
+                if !photo.canBeDownloaded {
+                    let unavailable = NSTextField(wrappingLabelWithString: "Рекламное фото сейчас недоступно; карточка не показана частично.")
+                    unavailable.font = .systemFont(ofSize: 13)
+                    unavailable.textColor = .secondaryLabelColor
+                    messageList.addArrangedSubview(unavailable)
+                    return
+                }
+                if failedSponsoredPhotos.contains(photoKey) {
+                    let retry = NSButton(title: "Повторить загрузку рекламного фото", target: self, action: #selector(retrySponsoredPhoto(_:)))
+                    let controlID = UUID().uuidString
+                    retry.identifier = NSUserInterfaceItemIdentifier(controlID)
+                    sponsoredPhotoRetryByControlID[controlID] = (key, card)
+                    messageList.addArrangedSubview(retry)
+                    return
+                }
+                requestSponsoredPhoto(photo, key: photoKey)
+                let label = NSTextField(wrappingLabelWithString: "Загружаю рекламную фотографию. Карточка появится после полной загрузки.")
+                label.font = .systemFont(ofSize: 13)
+                label.textColor = .secondaryLabelColor
+                messageList.addArrangedSubview(label)
+                return
+            }
+        }
+
         let badge = NSTextField(labelWithString: card.recommended ? "Рекомендовано" : "Реклама")
         badge.font = .systemFont(ofSize: 11, weight: .semibold)
         badge.textColor = .controlAccentColor
@@ -3442,8 +3506,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             body.maximumNumberOfLines = 0
             cardView.addArrangedSubview(body)
         }
-        if card.contentType != "messageText" {
-            let media = NSTextField(wrappingLabelWithString: sponsoredMediaDescription(card.contentType))
+        if let photoKey = sponsoredPhotoPresentation, let fileURL = sponsoredPhotoURL {
+            let imageView = NSImageView(frame: NSRect(x: 0, y: 0, width: 320, height: 240))
+            imageView.imageScaling = .scaleProportionallyUpOrDown
+            imageView.setAccessibilityLabel("Фотография спонсируемого сообщения")
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                imageView.widthAnchor.constraint(equalToConstant: 320),
+                imageView.heightAnchor.constraint(equalToConstant: 240),
+            ])
+            photoViews[photoKey] = imageView
+            photoLocalURLs[photoKey] = fileURL
+            cardView.addArrangedSubview(imageView)
+        }
+        let mediaDescription = sponsoredMediaDescription(card.contentType)
+        if !mediaDescription.isEmpty {
+            let media = NSTextField(wrappingLabelWithString: mediaDescription)
             media.font = .systemFont(ofSize: 12)
             media.textColor = .secondaryLabelColor
             media.maximumNumberOfLines = 0
@@ -3476,11 +3554,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             cardView.addArrangedSubview(reportButton)
         }
         messageList.addArrangedSubview(cardView)
+        if let photoKey = sponsoredPhotoPresentation, let fileURL = sponsoredPhotoURL {
+            requestPhotoPreview(photoKey, fileURL: fileURL)
+        }
+    }
+
+    private func requestSponsoredPhoto(_ photo: PhotoFileVariant, key: SponsoredPhotoKey) {
+        guard !lockState, let target = runtimesByAccount[key.account], target === runtime,
+              target.generation == key.generation, selectedChatByAccount[key.account] == key.chatID,
+              photo.canBeDownloaded else { return }
+        let conversation = ConversationKey(account: key.account, chatID: key.chatID)
+        guard !requestedSponsoredPhotos.contains(key) else { return }
+        let activeFiles = photoDownloadsByConversation.values.reduce(0) { $0 + $1.count }
+        if !photoDownloadsByConversation[conversation, default: []].contains(photo.fileID), activeFiles >= 4 {
+            setStatus("Уже загружаются четыре фотографии. Рекламное фото подождёт.")
+            return
+        }
+        requestedSponsoredPhotos.insert(key)
+        photoDownloadsByConversation[conversation, default: []].insert(photo.fileID)
+        historyRequestCounter &+= 1
+        let extra = "sponsored-photo-\(historyRequestCounter)"
+        pendingSponsoredPhotoByExtra[extra] = key
+        do {
+            try target.send(["@type": "downloadFile", "file_id": photo.fileID, "priority": 16, "offset": 0, "limit": 0, "synchronous": false, "@extra": extra])
+        } catch {
+            pendingSponsoredPhotoByExtra.removeValue(forKey: extra)
+            photoDownloadsByConversation[conversation]?.remove(photo.fileID)
+            requestedSponsoredPhotos.remove(key)
+            setStatus("Не удалось начать загрузку рекламной фотографии.")
+        }
+    }
+
+    @objc private func retrySponsoredPhoto(_ sender: NSButton) {
+        guard !lockState,
+              let identifier = sender.identifier?.rawValue,
+              let action = sponsoredPhotoRetryByControlID[identifier],
+              let target = runtimesByAccount[action.key.account], target === runtime,
+              target.generation == action.key.generation,
+              selectedChatByAccount[target.account] == action.key.chatID,
+              let photo = action.card.photo else { return }
+        let key = SponsoredPhotoKey(account: action.key.account, generation: action.key.generation, chatID: action.key.chatID, messageID: action.card.messageID, fileID: photo.fileID)
+        failedSponsoredPhotos.remove(key)
+        requestedSponsoredPhotos.remove(key)
+        requestSponsoredPhoto(photo, key: key)
+        let conversation = currentConversationKey(for: target.account, chatID: action.key.chatID)
+        clearStack(messageList)
+        renderMessages(messagesByConversation[conversation] ?? [])
     }
 
     private func sponsoredMediaDescription(_ type: String) -> String {
         switch type {
-        case "messagePhoto": return "В этой рекламе есть фотография. Просмотр медиа пока не подключён."
+        case "messagePhoto": return ""
         case "messageAnimation": return "В этой рекламе есть анимация. Просмотр медиа пока не подключён."
         case "messageVideo": return "В этой рекламе есть видео. Специальный рекламный просмотр ещё не подключён."
         default: return "Содержимое рекламы пока не распознано; публикация не скрыта."
@@ -4336,10 +4460,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               let chatID = selectedChatByAccount[target.account] else { return }
         let url = URL(fileURLWithPath: path)
         photoDownloadsByConversation[ConversationKey(account: target.account, chatID: chatID)]?.remove(fileID)
+        var completedSponsoredPhoto = false
+        var sponsoredPresentationKeys: Set<PhotoPresentationKey> = []
+        for (extra, key) in pendingSponsoredPhotoByExtra.filter({ $0.value.account == target.account && $0.value.chatID == chatID && $0.value.fileID == fileID }) {
+            pendingSponsoredPhotoByExtra.removeValue(forKey: extra)
+            sponsoredPhotoURLs[key] = url
+            sponsoredPresentationKeys.insert(PhotoPresentationKey(account: key.account, chatID: key.chatID, messageID: key.messageID, fileID: key.fileID))
+            completedSponsoredPhoto = true
+        }
+        if completedSponsoredPhoto, target === runtime,
+           selectedChatByAccount[target.account] == chatID,
+           currentConversationKey() == currentConversationKey(for: target.account, chatID: chatID) {
+            let conversation = currentConversationKey(for: target.account, chatID: chatID)
+            clearStack(messageList)
+            renderMessages(messagesByConversation[conversation] ?? [])
+        }
         pendingPhotoByExtra = pendingPhotoByExtra.filter {
             $0.value.account != target.account || $0.value.chatID != chatID || $0.value.fileID != fileID
         }
-        for key in photoViews.keys where key.account == target.account && key.chatID == chatID && key.fileID == fileID {
+        for key in photoViews.keys where key.account == target.account && key.chatID == chatID && key.fileID == fileID && !sponsoredPresentationKeys.contains(key) {
             photoLocalURLs[key] = url
             photoButtons[key]?.title = "Показать фото"
             photoButtons[key]?.isEnabled = true
@@ -4421,6 +4560,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
         pendingPhotoByExtra = pendingPhotoByExtra.filter { $0.value.account != account || $0.value.chatID != chatID }
         pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter { $0.value.account != account || $0.value.chatID != chatID }
+        pendingSponsoredPhotoByExtra = pendingSponsoredPhotoByExtra.filter { $0.value.account != account || $0.value.chatID != chatID }
+        requestedSponsoredPhotos = Set(requestedSponsoredPhotos.filter { $0.account != account || $0.chatID != chatID })
         requestedOriginalPhotos = Set(requestedOriginalPhotos.filter { $0.account != account || $0.chatID != chatID })
     }
 
@@ -4904,8 +5045,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         pendingSponsoredMessagesByExtra.removeAll()
         pendingSponsoredBotUsersByExtra.removeAll()
         pendingSponsoredReportsByExtra.removeAll()
+        pendingSponsoredPhotoByExtra.removeAll()
+        sponsoredPhotoURLs.removeAll()
+        requestedSponsoredPhotos.removeAll()
         sponsoredActionByControlID.removeAll()
         sponsoredReportActionByControlID.removeAll()
+        sponsoredPhotoRetryByControlID.removeAll()
+        failedSponsoredPhotos.removeAll()
         pendingForumTopicsByExtra.removeAll()
         selectedChatByAccount.removeAll()
         if draftsFlushed { draftsByConversation.removeAll() }
@@ -5005,6 +5151,14 @@ private struct PhoneCountry {
 
 private struct PhotoPresentationKey: Hashable, Sendable {
     let account: AccountUUID
+    let chatID: Int64
+    let messageID: Int64
+    let fileID: Int32
+}
+
+private struct SponsoredPhotoKey: Hashable, Sendable {
+    let account: AccountUUID
+    let generation: RuntimeGeneration
     let chatID: Int64
     let messageID: Int64
     let fileID: Int32

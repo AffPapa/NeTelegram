@@ -23,6 +23,7 @@ public struct SponsoredMessageCard: Equatable, Sendable {
     public let sponsorInfo: String
     public let additionalInfo: String
     public let contentType: String
+    public let photo: PhotoFileVariant?
 
     public init?(tdlibObject: [String: Any]) {
         guard let messageID = (tdlibObject["message_id"] as? NSNumber)?.int64Value,
@@ -30,9 +31,19 @@ public struct SponsoredMessageCard: Equatable, Sendable {
               let content = tdlibObject["content"] as? [String: Any],
               let sponsor = tdlibObject["sponsor"] as? [String: Any] else { return nil }
         let contentType = content["@type"] as? String ?? ""
+        let photo: PhotoFileVariant?
+        if contentType == "messagePhoto",
+           let photoObject = content["photo"] as? [String: Any],
+           let sizes = photoObject["sizes"] as? [[String: Any]] {
+            photo = PhotoSizeCatalog.original(from: sizes)
+        } else {
+            photo = nil
+        }
         let text: String
-        if contentType == "messageText",
-           let formatted = content["text"] as? [String: Any],
+        let formattedContent = contentType == "messageText"
+            ? content["text"] as? [String: Any]
+            : contentType == "messagePhoto" ? content["caption"] as? [String: Any] : nil
+        if let formatted = formattedContent,
            let value = formatted["text"] as? String {
             text = value
         } else {
@@ -48,6 +59,7 @@ public struct SponsoredMessageCard: Equatable, Sendable {
         sponsorInfo = sponsor["info"] as? String ?? ""
         additionalInfo = tdlibObject["additional_info"] as? String ?? ""
         self.contentType = contentType
+        self.photo = photo
     }
 }
 
