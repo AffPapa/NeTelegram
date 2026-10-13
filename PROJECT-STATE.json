@@ -11,21 +11,21 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "8c76ba0298768af8d1e4144c31804ee58b8e8518",
-    "working_tree_clean": true,
+    "commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "working_tree_clean": false,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38366877956,
+      "run_id": 38368612207,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38366877956"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38368612207"
     },
     "published_application_releases": []
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "build_info_commit": "c6bd4e475210bbbb1c5c37058947adc82a818218",
-    "application_source_commit": "88ba7e2b8d41927f427008ea339a259bf2fd8238",
+    "build_info_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "application_source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
@@ -35,19 +35,14 @@
   "verification": {
     "current_head_targeted_tests": {
       "result": "passed",
-      "count": 4,
-      "tests": [
-        "networkTypePolicyTracksPathEventsEvenWhenTDLibTypeIsUnchanged",
-        "networkPathRevisionGateRejectsDuplicatesAndSupersededDebounceWork",
-        "sendIntentIsBoundToAccountIdentityGenerationAndConversation",
-        "lockingInvalidatesQueuedSendIntentsAcrossUnlock"
-      ],
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache SWIFT_MODULE_CACHE_PATH=/private/tmp/netelegram-swift-cache swift test --scratch-path /private/tmp/netelegram-spm-test-run --filter '(networkTypePolicyTracksPathEvents|networkPathRevisionGateRejectsDuplicatesAndSupersededDebounceWork|sendIntentIsBoundToAccountIdentityGenerationAndConversation|lockingInvalidatesQueuedSendIntentsAcrossUnlock)'"
+      "count": 121,
+      "command": "swift test --scratch-path /private/tmp/nettelegram-spm-test-run"
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
-    "gatekeeper_and_sparkle_update": "not verified"
+    "gatekeeper_and_sparkle_update": "not verified",
+    "current_head_native_smoke": "Pinned TDLib/Dev.app workflow 38368612251: arm64 Dev.app built, first-run screenshot and graceful quit; accountless only."
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -69,6 +64,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue one source implementation slice with a concrete acceptance gap; do not rebuild the canonical Dev.app unless app source changes. Keep real login deferred until the user enters credentials in the app.",
+  "next_action": "Commit/push factual milestone and checkpoint, then publish same Site source.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; public product name Neridian, repository codename NeTelegram. Source code 88ba7e2 passed 118/118 exact macOS CI and pinned accountless Dev.app smoke. Canonical local Dev.app built from c6bd4e4 and phone-entry screen visually checked. Public Site v102 is live and anonymously verified. No app release or download exists.",
+  "status": "implementation_in_progress; Neridian public name, NeTelegram codename; source 8098e82: 121/121 local tests and exact-source CI passed; accountless Dev.app only; user deferred Telegram login; Site v102; no app release/download.",
   "cases": [
     {
       "id": "APP01",
@@ -428,14 +428,12 @@
   ],
   "last_verification": {
     "date": "2026-10-13",
-    "source_commit": "c6bd4e475210bbbb1c5c37058947adc82a818218",
-    "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-auth-layout-smoke ./Scripts/dev-app.sh --launch",
-    "local_result": "Canonical /private/tmp/NeTelegram-Dev.app built successfully with clean source tree, ARM64, Apple Swift 6.4, pinned TDLib c15d3f5a5de6e3ba5839822c451152e5e18bb700, ad-hoc dev signing, and source fingerprint 8a0ede09be358cd57b4c58ce9473172f76d2822eb015203ba1b6a0f713f57a25. BuildInfo records c6bd4e4 (only acceptance/docs changed since app code SHA 88ba7e2). Native phone-entry screen opened and was visually checked centered/readable in light appearance; isolated empty QA support root. No credentials entered.",
-    "hosted_ci": "Source commit 88ba7e2: exact-source macOS CI 38363652001 and pinned TDLib/isolated Dev.app 38363652045. Acceptance/docs commit c6bd4e4: macOS CI 38364899648. Docs/evidence commit 7f2ef4d3dcb9a0bbd22eb2dc6a3b1479d48592ed: macOS CI 38365535154 succeeded.",
-    "hosted_result": "Source macOS CI passed 118/118 Swift Testing tests; pinned TDLib workflow built arm64 Dev.app and captured the accountless first-run screen. Acceptance commit CI also succeeded. No real-account login or account behaviors are represented.",
-    "scope": "Phone-entry screen on one canonical local Dev.app is visually checked, but code/2FA/QR/registration and minimum-size variants are not. Real login/read/send/logout, all 20 simultaneous real runtime and performance, migration/recovery, real Keychain, Developer ID/notarization, Gatekeeper, Sparkle and release remain unverified. User chose Neridian and declined sponsored-video playback; channel access and stable release remain gated.",
-    "publication": "Public Site v102 at https://netelegram.iryadom.chatgpt.site is active/public. Site source commit eb6972ace4b5c2b9a5c45805eee1de91e332b109; deployment appgdep_6acde3a0a8608191bc941d4b6892cfcc succeeded; version appgprj_6acba85192e08191acdf7011928848cf~appgver_828ccb8d6d008191aa79ea3fbc3e59b1. Anonymous TLS-validating checks returned 200 for 8 HTML pages plus /updates/stable.xml and /updates/alpha.xml (text/xml); XML parsed, homepage links current c6bd4e4 app source, downloads says NO RELEASE. Archive SHA-256 6f333b4311122849361973c21e258e15335c0a2274a2b671d5e702bd3159e0c9; Sites hash sha256:6f333b4311122849361973c21e258e15335c0a2274a2b671d5e702bd3159e0c9; 184320 bytes, 12 files.",
-    "next_action": "Continue the next native implementation/acceptance slice without rebuilding the current Dev.app unless its source changes; real Telegram login remains deferred. Keep channel access and stable release gated."
+    "source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "local_result": "121/121 Swift tests. Canonical arm64 Dev.app built/launched accountless; local UI automation could not attach, screenshot evidence is from pinned TDLib CI.",
+    "hosted_ci": "Exact-source macOS CI 38368612207 and pinned TDLib/Dev.app 38368612251 succeeded.",
+    "scope": "Typing action is selected account/chat/topic only, throttled to 4 seconds, cancelled on clear/switch/send/picker/lock. No real Telegram login or 20-runtime evidence. User deferred login and declined sponsored-video playback; channels and stable remain gated.",
+    "publication": "Site v102 public before this devlog update; update pending. No app release/download.",
+    "next_action": "Commit source-mirrored factual devlog/checkpoint, publish via existing Sites source helper, verify public route."
   },
   "latest_site_deployment": {
     "date": "2026-10-13",
@@ -456,11 +454,10 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
-    "source_commit": "84ce26148dfd9623c35d579fcb2dae8db413a94e",
-    "tests": "117/117 Swift Testing tests passed locally; AppKit target compiled; JSON and git diff --check passed.",
-    "hosted_ci": "Exact-source macOS CI 38360568318 and pinned TDLib/isolated Dev.app workflow 38360568267 succeeded for the same full SHA.",
-    "scope": "Product identity aligned with the user decision: Neridian public display name, NeTelegram repository codename. Channel reading and stable release remain release-blocked pending required sponsored-video handling and base-functionality review. No release binary or account coverage.",
-    "site": "Public Site v98 source 48b4a269d7ce26a5698463e7f24ad2e8a8d03887; deployment appgdep_6acdd930f9c48191b9913c71cc6b12e4 succeeded; archive SHA-256 8d1d8771b5cee7982bbfa9974bf3787d329387825b07a83ebf5439c4d9ae924d; Sites stored hash sha256:026153ac02d16bbcf87e5204f714b725af0d51ab37dfbedfc8d8990c14239c4b. All 10 public routes returned 200 with expected HTML/XML MIME. No download is offered."
+    "source_commit": "8098e82c9f36af4da3bcbbf73fc5dbb70750312a",
+    "tests": "121/121 local Swift tests passed.",
+    "hosted_ci": "38368612207 and 38368612251 succeeded for the same SHA; pinned TDLib arm64 Dev.app accountless smoke.",
+    "scope": "No real auth, actual typing update, 20-account certification, performance, signing/notarization or release. Channels and stable remain gated."
   },
   "latest_source_audit": {
     "date": "2026-10-13",
