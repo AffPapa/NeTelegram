@@ -738,6 +738,48 @@ private func waitForTrue(_ value: LockedTestValue<Bool>, timeout: Duration) asyn
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func oneStalledStartupDoesNotBlockTheOtherNineteenProfiles() async {
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let stalledStartup = AsyncTestGate()
+    let stalledIsHoldingPermit = LockedTestValue(false)
+    let completedProfiles = LockedTestValue(0)
+
+    let stalled = Task {
+        await scheduler.withPermit {
+            stalledIsHoldingPermit.set(true)
+            await stalledStartup.wait()
+        }
+    }
+    #expect(await waitForTrue(stalledIsHoldingPermit, timeout: .seconds(2)))
+
+    let otherProfiles = (0..<19).map { _ in
+        Task {
+            await scheduler.withPermit {
+                completedProfiles.mutate { $0 += 1 }
+            }
+        }
+    }
+
+    var allOthersCompleted = false
+    // Observe the live counter while the first profile still holds its permit
+    // indefinitely (as during a stalled startup operation).
+    for _ in 0..<2_000 {
+        if completedProfiles.get() == 19 {
+            allOthersCompleted = true
+            break
+        }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(allOthersCompleted, "One stalled profile must not block the other nineteen startup attempts")
+    #expect(stalledIsHoldingPermit.get())
+
+    await stalledStartup.open()
+    await stalled.value
+    for profile in otherProfiles { await profile.value }
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func criticalEventsAreNotCoalescedAway() async {
     let coordinator = RuntimeCoordinator()
     #expect(await coordinator.mayCoalesce(.ordinaryState))
