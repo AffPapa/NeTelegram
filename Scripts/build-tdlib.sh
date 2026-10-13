@@ -15,8 +15,13 @@ if [ ! -d "$OPENSSL_SOURCE/.git" ]; then
   git -C "$OPENSSL_SOURCE" init
   git -C "$OPENSSL_SOURCE" remote add origin https://github.com/openssl/openssl.git
 fi
-git -C "$OPENSSL_SOURCE" fetch --depth=1 origin "$OPENSSL_COMMIT"
-git -C "$OPENSSL_SOURCE" checkout --force --detach FETCH_HEAD
+if [ "$(git -C "$OPENSSL_SOURCE" rev-parse HEAD 2>/dev/null || true)" = "$OPENSSL_COMMIT" ] \
+  && [ -z "$(git -C "$OPENSSL_SOURCE" status --porcelain)" ]; then
+  echo "Reusing clean pinned OpenSSL checkout $OPENSSL_COMMIT without touching source timestamps"
+else
+  git -C "$OPENSSL_SOURCE" fetch --depth=1 origin "$OPENSSL_COMMIT"
+  git -C "$OPENSSL_SOURCE" checkout --force --detach FETCH_HEAD
+fi
 test "$(git -C "$OPENSSL_SOURCE" rev-parse HEAD)" = "$OPENSSL_COMMIT"
 python3 - "$PIN_FILE" "$OPENSSL_SOURCE" <<'PY'
 import hashlib, json, pathlib, sys
@@ -41,8 +46,13 @@ if [ ! -d "$SOURCE_DIR/.git" ]; then
   git -C "$SOURCE_DIR" init
   git -C "$SOURCE_DIR" remote add origin https://github.com/tdlib/td.git
 fi
-git -C "$SOURCE_DIR" fetch --depth=1 origin "$TDLIB_COMMIT"
-git -C "$SOURCE_DIR" checkout --force --detach FETCH_HEAD
+if [ "$(git -C "$SOURCE_DIR" rev-parse HEAD 2>/dev/null || true)" = "$TDLIB_COMMIT" ] \
+  && [ -z "$(git -C "$SOURCE_DIR" status --porcelain)" ]; then
+  echo "Reusing clean pinned TDLib checkout $TDLIB_COMMIT without touching source timestamps"
+else
+  git -C "$SOURCE_DIR" fetch --depth=1 origin "$TDLIB_COMMIT"
+  git -C "$SOURCE_DIR" checkout --force --detach FETCH_HEAD
+fi
 test "$(git -C "$SOURCE_DIR" rev-parse HEAD)" = "$TDLIB_COMMIT"
 
 python3 - "$PIN_FILE" "$SOURCE_DIR" <<'PY'
