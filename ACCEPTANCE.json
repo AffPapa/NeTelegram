@@ -422,7 +422,7 @@
       "signature": "development CI; not a release"
     },
     "scope": "No real Telegram login/read/send/logout (user deferred login); no live Notification Center, 20-account lifecycle/resource matrix, sleep/wake soak, full accessibility, Developer ID/notarization, quarantine install, updater smoke or migration test. Telegram title/basic-functionality/sponsored-video compatibility remain open.",
-    "publication": "App source 24c1f3191c861fca234bab5ded52503dee9c4205 is public on AffPapa/NeTelegram main; website-only mirror 66ff0dfe52f71566063e1b373c21c0ee1266583e. Public Site v88 describes current source. No app tag or public binary download exists.",
+    "publication": "App source 24c1f3191c861fca234bab5ded52503dee9c4205; subsequent dependency/toolchain correction 1f1615e613bba198f88bdd2701cabc3a6e34e65f passed exact-source CI and pinned TDLib/Dev.app CI. Site v90 public, GitHub mirror at ca2788a6afb21f1ea3cd4c77e8ddf81a207e1657. No app tag or public binary download exists.",
     "next_action": "Continue one native correctness slice from the canonical checkout, run focused regression plus exact-source CI/Dev.app workflow. Real Telegram login remains deferred at user request; do not initiate it."
   },
   "latest_site_deployment": {
@@ -435,17 +435,24 @@
     "audience": "public",
     "archive_sha256": "a7125607a481e2dac000ce601b705e2117374daee2199f1832368c3d774d8ba4",
     "sites_archive_content_hash": "sha256:cfcad2adf91d2aec7d149a2c196edfce3d896322a683540e9d8c99327a976020",
-    "public_page_sha256": {
-      "/": "e8ebed5f12f4e0c5f5115c20efb420db6d08999902b09e0219d55a0009505440",
-      "/features/": "05f8728794147ce1bb3ec38cb306f4a175d81010e3874ba080987f92dcc350ef",
-      "/devlog/": "fefbabef567281409a6085c8401925e846de052927f0eadd562c92a2e0b84b1d",
-      "/downloads/": "5fb99a22a57d463cd3591dec65b22fbc0d9f1e15b3351415c7a60902ae9decca",
-      "/roadmap/": "59efc6d41d58925f7bb4be104eedfee3dc0343e1bb91221df9a62c53f4672da7",
-      "/source/": "2285ae8f7d0b5ecf7ac22a9495dc546838edccd5e6dafe5605f176309dad8e07",
+    "description": "Devlog records successful exact-source macOS CI and pinned TDLib/Dev.app accountless smoke. Downloads explicitly says NO RELEASE. Site v90 is public; full dist mirror is on GitHub main at ca2788a. No app release, signed binary, or real account verification.",
+    "github_mirror_commit": "ca2788a6afb21f1ea3cd4c77e8ddf81a207e1657",
+    "github_blob_sha1": {
+      "website/dist/devlog/index.html": "d5d19c6b1e0525879baafdf678147ac9f1b42f2c",
+      "website/dist/roadmap/index.html": "13060829cb6e4e5994d31813a3f1c7e4369065cb",
+      "website/dist/source/index.html": "7958a25cfa05ae7ebb2491d9606b86251dc02a29"
+    },
+    "normalized_content_sha256": {
+      "/": "608e1d036f15d8519799989b36b1f859528da2f155ae3baf164850f70ff911ec",
+      "/features/": "63ebcdc9eca9132b4815ecbc10b43afb03fce567fcb2b9ab85e3fc73c5423a8b",
+      "/devlog/": "f4c547cb78ae2362d69c97c3b2aa592e671455025c3692856028e45ec38b12bc",
+      "/downloads/": "695bbd36cb08e8d30b07cdc9d00908d41792f07d3774190b68141ceca1c33cc5",
+      "/roadmap/": "3213e0232db2e415b7bcd7880ccdd32f4780a11f93d2392a027f8607c7e06487",
+      "/source/": "94cc62bcc5f47a6778399aec8fd7b62de079bba5e342318592c3abb32d4987a4",
       "/updates/alpha.xml": "23cced0c8efd2d323d6b1ed32258999b285d153b94c1f907f3fa0334404008ec",
       "/updates/stable.xml": "f4a2bfb6f913dce21dc63590fad66ae926189a8e8beda1cf871fa1fd03e91555"
     },
-    "description": "Anonymous HTTPS checks after v90: six HTML routes returned 200 text/html; alpha/stable feeds returned 200 text/xml and parsed. Devlog records successful exact-source macOS CI and pinned TDLib/Dev.app accountless smoke. Downloads explicitly says NO RELEASE. Entire Site dist is mirrored in website/dist; public app remains unreleased."
+    "public_verification": "All eight anonymous HTTPS routes returned 200. Both XML feeds parsed and matched package byte-for-byte. Six HTML responses matched their packaged files after removing a dynamically appended Cloudflare edge-verification script; therefore raw HTTP-body hashes are not stable release fingerprints. GitHub API blob IDs for changed devlog/roadmap/source mirror files matched git hash-object at mirror commit ca2788a."
   },
   "latest_local_candidate": {
     "date": "2026-10-13",
