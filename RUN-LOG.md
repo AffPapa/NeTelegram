@@ -597,3 +597,9 @@
 - Updated only the existing public Site devlog through its official source helper. Exact Site source commit `73bdefad3368d9ed6d65d0e15745303e138db127` mirrors to the app repository's `website/` directory. No Site `origin` was changed and no new project was created.
 - Saved version 163 as `appgprj_6acba85192e08191acdf7011928848cf~appgver_763225b471fc8191a19b41d759f602f1`; deployment `appgdep_6acebad482b88191b71d3ba495b4ba9b` succeeded at https://netelegram.iryadom.chatgpt.site with the audience still public. Archive SHA-256 `183568ef690995b5e3047a9da2b26314b4fb9e3566f39bd5a5693378d2b0b2e0` (296,477 bytes); Sites stored hash `sha256:97d555f676cc5e463e93f66bc6791ab719d3176fde98486d2d80659accc60f02` (552,960 bytes, 15 files).
 - Static build/validation passed for eight routes. Archive inspection confirmed release feed files and assets, exact run/source markers, and no download URL. Anonymous HTTPS `/devlog/` returned 200 `text/html`. No app binary was built or published; real login, 20-runtime certification, Developer ID/notarization and updater remain open.
+
+## 2026-10-14 — Verification cadence aligned with measured CI cache
+
+- Corrected `DEV-WORKFLOW.md`: exact cold/warm cache runs 38481765351 and 38481987804 both passed the probe and 157/157 suite; compile step measured 48.43s then 17.50s with a restored 51 MB cache. The result is explicitly not a guarantee of later cache hits.
+- Added a changed-path-to-check mapping so unchanged gates are reused and failures are investigated at the failing stage before retry. Documentation-only change; no Swift build, app launch, or Site deployment was needed.
+- Checks: `git diff --check`; `PROJECT-STATE.json` and `ACCEPTANCE.json` parsed successfully. CI trigger review confirms this file change does not run the Swift suite.
