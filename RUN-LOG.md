@@ -180,3 +180,13 @@
 - Local checks: HTMLParser/anchor checks passed for homepage and features; `git diff --check` passed; stale old commit/run strings absent from the two edited pages. Public browser tab was refreshed and its accessibility tree confirmed the new content and version. Sites reported successful public deployment. Direct web-fetch tool could not access the hostname; no raw HTTP status claim.
 - Archive: local SHA-256 `b3e2115a0d32da9cdf66015ca9ea66848f5161c20ab50a88a01e07157630054c`, 52,152 bytes; Sites reports content hash `sha256:2bccaef60fb35a85cff28b9ee35d8693eca15e6e430569de09bde439e30a7760`, 12 files / 225,280 bytes.
 - Next: planned SecretsStore backend injection; no Telegram session entered and no 20 authorized runtimes measured.
+
+
+## 2026-10-13 — SecretsStore Keychain backend injection and Site v132
+
+- App-source commit: `3934bd21bc563fc8a0cc9b901a3650dd1b3cbd15`. `SecretsStore` now delegates typed read/add/update/delete operations to an immutable per-instance `KeychainItemBackend`; production default stays on Security.framework.
+- Local verification: five focused tests passed on Xcode 27.0 / Swift 6.4 using an in-memory backend. They exercise real `SecretsStore` CRUD/policy methods for fail-closed read errors, explicit not-found creation, read-only no-create, API-hash update error without add fallback, and account-scoped deletion. No real Keychain was touched; system Keychain ACL and lock/unlock remain unverified.
+- Exact-SHA macOS CI `38420552764` succeeded. Pinned TDLib/Dev.app run `38420551856` succeeded: dependency build and isolated arm64 app assembly/verification passed. It did not perform window interaction or account login.
+- Site entries v131/v132: v131 published the new Keychain milestone. A cross-page verification caught `/features/` still referring to the older `6434b10`; corrected to current `3934bd2` in v132. This correction is recorded so resume checks the whole active route set once before finalizing, and does not treat history entries as current status.
+- Site v132 source: `6302d3a84904c013ee38039bcdd332fe1987a824`; saved version `appgprj_6acba85192e08191acdf7011928848cf~appgver_288dc25fd4f4819185a89c65ddf837e3`; deployment `appgdep_6ace4cdaba7881919bc3cc02e5216327` succeeded. Local archive SHA-256 `757d336e4f5f69d5e82534bafa3e00cf743abf605e7277cd630c561a9314e1ed` (52,645 bytes); Sites hash `sha256:90846368dd019fc5a7969551ae1a0aa34b67cb9ee9daba59b240e998e2901a37` (12 files / 225,280 bytes). Refreshed browser accessibility trees verified new homepage, `/features/` and links. Direct web fetch remains unavailable.
+- Release/account limits remain: no real Telegram login, no 20 authorized-runtime certification, Developer ID/notarized app and public downloads not available.
