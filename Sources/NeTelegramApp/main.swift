@@ -8,6 +8,13 @@ import UniformTypeIdentifiers
 import UserNotifications
 import NeTelegramCore
 
+private extension NSLayoutConstraint {
+    func withPriority(_ value: NSLayoutConstraint.Priority) -> NSLayoutConstraint {
+        priority = value
+        return self
+    }
+}
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
     private var window: NSWindow!
@@ -406,9 +413,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             authStack.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             authStack.centerYAnchor.constraint(equalTo: content.centerYAnchor),
             mark.widthAnchor.constraint(equalToConstant: 64), mark.heightAnchor.constraint(equalToConstant: 64),
-            loginHeading.widthAnchor.constraint(equalToConstant: 500),
-            loginSubtitle.widthAnchor.constraint(equalToConstant: 500),
-            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500), registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
+            // Keep the form centered while allowing its explanatory text and
+            // registration terms to shrink with a narrow window.
+            loginHeading.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginHeading.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginSubtitle.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPicker.widthAnchor.constraint(equalToConstant: 300), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             phoneField.widthAnchor.constraint(equalToConstant: 360), phoneField.heightAnchor.constraint(equalToConstant: 38),
             emailField.widthAnchor.constraint(equalToConstant: 360), emailField.heightAnchor.constraint(equalToConstant: 38),
@@ -416,9 +429,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             secureInputField.widthAnchor.constraint(equalToConstant: 360), secureInputField.heightAnchor.constraint(equalToConstant: 38),
             firstNameField.widthAnchor.constraint(equalToConstant: 360), firstNameField.heightAnchor.constraint(equalToConstant: 38),
             lastNameField.widthAnchor.constraint(equalToConstant: 360), lastNameField.heightAnchor.constraint(equalToConstant: 38),
-            registrationConsent.widthAnchor.constraint(equalToConstant: 500),
+            registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            registrationConsent.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
-            statusLabel.widthAnchor.constraint(equalToConstant: 500),
+            statusLabel.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            statusLabel.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(equalToConstant: 360), actionButton.heightAnchor.constraint(equalToConstant: 38),
             qrButton.widthAnchor.constraint(equalToConstant: 280), qrButton.heightAnchor.constraint(equalToConstant: 28),
         ])
@@ -572,7 +587,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // by Auto Layout inside that coordinate space, independent of window size.
         window.setContentSize(NSSize(width: contentWidth, height: contentHeight))
         window.center()
-        window.minSize = NSSize(width: 900, height: 620)
+        // The auth flow includes code, 2FA, QR, and registration states. Keep
+        // enough vertical room for these states so the centered form cannot
+        // disappear above or below a short window.
+        window.minSize = NSSize(width: 900, height: 700)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
