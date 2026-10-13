@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app-source 1de5720 passes 157/157 exact-source macOS CI; pinned TDLib/Dev.app workflow 38477106487 passed. Canonical Dev.app default clean first-run presentation and window lifecycle are verified, but real auth remains deferred and old support-root Keychain restore remains partial. No 20-runtime certification, Developer ID/notarization, updater, or user downloads.",
+  "status": "implementation_in_progress; app-source 1de5720 hosted CI 157/157. New auth disclosure slice 209be94 passed local serial Swift 157/157 and one canonical accountless UI smoke; exact-source hosted CI pending. Normal Quit left the process live and needs diagnosis. No real auth/20-runtime, Developer ID/notarization, updater, or app downloads.",
   "current_evidence": {
-    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
+    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
     "app_tests": "Exact-source GitHub macos-15 Apple Silicon serial suite: 157/157 passed for 1de572048aec9ecb6fa04f2f7c6ed786473888df (run 38475546446). Three focused local Keychain tests passed. An initial focused run exposed a deadlock in the newly written test semaphore ordering; that test bug was fixed before the passing reruns. No real Telegram account or 20-runtime certification.",
     "github_workflows": {
       "current_app_source_ci": {
@@ -33,9 +33,9 @@
         "scope": "Pinned TDLib arm64 Dev.app build, accountless window close/reopen/quit smoke."
       }
     },
-    "native_smoke": "Checkpoint 3cba4c58555bce73802f9ff70f073fe9e5856101 / app source 1de572048aec9ecb6fa04f2f7c6ed786473888df; same canonical Dev.app built locally in 0.22s using the new default isolated support root; fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3; executable dd65910e1b02dc0ac659d2746fd2edb2239444fcd8bad35e8a7403bfd5ed680b; TDJSON 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; ad-hoc signature passed. AX shows +66, phone, Continue/QR and neutral status with no UUID profile. Native CI 38477106487 passed pinned TDLib and close/reopen/quit smoke. No phone/code entered. Old support root remains preserved; restore from it unverified.",
+    "native_smoke": "Canonical /private/tmp/NeTelegram-Dev.app; content source commit 209be94fde904d0b666ab5c28f588d78610b05bf, embedded build identity 87c92570+dirty. Incremental app build 8.57s; ad-hoc nested code signature passed. Source fingerprint b954e21469bfc42bf0c98e05867f2b107857255d84b9daecda010033e35b97bc; executable SHA-256 f31409c71cb07c6b8568adbfbe4a444cc149475b3c6ca4918465ae2a9cb9d844; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. AX and screenshot show updated independent-client/non-affiliation/no-session-import disclosure, country +66, phone entry, Continue, QR and neutral status. No phone or code. On selecting normal Quit, process remained live and UI unchanged >2 seconds; no force quit or replacement performed. This is a development smoke, not release verification.",
     "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
-    "real_account_coverage": "none; user deferred login",
+    "real_account_coverage": "none; login remains deferred",
     "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
     "release_status": "no public application release; current signing identity check found 0 valid codesigning and 0 Developer ID Application identities; notarization profile remains unverified",
     "site": "Public Site v160 at https://netelegram.iryadom.chatgpt.site; Site source cc15fded6d6a54aba81b033df930c1a405bbf6ed; app checkpoint 3cba4c58555bce73802f9ff70f073fe9e5856101; app source 1de572048aec9ecb6fa04f2f7c6ed786473888df; deployment appgdep_6aceaf8916848191bdc8bc64d3243a49. All eight anonymous routes returned HTTP 200 text/html; exact support-root/CI markers present; downloads has no installer asset link.",
@@ -472,7 +472,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App-source SHA 816bbb4ab2a61817cc3da0780f47219b1f8f52e9 contains a centered adaptive AppKit authentication card and the exact-source pinned TDLib/Dev.app workflow 38407466662 captured its accountless first-run screen in isolated CI. The screenshot was not visually re-reviewed in this checkpoint. Earlier source-matched first-run screen review is historical for 1b3d910. Dark appearance, minimum supported window, code/2FA/QR/registration layouts, high contrast, native VoiceOver and IME remain unverified; actual macOS Keychain persistence and login are not tested. Status stays partial. Current source commit 86855e4599ae4dc9d00274c07331617ddc5b3684 replaces the contradictory sign-in subtitle with a clear statement that NeTelegram is an independent unofficial client using Telegram API/TDLib and has no direct relationship with Telegram Messenger LLP; exact-HEAD AppKit build passed. This validates compilation and copy only, not native visual contrast, dark appearance, VoiceOver, IME, minimum window layout, or live login. Case remains partial. Static review at current app source 4e96a1556e6cd5f74d0cabeb651e21fa64793b51 confirms the window enforces a 900×700 minimum; the auth card is capped at 568 px and 360 px input controls fit within that width. This establishes the declared minimum-width geometry by constraints only. Current run `13b52310d739829d923aa9b8360cfc7887e981a9` has an exact-source pinned Dev.app first-run artifact available, but no screenshot was visually reviewed in this checkpoint. Registration/QR and other authorization states, native accessibility/contrast and user-driven resize remain unverified; status stays partial. Exact-source Dev.app screenshot for 6145b015 was visually inspected: centered phone entry and API/TDLib plus no-affiliation disclosure are present, but the disclosure appears small and low-contrast; CI intentionally has no API hash and no login was attempted. This is one screenshot observation only; dark mode, minimum-size, VoiceOver/IME, and other auth states remain unverified."
+      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial."
     },
     {
       "id": "AUTH04",
@@ -495,14 +495,14 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
-    "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
-    "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-fast-validation --filter secretsStoreReadQueryDisallows|keychainReadsRunOutside|blockedKeychainOperation",
-    "local_result": "Focused tests 3/3 passed. First attempt had a test-only deadlock because the semaphore release happened after awaiting the blocked operation; corrected ordering then passed. No local full-suite PASS claimed.",
-    "hosted_ci": "GitHub macOS CI 38475546446 passed the exact-source serial Swift suite 157/157 on macOS 15 arm64 (Xcode 16.4 / Swift 6.1.2).",
-    "native_dev_app_smoke": "Clean first-run presentation PASS only. Canonical app built from checkpoint 3cba4c5 in 0.22s using default support root /private/tmp/netelegram-dev-support-clean; source fingerprint be0f24718ae00fd4bc95d5a08a0c845dfc60d5b39cc1a210514f79ff911e23e3; executable SHA-256 dd65910e1b02dc0ac659d2746fd2edb2239444fcd8bad35e8a7403bfd5ed680b; TDJSON 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. AX shows country +66, phone, Continue, QR, neutral status, no UUID profile. No credentials entered. Pinned native CI 38477106487 passed close/reopen/quit. The preserved previous default root remains unverified for restore.",
-    "scope": "Synthetic exact-source Swift CI 157/157, pinned native bundle/window lifecycle, clean default first-run UI and public Site v160 pass. Real login, 20-account runtime, restore from old local support, signed/notarized release and updater remain open.",
-    "checkpoint_commit": "3cba4c58555bce73802f9ff70f073fe9e5856101"
+    "source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-auth-disclosure-validation",
+    "local_result": "Full serial Swift suite passed 157/157 in 0.212s test execution after 17.89s build. Initial sandbox attempt was denied during manifest setup before tests; same suite passed on approved host execution. No account or auth test.",
+    "hosted_ci": "Pending exact-source push; prior CI 38475546446 is only for source 1de5720 and is not reused as evidence for this change.",
+    "native_dev_app_smoke": "One canonical Dev.app shows the phone-entry screen with updated disclosure. No phone/code entered. Normal Quit was selected; process remained live >2s with unchanged UI. Do not replace this bundle until process exit is confirmed. AX/screenshot verifies disclosure text. Ad-hoc development code only.",
+    "scope": "One AppKit login disclosure/copy readability change; local full serial suite and one canonical accountless Dev.app smoke. Real login, 20 runtimes, graceful quit, native VoiceOver/IME/dark/light, signing/notarization, updater and release remain unverified.",
+    "checkpoint_commit": "87c925700f581f31486c443bc5b8da450801fc41"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -526,11 +526,11 @@
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
-    "source_commit": "c028bd3859d76b6abf31634a4bb62f071d5e9f57",
-    "source_fingerprint_sha256": "d4a02f5339d4d87b9f79ab6d4df9f9ca56639e6f09366e3520e1afc66c9586d8",
-    "tests": "App-source 4d6820d full serial suite 153/153; unchanged and not repeated.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38471657127",
-    "scope": "Canonical arm64 accountless Dev.app build/UI smoke; current native workflow additionally verifies pinned TDLib bundle and close/reopen/quit lifecycle. Ad-hoc development signing; not a release."
+    "source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
+    "source_fingerprint_sha256": "b954e21469bfc42bf0c98e05867f2b107857255d84b9daecda010033e35b97bc",
+    "local_tests": "157/157 full serial Swift suite passed; Xcode 27 / Swift 6.4 / arm64e.",
+    "hosted_ci": "pending exact-source push",
+    "native_app": "Canonical Dev.app smoke; accountless, ad-hoc. Quit observation unresolved; bundle identity shows parent +dirty."
   },
   "latest_source_audit": {
     "date": "2026-10-14",
@@ -549,5 +549,5 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Diagnose the current Dev.app Keychain wait and ensure the startup UI reports a useful state without inspecting installed Telegram data or reusing the chat-exposed API hash. Keep one canonical bundle. Real login remains deferred; 20-account and distribution gates remain open."
+  "next_action": "Publish source/checkpoint once and verify exact-source CI. Diagnose the normal Quit wait from app-owned runtime evidence; do not force-kill or overwrite the canonical bundle. Update the existing public Site devlog once after CI. Real login is deferred; all-20, release signing/notary, updater and downloadable binaries remain open."
 }
