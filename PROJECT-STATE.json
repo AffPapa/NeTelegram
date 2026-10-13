@@ -11,13 +11,13 @@
     "repository": "https://github.com/AffPapa/NeTelegram",
     "repository_id": 1415421574,
     "branch": "main",
-    "commit": "e89265c0dda7dc88a7d7a7f75abd5010c25a48c9",
+    "commit": "658b3506d4adc3ec9c66ae60c880e095a836c6e1",
     "working_tree_clean": true,
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38381351793,
+      "run_id": 38382785566,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38381351793"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38382785566"
     },
     "published_application_releases": [],
     "github_access": {
@@ -38,9 +38,9 @@
       "note": "Git push for the app-source commit succeeded through the existing Git transport. gh auth status was checked and both stored CLI credentials are invalid. Do not run gh auth login or create a token as a retry; Git transport and GitHub connector are separate. No credential material is recorded."
     },
     "latest_exact_commit_native_workflow": {
-      "run_id": 38381351711,
+      "run_id": 38382785558,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38381351711"
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38382785558"
     }
   },
   "local_development_candidate": {
@@ -60,17 +60,17 @@
       "result": "passed",
       "count": 127,
       "command": "swift test",
-      "focused_test": "swift test --filter saturatedHotLaneReservesBoundedProgressForAnotherAccount",
-      "xcode": "Xcode 27.0 (27A5228h)",
-      "source_commit": "e89265c0dda7dc88a7d7a7f75abd5010c25a48c9",
-      "scope": "Full local suite plus a deterministic bounded hot-lane reservation fixture; synthetic queues, not real Telegram or Instruments."
+      "focused_test": "AppKit build for the authentication card; no new isolated test was added",
+      "xcode": "Xcode 27.0 / Swift 6.4 / macOS 27 SDK",
+      "source_commit": "658b3506d4adc3ec9c66ae60c880e095a836c6e1",
+      "scope": "Synthetic suite and compile only; no real Telegram account or interactive auth."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "not verified",
     "gatekeeper_and_sparkle_update": "not verified",
-    "current_head_native_smoke": "Pinned TDLib app workflow 38381351711 succeeded for exact app-source SHA e89265c0dda7dc88a7d7a7f75abd5010c25a48c9; built pinned TDLib and assembled/verified isolated arm64 Dev.app. CI smoke is accountless and does not measure live UI responsiveness or real 20-account operation. The canonical local Dev.app was not relaunched or switched.",
-    "current_head_site": "Public Site v109 deployment appgdep_6ace0421a5cc8191ad6faa681bcee6c2 succeeded. Anonymous HTTPS returned 200 text/html for /devlog/ and /downloads/; exact app-source SHA e89265c is present in devlog; downloads still shows NO RELEASE. No application download or release exists.",
+    "current_head_native_smoke": "Pinned TDLib workflow 38382785558 succeeded for exact app-source SHA 658b3506d4adc3ec9c66ae60c880e095a836c6e1; pinned TDLib was built and isolated arm64 Dev.app assembled. CI first-run screenshot SHA-256 d0bf4fa8a6bd0512330b5897d9efc679c86a9c83579fcd50028423ee5bf9668e; clean 1024x768 screen reviewed. No credentials or account data entered. This is not a real login or all-20-runtime smoke.",
+    "current_head_site": "Public Site v110 deployment appgdep_6ace075ab7788191a4f7a6c0a0f8d3c8 succeeded. Anonymous HTTPS: /devlog/ and /downloads/ 200 text/html; screenshot 200 image/png and bytes match CI SHA-256 d0bf4fa8a6bd0512330b5897d9efc679c86a9c83579fcd50028423ee5bf9668e. Exact app SHA 658b3506d4adc3ec9c66ae60c880e095a836c6e1 is on devlog; downloads still shows NO RELEASE. No application download or release exists.",
     "keychain_main_thread": "Old PID 28662 sample shows SecItemCopyMatching in restoreProfiles on AppKit main thread. Source ff3da44 moves API hash and per-account DB/draft key reads to a utility task; tests prove helper execution is off-main and stale restore token invalidation, but not a controlled keychain fault injection."
   },
   "site": {
@@ -78,17 +78,17 @@
     "title": "Neridian Development",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 109,
-    "source_commit": "68fee1c6824352eeddae796a4b3e393136014fb6",
-    "deployment_id": "appgdep_6ace0421a5cc8191ad6faa681bcee6c2",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_2be90fb410cc81918f325e53c6145045",
+    "latest_version": 110,
+    "source_commit": "7f4fe1b57dff39c9f7f176427b00c78c54d16c81",
+    "deployment_id": "appgdep_6ace075ab7788191a4f7a6c0a0f8d3c8",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9b90c14f41b48191b3cb55b48a35301d",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous TLS curl: /devlog/ and /downloads/ both 200 text/html; exact e89265c milestone present; downloads shows NO RELEASE.",
-    "archive_local_sha256": "60c9b4a3d8c928b734850251d9fe331b34a6dfdd867c15ff7b51e3012d5868be",
-    "archive_sites_reported_content_hash": "sha256:fc444647098efd31d8b12a78846d45a1ea0a3408aed804aaafd72d22a52c284f",
-    "archive_size_bytes": 47938,
-    "archive_file_count": 12
+    "public_route_verified": "Anonymous HTTPS returned 200 for /devlog/ and /downloads/ (text/html) and the CI screenshot (image/png). SHA verified identical: d0bf4fa8a6bd0512330b5897d9efc679c86a9c83579fcd50028423ee5bf9668e. Exact 658b3506d4adc3ec9c66ae60c880e095a836c6e1 appears in devlog; downloads still says NO RELEASE.",
+    "archive_local_sha256": "2a479ada0b35b26158f1c32809467f7be6f850263a3294385960591f29e16c9e",
+    "archive_sites_reported_content_hash": "sha256:03c14fdd034f8c87af8867edf4f9614895be175ac97e6c0f0066b13ed2d70afb",
+    "archive_size_bytes": 327680,
+    "archive_file_count": 13
   },
   "open_gates": [
     "Telegram API hash was not stored: the earlier hidden-input PTY attempt echoed the supplied value and the Keychain write failed. Do not reuse that exposed value; replace it if possible, then enter a replacement only through a verified non-echoing local UI. The Keychain item remains absent.",
@@ -98,6 +98,6 @@
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player."
   ],
-  "next_action": "Continue from app-source SHA e89265c. Use the verified Git transport for source pushes; gh CLI credentials are invalid and must not trigger another login/token loop. Select the next concrete high-impact acceptance gap. Preserve the single canonical local Dev.app; real login remains user-deferred.",
+  "next_action": "Continue from app-source SHA 658b3506d4adc3ec9c66ae60c880e095a836c6e1; pick the next highest-impact acceptance gap, keep the existing canonical local Dev.app untouched, and do not begin Telegram login until user asks to enter credentials in Neridian.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here."
 }
