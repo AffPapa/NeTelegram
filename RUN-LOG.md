@@ -326,3 +326,11 @@
 ### 2026-10-14 — validate the updated project checkpoint
 
 - Metadata-only validation [38457141078](https://github.com/AffPapa/NeTelegram/actions/runs/38457141078) passed for checkpoint commit `cd1fbe457ad8c14884bd781b84ef2ac007b88909`. It does not rerun the Swift suite; exact-source Swift PASS remains run 38456932580.
+
+
+### 2026-10-14 — verify sign-in disclosure on one exact candidate
+
+- Canonical checkout `/private/tmp/netelegram-cli-work`, `main`, source `6145b0156068f784e1eea3bf70df77a8b834bf83`, clean and equal to `origin/main`. Local AppKit/Core build passed in 5.27 seconds; serial suite passed 151/151 (0.202 seconds) on Xcode 27 / Swift 6.4.
+- Pinned TDLib/arm64 Dev.app run [38457814416](https://github.com/AffPapa/NeTelegram/actions/runs/38457814416) passed exact-source bundle verification, first-run capture, window close/reopen in the same PID, and normal quit. Screenshot review confirms the phone-entry card and API/TDLib + non-affiliation disclosure; the line is small/low-contrast. CI has no API hash configured, so no login was attempted.
+- Hosted macOS CI [38457814445](https://github.com/AffPapa/NeTelegram/actions/runs/38457814445) passed 151/151 in 0.468 seconds after a 36.31-second build (about 52 seconds total) on macOS 15 / Xcode 16.4 / Swift 6.1.2. The first attempt completed build but the Swift Testing runner stayed silent and hit its five-minute timeout; one same-SHA rerun passed. No code change or duplicate native build was used to resolve it.
+- No real account, private account data, Site deployment, or app release was accessed or published. Site remains v150; real login/all-20-runtime coverage and signed distribution remain open.
