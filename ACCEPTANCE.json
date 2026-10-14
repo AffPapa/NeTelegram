@@ -1,34 +1,34 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; auth disclosure contrast correction at exact app source 0a7cbe6. Exact-source macOS CI 38501111688 passed. Current canonical bundle remains running at e43bcd0; guarded native replacement refused and visual verification for 0a7cbe6 is pending. Real login, 20-account coverage, signed release and compatibility gates remain open.",
+  "status": "implementation_in_progress; auth disclosure contrast verified at exact app source 0a7cbe6. Exact-source macOS CI 38501111688 passed; the one canonical arm64 Dev.app rebuilt in 5.24s, signature verified, and CUA confirmed the visible change. Real login, 20-account coverage, signed release and compatibility gates remain open.",
   "current_evidence": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-    "local_suite": "Not run for the one-line color correction; no behavior or logic changed.",
-    "focused_test": "No Swift app logic regression applies. Focused checkpoint pending-bundle validator regression is added and will be run with release metadata suite.",
+    "local_suite": "Not rerun for the one-line presentation change; logic unchanged.",
+    "focused_test": "No logic-focused Swift test applies to the color-only change.",
     "hosted_ci": {
       "run_id": 38501111688,
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501111688",
-      "scope": "Exact-source macOS CI passed. No exact test count was captured in output."
+      "scope": "Exact-source macOS CI passed; test count not captured."
     },
     "native_build": {
-      "status": "blocked_running_canonical_app",
-      "scope": "Scripts/dev-app.sh refused to replace the existing e43bcd0 bundle because the process remained running after CUA Cmd+Q and menu Quit. No second bundle was started."
+      "status": "success_local",
+      "scope": "Canonical app built once from exact source 0a7cbe6 in 5.24s with pinned TDLib; codesign verification passed."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
-      "source_fingerprint_sha256": "f020523821ea483e933cc7bf5712e4df3d06ab62b284bb1e816046fc39ad6229",
-      "executable_sha256": "ed17b1e108223fd97e921cf2691abdee6c4ab927539326471b28a7bdfdb4c461",
+      "source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
+      "source_fingerprint_sha256": "f80ce59a1b8fa6497e1abaa2441dc3c1d10b491e5929606e6290162672a3639b",
+      "executable_sha256": "f5b47d8ab41381bbe045ac0d3c7696a4ac78d7284bb5a7ec83b2d94523220b4d",
       "architecture": "arm64",
-      "signature": "ad-hoc development only",
-      "smoke": "Existing canonical bundle is old e43bcd0 and still running accountless. Current source is 0a7cbe6. The new screenshot has not been verified."
+      "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "CUA title and screenshot confirm exact source 0a7cbe6, readable secondary non-affiliation disclosure and accountless form; no credentials."
     },
     "native_keyboard_smoke": {
-      "app_source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
+      "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Historical CUA presence check for e43bcd0 only; not evidence for current 0a7cbe6."
+      "result": "Current-source CUA screenshot and accessibility tree confirm the accountless form and readable secondary disclosure. This does not claim VoiceOver, keyboard traversal, IME/RTL or real-auth coverage."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -479,14 +479,14 @@
     "date": "2026-10-14",
     "source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-    "checkpoint_commit": "239e5afaea1c9e712cd4a420b65461956cb233e2",
-    "local_command": "python3 -m unittest discover -s Tests/release -p test_*.py (14/14), python3 Scripts/validate_checkpoint.py, JSON parse and git diff --check.",
-    "local_result": "Release metadata suite passed 14/14; checkpoint validator and JSON parsing passed; git diff --check clean. Current Dev.app mismatch is explicitly recorded as a pending native candidate.",
-    "hosted_ci": "Exact-source macOS CI run 38501111688 succeeded; test count not captured.",
-    "native_dev_app_smoke": "Current source 0a7cbe6 has not been built/launched. Existing canonical app is e43bcd0; do not treat it as current.",
-    "metadata_ci": "PASS: checkpoint metadata workflow 38501377674 for exact checkpoint 5aaadc7; JSON validation and checkpoint validator passed.",
-    "scope": "One-line auth disclosure contrast change; live native visual result unverified. Real auth, 20-account coverage, Developer ID/notarization and compatibility remain open.",
-    "site_deployment": "Public Site v170 unchanged; no app download or Site update."
+    "checkpoint_commit": "db1a69bec5415c5c00d4ad8feae829495f40c930",
+    "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-dev-support-clean Scripts/dev-app.sh --launch; codesign --verify --deep --strict; CUA accessibility/screenshot.",
+    "local_result": "Build complete in 5.24s. BuildInfo source/fingerprint matched 0a7cbe6; canonical bundle signature passed. CUA screenshot confirmed disclosure is readable and secondary.",
+    "hosted_ci": "Exact-source macOS CI 38501111688 success; test count not captured.",
+    "native_dev_app_smoke": "One canonical /private/tmp/NeTelegram-Dev.app at exact source 0a7cbe6 is running; no credentials entered.",
+    "metadata_ci": "PASS: metadata workflow 38501473452 passed for preceding checkpoint db1a69b; this update triggers one new metadata run.",
+    "scope": "Accountless presentation smoke only. Real auth, 20-account coverage, Developer ID/notarization and Telegram compatibility remain unverified.",
+    "site_deployment": "Public Site v170 unchanged, no app download."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",

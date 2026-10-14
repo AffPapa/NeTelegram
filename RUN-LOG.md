@@ -816,3 +816,10 @@
 - Added a checkpoint rule/test so a stale running bundle can be recorded only when the pending candidate names the exact new source, old bundle source, blocked state, and reason. This prevents a false claim that an old UI is the current binary while still allowing an honest resumable checkpoint.
 - Next: diagnose/complete the normal quit barrier, then rebuild only the canonical Dev.app from `0a7cbe6` and inspect the contrast once. Real account entry remains deferred.
 - Checkpoint validator regression and metadata suite passed locally **14/14**; `Scripts/validate_checkpoint.py`, both JSON parses, and `git diff --check` passed. Checkpoint metadata CI [38501377674](https://github.com/AffPapa/NeTelegram/actions/runs/38501377674) passed for exact commit `5aaadc7bb4dbb1635fe8574ef7e00e5f4790b6d5`.
+
+## 2026-10-14 — Verified current auth disclosure contrast in the canonical app
+
+- The normal quit barrier completed after the previous turn's UI action; fresh CUA inventory confirmed NeTelegram Dev was no longer running. No process was force-killed and no second app bundle was created.
+- Rebuilt `/private/tmp/NeTelegram-Dev.app` once from exact source `0a7cbe627d253c5cb9751573b014145ee9f630d3`; Swift build completed in 5.24s with pinned TDLib `c15d3f5a5de6e3ba5839822c451152e5e18bb700`. BuildInfo fingerprint is `f80ce59a1b8fa6497e1abaa2441dc3c1d10b491e5929606e6290162672a3639b`; executable SHA-256 is `f5b47d8ab41381bbe045ac0d3c7696a4ac78d7284bb5a7ec83b2d94523220b4d`; `codesign --verify --deep --strict` passed. Ad-hoc dev signing only.
+- CUA title and screenshot confirm `NeTelegram · dev 0a7cbe62`. The non-affiliation notice is now readable in secondary contrast without dominating the login form. No phone, code, account, or Telegram session was entered. This is a visual smoke, not real-auth or accessibility certification.
+- Exact-source macOS CI [38501111688](https://github.com/AffPapa/NeTelegram/actions/runs/38501111688) and prior checkpoint metadata CI [38501473452](https://github.com/AffPapa/NeTelegram/actions/runs/38501473452) passed. No app release or Site deployment occurred; Site remains public v170 without a download.
