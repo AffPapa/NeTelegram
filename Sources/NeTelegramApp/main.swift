@@ -5499,30 +5499,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             appendMessageActions(message, into: destination)
             return destination
         }
-        let sender = message["sender_id"] as? [String: Any]
-        let who = sender? ["@type"] as? String == "messageSenderUser" ? "Пользователь" : "Сообщение"
-        let body: NSView
+        let isOutgoing = message["is_outgoing"] as? Bool ?? false
+        let maximumWidth = min(620, messageTextWidth(for: destination, albumPhotoWidth: photoWidth))
+        let row = NSStackView()
+        row.orientation = .horizontal
+        row.alignment = .top
+        row.distribution = .fill
+        row.spacing = 0
+        row.translatesAutoresizingMaskIntoConstraints = false
+        row.widthAnchor.constraint(equalTo: destination.widthAnchor).isActive = true
+
+        let bubble = NSStackView()
+        bubble.orientation = .vertical
+        bubble.alignment = .leading
+        bubble.spacing = 6
+        bubble.edgeInsets = NSEdgeInsets(top: 9, left: 12, bottom: 9, right: 12)
+        bubble.wantsLayer = true
+        bubble.layer?.cornerRadius = 14
+        bubble.layer?.backgroundColor = (isOutgoing
+            ? NSColor.controlAccentColor.withAlphaComponent(0.20)
+            : NSColor.controlBackgroundColor).cgColor
+        bubble.setAccessibilityElement(true)
+        bubble.setAccessibilityRole(.group)
+        bubble.setAccessibilityLabel(isOutgoing ? "Отправленное сообщение" : "Входящее сообщение")
+        bubble.translatesAutoresizingMaskIntoConstraints = false
+        bubble.widthAnchor.constraint(lessThanOrEqualToConstant: maximumWidth).isActive = true
+
+        let spacer = NSView()
+        if isOutgoing {
+            row.addArrangedSubview(spacer)
+            row.addArrangedSubview(bubble)
+        } else {
+            row.addArrangedSubview(bubble)
+            row.addArrangedSubview(spacer)
+        }
+        destination.addArrangedSubview(row)
+
         if type == "messageText",
            let formattedText = content["text"] as? [String: Any],
            let textView = incomingMessageTextView(
             formattedText: formattedText,
-            prefix: "\(who): ",
-            maximumWidth: messageTextWidth(for: destination, albumPhotoWidth: photoWidth)
+            maximumWidth: max(160, maximumWidth - 24)
            ) {
-            destination.addArrangedSubview(textView)
-            body = textView
+            bubble.addArrangedSubview(textView)
         } else {
             let textValue = IncomingMessagePresentation.cardText(for: type)
-            let label = NSTextField(wrappingLabelWithString: "\(who): \(textValue)")
+            let label = NSTextField(wrappingLabelWithString: textValue)
             label.font = .systemFont(ofSize: 14)
             label.maximumNumberOfLines = 0
-            label.setAccessibilityLabel("\(who). \(textValue)")
-            destination.addArrangedSubview(label)
-            body = label
+            label.widthAnchor.constraint(lessThanOrEqualToConstant: max(120, maximumWidth - 24)).isActive = true
+            label.setAccessibilityLabel("\(isOutgoing ? "Отправленное" : "Входящее") сообщение. \(textValue)")
+            bubble.addArrangedSubview(label)
         }
-        appendReplyAction(message, into: destination)
-        appendMessageActions(message, into: destination)
-        return body
+        appendReplyAction(message, into: bubble)
+        appendMessageActions(message, into: bubble)
+        return row
     }
 
     private func messageTextWidth(for destination: NSStackView, albumPhotoWidth: CGFloat) -> CGFloat {
@@ -5533,19 +5564,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func incomingMessageTextView(
         formattedText: [String: Any],
-        prefix: String,
         maximumWidth: CGFloat
     ) -> NSTextView? {
         guard let text = formattedText["text"] as? String else { return nil }
         let spans = IncomingTextEntityPresentation.spans(in: formattedText)
         let baseFont = NSFont.systemFont(ofSize: 14)
-        let prefixLength = (prefix as NSString).length
         let attributed = NSMutableAttributedString(
-            string: prefix + text,
+            string: text,
             attributes: [.font: baseFont, .foregroundColor: NSColor.labelColor]
         )
         for span in spans {
-            let range = NSRange(location: prefixLength + span.offsetUTF16, length: span.lengthUTF16)
+            let range = NSRange(location: span.offsetUTF16, length: span.lengthUTF16)
             guard NSMaxRange(range) <= attributed.length else { continue }
             switch span.type {
             case "textEntityTypeUrl", "textEntityTypeTextUrl", "textEntityTypeEmailAddress":
@@ -5572,21 +5601,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
         }
 
-        let width = max(120, maximumWidth)
-        let textContainer = NSTextContainer(containerSize: NSSize(width: width, height: .greatestFiniteMagnitude))
+        let maximumTextWidth = max(120, maximumWidth)
+        let textContainer = NSTextContainer(containerSize: NSSize(width: 10_000, height: CGFloat.greatestFiniteMagnitude))
         textContainer.lineFragmentPadding = 0
-        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: width, height: 1), textContainer: textContainer)
-        textView.textContainerInset = .zero
+        let textView = NSTextView(frame: NSRect(x: 0, y: 0, width: maximumTextWidth, height: 1), textContainer: textContainer)
+        textView.textContainerInset = NSSize.zero
         textView.isEditable = false
         textView.isSelectable = true
         textView.isRichText = false
         textView.drawsBackground = false
         textView.isVerticallyResizable = false
         textView.isHorizontallyResizable = false
-        textView.minSize = .zero
-        textView.maxSize = NSSize(width: width, height: .greatestFiniteMagnitude)
+        textView.minSize = NSSize.zero
+        textView.maxSize = NSSize(width: maximumTextWidth, height: CGFloat.greatestFiniteMagnitude)
         textView.textStorage?.setAttributedString(attributed)
         guard let layoutManager = textView.layoutManager else { return nil }
+        layoutManager.ensureLayout(for: textContainer)
+        let naturalWidth = ceil(layoutManager.usedRect(for: textContainer).width)
+        let width = min(maximumTextWidth, max(120, naturalWidth))
+        textContainer.containerSize = NSSize(width: width, height: .greatestFiniteMagnitude)
         layoutManager.ensureLayout(for: textContainer)
         let contentHeight = max(20, ceil(layoutManager.usedRect(for: textContainer).height))
         textView.frame = NSRect(x: 0, y: 0, width: width, height: contentHeight)
@@ -6185,11 +6218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         if let caption = content["caption"] as? [String: Any],
            let text = caption["text"] as? String,
            !text.isEmpty,
-           let textView = incomingMessageTextView(
-            formattedText: caption,
-            prefix: "",
-            maximumWidth: width
-           ) {
+           let textView = incomingMessageTextView(formattedText: caption, maximumWidth: width) {
             destination.addArrangedSubview(textView)
         }
 
@@ -7134,21 +7163,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         chatPane.isHidden = false
         authCard.isHidden = true
+        let compact = CommandLine.arguments.contains("--ci-chat-shell-preview-compact")
+        window.setContentSize(compact ? NSSize(width: 760, height: 600) : NSSize(width: 1060, height: 720))
+        window.center()
+        layoutWindowContents()
         accountPicker.isHidden = true
         addAccountButton.isHidden = true
         accountProfileHint.stringValue = "Предпросмотр интерфейса без входа в аккаунт."
         accountProfileHint.isHidden = false
-        conversationTitleLabel.stringValue = "Выберите чат"
-        chatStatusLabel.stringValue = "Предпросмотр макета · аккаунты не подключены"
+        conversationTitleLabel.stringValue = "Пример переписки"
+        chatStatusLabel.stringValue = "Демонстрационные сообщения · данные не подключены к Telegram"
         composer.isEditable = false
         composer.isSelectable = false
         searchField.isEnabled = false
         photoSendButton.isEnabled = false
         sendButton.isEnabled = false
+        clearStack(chatList)
+        let previewRow = ConversationListRowButton(
+            conversationTitle: "Пример переписки",
+            preview: "Демонстрационное сообщение",
+            time: "12:34",
+            unreadCount: 1,
+            isMuted: false,
+            chatID: 0,
+            isSelected: true,
+            target: nil,
+            action: nil
+        )
+        previewRow.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
+        chatList.addArrangedSubview(previewRow)
+        clearStack(messageList)
+        let previewMessages: [[String: Any]] = [
+            ["is_outgoing": false, "content": ["@type": "messageText", "text": ["text": "Привет! Это демонстрационный просмотр интерфейса. Здесь показано, как читается обычная переписка.", "entities": []]]],
+            ["is_outgoing": true, "content": ["@type": "messageText", "text": ["text": "Входящие и исходящие сообщения теперь различаются положением и спокойным фоном.", "entities": []]]],
+        ]
+        for message in previewMessages { _ = appendMessage(message) }
         window.title = "\(ProductIdentity.displayName) · предпросмотр макета без аккаунтов"
-        let compact = CommandLine.arguments.contains("--ci-chat-shell-preview-compact")
-        window.setContentSize(compact ? NSSize(width: 760, height: 600) : NSSize(width: 1060, height: 720))
-        window.center()
         layoutWindowContents()
         return true
     }
