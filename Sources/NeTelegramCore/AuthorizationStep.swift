@@ -100,7 +100,8 @@ public enum AuthenticationFailureAnnouncement {
         case .emailAddress: "Адрес почты не принят. Проверьте его и попробуйте снова."
         case .emailCode: "Код из письма не принят. Проверьте последнее письмо и попробуйте снова."
         case .registration: "Не удалось завершить регистрацию. Проверьте имя и попробуйте снова."
-        case .parameters, .qrConfirmation, .premiumPurchase, .ready, .loggingOut, .closing, .closed, .unknown:
+        case .qrConfirmation: "Не удалось запросить QR-код. Попробуйте вход по номеру телефона."
+        case .parameters, .premiumPurchase, .ready, .loggingOut, .closing, .closed, .unknown:
             nil
         }
     }

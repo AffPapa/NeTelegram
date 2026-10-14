@@ -4500,7 +4500,7 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     for (step, expected) in cases {
         #expect(AuthenticationFailureAnnouncement.message(for: step) == expected)
     }
-    #expect(AuthenticationFailureAnnouncement.message(for: .qrConfirmation) == nil)
+    #expect(AuthenticationFailureAnnouncement.message(for: .qrConfirmation) == "Не удалось запросить QR-код. Попробуйте вход по номеру телефона.")
     #expect(AuthenticationFailureAnnouncement.message(for: .ready) == nil)
     #expect(AuthenticationFailureAnnouncement.message(for: .unknown) == nil)
 }

@@ -7051,7 +7051,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
             authRequestInFlight = true
             qrButton.isEnabled = false
-            pendingAuthRequestsByExtra[extra] = (runtime.account, "authorizationStateWaitPhoneNumber")
+            pendingAuthRequestsByExtra[extra] = (runtime.account, "authorizationStateWaitOtherDeviceConfirmation")
             setStatus("Запрашиваю QR-код…")
         } catch {
             authRequestInFlight = false
