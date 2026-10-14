@@ -5524,6 +5524,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         bubble.setAccessibilityLabel(isOutgoing ? "Отправленное сообщение" : "Входящее сообщение")
         bubble.translatesAutoresizingMaskIntoConstraints = false
         bubble.widthAnchor.constraint(lessThanOrEqualToConstant: maximumWidth).isActive = true
+        row.heightAnchor.constraint(equalTo: bubble.heightAnchor).isActive = true
 
         let spacer = NSView()
         if isOutgoing {
@@ -7171,33 +7172,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.isHidden = true
         accountProfileHint.stringValue = "Предпросмотр интерфейса без входа в аккаунт."
         accountProfileHint.isHidden = false
-        conversationTitleLabel.stringValue = "Пример переписки"
-        chatStatusLabel.stringValue = "Демонстрационные сообщения · данные не подключены к Telegram"
+        conversationTitleLabel.stringValue = "Выберите чат"
+        chatStatusLabel.stringValue = "Предпросмотр макета · аккаунты не подключены"
         composer.isEditable = false
         composer.isSelectable = false
         searchField.isEnabled = false
         photoSendButton.isEnabled = false
         sendButton.isEnabled = false
-        clearStack(chatList)
-        let previewRow = ConversationListRowButton(
-            conversationTitle: "Пример переписки",
-            preview: "Демонстрационное сообщение",
-            time: "12:34",
-            unreadCount: 1,
-            isMuted: false,
-            chatID: 0,
-            isSelected: true,
-            target: nil,
-            action: nil
-        )
-        previewRow.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
-        chatList.addArrangedSubview(previewRow)
-        clearStack(messageList)
-        let previewMessages: [[String: Any]] = [
-            ["is_outgoing": false, "content": ["@type": "messageText", "text": ["text": "Привет! Это демонстрационный просмотр интерфейса. Здесь показано, как читается обычная переписка.", "entities": []]]],
-            ["is_outgoing": true, "content": ["@type": "messageText", "text": ["text": "Входящие и исходящие сообщения теперь различаются положением и спокойным фоном.", "entities": []]]],
-        ]
-        for message in previewMessages { _ = appendMessage(message) }
         window.title = "\(ProductIdentity.displayName) · предпросмотр макета без аккаунтов"
         layoutWindowContents()
         return true
