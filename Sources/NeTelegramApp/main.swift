@@ -412,21 +412,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         markLabel.textColor = .white
         markLabel.alignment = .center
         markLabel.frame = NSRect(x: 0, y: 8, width: 56, height: 40)
+        markLabel.setAccessibilityElement(false)
         mark.addSubview(markLabel)
 
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
-        loginHeading.font = .systemFont(ofSize: 24, weight: .semibold)
+        loginHeading.font = .systemFont(
+            ofSize: NSFont.preferredFont(forTextStyle: .title1).pointSize,
+            weight: .semibold
+        )
         loginHeading.alignment = .center
         loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
-        loginSubtitle.font = .systemFont(ofSize: 14)
+        loginSubtitle.font = .preferredFont(forTextStyle: .body)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
         loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
-        loginDisclosure.font = .systemFont(ofSize: 13)
+        loginDisclosure.font = .preferredFont(forTextStyle: .footnote)
         loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
         loginDisclosure.alignment = .center
-        loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
+        loginDisclosure.setAccessibilityLabel(loginDisclosure.stringValue)
 
         accountPicker = NSPopUpButton(frame: NSRect(x: 16, y: 625, width: 298, height: 30), pullsDown: false)
         accountPicker.isHidden = true
@@ -462,14 +466,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPickerStack.spacing = 8
         countryPickerStack.isHidden = true
         countrySuggestionLabel = NSTextField(wrappingLabelWithString: "")
-        countrySuggestionLabel.font = .systemFont(ofSize: 12)
+        countrySuggestionLabel.font = .preferredFont(forTextStyle: .footnote)
         countrySuggestionLabel.textColor = .secondaryLabelColor
         countrySuggestionLabel.alignment = .left
         countrySuggestionLabel.maximumNumberOfLines = 2
         countrySuggestionLabel.isHidden = true
         countrySuggestionLabel.setAccessibilityLabel("Можно выбрать страну для местного номера или ввести полный номер с плюсом")
         phoneFieldLabel = NSTextField(labelWithString: "Номер телефона:")
-        phoneFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        phoneFieldLabel.font = .preferredFont(forTextStyle: .subheadline)
         phoneFieldLabel.textColor = .labelColor
         phoneFieldLabel.alignment = .left
         phoneFieldLabel.setAccessibilityLabel("Номер телефона")
@@ -486,7 +490,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         emailField = NSTextField(string: "")
         emailField.placeholderString = "Электронная почта"
         emailField.font = .systemFont(ofSize: 17)
-        emailField.alignment = .center
+        emailField.alignment = .left
         emailField.setAccessibilityLabel("Электронная почта для входа")
         emailField.isHidden = true
         emailField.delegate = self
@@ -537,13 +541,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         secureInputField.placeholderString = "Пароль двухэтапной проверки"
         secureInputField.font = .systemFont(ofSize: 17)
         secureInputField.frame = .zero
-        secureInputField.alignment = .center
+        secureInputField.alignment = .left
         secureInputField.setAccessibilityLabel("Пароль двухэтапной проверки")
         secureInputField.isHidden = true
         secureInputField.delegate = self
 
         statusLabel = NSTextField(wrappingLabelWithString: "Подключаю экран входа…")
-        statusLabel.font = .systemFont(ofSize: 12)
+        statusLabel.font = .preferredFont(forTextStyle: .footnote)
         statusLabel.textColor = .secondaryLabelColor
         statusLabel.alignment = .left
         statusLabel.setAccessibilityLabel("Статус авторизации")
@@ -660,9 +664,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             statusLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            actionButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
+            actionButton.widthAnchor.constraint(equalToConstant: 240).withPriority(.defaultHigh),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            qrButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
+            qrButton.widthAnchor.constraint(equalToConstant: 240).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
             changePhoneButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             changePhoneButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), changePhoneButton.heightAnchor.constraint(equalToConstant: 32),
         ])
@@ -1459,19 +1463,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         apiHashAccessCheckInProgress = true
         setStatus("Запрашиваю разрешение macOS прочитать сохранённый API hash. Само значение не отображается; вход в Telegram не запускается…")
+        telegramAPIHashReadiness.invalidate()
         Task { @MainActor [weak self] in
-            defer { self?.apiHashAccessCheckInProgress = false }
+            guard let self else { return }
+            defer { self.apiHashAccessCheckInProgress = false }
             do {
-                let value = try await SecretsStore.performKeychainOperation {
-                    try SecretsStore().telegramAPIHash(allowingUserInteraction: true)
+                let value = try await self.telegramAPIHashReadiness.value(timeout: 12) {
+                    try await SecretsStore.performKeychainOperation {
+                        try SecretsStore().telegramAPIHash(allowingUserInteraction: true)
+                    }
                 }
-                guard let self, !self.lockState, !self.closingForTermination else { return }
+                guard !self.lockState, !self.closingForTermination else { return }
                 self.telegramAPIHashReadiness.acceptVerifiedValue(value)
                 self.setStatus("Доступ к сохранённому API hash подтверждён. Значение осталось в Связке ключей; нажмите «Продолжить», чтобы отдельно начать вход.")
+            } catch TelegramAPIHashReadinessError.timedOut {
+                self.setStatus("Связка ключей macOS пока не ответила. Запрос продолжает выполняться, запись не изменена; повторное нажатие будет ждать тот же запрос.")
             } catch SecretsStoreError.missing {
-                self?.setStatus("Сохранённый API hash не найден. Запрос разрешения не менял Связку ключей; настройте значение через защищённое меню приложения.")
+                self.setStatus("Сохранённый API hash не найден. Запрос разрешения не менял Связку ключей; настройте значение через защищённое меню приложения.")
             } catch {
-                self?.setStatus("macOS не разрешила прочитать API hash. Запись не изменялась; вход в Telegram не начинался.")
+                self.setStatus("macOS не разрешила прочитать API hash. Запись не изменялась; вход в Telegram не начинался.")
             }
         }
     }
