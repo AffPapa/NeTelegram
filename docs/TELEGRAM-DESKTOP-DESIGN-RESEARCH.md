@@ -107,18 +107,24 @@ checks passed; exact-source macOS CI
 passed for final source `1408ab5`. This is implementation evidence, not live
 visual parity.
 
-At current app source `4e54ce8d7c03ac92905de498b45f0bfc9b57cc52`, the AppKit
-shell still has the researched two-pane hierarchy, separate header/history/
-composer, search, selected chat and visible unsupported content. The prior
-chat-list pagination trigger could become stuck when the viewport reached the
-end before the first TDLib page completed; it now gates per account, waits for
-`.loaded`, and rechecks the same viewport after completion. A response also
-clears the originating account's gate even if that account is now backgrounded
-or the privacy lock is active; only the selected, unlocked account refreshes
-visible UI. Deterministic regressions pass 3/3, and exact-source macOS CI passes
-185/185. Synthetic
-chat-ID-colored initials were removed in favor of a neutral system placeholder,
-so the UI does not imply a discovered avatar or identity. The canonical Dev.app
-is open on its accountless first-run screen. Real chat rows/avatar rendering,
-VoiceOver, IME, RTL and photo-bearing conversations still require a
-user-authorized account and visual review.
+At app source `9e0af7a46c1904600cdfc8eeb1e3716239b7cb95`, the AppKit shell
+retains the two-pane hierarchy, separate header/history/composer, search,
+selected chat and visible unsupported content. Conversation rows now have
+stable view identity across TDLib refreshes: changed row presentation and its
+accessibility label update in place; added/removed rows reconcile by chat ID;
+existing views move only when the server ordering changes. Search, empty/loading,
+revoked-account and privacy-clear paths still discard row caches. The isolated
+`NeTelegramApp` build passed, exact-source macOS CI
+[`38611394780`](https://github.com/AffPapa/NeTelegram/actions/runs/38611394780)
+passed, and pinned TDLib/Dev.app workflow
+[`38611394887`](https://github.com/AffPapa/NeTelegram/actions/runs/38611394887)
+passed. These checks prove compile/test and bundle assembly, not a measured
+large-list performance improvement or local visual behavior.
+
+The canonical local Dev.app remains a separate artifact at source
+`291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b`. The old screenshot title
+`5f414650` identifies an even earlier build. The current process is still open,
+and the app-specific API-hash Keychain lookup returned `not_found`; no app
+replacement or local smoke was attempted. Real chat rows/avatar rendering,
+VoiceOver, IME, RTL and photo-bearing conversations still require visual review;
+authenticated behavior requires an owner-operated login.
