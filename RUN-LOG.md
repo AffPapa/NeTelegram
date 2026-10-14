@@ -1600,5 +1600,14 @@
 
 - Finding: TDLib's `authorizationStateWaitOtherDeviceConfirmation` update uses a dedicated QR presentation branch that bypassed the shared authorization-step announcer. The QR image had an AX label, but the transition could be silent to VoiceOver.
 - Change: invoke the existing account/generation-deduplicated announcement after the QR screen is presented; add an explicit assertion for the TDLib QR-state mapping and static announcement.
-- Verification: pending focused authorization-announcement test, exact-source macOS CI, and one canonical Dev.app rebuild/accountless smoke. The actual spoken announcement with VoiceOver enabled is not yet verified.
+- Verification: focused authorization-announcement test passed 1/1; exact-source macOS CI run 38599873729 passed; one canonical arm64 Dev.app rebuilt in 5.68s and strict ad-hoc signature verification passed. CUA confirmed title `NeTelegram · dev 681b1622` and the accountless AX tree. The authenticated QR transition and actual spoken announcement with VoiceOver enabled remain unverified.
 - No account or credentials used; source and Site identities remain separate.
+
+
+## 2026-10-14 — AUTH-UI-DESIGN-02 Apple HIG layout correction
+
+- Research: rechecked Apple HIG macOS/window/layout/color/focus guidance and GitHub-hosted Telegram Desktop structure. Applied native AppKit/system appearance, Auto Layout, one task-aligned control grid and concise status copy. Telegram Desktop was a flow reference only; no upstream code or art was copied. Research notes: `docs/TELEGRAM-DESKTOP-DESIGN-RESEARCH.md`.
+- Finding: country search and country menu consumed separate full-width rows, and status text repeated the subtitle. Changed the two controls to one 360 pt row (132 pt search + 8 pt gap + 220 pt native country picker); kept the phone field aligned below and shortened dynamic status. Auth commands, selected-country policy and data handling are unchanged.
+- Source `936c2cf2e09b00e3b0c8e5a8421de07544bdb2de` was pushed once to `AffPapa/NeTelegram/main`. Exact-source macOS CI [38600662118](https://github.com/AffPapa/NeTelegram/actions/runs/38600662118) passed.
+- One canonical `/private/tmp/NeTelegram-Dev.app` built after CI in 5.50 s; BuildInfo records arm64/macOS 14, Swift 6.4 and pinned TDLib `c15d3f5a5de6e3ba5839822c451152e5e18bb700`. Fingerprint `0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d`; executable SHA-256 `7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`. Strict ad-hoc `codesign --verify --deep --strict` passed. CUA title `NeTelegram · dev 936c2cf2`; screenshot and AX show the new layout; Tab order search → country picker → phone passed. No account or credentials used.
+- Limits: visual review covers only the accountless phone-entry screen. Authenticated message screens, native VoiceOver speech, RTL/IME interaction and live login remain unverified. Public Site stays at v194 and has no download; no release gates changed.
