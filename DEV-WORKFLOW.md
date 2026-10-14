@@ -4,7 +4,7 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 
 ## Test cadence
 
-1. Finish one related vertical slice before rebuilding. Keep one checkout, one app-source SHA, and the one canonical Dev.app; do not start a parallel bundle.
+1. Finish one related vertical slice before rebuilding. Keep one checkout, one app-source SHA, and the one canonical Dev.app; do not start a parallel bundle. Complete any delegated read-only reviews before freezing the candidate; the parent owns edits, tests, pushes, builds, and publication. This prevents late findings from invalidating a just-built candidate.
 2. While editing, run only the focused regression needed for fast diagnosis. After the slice is complete, push its final source SHA once and let the automatic macOS CI be the sole full-suite gate. Do not also run the full suite locally or dispatch another CI run when the exact SHA already has a successful run. Local full-suite runs are for offline work, toolchain changes, or diagnosing a hosted-only failure.
 3. CI runs one bounded `swift test --no-parallel --verbose` process for the full suite. Do not add several preflight `swift test` processes before it: isolated probe passes did not prevent the full-runner timeout and repeated SwiftPM startup. For a hosted failure, inspect the exact run's job/log, classify product vs test vs runner/setup, and change the harness or source before retrying. A built binary with no `Test run started` output is runner/test-execution evidence, not a test-level failure. The SwiftPM cache key includes OS, architecture, Swift/Xcode versions, `Package.swift`, and `TDLIB.lock.json`; observed warm/cold compile times are comparisons, not guarantees.
 4. Select verification by changed surface:
