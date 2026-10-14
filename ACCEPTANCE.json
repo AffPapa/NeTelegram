@@ -1,29 +1,23 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; source 2d8a4e5 passed local serial Swift 160/160 and exact hosted macOS CI 38492400249; pinned-TDLib native app workflow 38492400259 and metadata validation 38492400278 passed on checkpoint 7d63518. The single canonical Dev.app was rebuilt and its accountless first-run UI verified at title 2d8a4e5. Public Site v168 is deployed from Site source 8a90bfa as deployment appgdep_6aced33c6180819180ed76df0094ad26; public /devlog/ and /downloads/ routes were verified anonymously. No app release/download exists. Real login remains deferred; 20 real-account coverage, signing/notarization, and Telegram compatibility remain open.",
+  "status": "implementation_in_progress; app/test commit 5b40336 adds post-staging photo-send target revalidation. Focused local regression passed 1/1 and the local serial suite passed 161/161. Exact-source hosted macOS CI run 38494308524 was cancelled after 5 minutes before the Swift Testing run began (the filtered probe passed); exact-source pinned-TDLib Dev.app build run 38494308687 passed. Real login remains deferred; 20 real-account coverage, signing/notarization, and Telegram compatibility remain open.",
   "current_evidence": {
-    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "app_tests": "Exact-source hosted macOS serial suite passed 160/160 on test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app source remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Local focused APP01 test passed 1/1.",
+    "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+    "app_tests": "Photo-send race regression photoSendRevalidatesLiveTargetAfterAsyncStaging passed locally 1/1; diagnostic full local serial suite passed 161/161 under arm64 / Xcode 27 / Swift 6.4. Exact hosted macOS CI run 38494308524 was cancelled at the 5-minute limit before any full-suite test result; the one-test probe passed, and logs show the test process built but never emitted 'Test run started'.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38493619014,
-        "workflow_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
-        "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-        "result": "success",
-        "scope": "Exact-source macOS serial Swift suite passed 160/160; test-only APP01 fan-out refinement, no Swift app source changed."
-      },
-      "current_checkpoint_metadata": {
-        "run_id": 38493619106,
-        "workflow_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
-        "result": "success",
-        "scope": "Metadata validation passed on test/checkpoint commit bb9b38f."
+        "run_id": 38494308524,
+        "workflow_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+        "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+        "result": "cancelled",
+        "scope": "5-minute job limit while full Swift Testing runner was starting; filtered runner probe passed and no full-suite test-level result was emitted. Local diagnostic exact-source serial suite passed 161/161."
       },
       "latest_native_bundle": {
-        "run_id": 38492400259,
-        "workflow_commit": "7d63518026eb17266cfb816d4af22189be859374",
-        "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+        "run_id": 38494308687,
+        "workflow_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+        "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
         "result": "success",
-        "scope": "Pinned TDLib arm64 Dev.app bundle assembly and lifecycle smoke for exact app source 2d8a4e5."
+        "scope": "Pinned TDLib arm64 Dev.app build/assembly passed for exact Swift source 5b40336; not a real-account smoke."
       }
     },
     "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app rebuilt for app source 2d8a4e5; ad-hoc signature verified. CUA confirms accountless welcome, phone and QR entry. No login credentials entered.",
@@ -186,7 +180,7 @@
       "method": "C bridge/reducer tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Synthetic integrated pipeline test at app-source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350 registers 20 routes, holds one callback while 19 lanes progress, observes receive backpressure, then proves accepted-event drain/FIFO during shutdown. Two focused and full suite 151/151 passed locally on Xcode 27.0 / Swift 6.4. Independent read-only review found the callback-entered/drain-requested handshake deterministic. Exact-SHA hosted macOS CI status is unverified due GitHub API connectivity; pinned TDLib/Dev.app workflow 38440068795 was cancelled before steps. No real TDLib, authorized 20 accounts, or resource measurements; remains partial."
+      "evidence": "Synthetic integrated pipeline test at app-source 0fc9e8604a851ce8ab2968f5b2623a1417a7e350 registers 20 routes, holds one callback while 19 lanes progress, observes receive backpressure, then proves accepted-event drain/FIFO during shutdown. Two focused and full suite 151/151 passed locally on Xcode 27.0 / Swift 6.4. Independent read-only review found the callback-entered/drain-requested handshake deterministic. Exact-SHA hosted macOS CI status is unverified due GitHub API connectivity; pinned TDLib/Dev.app workflow 38440068795 was cancelled before steps. No real TDLib, authorized 20 accounts, or resource measurements; remains partial. A subsequent source review on 5b40336754462cc767727a1bde9c553e2513d13e found a remaining risk: production `.routingFailure` handling only reports status and keeps the receiver alive, so an unrouteable critical update may be lost. No fallback occurs; terminal recovery policy and a regression test remain next."
     },
     {
       "id": "APP17",
@@ -195,7 +189,7 @@
       "method": "native+integration",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Text/photo send paths capture account, Telegram identity, runtime generation and conversation before dispatch; photo-picker completion revalidates privacy epoch, identity, permission and topic. Regression sendIntentDispatchStaysOnAccountAAfterSelectionSwitchesToB simulates UI selection changing A→B after capture and verifies the queued dispatch still targets A. Exact-source local Swift suite passed 111/111 and macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38357782191 succeeded for 0ed9b9dc50dec1149688a901950fd8bcd7a665b4. This is contract-level synthetic coverage; real native picker/send timing, send-as/permission changes against TDLib, and authorized-account A→B integration remain unverified."
+      "evidence": "Text/photo send paths capture account, Telegram identity, runtime generation and conversation before dispatch; photo-picker completion revalidates privacy epoch, identity, permission and topic. Regression sendIntentDispatchStaysOnAccountAAfterSelectionSwitchesToB simulates UI selection changing A→B after capture and verifies the queued dispatch still targets A. Exact-source local Swift suite passed 111/111 and macOS CI https://github.com/AffPapa/NeTelegram/actions/runs/38357782191 succeeded for 0ed9b9dc50dec1149688a901950fd8bcd7a665b4. This is contract-level synthetic coverage; real native picker/send timing, send-as/permission changes against TDLib, and authorized-account A→B integration remain unverified. Post-staging regression at source 5b40336754462cc767727a1bde9c553e2513d13e adds PhotoSendDispatchGuard and rechecks current account namespace, Telegram identity, runtime generation/registration, authorization-ready state, privacy lock epoch, live permission and typed topic after ImageIO staging. The new focused test rejects changed rights, identity, generation, runtime registration, auth state, lock and epoch. Local test 1/1 and full serial suite 161/161 passed. Hosted run 38494308524 was cancelled before tests started; native arm64 bundle workflow 38494308687 passed. Native picker timing and authorized real-account send remain unverified; status remains partial."
     },
     {
       "id": "APP18",
@@ -488,16 +482,16 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
-    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "checkpoint_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
-    "local_command": "swift test --package-path . --scratch-path .build/canonical-dev-build/swift --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
-    "local_result": "Focused APP01 test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no duplicate full local suite.",
-    "hosted_ci": "Run 38493619014 passed the exact-source serial macOS suite 160/160 on test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744.",
-    "native_dev_app_smoke": "No native rebuild was needed: only Tests/** and checkpoint files changed. Existing pinned native workflow 38492400259 still validates unchanged app source 2d8a4e5964211c9fbd40136f5470da7d47266937; no new Dev.app launch occurred.",
-    "metadata_ci": "Run 38493619106 passed metadata validation for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744.",
-    "scope": "APP01 synthetic integration now invokes the production AccountRestorePlanner.enqueueStartupProfiles fan-out helper. It asserts all 20 are queued, one startup stalls, one first request fails and retries under a fresh generation, routes register before requests, and account selection does not replace routing. Does not exercise AppDelegate restoreProfiles end-to-end, real TDLib or 20 authorized accounts.",
-    "site_deployment": "No user-visible app behavior changed; Site devlog not updated for test-only coverage work."
+    "source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+    "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
+    "checkpoint_commit": null,
+    "local_command": "swift test --no-parallel --filter photoSendRevalidatesLiveTargetAfterAsyncStaging; diagnostic exception: swift test --no-parallel --verbose",
+    "local_result": "Focused regression passed 1/1; because hosted runner stalled before Swift Testing startup, one full local diagnostic suite passed 161/161 under arm64 / Xcode 27 / Swift 6.4.",
+    "hosted_ci": "Run 38494308524 was cancelled at the 5-minute job limit before full-suite test execution; filtered probe passed, build completed, but no 'Test run started' event appeared. GitHub logs show runner cleanup terminated swiftpm-testing. GitHub connector rerun was denied 403 (Actions write permission unavailable).",
+    "native_dev_app_smoke": "Pinned TDLib/Dev.app workflow 38494308687 passed exact source assembly/build. It did not launch the app or perform a picker/account smoke; canonical local Dev.app was not rebuilt.",
+    "metadata_ci": "Not run for this source-only commit.",
+    "scope": "After async ImageIO staging, production photo-send now revalidates the same account, Telegram identity, runtime generation and registration, authorization-ready state, live chat permission, typed-topic policy, privacy unlocked state and epoch before manifest registration. Invalidated staged files are deleted; caption remains in draft. Local tests are synthetic; no real TDLib send or authorized account was used.",
+    "site_deployment": "No download/release availability changed; public Site remains v168 and was not updated."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -548,7 +542,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue the next incomplete product acceptance slice without repeating APP01 checks. All-active real-account certification remains open until authorized Telegram profiles are available; do not substitute synthetic fixtures.",
+  "next_action": "Continue APP16 by deciding and testing fail-closed handling for unrouteable TDLib updates; preserve source SHA separation and diagnose runner startup before any CI retry. Real-account login remains deferred.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
