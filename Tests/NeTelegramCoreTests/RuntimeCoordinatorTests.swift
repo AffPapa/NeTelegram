@@ -935,6 +935,34 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
 }
 
+@Test func receiveWorkerExitWaitersResumeOnlyAfterExitCallbackCompletes() async {
+    let exitCallbackEntered = LockedTestValue(false)
+    let waiterReturned = LockedTestValue(false)
+    let releaseExitCallback = DispatchSemaphore(value: 0)
+    let gateway = TDLibGateway { _ in .timeout }
+    gateway.startSingleReceiveWorker(
+        timeoutSeconds: 0.01,
+        onUpdate: { _ in .accepted },
+        onExit: {
+            exitCallbackEntered.set(true)
+            releaseExitCallback.wait()
+        }
+    )
+    gateway.requestWorkerStop()
+
+    let waiter = Task {
+        await gateway.waitForReceiveWorkerExit()
+        waiterReturned.set(true)
+    }
+    #expect(await waitForTrue(exitCallbackEntered, timeout: .seconds(2)))
+    #expect(!waiterReturned.get(), "The exit barrier must include the pipeline's onExit callback")
+
+    releaseExitCallback.signal()
+    #expect(await waitForTrue(waiterReturned, timeout: .seconds(2)))
+    await waiter.value
+    #expect(gateway.receiveWorkerHasExited)
+}
+
 @Test func unknownClientUpdateFailsSharedReceiverAfterDrainingAcceptedEvents() async throws {
     let coordinator = RuntimeCoordinator(startupParallelism: 2)
     let account = AccountUUID()

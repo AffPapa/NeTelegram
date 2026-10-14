@@ -2431,15 +2431,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         } else {
             gateway.requestWorkerStop()
         }
+        setStatus("Все аккаунты закрыты; завершаю получение обновлений…")
         Task { @MainActor [weak self, gateway] in
-            var polls = 0
-            while !gateway.receiveWorkerHasExited {
-                try? await Task.sleep(for: .milliseconds(20))
-                polls += 1
-                if polls == 250 {
-                    self?.setStatus("TDLib закрыл аккаунты; ожидаю завершения receive worker…")
-                }
-            }
+            await gateway.waitForReceiveWorkerExit()
             guard let self else { return }
             let pipeline = self.updatePipeline
             await pipeline?.finishInputAndDrain()

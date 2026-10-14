@@ -28,6 +28,8 @@ public final class TDLibGateway: @unchecked Sendable {
     private let stopLock = NSLock()
     private let receivePoll: @Sendable (Double) -> TDLibReceivePollResult
     private var receiveThread: Thread?
+    private var receiveWorkerExited = true
+    private var receiveWorkerExitWaiters: [CheckedContinuation<Void, Never>] = []
     private var stopping = false
     private var receiveFailure: TDLibGatewayError?
 
@@ -92,12 +94,16 @@ public final class TDLibGateway: @unchecked Sendable {
     ) {
         stopLock.lock()
         precondition(receiveThread == nil, "TDLib permits exactly one concurrent td_receive worker")
+        receiveWorkerExited = false
         let worker = Thread { [weak self] in
             guard let self else {
                 onExit()
                 return
             }
-            defer { onExit() }
+            defer {
+                onExit()
+                self.completeReceiveWorkerExit()
+            }
             while !self.shouldStop {
                 self.receiveLock.lock()
                 let result = self.receivePoll(timeoutSeconds)
@@ -155,7 +161,31 @@ public final class TDLibGateway: @unchecked Sendable {
     public var receiveWorkerHasExited: Bool {
         stopLock.lock()
         defer { stopLock.unlock() }
-        return receiveThread?.isFinished ?? true
+        return receiveWorkerExited
+    }
+
+    /// Suspends without occupying an executor thread until the sole receive
+    /// worker has completed its exit callback and can no longer touch TDLib.
+    public func waitForReceiveWorkerExit() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            stopLock.lock()
+            guard !receiveWorkerExited else {
+                stopLock.unlock()
+                continuation.resume()
+                return
+            }
+            receiveWorkerExitWaiters.append(continuation)
+            stopLock.unlock()
+        }
+    }
+
+    private func completeReceiveWorkerExit() {
+        stopLock.lock()
+        receiveWorkerExited = true
+        let waiters = receiveWorkerExitWaiters
+        receiveWorkerExitWaiters.removeAll(keepingCapacity: false)
+        stopLock.unlock()
+        waiters.forEach { $0.resume() }
     }
 
     private var shouldStop: Bool {
