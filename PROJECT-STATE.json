@@ -16,7 +16,14 @@
     "app_source_changed": false,
     "app_source_fingerprint_changed": false,
     "native_bundle_rebuilt": false,
-    "observed_process_state": "Canonical Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244; replacement correctly refused."
+    "observed_process_state": "Canonical Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244; replacement correctly refused.",
+    "native_workflow": {
+      "run_id": 38529572922,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38529572922",
+      "workflow_commit": "4b8b6bd10b5f352920bdc4dfe9feae774f836684",
+      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed after the dev-app process-guard diagnostic change; no local canonical bundle replacement or account login."
+    }
   },
   "product": {
     "public_name": "NeTelegram",
