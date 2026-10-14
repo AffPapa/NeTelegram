@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "UI-CHATLIST-01 conversation selection hierarchy — AppKit build, accountless native shell smoke, and exact-source macOS CI passed; row selection awaits real chat data for visual confirmation.",
+  "phase": "APP29b initial auto-presented runtime logout guard — focused test 1/1 and exact-source GitHub CI 179/179 passed; canonical Dev.app remains open on prior source.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f"
+    "app_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38555778654,
+      "run_id": 38560168478,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38555778654",
-      "workflow_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "app_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "scope": "Exact-source macOS CI passed after the AppKit conversation-row selection change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38560168478",
+      "workflow_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "app_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "scope": "Exact-source macOS arm64 CI passed 179/179; Xcode 27 / Swift 6.4."
     },
     "published_application_releases": [],
     "github_access": {
@@ -92,19 +92,19 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38545074877,
+      "run_id": 38559132402,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38545074877",
-      "workflow_commit": "836daa3b9f413ed1253339f3a796b293cf027173",
-      "scope": "Latest completed metadata validation for checkpoint 836daa3 before the current CORE-RUNTIME-02 metadata update; current app source is independently validated by exact-source CI."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38559132402",
+      "workflow_commit": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+      "scope": "Checkpoint metadata validation passed after APP29 source push."
     },
     "latest_exact_source_ci": {
-      "run_id": 38555778654,
+      "run_id": 38560168478,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38555778654",
-      "workflow_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "app_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "scope": "Exact-source macOS CI passed after the AppKit conversation-row selection change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38560168478",
+      "workflow_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "app_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "scope": "Exact-source macOS arm64 CI passed 179/179; Xcode 27 / Swift 6.4."
     },
     "latest_native_workflow_ci": {
       "run_id": 38554499473,
@@ -115,10 +115,10 @@
       "scope": "Exact-source pinned TDLib build and isolated arm64 Dev.app assembly/verification passed; build artifact uploaded for review. This is hosted build evidence, not real-account acceptance or a signed public release."
     },
     "latest_pushed_commit": {
-      "sha": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+      "sha": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
       "branch": "main",
-      "verified": "GitHub connector fetched this exact commit and source blob from AffPapa/NeTelegram.",
-      "ci_status": "No status checks reported yet; pending/unverified."
+      "verified": "GitHub connector fetched exact commit and diff from AffPapa/NeTelegram.",
+      "ci_status": "exact-source macOS CI passed 179/179; run 38560168478."
     }
   },
   "local_development_candidate": {
@@ -139,7 +139,9 @@
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
     "build_record_sha256": "ef05513128e7eb85aa5a4f5660cd55bd7f6c7348947178a37f07e4648d7cee2b",
     "smoke": "Built once from clean source 92b8ca3 and launched the canonical Dev.app in the explicit compact chat-shell preview. CUA verified the first-run workspace and honest empty state; no accounts, profiles, TDLib auth, or synthetic identities were loaded. Selected-row appearance could not be visually exercised without chat data.",
-    "scope": "AppKit compile, ad-hoc strict codesign, and accountless native workspace launch only; no real login, selected-chat visual data, VoiceOver audit, or 20-runtime certification."
+    "scope": "AppKit compile, ad-hoc strict codesign, and accountless native workspace launch only; no real login, selected-chat visual data, VoiceOver audit, or 20-runtime certification.",
+    "pending_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+    "current_running_pid": 67677
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -149,7 +151,7 @@
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
-    "developer_id_and_notarization": "Fresh read-only inventory on 2026-10-14: two consecutive security find-identity queries returned 4 valid identities, including 2 Developer ID Application identities for team H6VGU2M6JD. One adjacent query returned 0, so inventory was inconsistent once; repeated enumerations returned 4. Keychain query for Apple notarytool service com.apple.gke.notary.tool returned errSecItemNotFound with attributes only; no APPLE_/ASC_/NOTARY_ environment variable names are configured. No signing, notarization, or secret-value access was performed. Candidate Developer ID identity exists; notary credentials remain unavailable/unverified.",
+    "developer_id_and_notarization": "Fresh direct security find-identity -v -p codesigning on 2026-10-14 returned 0 valid identities; this supersedes conflicting prior inventory. Notary credentials remain unverified. No signing or notarization was performed.",
     "gatekeeper_and_sparkle_update": "not verified",
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
@@ -334,7 +336,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Keep the single canonical Dev.app running; do not replace it until the owner has completed protected API credential entry. The stale authorizationStateClosed selection race is guarded and its targeted local regression passes. The Telegram Desktop source review confirms the existing two-pane structure, selected conversation row, separate chat header/list/composer, and explicit empty state are the right bounded design direction; validate visual states with real chat data after login rather than repeating a broad redesign. Recheck signing identity and GitHub transport before release; publish only a signed/notarized immutable prerelease with public-byte verification, then update the existing Site once. Stable remains gated by Telegram compatibility and 20 real accounts.",
+  "next_action": "Keep the single canonical Dev.app open on prior source 92b8ca3 (PID 67677); do not interact with the protected credential UI. After it is safely closed, build source 632bf551 once and run the short native first-run/auth UI smoke. Real Telegram login/read/send remains owner-driven. Current local codesign inventory is 0 identities; notary credentials are unverified, so no signed release or download button can be produced. Site v194 stays unchanged until verified signed/notarized assets exist.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -555,40 +557,18 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "UI-CHATLIST-01 conversation selection hierarchy",
-    "source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-    "local_focused_test": "Not applicable: AppKit-only presentation change.",
-    "local_suite": "Not run locally; exact-source macOS CI passed.",
+    "id": "APP29b initial auto-presented runtime logout guard",
+    "source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+    "local_focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests; no app bundle rebuilt.",
     "hosted_ci": {
-      "run_id": 38555778654,
+      "run_id": 38560168478,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38555778654",
-      "workflow_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "app_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "scope": "Exact-source macOS CI passed after the AppKit conversation-row selection change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38560168478",
+      "workflow_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "app_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+      "scope": "Exact-source macOS arm64 CI passed 179/179; Xcode 27 / Swift 6.4."
     },
-    "native_bundle_local": {
-      "bundle_id": "org.affpapa.netelegram.dev",
-      "version": "0.0.0-dev",
-      "application_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "dirty_source": false,
-      "distribution_ready": false,
-      "path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "source_fingerprint_sha256": "3f98eeb08df406a0711fb76b2bfa791c9ea7942919429b9c53715e6d3d1b8ff2",
-      "executable_sha256": "86b31cc13ed52ff13e2b72719ebacce24e6437f453e8bb47157d15f8acde1e0d",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "1e16b78a419b7dd8c95b12e6012c5ba5d69a70894387b44f8c8ad5ccf151a2e7",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "build_record_sha256": "ef05513128e7eb85aa5a4f5660cd55bd7f6c7348947178a37f07e4648d7cee2b",
-      "smoke": "Built once from clean source 92b8ca3 and launched the canonical Dev.app in the explicit compact chat-shell preview. CUA verified the first-run workspace and honest empty state; no accounts, profiles, TDLib auth, or synthetic identities were loaded. Selected-row appearance could not be visually exercised without chat data.",
-      "scope": "AppKit compile, ad-hoc strict codesign, and accountless native workspace launch only; no real login, selected-chat visual data, VoiceOver audit, or 20-runtime certification."
-    },
-    "telegram_desktop_research": "Official telegramdesktop/tdesktop dev at d77f486228a98e15d6695514d5f2b28ce1c6a872; reused dialog title/snippet hierarchy, explicit selected state, and semantic list labeling only. No code/assets copied. Native preview was accountless and therefore did not visually exercise a selected chat.",
-    "scope": "One AppKit conversation-row hierarchy/selection slice. No real account or UI feature claims beyond this evidence."
+    "scope": "Records initial auto-presented runtime as selection intent and proves later user selection invalidates cleanup eligibility. This policy test does not execute native TDLib cleanup, real login or 20-runtime operation."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -782,9 +762,19 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "commit": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
-    "push": "success; commit confirmed in GitHub main through the GitHub connector",
-    "ci": "pending/unverified; GitHub returned no status rows yet",
-    "canonical_dev_app": "still running the prior source; not replaced"
+    "commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+    "parent_source_commit": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+    "push": "success; GitHub connector verified exact commit",
+    "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests",
+    "exact_source_ci": "PASS 179/179; run 38560168478",
+    "canonical_dev_app": "PID 67677 running prior source 92b8ca3; no rebuild or interaction while open",
+    "real_account": "not used"
+  },
+  "pending_native_candidate": {
+    "source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
+    "running_bundle_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
+    "status": "blocked_running_canonical_app",
+    "reason": "Canonical /private/tmp/NeTelegram-Dev.app is open as PID 67677. Preserve it until safely closed; then build this exact commit once.",
+    "source_ci_run_id": 38560168478
   }
 }
