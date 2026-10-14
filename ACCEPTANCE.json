@@ -27,6 +27,11 @@
       "architecture": "arm64",
       "signature": "ad-hoc; codesign --verify --deep --strict passed",
       "smoke": "CUA search Canada found 🇨🇦 Канада +1; selected value updated. No credentials entered."
+    },
+    "native_keyboard_smoke": {
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+      "result": "On canonical /private/tmp/NeTelegram-Dev.app at exact app source fa80d5a, CUA Tab navigation moved through country search -> country picker -> phone number -> Continue -> QR. AX identified each focused control; no activation, number, code, profile, or Telegram account was used. This is accountless keyboard focus evidence only; VoiceOver announcements, IME, RTL and later auth states remain unverified."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -227,7 +232,7 @@
       "method": "fixtures+native accessibility",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App source 4478f967654b270cd78f71a5afe69f625491d38d adds AppKit announcementRequested events for the static typed authorization steps phone, code, 2FA, email, registration and QR. No TDLib payload or entered values are passed into announcement text; duplicate state is suppressed per account and runtime generation. The new mapping/dedup test passes in the 130/130 exact-source Swift suite. Exact-source CI and pinned TDLib/Dev.app assembly succeeded. No native VoiceOver walkthrough, keyboard-only journey, RTL/IME, QR interaction or real account auth was performed; status remains partial."
+      "evidence": "App source 4478f967654b270cd78f71a5afe69f625491d38d adds AppKit announcementRequested events for the static typed authorization steps phone, code, 2FA, email, registration and QR. No TDLib payload or entered values are passed into announcement text; duplicate state is suppressed per account and runtime generation. The new mapping/dedup test passes in the 130/130 exact-source Swift suite. Exact-source CI and pinned TDLib/Dev.app assembly succeeded. No native VoiceOver walkthrough, keyboard-only journey, RTL/IME, QR interaction or real account auth was performed; status remains partial. Native keyboard smoke on the exact current canonical Dev.app at app source fa80d5a confirmed Tab focus order from country search to country picker, phone field, Continue, and QR using CUA accessibility state; controls were not activated and no account data was entered. APP22 remains partial: no VoiceOver walkthrough, RTL/IME, full conversation keyboard flow, or real auth was tested."
     },
     {
       "id": "APP23",
@@ -481,7 +486,7 @@
     "local_command": "Focused countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct; full serial Swift suite once because hosted runner stalled.",
     "local_result": "Focused 1/1 and exact-source serial 163/163 passed in 0.426s under arm64e / Xcode 27.0 / Swift 6.4.",
     "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214 cancelled at the five-minute limit after the runner probe; no suite result. Do not repeat unchanged.",
-    "native_dev_app_smoke": "Pinned TDLib arm64 assembly 38497467210 passed. Canonical /private/tmp/NeTelegram-Dev.app BuildInfo and CUA title match exact app source; CUA country search/select passed, no credentials.",
+    "native_dev_app_smoke": "Pinned TDLib arm64 assembly 38497467210 passed. Canonical /private/tmp/NeTelegram-Dev.app BuildInfo and CUA title match exact app source; CUA country search/select passed, no credentials. Keyboard focus smoke also traversed country search → country picker → phone → Continue → QR on the same exact bundle; no controls activated.",
     "metadata_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919 passed for checkpoint 6883cba; the checkpoint-validator change triggers a fresh metadata run.",
     "scope": "AUTH05 accountless UI and deterministic country/phone tests only. Real login, 20-account, sleep/wake, Developer ID/notarization, and Telegram compatibility remain unverified.",
     "site_deployment": "Public Site v170 deployment appgdep_6acee10806988191b7212e17add857a3; anonymous cache-busted /devlog route verified the AUTH05 entry. Downloads page contains no app binary."

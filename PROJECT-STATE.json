@@ -80,7 +80,7 @@
     "minimum_macos": "14.0",
     "signing": "ad-hoc; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "CUA confirms the single canonical Dev.app is open at this exact source; country search/select smoke passed. No phone, code, or Telegram profile created.",
+    "process_state": "CUA confirms the single canonical Dev.app is open at this exact source; country search/select smoke passed. No phone, code, or Telegram profile created. Keyboard focus order through Continue and QR was checked without activation.",
     "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
     "app_executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
@@ -343,7 +343,7 @@
     "minimum_macos": "14.0",
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "live_ui": "CUA confirmed NeTelegram · dev fa80d5a5; Canada search displayed 🇨🇦 Канада +1 and selected value updated. No number, credentials, or profile.",
+    "live_ui": "CUA confirmed NeTelegram · dev fa80d5a5; Canada search displayed 🇨🇦 Канада +1 and selected value updated. No number, credentials, or profile. Tab focus order reached country picker, phone, Continue and QR; no control activated.",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
     "native_run_id": 38497467210,
     "scope": "Accountless native UI smoke on the exact canonical app source. No authorized account, 20-runtime, sleep/wake, or distribution test."
