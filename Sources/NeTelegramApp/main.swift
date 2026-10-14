@@ -3309,12 +3309,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func reconcileNotifications(_ groups: [[String: Any]], for target: LocalAccountRuntime) {
+        let old = notificationIDsByAccount[target.account] ?? []
         var next = Set<String>()
         var routed: [String: RoutedTDLibNotification] = [:]
         for group in groups {
             guard let groupID = (group["id"] as? NSNumber)?.int32Value,
                   let chatID = (group["chat_id"] as? NSNumber)?.int64Value else { continue }
             for item in group["notifications"] as? [[String: Any]] ?? [] {
+                if TDLibNotificationRouter.isPendingPushReplacement(["@type": "updateNotification", "notification": item]),
+                   let notificationID = (item["id"] as? NSNumber)?.int32Value {
+                    let identifier = RoutedTDLibNotification.systemIdentifier(
+                        account: target.account,
+                        groupID: groupID,
+                        notificationID: notificationID
+                    )
+                    // An active snapshot can contain the same transient push
+                    // form as a live update. Retain its prior route/presentation
+                    // until TDLib supplies the downloaded NewMessage.
+                    if old.contains(identifier), let previous = notificationTargets[identifier] {
+                        next.insert(identifier)
+                        routed[identifier] = previous
+                    }
+                    continue
+                }
                 guard let value = TDLibNotificationRouter.route(
                     account: target.account,
                     groupID: groupID,
@@ -3326,7 +3343,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 routed[value.systemIdentifier] = value
             }
         }
-        let old = notificationIDsByAccount[target.account] ?? []
         let removed = old.subtracting(next)
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
