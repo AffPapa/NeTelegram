@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "APP29c logout failure status remains account scoped — focused regression 1/1 and exact-source GitHub CI 179/179 passed; Dev.app is still open on its protected API hash dialog.",
+  "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source GitHub CI passed; native visual smoke waits for the protected API-hash dialog to be safely resolved.",
   "current_evidence": {
-    "app_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-    "local_suite": "Focused local selection-policy regression passed 1/1 and SwiftPM compiled AppKit plus test targets. Exact-source macOS CI passed 179/179.",
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "local_suite": "No local behavioral suite run for presentation-only slice. SwiftPM AppKit target build passed; exact-source GitHub macOS CI run 38563635904 passed.",
     "focused_test": "delayedClosedAccountCleanupCannotOverrideNewerSelection PASS 1/1.",
     "hosted_ci": {
-      "run_id": 38561302832,
+      "run_id": 38563635904,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38561302832",
-      "workflow_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-      "app_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-      "scope": "Exact-source macOS arm64 CI passed 179/179 on macOS 15.7.9 / Xcode 27 / Swift 6.4."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38563635904",
+      "workflow_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "scope": "Exact-source GitHub macOS CI passed on this commit; the Apple Silicon Swift tests job completed successfully. No real-account or native UI smoke is included."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -32,7 +32,7 @@
       "build_record_sha256": "ef05513128e7eb85aa5a4f5660cd55bd7f6c7348947178a37f07e4648d7cee2b",
       "smoke": "Built once from clean source 92b8ca3 and launched the canonical Dev.app in the explicit compact chat-shell preview. CUA verified the first-run workspace and honest empty state; no accounts, profiles, TDLib auth, or synthetic identities were loaded. Selected-row appearance could not be visually exercised without chat data.",
       "scope": "Installed canonical bundle is prior source 92b8ca3 and is currently running on the protected API hash setup dialog. Source 41b3378 is pending one in-place rebuild after owner resolves the dialog and closes the app. No real account login.",
-      "pending_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
+      "pending_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
       "current_running_pid": null
     },
     "app02_stalled_profile_test": {
@@ -659,21 +659,22 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-    "app_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app29c-stale-status-test --filter delayedClosedAccountCleanupCannotOverrideNewerSelection",
-    "local_result": "PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests. No Dev.app bundle rebuilt.",
-    "hosted_ci_run_id": 38561302832,
+    "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-design SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-design swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-design-5239471",
+    "local_result": "PASS; AppKit target compile. git diff --check passed. No Dev.app rebuild.",
+    "hosted_ci_run_id": 38563635904,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38561302832"
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38563635904",
+    "scope": "Exact-source GitHub macOS CI passed on this commit; the Apple Silicon Swift tests job completed successfully. No real-account or native UI smoke is included."
   },
   "current_local_slice": {
-    "commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-    "parent_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
-    "push": "success; verified on GitHub main",
-    "focused_test": "delayedClosedAccountCleanupCannotOverrideNewerSelection PASS 1/1; AppKit and test targets compiled",
-    "exact_source_ci": "PASS 179/179; run 38561302832",
-    "canonical_dev_app": "CUA freshly confirms the app is running; Info.plist identifies its bundle source as 92b8ca3. Accessibility shows the protected API hash setup dialog. Field value not read or changed; CUA did not expose a PID.",
+    "commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "parent_source_commit": "5239471ac621040b76aa1b44221824ffca942e73",
+    "push": "success; exact origin/main verified",
+    "local_build": "PASS AppKit SwiftPM target compile; git diff --check PASS",
+    "exact_source_ci": "not reported yet; old run 38561302832 is for prior source 41b3378 and does not apply",
+    "canonical_dev_app": "CUA confirms prior source 92b8ca3 remains running on protected API-hash dialog. Cmd+Q did not close it. No secret field contents observed or changed.",
     "real_account": "not used"
   },
   "latest_site_deployment": {
@@ -715,7 +716,7 @@
     "verified": "Canonical app is running and its installed bundle source is 92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f. The secure API hash field and Save/Cancel controls are present.",
     "not_verified": "Secure field contents or whether it matches the intended app credential; app API credential saved state; real Telegram login or account behavior; current process PID."
   },
-  "next_action": "CUA freshly confirms the canonical Dev.app is running prior source 92b8ca3 on the protected API hash setup dialog; field value was not read or changed. The owner must save or cancel in the app, then close it. Build the same canonical bundle once from source 41b33783fdd8db9. Exact-source CI for that source is already recorded as 179/179; do not rerun unchanged tests. Fresh Developer ID inventory is 0; notarization credentials unverified; no public app release/download. Keep Site v194 unchanged.",
+  "next_action": "The exact-source CI for 44c999dee5c866f03272404e7d14965509fdefa6 passed (run 38563635904); do not rerun it. The owner should finish or discard the protected API-hash setup dialog and close NeTelegram Dev. Then build /private/tmp/NeTelegram-Dev.app once from 44c999d, verify BuildInfo and perform one named native visual smoke. Real account login is still user-operated. Developer ID identity count is 0 and notarization credentials are unverified, so no public app release/download. Keep Site v194 unchanged.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -745,47 +746,33 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "990f97ae9d4f68e1f870e9e2023848e2abd44226",
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
     "branch": "main",
-    "working_tree": "app source clean at exact published SHA; checkpoint metadata update pending",
-    "local_tests": "Layout-only slice: AppKit build, ad-hoc signature verification, native compact preview passed; no local core suite run.",
-    "hosted_validation": "Exact-source GitHub macOS CI 38552967052 passed Swift tests and pinned TDLib/Dev.app jobs.",
+    "working_tree": "source clean and exact origin/main verified",
+    "local_tests": "No behavioral suite run for presentation-only slice; AppKit executable target compiled. git diff --check passed.",
+    "hosted_validation": "Exact-source GitHub macOS CI passed; run 38563635904 for source 44c999d. Native Dev.app visual smoke pending.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "990f97ae9d4f68e1f870e9e2023848e2abd44226",
-      "dirty_source": false,
-      "distribution_ready": false,
+      "application_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
       "path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "990f97ae9d4f68e1f870e9e2023848e2abd44226",
-      "source_fingerprint_sha256": "21f77c5911ebe4f8d5ce60761d477ee473dbcde42d4eb8fd80c399c86242dc2a",
-      "executable_sha256": "3183b4aad84542bf9aa0a13e9e3d9ddbd733432a4b0bf4161b4c5099a9725b9a",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "b511369d78ea8d6c0b7dd4096f5ed040f90730e251e6e8e1ec088df767dd1ff9",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Exact clean source 990f97ae built into canonical Dev.app and launched. CUA confirmed adaptive split workspace at 760x600 with explicit no-account state; no Telegram accounts, credentials, or profiles were used.",
-      "scope": "Native accountless shell launch and screenshot/accessibility-tree inspection. GitHub exact-source macOS CI passed (run 38552967052). No authenticated chat, VoiceOver interaction, real account, or 20-runtime certification.",
-      "build_record_sha256": "484d9ff87523cc93b7ffd6b91a52a033f74dacbedffd5807e267e9ad36416a0b",
-      "process_state": "Canonical Dev.app running in DEBUG compact preview; no account connected."
-    },
-    "date": "2026-10-14"
+      "status": "Running prior bundle source 92b8ca3 on protected API-hash setup dialog; no save/cancel action taken; candidate 44c999d not bundled or visually checked.",
+      "pending_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6"
+    }
   },
   "latest_acceptance_slice": {
-    "id": "APP29c logout failure status remains account scoped",
-    "source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-    "local_focused_test": "delayedClosedAccountCleanupCannotOverrideNewerSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests.",
+    "id": "CHATLIST01 native conversation row design",
+    "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "local_focused_test": "No behavioral test was needed for the presentation-only slice; SwiftPM AppKit target compile passed.",
     "hosted_ci": {
-      "run_id": 38561302832,
+      "run_id": 38563635904,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38561302832",
-      "workflow_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-      "app_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-      "scope": "Exact-source macOS arm64 CI passed 179/179 on macOS 15.7.9 / Xcode 27 / Swift 6.4."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38563635904",
+      "workflow_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "scope": "Exact-source GitHub macOS CI passed on this commit; the Apple Silicon Swift tests job completed successfully. No real-account or native UI smoke is included."
     },
-    "scope": "The unexpected pre-confirmation close status now checks the account selection revision before changing global window status. The same revision regression exercises account-switch invalidation; it is a focused policy check plus exact-source compile/CI, not native TDLib logout integration."
+    "scope": "TDLib-backed native rows. Synthetic and real-account acceptance is unchanged; no real Telegram identities used."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -863,5 +850,11 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "APP29c logout failure status remains account scoped — focused regression 1/1 and exact-source GitHub CI 179/179 passed; Dev.app is still open on its protected API hash dialog."
+  "phase": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source GitHub CI passed; native visual smoke waits for the protected API-hash dialog to be safely resolved.",
+  "latest_local_build": {
+    "date": "2026-10-14",
+    "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-design SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-design swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-design-5239471",
+    "result": "PASS; 4.80s incremental after cache warming. Initial attempt was blocked by sandboxed cache path; rerun with Xcode build permission and cache redirected to /private/tmp passed. No Dev.app bundle was replaced or launched."
+  }
 }
