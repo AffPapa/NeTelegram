@@ -396,14 +396,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountPicker.isHidden = true
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
-        accountPicker.setAccessibilityLabel("Локальный профиль и статус входа")
-        accountPicker.setAccessibilityHelp("Это профили, созданные внутри NeTelegram на этом Mac. Сессии и файлы других Telegram-приложений не импортируются.")
+        accountPicker.setAccessibilityLabel("Аккаунты NeTelegram и статус входа")
+        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в NeTelegram на этом Mac. Сессии других приложений не импортируются.")
 
-        accountProfileHint = NSTextField(wrappingLabelWithString: "Локальные профили NeTelegram на этом Mac. Сессии из других приложений не импортируются.")
+        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в NeTelegram отдельно. Сессии других приложений не используются.")
         accountProfileHint.font = .systemFont(ofSize: 11)
         accountProfileHint.textColor = .secondaryLabelColor
         accountProfileHint.maximumNumberOfLines = 2
-        accountProfileHint.setAccessibilityLabel("О профилях NeTelegram")
+        accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.target = self
@@ -1758,9 +1758,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         secureInputField.stringValue = ""
         firstNameField.stringValue = ""
         lastNameField.stringValue = ""
-        loginHeading.stringValue = "Локальный профиль"
-        loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные предыдущего профиля скрыты."
-        statusLabel.stringValue = "Открываю профиль \(profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1)…"
+        let accountNumber = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
+        loginHeading.stringValue = "Вход NeTelegram \(accountNumber)"
+        loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные другого аккаунта скрыты."
+        statusLabel.stringValue = "Открываю вход \(accountNumber)…"
         window.title = identifiedWindowTitle(ProductIdentity.displayName)
     }
 
@@ -2629,7 +2630,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
             if target.takeLogoutFailureNotice() {
                 if let client = target.route?.client.value { pendingClosures.remove(client) }
-                setStatus("Telegram не подтвердил выход. Локальный профиль и данные сохранены; проверьте сеть и повторите позже.")
+                setStatus("Telegram не подтвердил выход. Локальная запись аккаунта и данные сохранены; проверьте сеть и повторите позже.")
                 refreshAccountPicker()
                 refreshStatusMenu()
             }
@@ -7113,7 +7114,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authCard.isHidden = true
         accountPicker.isHidden = true
         addAccountButton.isHidden = true
-        accountProfileHint.stringValue = "Предпросмотр интерфейса без подключённых аккаунтов."
+        accountProfileHint.stringValue = "Предпросмотр интерфейса без входа в аккаунт."
         accountProfileHint.isHidden = false
         conversationTitleLabel.stringValue = "Выберите чат"
         chatStatusLabel.stringValue = "Предпросмотр макета · аккаунты не подключены"

@@ -1019,13 +1019,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         unverifiedRemovalPending: true
     )
 
-    #expect(firstPending == "Профиль NeTelegram 1 — ожидает номер")
-    #expect(secondPending == "Профиль NeTelegram 2 — ожидает код")
-    #expect(verified == "Test User · профиль 3 — подключён")
-    #expect(networkUpdatePending == "Test User · профиль 3 — подключён · ожидает обновление сети")
-    #expect(closedBackgroundProfile == "Test User · профиль 3 — ошибка")
-    #expect(logoutCleanup == "Test User · профиль 4 — очистка после выхода ожидает")
-    #expect(removalCleanup == "Профиль NeTelegram 5 — удаление незавершённого входа ожидает")
+    #expect(firstPending == "Вход NeTelegram 1 — ожидает номер")
+    #expect(secondPending == "Вход NeTelegram 2 — ожидает код")
+    #expect(verified == "Test User · аккаунт 3 — подключён")
+    #expect(networkUpdatePending == "Test User · аккаунт 3 — подключён · ожидает обновление сети")
+    #expect(closedBackgroundProfile == "Test User · аккаунт 3 — ошибка")
+    #expect(logoutCleanup == "Test User · аккаунт 4 — очистка после выхода ожидает")
+    #expect(removalCleanup == "Вход NeTelegram 5 — удаление незавершённого входа ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
