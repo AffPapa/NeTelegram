@@ -10,7 +10,7 @@ surface.
 
 ## Apple platform review
 
-Reviewed Apple's current guidance for [designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/), [windows](https://developer.apple.com/design/human-interface-guidelines/windows), [layout](https://developer.apple.com/design/human-interface-guidelines/layout), [color](https://developer.apple.com/design/human-interface-guidelines/color), and [focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection/). For this AppKit client, the applied rules are:
+Reviewed Apple's current guidance for [designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/), [windows](https://developer.apple.com/design/human-interface-guidelines/windows), [layout](https://developer.apple.com/design/human-interface-guidelines/layout), [text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields), [buttons](https://developer.apple.com/design/human-interface-guidelines/buttons), [typography](https://developer.apple.com/design/human-interface-guidelines/typography), [color](https://developer.apple.com/design/human-interface-guidelines/color), [Dark Mode](https://developer.apple.com/design/human-interface-guidelines/dark-mode), and [accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility). For this AppKit client, the applied rules are:
 
 - Keep normal window chrome and native controls so active/inactive, light/dark,
   focus-ring, keyboard, and system accessibility appearances remain platform
@@ -25,15 +25,21 @@ Reviewed Apple's current guidance for [designing for macOS](https://developer.ap
 - Use system font styles and labels, preserve keyboard focus and full keyboard
   access, and make controls understandable without color. Screen-reader speech
   and real IME interaction still require native-user verification.
+- Keep helper text in a readable system text size and semantic color; do not
+  lower contrast with fixed gray values. Give each step one clear instruction,
+  retain a separate status line only when it communicates new progress or an
+  error, and keep secure input in `NSSecureTextField`.
 
-Review of the current accountless screenshot found that country search and the
-country menu each consumed a full row, while the status repeated the subtitle's
-instructions. The login form now places the searchable country field and native
-country menu side by side on the same 360 pt grid, with the phone field below;
-the status identifies the selected/suggested region briefly. The phone value,
-TDLib request, and country-selection policy are unchanged. This is a focused
-layout correction, not a claim that authenticated conversation screens have
-passed visual review.
+Review of the current accountless screen found that country search and the
+country menu each consumed a full row, and the code/2FA preview repeated the
+subtitle's instruction as a second status line. The login form now places the
+searchable country field and native country menu side by side on the same 360 pt
+grid, with the phone field below; the status identifies the selected/suggested
+region briefly. Authorization status is hidden only when it exactly repeats
+the visible subtitle; distinct progress and error messages remain visible. The
+phone value, TDLib request, and country-selection policy are unchanged. This is
+a focused layout correction, not a claim that authenticated conversation
+screens have passed visual review.
 
 ## Useful interaction structure
 

@@ -6842,9 +6842,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func showAuthInput(_ message: String, placeholder: String, button: String) {
         setAuthCardVisible(true)
         phoneField.stringValue = ""
-        setStatus(message)
         loginHeading.stringValue = pendingAuthorizationType == "authorizationStateWaitCode" ? "Введите код" : "Подтверждение входа"
         loginSubtitle.stringValue = message
+        setStatus(message)
         registrationTermsScroll.isHidden = true
         countryPickerStack.isHidden = true
         phoneField.isHidden = true
@@ -7307,6 +7307,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func setStatus(_ value: String) {
         statusLabel?.stringValue = value
+        // Authorization instructions already appear in the subtitle. Keep the
+        // status row only for distinct progress, validation, and error text.
+        statusLabel?.isHidden = authCard?.isHidden == false && value == loginSubtitle?.stringValue
         chatStatusLabel?.stringValue = value
     }
 
