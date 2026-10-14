@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "APP26 typed forum search navigation preserves account and topic identity: focused regression 1/1, local serial suite 172/172, exact-source GitHub macOS CI passed, Site v185 live; native search and real account remain unverified.",
+  "status": "APP26 typed forum search navigation preserves account and topic identity: focused regression 1/1, local serial suite 172/172, exact-source GitHub macOS CI passed; public Site v186 live. Native search and real account remain unverified.",
   "current_evidence": {
     "app_source_commit": "7683cc6bace702b3376a08a9a2aaf4aaf881a691",
     "local_suite": "PASS 172/172 serial macOS Swift suite in 0.471s on arm64e / Xcode beta / Swift 6.4; AppKit executable target compiled.",
