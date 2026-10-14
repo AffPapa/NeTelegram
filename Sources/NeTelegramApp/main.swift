@@ -2714,13 +2714,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         && runtimesByClient[update.route.client.value] === target
                 }
             ) else { return }
-            if target === runtime,
-               !lockState,
-               target.mainChatLoadRevision != previousMainChatLoadRevision {
+            if target.mainChatLoadRevision != previousMainChatLoadRevision {
                 chatListPaginationPolicy.pageDidComplete(for: target.account)
-                refreshChatList()
-                if target.mainChatListLoadState == .loaded {
-                    DispatchQueue.main.async { [weak self] in self?.evaluateChatListPagination() }
+                if target === runtime, !lockState {
+                    refreshChatList()
+                    if target.mainChatListLoadState == .loaded {
+                        DispatchQueue.main.async { [weak self] in self?.evaluateChatListPagination() }
+                    }
                 }
             }
             if previousTelegramUserID != nil,
