@@ -1,25 +1,25 @@
 {
   "schema_version": 2,
-  "status": "AUTH-FORM-APPLE-HIG-14: native AppKit phone sign-in form aligned and initial focus corrected.",
+  "status": "APP28-PROD-CALLBACK-01: production update reduction and post-await ownership validation now share one tested seam.",
   "current_evidence": {
-    "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-    "local_suite": "UI-only AppKit change: canonical Swift build and real accountless UI/AX smoke passed; no new unit test was added. Exact-source macOS CI and pinned native app workflow passed for 6a0b7bf.",
-    "focused_test": "No new unit test for a UI-only layout edit. `git diff --check` passed; canonical Dev.app compiled from clean source and the actual accountless window was visually and accessibility-tree checked.",
+    "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+    "local_suite": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "focused_test": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
     "hosted_ci": {
-      "run_id": 38629446608,
+      "run_id": 38630779359,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446608",
-      "workflow_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "scope": "Exact-source macOS serial Swift CI passed for the AppKit sign-in layout change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
     },
     "native_workflow_ci": {
-      "run_id": 38629446622,
+      "run_id": 38630779299,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446622",
-      "workflow_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict bundle verification passed for this exact source commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -36,9 +36,10 @@
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request. Strict ad-hoc codesign verification passed; not a release signature."
+      "smoke": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request. Strict ad-hoc codesign verification passed; not a release signature. Pending source 468ab74 changes only the callback ownership seam; canonical app replacement is deferred while its process is running.",
+      "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
     },
-    "scope": "AppKit sign-in layout, keyboard focus, accountless rendering and exact-source CI only. No account, Keychain value, credential, or Telegram request was accessed.",
+    "scope": "APP28 runtime callback isolation: production consume-then-check seam, deterministic suspended identity-persistence regression, exact-source CI, and hosted pinned Dev.app assembly. Local canonical bundle remains at 6a0b7bf because PID 49828 is still running; no login, Keychain value read, real account, or Telegram request.",
     "latest_site_deployment": {
       "date": "2026-10-15",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -64,7 +65,15 @@
       "saved_archive_file_count": 14,
       "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
     },
-    "source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581"
+    "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+    "exact_source_ci": {
+      "run_id": 38630779359,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+    }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -527,7 +536,8 @@
       "method": "Core route-ownership regression plus production call-site audit, exact-source CI and accountless native build smoke",
       "required_for": "all-active account isolation",
       "status": "partial",
-      "evidence": "RuntimeCoordinator.isCurrent(_:) checks the exact registered route. AppDelegate.receive now rechecks that route and client ownership immediately after await target.consume(object), before its UI/notification/account-state side effects. asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement passed 1/1; full serial suite passed 176/176; exact-source macOS CI 38545776110 succeeded; canonical Dev.app from cea9864 launched once and showed accountless auth UI. Synthetic route replacement only: no deterministic test blocks the AppDelegate identity persistence await while replacing the live runtime, and no real Telegram login or 20-account runtime coverage is available. On exact source 4e27791, `RuntimeUpdateOwnership` now performs the production post-await coordinator-then-local-owner guard. Deterministic test `callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed locally 1/1; exact-source macOS CI run 38565962163 passed. The test models the interleaving only; real TDLib/AppDelegate session and 20-account integration remain unverified."
+      "evidence": "RuntimeCoordinator.isCurrent(_:) checks the exact registered route. AppDelegate.receive now rechecks that route and client ownership immediately after await target.consume(object), before its UI/notification/account-state side effects. asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement passed 1/1; full serial suite passed 176/176; exact-source macOS CI 38545776110 succeeded; canonical Dev.app from cea9864 launched once and showed accountless auth UI. Synthetic route replacement only: no deterministic test blocks the AppDelegate identity persistence await while replacing the live runtime, and no real Telegram login or 20-account runtime coverage is available. On exact source 4e27791, `RuntimeUpdateOwnership` now performs the production post-await coordinator-then-local-owner guard. Deterministic test `callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed locally 1/1; exact-source macOS CI run 38565962163 passed. The test models the interleaving only; real TDLib/AppDelegate session and 20-account integration remain unverified. Current source 468ab74 extracts the production-used sequence `await consume -> coordinator route recheck -> MainActor local-owner check` into `RuntimeUpdateOwnership.consumeThenCheck`; AppDelegate.receive and the gated replacement-generation regression both use this seam. Focused local test passed 1/1 and compiled NeTelegramApp; exact-source CI 38630779359 and pinned TDLib/native workflow 38630779299 passed. A separate process guard confirmed the sole canonical local Dev.app is still running at PID 49828 on source 6a0b7bf, so it was not replaced. This still does not prove physical AppDelegate/TDLib behavior, authorized sessions, or 20-account resource use.",
+      "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
     },
     {
       "id": "APP29",
@@ -579,18 +589,18 @@
     }
   ],
   "last_verification": {
-    "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-    "source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
+    "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+    "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
     "date": "2026-10-15",
-    "hosted_ci_run_id": 38629446608,
+    "hosted_ci_run_id": 38630779359,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446608",
-    "native_workflow_run_id": 38629446622,
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
+    "native_workflow_run_id": 38630779299,
     "native_workflow_status": "success",
-    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446622",
-    "local_command": "Scripts/dev-app.sh --launch",
-    "local_result": "Clean canonical Dev.app build, strict ad-hoc signature verification, and accountless sign-in screenshot/AX smoke passed. No user authentication or Keychain read.",
-    "scope": "Dark appearance/accountless auth only. No VoiceOver speech, light appearance, IME/RTL, real login, authenticated chat, or 20-account verification."
+    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
+    "local_command": "`CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1",
+    "local_result": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "scope": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
   },
   "current_local_slice": {
     "id": "AUTH-FORM-APPLE-HIG-12",
@@ -674,7 +684,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "The most recent non-value presence check recorded the configured NeTelegram API-hash item as absent; this turn did not query the real Keychain. Owner must enter a fresh/current API hash in NeTelegram secure settings before user-operated login/read/send/logout. Keep 20-account runtime, authenticated UI, Telegram compatibility, Developer ID/notarization, signed release, and live downloads open.",
+  "next_action": "The canonical /private/tmp/NeTelegram-Dev.app remains open at PID 49828 on source 6a0b7bf; do not replace it while running. After any open secure-entry dialog is saved or canceled and the app is quit normally, rebuild that single canonical bundle from 468ab74 and perform accountless smoke. Continue real login only after the owner enters a fresh/current API hash in secure settings; keep real accounts, 20-runtime measurements, compatibility, Developer ID/notarization and release gates open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -734,50 +744,42 @@
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request."
-    }
+      "smoke": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request.",
+      "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
+    },
+    "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-FORM-APPLE-HIG-14",
-    "source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-    "change": "Applied current Apple macOS guidance to the accountless sign-in window: consolidated country search and native country picker into one aligned row; removed the user-specific macOS-region hint in favor of neutral number-format guidance; made phone entry the initial keyboard focus because a full international number does not require a country selection; reduced the default window height to 560 pt. Existing AppKit controls, explicit country selection, semantic system colors, authentication policy, and non-affiliation note remain.",
-    "focused_test": "No new unit test for a UI-only layout edit. `git diff --check` passed; canonical Dev.app compiled from clean source and the actual accountless window was visually and accessibility-tree checked.",
+    "id": "APP28-PROD-CALLBACK-01",
+    "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+    "change": "Added production-used `RuntimeUpdateOwnership.consumeThenCheck`: it awaits account update reduction, rechecks coordinator route, then validates MainActor-local runtime ownership before AppDelegate performs UI, notification, or account-state side effects. AppDelegate.receive uses this exact seam; the deterministic suspended identity-persistence regression also uses it and verifies a replacement generation blocks effects. No authentication, route fallback, identity, or TDLib behavior changed.",
+    "focused_test": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
     "hosted_ci": {
-      "run_id": 38629446608,
+      "run_id": 38630779359,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446608",
-      "workflow_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "scope": "Exact-source macOS serial Swift CI passed for the AppKit sign-in layout change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
     },
     "exact_source_ci": {
-      "run_id": 38629446608,
+      "run_id": 38630779359,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446608",
-      "workflow_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "scope": "Exact-source macOS serial Swift CI passed for the AppKit sign-in layout change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
     },
     "native_workflow": {
-      "run_id": 38629446622,
+      "run_id": 38630779299,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38629446622",
-      "workflow_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict bundle verification passed for this exact source commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
+      "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
     },
-    "native_smoke": {
-      "date": "2026-10-15",
-      "app_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "dbd35d733dca519973a03e8e6caa90c8ebb7f5c191aaef378c1d75802b4a0930",
-      "executable_sha256": "bad8b4988049aa63e7bc4e11d7e6febe879dbd96391a01ca4c5c14e6181dce8f",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "result": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request. Strict ad-hoc codesign verification passed; not a release signature.",
-      "scope": "Accountless sign-in screen only, dark appearance, native screenshot and AX. No login or Telegram network request. Light appearance, VoiceOver speech, IME/RTL, authenticated chat, and 20-runtime operation remain unverified."
-    },
-    "coverage_limit": "Dark appearance/accountless auth only. No VoiceOver speech, light appearance, IME/RTL, real login, authenticated chat, or 20-account verification."
+    "native_smoke": null,
+    "coverage_limit": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
