@@ -51,6 +51,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var authCard: AuthenticationCardView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
+    /// Latest account the user asked to see, including one still starting.
+    /// Background startup completion must not replace this selection.
+    private var selectedAccountIntent: AccountUUID?
     private var gateway: TDLibGateway?
     private var updatePipeline: TDLibUpdatePipeline?
     private var tdlibReceiveFailed = false
@@ -1178,6 +1181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let index = accountPicker.indexOfSelectedItem
         guard accountPickerAccounts.indices.contains(index) else { return }
         let account = accountPickerAccounts[index]
+        selectedAccountIntent = account
         if let profile = knownProfilesByAccount[account], profile.unverifiedRemovalPending == true {
             if let target = runtimesByAccount[account] {
                 if target.requestUnverifiedProfileRemoval() {
@@ -1195,6 +1199,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         guard let selected = runtimesByAccount[account] else {
+            if profileStartupTasks[account] != nil || profileOpenRequests.contains(account) {
+                prepareToSelectUnopenedProfile(account)
+                return
+            }
             retryOpeningProfile(account)
             return
         }
@@ -1210,6 +1218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func presentRuntime(_ selected: LocalAccountRuntime) {
+        selectedAccountIntent = selected.account
         runtime = selected
         closedProfileToRetry = nil
         actionButton.target = self
@@ -2210,7 +2219,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             runtimesByClient[route.client.value] = runtime
             runtimesByAccount[profile.id] = runtime
             refreshStatusMenu()
-            let presentsThisRuntime = select || self.runtime == nil
+            let presentsThisRuntime = AccountPresentation.shouldPresentStartupRuntime(
+                account: profile.id,
+                explicitlySelected: select,
+                selectedAccountIntent: selectedAccountIntent,
+                hasPresentedRuntime: self.runtime != nil
+            )
             if presentsThisRuntime { self.runtime = runtime }
             if updatePipeline == nil {
                 let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)

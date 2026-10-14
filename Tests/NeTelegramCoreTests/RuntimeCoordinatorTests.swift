@@ -1671,6 +1671,43 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
 }
 
+@Test func lateBackgroundStartupCannotStealNewerAccountSelection() {
+    let first = AccountUUID()
+    let second = AccountUUID()
+    let third = AccountUUID()
+
+    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+        account: first,
+        explicitlySelected: false,
+        selectedAccountIntent: second,
+        hasPresentedRuntime: false
+    ), "A finishing restore must leave the selected account's startup view in place")
+    #expect(AccountPresentation.shouldPresentStartupRuntime(
+        account: second,
+        explicitlySelected: false,
+        selectedAccountIntent: second,
+        hasPresentedRuntime: false
+    ), "The account currently selected while starting becomes the visible runtime")
+    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+        account: first,
+        explicitlySelected: true,
+        selectedAccountIntent: third,
+        hasPresentedRuntime: true
+    ), "An older explicit startup request cannot override a later account selection")
+    #expect(AccountPresentation.shouldPresentStartupRuntime(
+        account: first,
+        explicitlySelected: false,
+        selectedAccountIntent: nil,
+        hasPresentedRuntime: false
+    ), "The first runtime may initialize the window when no account was selected")
+    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+        account: first,
+        explicitlySelected: false,
+        selectedAccountIntent: nil,
+        hasPresentedRuntime: true
+    ), "A background startup cannot replace an already visible runtime")
+}
+
 @Test func cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable() async {
     let scheduler = RuntimeStartupScheduler(parallelism: 1)
     let activeStartup = AsyncTestGate()

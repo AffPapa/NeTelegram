@@ -63,7 +63,7 @@ jobs:
         # serial suite. This distinguishes a runner startup stall from a later
         # suite stall and validates the changed contract on the hosted toolchain.
         timeout-minutes: 2
-        run: swift test --no-parallel --verbose --filter restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers
+        run: swift test --no-parallel --verbose --filter lateBackgroundStartupCannotStealNewerAccountSelection
 
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output
