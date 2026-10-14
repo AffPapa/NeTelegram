@@ -1611,3 +1611,11 @@
 - Source `936c2cf2e09b00e3b0c8e5a8421de07544bdb2de` was pushed once to `AffPapa/NeTelegram/main`. Exact-source macOS CI [38600662118](https://github.com/AffPapa/NeTelegram/actions/runs/38600662118) passed.
 - One canonical `/private/tmp/NeTelegram-Dev.app` built after CI in 5.50 s; BuildInfo records arm64/macOS 14, Swift 6.4 and pinned TDLib `c15d3f5a5de6e3ba5839822c451152e5e18bb700`. Fingerprint `0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d`; executable SHA-256 `7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`. Strict ad-hoc `codesign --verify --deep --strict` passed. CUA title `NeTelegram · dev 936c2cf2`; screenshot and AX show the new layout; Tab order search → country picker → phone passed. No account or credentials used.
 - Limits: visual review covers only the accountless phone-entry screen. Authenticated message screens, native VoiceOver speech, RTL/IME interaction and live login remain unverified. Public Site stays at v194 and has no download; no release gates changed.
+
+## 2026-10-14 — AUTH-UI-DESIGN-03: Apple HIG auth refinement
+
+- Reviewed Apple HIG for macOS windows/layout, text fields, buttons, typography, semantic color, Dark Mode and accessibility; Telegram Desktop source reviewed for flow hierarchy only. No upstream implementation/assets copied.
+- Removed duplicate instructional text from authorization code/2FA screens by hiding status only when it exactly equals the current subtitle; independent phone guidance, progress/errors and fake-QR preview status remain. Updated `docs/TELEGRAM-DESKTOP-DESIGN-RESEARCH.md`.
+- Added `Sources/**` trigger to the pinned TDLib/Dev.app workflow so AppKit source edits get a native bundle build.
+- Source `45a5451cb614202989ccc3a3981f539eadf0d7fb` pushed to `main`; exact macOS CI 38602110387 passed 187/187; pinned native build 38602110256 passed. One canonical arm64 Dev.app rebuilt (5.48s), strict ad-hoc signature verification passed; CUA inspected phone/code/2FA/QR/registration with no credentials or account.
+- Local `swift test` could not enter compilation because the sandbox rejected `sandbox_apply`; exact hosted suite is the test evidence. Real auth, authenticated UI, VoiceOver speech, RTL/IME and all-20 runtime remain unverified. Site/release unchanged.

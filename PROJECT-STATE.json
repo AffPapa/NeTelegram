@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "AUTH-UI-DESIGN-02: Apple HIG review completed; country lookup and selection now share one row; exact-source CI and canonical arm64 accountless visual/AX smoke passed. Authenticated screens, VoiceOver speech and real account behavior remain unverified.",
+  "phase": "AUTH-UI-DESIGN-03: Apple HIG-aligned auth cleanup; duplicate code/2FA status removed; exact-source CI 187/187 and one canonical arm64 Dev.app build/smoke passed. Authenticated screens and real account use remain unverified.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de"
+    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38600662118,
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-      "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
     },
     "published_application_releases": [],
     "github_access": {
@@ -125,19 +125,19 @@
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
+    "application_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d",
-    "executable_sha256": "7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0",
+    "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+    "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical bundle built once after exact-source CI. CUA title NeTelegram · dev 936c2cf2; screenshot shows inline searchable country/code and country picker, aligned phone field, concise status, Continue and QR actions. AX labels present; keyboard Tab order search → country picker → phone verified. No credentials/account used."
+    "smoke": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used."
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -338,7 +338,7 @@
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Continue the implementation from exact app source 936c2cf2, one bounded app slice at a time. Reuse canonical Dev.app currently on that SHA; do not rebuild unchanged source. Actual VoiceOver speech and Telegram auth require owner-operated input; do not handle credentials. No app download before real-account/runtime, Telegram policy, Developer ID and notarization gates pass.",
+  "next_action": "Continue from exact app source 45a5451, one bounded slice at a time. Reuse this canonical Dev.app until application source changes. Next product blocker is owner-operated Telegram auth for real login/read/send; do not inspect or import sessions. No app download before real-account/runtime, Telegram policy, Developer ID and notarization gates pass.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -555,38 +555,52 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-UI-DESIGN-02",
-    "source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "change": "Country lookup/search and the native country menu now share one horizontal row; status wording no longer repeats the title/subtitle. AppKit semantics and TDLib auth flow unchanged.",
-    "focused_test": "Not run for this constraint/copy-only change; exact-source full macOS CI passed.",
+    "id": "AUTH-UI-DESIGN-03",
+    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
+    "focused_test": "No AppKit unit test added; native CUA preview checked phone/code/2FA/QR/registration and AX. Local swift test could not start because the sandbox rejected sandbox_apply; exact-source hosted suite passed 187/187.",
     "hosted_ci": {
-      "run_id": 38600662118,
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-      "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
     },
     "exact_source_ci": {
-      "run_id": 38600662118,
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-      "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
+    },
+    "native_workflow": {
+      "run_id": 38602110256,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110256",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed; native workflow now also triggers for Sources/**. Hosted build artifact is development evidence only."
     },
     "native_smoke": {
-      "date": "2026-10-14",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d",
-      "executable_sha256": "7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0",
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "version": "0.0.0-dev",
+      "application_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "dirty_source": false,
+      "distribution_ready": false,
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+      "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "Canonical bundle built once after exact-source CI. CUA title NeTelegram · dev 936c2cf2; screenshot shows inline searchable country/code and country picker, aligned phone field, concise status, Continue and QR actions. AX labels present; keyboard Tab order search → country picker → phone verified. No credentials/account used.",
-      "scope": "Accountless phone-entry screen, layout, AX labels and keyboard focus order only; no Telegram authentication or authenticated chat surfaces."
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used."
     },
-    "coverage_limit": "Accountless layout/AX/keyboard smoke only; authenticated screens, VoiceOver speech, RTL/IME and real-account behavior remain unverified.",
+    "coverage_limit": "Accountless visual/AX preview only. Real login, authenticated screens, VoiceOver speech, RTL/IME and real account/runtime behavior remain unverified.",
     "status": "partial"
   },
   "latest_auth05": {
@@ -644,11 +658,11 @@
   },
   "latest_native_ui_review": {
     "date": "2026-10-14",
-    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
-    "window_title": "NeTelegram · dev 44c999de",
-    "method": "CUA native accessibility tree; no screenshot capture.",
-    "result": "Phone-login UI exposes country search/picker, phone entry, Continue, QR alternative and independent-client disclosure. No synthetic account/profile appears.",
-    "limits": "No real auth, real conversation row, resizing, dark appearance, or VoiceOver interaction verified."
+    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "window_title": "NeTelegram · auth preview phone/code/password/qr/registration",
+    "method": "CUA native screenshots and accessibility tree on canonical Dev.app.",
+    "result": "Phone screen retains distinct region guidance; code and 2FA show each instruction once; QR retains its distinct local-preview status; registration controls remain accessible in AX.",
+    "limits": "Preview is accountless and cannot prove auth, protected real QR behavior, light/dark/increased contrast, VoiceOver speech, RTL/IME or authenticated layout."
   },
   "latest_release_artifact_guards": {
     "date": "2026-10-14",
@@ -734,13 +748,17 @@
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
     "upstream_ref": "dev",
     "upstream_commit": "d77f486228a98e15d6695514d5f2b28ce1c6a872",
-    "summary": "Rechecked current AppKit auth screenshot against Apple HIG for macOS, windows, layout, semantic color, and focus/selection. Retain native window/control behavior, system typography/colors and Auto Layout. Fixed duplicate vertical country-search/menu rows and redundant instructional status. Telegram Desktop remains a flow/hierarchy reference only; no third-party code or assets copied. Authenticated message views remain unreviewed because no account is available.",
+    "summary": "Reviewed Apple HIG for macOS, windows, layout, text fields, buttons, typography, semantic color, Dark Mode and accessibility. Kept native AppKit, system colors/typography and centered constrained layout; removed duplicate auth status. Telegram Desktop remains a hierarchy reference only; no code/assets copied. Authenticated views remain unreviewed without a real account.",
     "apple_hig_sources": [
       "https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/",
       "https://developer.apple.com/design/human-interface-guidelines/windows",
       "https://developer.apple.com/design/human-interface-guidelines/layout",
+      "https://developer.apple.com/design/human-interface-guidelines/text-fields",
+      "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "https://developer.apple.com/design/human-interface-guidelines/typography",
       "https://developer.apple.com/design/human-interface-guidelines/color",
-      "https://developer.apple.com/design/human-interface-guidelines/focus-and-selection/"
+      "https://developer.apple.com/design/human-interface-guidelines/dark-mode",
+      "https://developer.apple.com/design/human-interface-guidelines/accessibility"
     ],
     "github_reference": "https://github.com/telegramdesktop/tdesktop"
   },
@@ -765,37 +783,37 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "AUTH-UI-01",
-    "commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-    "push": "Pushed once to AffPapa/NeTelegram main; exact-source CI passed.",
-    "change": "AUTH-UI-01: initial window resized to 760×600 pt; related auth controls share a 360 pt width and consistent axis; vertical gaps express hierarchy; phone/status align to the form edge; the long country hint is concise; independence disclosure uses readable secondary semantic text color. AppKit controls, TDLib auth behavior and keyboard/accessibility names remain intact.",
-    "local_tests": "PASS 2/2 focused country-picker and phone-input tests: countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct; phoneNumberInputRejectsAmbiguousAndMalformedNumbersWithoutSilentMutation.",
-    "hosted_ci": {
-      "run_id": 38597901537,
+    "id": "AUTH-UI-DESIGN-03",
+    "commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "push": "PASS: source pushed to AffPapa/NeTelegram main.",
+    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
+    "local_tests": "No new unit test; local AppKit visual/AX preview checked five accountless auth states. Local swift test unavailable under sandbox; see exact-source CI.",
+    "exact_source_ci": {
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38597901537",
-      "workflow_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-      "app_source_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift test suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
     },
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-      "source_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
+      "application_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "9ce4fab86cd7bc194ba94b6400c0f4c5a0945f97ec9092ad4b1641d0135d0704",
-      "executable_sha256": "e8d51ad923c89443078a5fab94384fb7631e306bd068e804fb6cf78516ed5f6d",
+      "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+      "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA screenshot and accessibility tree verify NeTelegram · dev ae169ecf, compact centered phone-entry form, shared 360 pt control alignment, concise country instruction, stronger secondary-color disclosure; blank phone/QR form and no account data."
+      "smoke": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used."
     },
-    "coverage_limit": "Focused pure country/phone tests and accountless AppKit screenshot/AX review. Real Telegram auth and all-active runtime remain unverified."
+    "coverage_limit": "Accountless visual/AX preview only. Real login, authenticated screens, VoiceOver speech, RTL/IME and real account/runtime behavior remain unverified."
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
@@ -814,26 +832,26 @@
   },
   "latest_committed_ui_change": {
     "date": "2026-10-14",
-    "source_commit": "681b16223c8dc8aba5445bdb0b88bcbbde80cb39",
-    "change": "Call the existing account/generation-deduplicated authorization announcement after the dedicated TDLib QR-confirmation presentation, which previously bypassed the shared authorization-state announcer.",
-    "validation": "Focused authorization announcement test passed; exact-source macOS CI 38599873729 passed; canonical arm64 Dev.app rebuilt once and passed strict ad-hoc signature verification; CUA title/AX matched source SHA.",
+    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
+    "validation": "Exact-source macOS CI run 38602110387 passed 187/187; native pinned TDLib/Dev.app workflow 38602110256 passed; one canonical local arm64 Dev.app rebuilt in 5.48s and strict ad-hoc codesign passed; CUA verified five accountless auth states and absence of repeated status on code/2FA.",
     "publication": "Source pushed to AffPapa/NeTelegram main. No app release or Site deployment."
   },
   "pending_native_candidate": null,
   "latest_pushed_commit": {
     "branch": "main",
-    "sha": "681b16223c8dc8aba5445bdb0b88bcbbde80cb39",
-    "verified": "Pushed once to AffPapa/NeTelegram main; exact-source macOS CI passed.",
+    "sha": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "verified": "Pushed to AffPapa/NeTelegram main; exact-source CI and pinned native bundle workflow passed.",
     "ci_status": "success",
-    "ci_run_id": 38599873729
+    "ci_run_id": 38602110387
   },
   "latest_exact_source_ci": {
-    "run_id": 38600662118,
+    "run_id": 38602110387,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-    "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+    "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
   },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
@@ -844,23 +862,23 @@
   "checkpoint_pointer_policy": "Canonical current Dev.app identity lives at local_development_candidate and mirrors ACCEPTANCE.current_evidence.local_dev_app. App-source SHA, repository checkpoint commit, and public Site v194 are separate. Historical evidence stays in RUN-LOG.md.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "command": "Scripts/dev-app.sh --launch",
-    "result": "PASS: one canonical arm64 Dev.app rebuilt from clean source after exact-SHA CI; strict ad-hoc codesign verification passed.",
-    "source_fingerprint_sha256": "0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d",
-    "executable_sha256": "7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0",
+    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "command": "Scripts/dev-app.sh --launch-auth-layout-preview",
+    "result": "PASS: one canonical arm64 Dev.app rebuilt from clean source after process guard; strict ad-hoc codesign verification passed.",
+    "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+    "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
+    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d",
-    "executable_sha256": "7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0",
+    "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+    "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical bundle built once after exact-source CI. CUA title NeTelegram · dev 936c2cf2; screenshot shows inline searchable country/code and country picker, aligned phone field, concise status, Continue and QR actions. AX labels present; keyboard Tab order search → country picker → phone verified. No credentials/account used.",
-    "scope": "Accountless phone-entry screen, layout, AX labels and keyboard focus order only; no Telegram authentication or authenticated chat surfaces."
+    "result": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used.",
+    "scope": "Accountless native visual/AX preview of phone, code, password, fake QR and registration only; no login or account data."
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
@@ -891,38 +909,60 @@
     "coverage_limit": "Synthetic state-policy tests and accountless native login only; no live chat pagination, profile avatars, messages or 20-account coverage."
   },
   "latest_ui_design_slice": {
-    "id": "AUTH-UI-DESIGN-02",
-    "source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-    "change": "Country lookup/search and the native country menu now share one horizontal row; status wording no longer repeats the title/subtitle. AppKit semantics and TDLib auth flow unchanged.",
-    "focused_test": "Not run for this constraint/copy-only change; exact-source full macOS CI passed.",
+    "id": "AUTH-UI-DESIGN-03",
+    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
+    "focused_test": "No AppKit unit test added; native CUA preview checked phone/code/2FA/QR/registration and AX. Local swift test could not start because the sandbox rejected sandbox_apply; exact-source hosted suite passed 187/187.",
     "hosted_ci": {
-      "run_id": 38600662118,
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-      "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
     },
     "exact_source_ci": {
-      "run_id": 38600662118,
+      "run_id": 38602110387,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38600662118",
-      "workflow_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
+    },
+    "native_workflow": {
+      "run_id": 38602110256,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110256",
+      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed; native workflow now also triggers for Sources/**. Hosted build artifact is development evidence only."
     },
     "native_smoke": {
-      "date": "2026-10-14",
-      "app_source_commit": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "0384f03bc5cd0d2a6fb1c61315b5d7b17db18f0e658e8b638d73446a7aa95f6d",
-      "executable_sha256": "7bd24cc0380d9cf0901e33320475ae1b4650b356f2c6dc58dedba3902d02ccc0",
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "version": "0.0.0-dev",
+      "application_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+      "dirty_source": false,
+      "distribution_ready": false,
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
+      "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "Canonical bundle built once after exact-source CI. CUA title NeTelegram · dev 936c2cf2; screenshot shows inline searchable country/code and country picker, aligned phone field, concise status, Continue and QR actions. AX labels present; keyboard Tab order search → country picker → phone verified. No credentials/account used.",
-      "scope": "Accountless phone-entry screen, layout, AX labels and keyboard focus order only; no Telegram authentication or authenticated chat surfaces."
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used."
     },
-    "coverage_limit": "Accountless layout/AX/keyboard smoke only; authenticated screens, VoiceOver speech, RTL/IME and real-account behavior remain unverified.",
+    "coverage_limit": "Accountless visual/AX preview only. Real login, authenticated screens, VoiceOver speech, RTL/IME and real account/runtime behavior remain unverified.",
     "status": "partial"
+  },
+  "latest_native_workflow_ci": {
+    "run_id": 38602110256,
+    "status": "success",
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110256",
+    "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
+    "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed; native workflow now also triggers for Sources/**. Hosted build artifact is development evidence only."
   }
 }
