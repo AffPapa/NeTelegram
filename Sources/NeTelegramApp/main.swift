@@ -3433,7 +3433,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }.sorted {
                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
             }
-            phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
+            phoneField.placeholderString = "Введите номер"
             populateCountryPicker(preferredRegion: selectedRegion)
             countryPickerStack.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
             updateCountrySuggestion()
@@ -7365,7 +7365,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         emailField.isHidden = true
         firstNameField.isHidden = true
         lastNameField.isHidden = true
-        phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
+        phoneField.placeholderString = "Введите номер"
         setPhoneFieldVisible(true)
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -7441,7 +7441,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 callingCodes: [entry.callingCode]
             )
         }.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
+        phoneField.placeholderString = "Введите номер"
         populateCountryPicker(preferredRegion: selectedCountryRegionCode)
         updateCountrySuggestion()
     }
