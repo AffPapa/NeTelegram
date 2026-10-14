@@ -7309,6 +7309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         statusLabel?.stringValue = value
         // Authorization instructions already appear in the subtitle. Keep the
         // status row only for distinct progress, validation, and error text.
+        // The subtitle is the single source of truth for the current step.
         statusLabel?.isHidden = authCard?.isHidden == false && value == loginSubtitle?.stringValue
         chatStatusLabel?.stringValue = value
     }
