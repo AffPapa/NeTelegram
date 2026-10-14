@@ -4654,6 +4654,32 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     }
 }
 
+@Test func searchResultNavigationKeepsForumTypeAnchorAndAccountIdentity() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    let main = ConversationKey(account: accountA, chatID: 41)
+    let forum = ConversationKey(account: accountA, chatID: 41, topic: .forum(topicID: 12))
+    let thread = ConversationKey(account: accountA, chatID: 41, topic: .thread(messageThreadID: 17))
+    let direct = ConversationKey(account: accountA, chatID: 41, topic: .directMessages(topicID: 23))
+    let saved = ConversationKey(account: accountA, chatID: 41, topic: .savedMessages(topicID: 29))
+    let sameChatInOtherAccount = ConversationKey(account: accountB, chatID: 41, topic: .forum(topicID: 12))
+
+    let mainPlan = SearchResultNavigationPlan(conversation: main, messageID: 99)
+    #expect(mainPlan.conversation == main)
+    #expect(mainPlan.topicSelection == .main)
+    #expect(mainPlan.historyAnchorMessageID == 99)
+    #expect(SearchResultNavigationPlan(conversation: forum, messageID: 100).topicSelection == .forum(topicID: 12))
+    #expect(SearchResultNavigationPlan(conversation: forum, messageID: 100).historyAnchorMessageID == 100)
+    #expect(SearchResultNavigationPlan(conversation: thread, messageID: 101).topicSelection == .typed(.thread(messageThreadID: 17)))
+    #expect(SearchResultNavigationPlan(conversation: direct, messageID: 102).topicSelection == .typed(.directMessages(topicID: 23)))
+    #expect(SearchResultNavigationPlan(conversation: saved, messageID: nil).topicSelection == .typed(.savedMessages(topicID: 29)))
+    #expect(SearchResultNavigationPlan(conversation: saved, messageID: nil).historyAnchorMessageID == nil)
+    #expect(SearchResultNavigationPlan(conversation: forum, messageID: 100) != SearchResultNavigationPlan(
+        conversation: sameChatInOtherAccount,
+        messageID: 100
+    ))
+}
+
 @Test func textSendPermissionRejectsChannelsUnknownSendersTopicsAndPaidOptions() {
     let ordinaryGroup = ChatSendPermission(canSendBasicMessages: true, isChannel: false, defaultSenderTelegramUserID: 123)
     #expect(ordinaryGroup.permitsTextSend(as: 123, topic: .main, paidStars: 0))

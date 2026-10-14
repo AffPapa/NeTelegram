@@ -3784,20 +3784,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard !lockState, let key = sender.identifier?.rawValue,
               let result = searchResultByControlID[key],
               let target = runtimesByAccount[result.account], target.telegramUserID != nil else { return }
-        if let conversation = result.conversation {
+        let navigationPlan = result.conversation.map {
+            SearchResultNavigationPlan(conversation: $0, messageID: result.messageID)
+        }
+        if let plan = navigationPlan {
             // Search results already carry TDLib's typed topic. Keep that exact
             // selection when switching account/chat so history and drafts use
             // the same conversation identity as the result.
-            switch conversation.topic {
+            let chatID = plan.conversation.chatID
+            switch plan.topicSelection {
             case .main:
-                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
-                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
+                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: chatID)
+                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: chatID)
             case .forum(let topicID):
-                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
-                selectedForumTopicIDsByAccount[result.account, default: [:]][conversation.chatID] = topicID
-            case .thread, .directMessages, .savedMessages:
-                selectedConversationTopicsByAccount[result.account, default: [:]][conversation.chatID] = conversation.topic
-                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
+                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: chatID)
+                // The search response may be the first time this chat reaches
+                // the UI. Mark its type before openChat chooses the history
+                // route, or a forum result can fall back to main chat history.
+                forumChatsByAccount[result.account, default: []].insert(chatID)
+                selectedForumTopicIDsByAccount[result.account, default: [:]][chatID] = topicID
+            case .typed(let topic):
+                selectedConversationTopicsByAccount[result.account, default: [:]][chatID] = topic
+                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: chatID)
             }
         }
         searchDebounceTask?.cancel()
@@ -3818,15 +3826,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshAccountPicker(select: target.account)
             showAuthenticatedChatUI()
         }
-        guard let conversation = result.conversation else {
+        guard let plan = navigationPlan else {
             refreshChatList()
             displaySelectedConversation()
             return
         }
-        if let messageID = result.messageID {
-            historyAnchorByConversation[conversation] = messageID
+        if let messageID = plan.historyAnchorMessageID {
+            historyAnchorByConversation[plan.conversation] = messageID
         }
-        openChat(chatID: conversation.chatID, in: target)
+        openChat(chatID: plan.conversation.chatID, in: target)
         refreshChatList()
     }
 
