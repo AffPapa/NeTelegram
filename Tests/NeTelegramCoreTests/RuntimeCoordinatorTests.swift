@@ -160,6 +160,38 @@ import Testing
     ) == [conversation: "last unsaved copy"])
 }
 
+@Test func acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery() {
+    let account = AccountUUID()
+    let sentConversation = ConversationKey(account: account, chatID: 30)
+    let newerConversation = ConversationKey(account: account, chatID: 31)
+    var presentationDrafts: [ConversationKey: String] = [:]
+    var lockedDirtyDrafts = [
+        sentConversation: "accepted text",
+        newerConversation: "another unsaved draft",
+    ]
+
+    #expect(DraftPrivacyCache.removeIfMatching(
+        sentConversation,
+        text: "accepted text",
+        presentationDrafts: &presentationDrafts,
+        lockedDirtyDrafts: &lockedDirtyDrafts
+    ))
+    #expect(lockedDirtyDrafts == [newerConversation: "another unsaved draft"])
+    #expect(DraftPrivacyCache.draftsForPersistence(
+        account: account,
+        presentationDrafts: presentationDrafts,
+        lockedDirtyDrafts: lockedDirtyDrafts
+    ) == [newerConversation: "another unsaved draft"])
+
+    #expect(!DraftPrivacyCache.removeIfMatching(
+        newerConversation,
+        text: "older accepted text",
+        presentationDrafts: &presentationDrafts,
+        lockedDirtyDrafts: &lockedDirtyDrafts
+    ))
+    #expect(lockedDirtyDrafts[newerConversation] == "another unsaved draft")
+}
+
 @Test func sponsoredMessagesCacheExpiresAtFiveMinutesAndRejectsFutureTimestamp() {
     let now = Date(timeIntervalSince1970: 10_000)
     #expect(SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: nil, now: now))

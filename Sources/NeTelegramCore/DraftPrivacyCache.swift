@@ -3,6 +3,29 @@ import Foundation
 /// Separates drafts that could not be persisted from presentation memory while
 /// the privacy lock is active. Recovery values are restored only after unlock.
 public enum DraftPrivacyCache {
+    /// Removes only the exact text confirmed by TDLib from both visible and
+    /// lock-time recovery memory. A newer draft for the same conversation is
+    /// preserved, and the caller retains the account dirty barrier until all
+    /// remaining drafts are durable.
+    @discardableResult
+    public static func removeIfMatching(
+        _ conversation: ConversationKey,
+        text: String,
+        presentationDrafts: inout [ConversationKey: String],
+        lockedDirtyDrafts: inout [ConversationKey: String]
+    ) -> Bool {
+        var removed = false
+        if presentationDrafts[conversation] == text {
+            presentationDrafts.removeValue(forKey: conversation)
+            removed = true
+        }
+        if lockedDirtyDrafts[conversation] == text {
+            lockedDirtyDrafts.removeValue(forKey: conversation)
+            removed = true
+        }
+        return removed
+    }
+
     /// Builds the durable snapshot from both visible drafts and the private
     /// recovery cache used while locked. A failed lock-time write must not let
     /// a later quit overwrite the last durable copy with an empty presentation

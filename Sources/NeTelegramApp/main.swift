@@ -4604,8 +4604,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     ) {
         switch outcome {
         case .succeeded:
-            if draftsByConversation[pending.intent.conversation] == pending.text {
-                draftsByConversation.removeValue(forKey: pending.intent.conversation)
+            let removedFromPresentation = draftsByConversation[pending.intent.conversation] == pending.text
+            let removedFromPrivacyRecovery = DraftPrivacyCache.removeIfMatching(
+                pending.intent.conversation,
+                text: pending.text,
+                presentationDrafts: &draftsByConversation,
+                lockedDirtyDrafts: &lockedDirtyDraftRecovery
+            )
+            if removedFromPresentation {
                 persistDrafts(for: pending.intent.account)
                 if mayPresent, !lockState, currentConversationKey() == pending.intent.conversation {
                     setComposerText("")
@@ -4614,14 +4620,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                       !unavailableDraftAccounts.contains(pending.intent.account) {
                 // Privacy Lock may have purged the presentation cache after
                 // TDLib accepted this send. Reconcile the encrypted durable
-                // draft by value, so a newer draft is never removed and no
-                // unrelated drafts are overwritten from an empty cache.
+                // draft and lock-time recovery value by exact text, so a newer
+                // draft is never removed and unrelated dirty drafts stay behind
+                // the account's persistence barrier.
                 do {
                     _ = try store.removeDraftIfMatching(pending.intent.conversation, text: pending.text)
                 } catch {
                     unavailableDraftAccounts.insert(pending.intent.account)
                     setStatus("Отправка подтверждена, но черновик не удалось сверить с хранилищем.")
                 }
+            } else if removedFromPrivacyRecovery {
+                // The accepted text is no longer restorable in this process.
+                // Keep dirtyDraftAccounts set: a later lock/quit must still
+                // flush any other unsaved draft for this account.
             }
             if let replyID = pending.intent.replyToMessageID,
                replyTargetsByConversation[pending.intent.conversation] == replyID {
