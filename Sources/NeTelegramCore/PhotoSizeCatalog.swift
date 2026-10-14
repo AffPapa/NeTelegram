@@ -1,5 +1,53 @@
 import Foundation
 
+/// Captures the exact user action that should mark photo content as opened.
+/// It is created only from an explicit UI action and dispatched only after the
+/// matching preview has decoded successfully.
+public struct PhotoContentOpenIntent: Equatable, Sendable {
+    public let account: AccountUUID
+    public let expectedTelegramUserID: Int64
+    public let runtimeGeneration: RuntimeGeneration
+    public let chatID: Int64
+    public let messageID: Int64
+    public let privacyEpoch: UInt64
+
+    public init(
+        account: AccountUUID,
+        expectedTelegramUserID: Int64,
+        runtimeGeneration: RuntimeGeneration,
+        chatID: Int64,
+        messageID: Int64,
+        privacyEpoch: UInt64
+    ) {
+        self.account = account
+        self.expectedTelegramUserID = expectedTelegramUserID
+        self.runtimeGeneration = runtimeGeneration
+        self.chatID = chatID
+        self.messageID = messageID
+        self.privacyEpoch = privacyEpoch
+    }
+
+    @discardableResult
+    public func dispatch(
+        through barrier: PrivacyDispatchBarrier,
+        currentAccount: AccountUUID,
+        currentTelegramUserID: Int64,
+        currentGeneration: RuntimeGeneration,
+        send: () throws -> Void
+    ) rethrows -> Bool {
+        try barrier.dispatchBoundUserCommand(
+            account: account,
+            expectedTelegramUserID: expectedTelegramUserID,
+            runtimeGeneration: runtimeGeneration,
+            privacyEpoch: privacyEpoch,
+            currentAccount: currentAccount,
+            currentTelegramUserID: currentTelegramUserID,
+            currentGeneration: currentGeneration,
+            send: send
+        )
+    }
+}
+
 public struct PhotoFileVariant: Equatable, Sendable {
     public let fileID: Int32
     public let width: Int32

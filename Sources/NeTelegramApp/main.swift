@@ -142,6 +142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var photoOriginalLocalURLs: [PhotoPresentationKey: URL] = [:]
     private var photoOriginalKeysByFileID: [AccountUUID: [Int32: Set<PhotoPresentationKey>]] = [:]
     private var photoTokens: [PhotoPresentationKey: PhotoPreviewToken] = [:]
+    private var pendingPhotoContentOpen: [PhotoPresentationKey: PhotoContentOpenIntent] = [:]
     private var pendingPhotoByExtra: [String: PhotoPresentationKey] = [:]
     private var pendingOriginalPhotoByExtra: [String: PhotoPresentationKey] = [:]
     private var requestedOriginalPhotos: Set<PhotoPresentationKey> = []
@@ -1673,6 +1674,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
         photoPipeline.cancelPreviews(for: account)
+        pendingPhotoContentOpen = pendingPhotoContentOpen.filter { $0.key.account != account }
         if photoViewerKey?.account == account {
             photoViewerToken = nil
             photoViewerPrivacyEpoch = nil
@@ -5689,6 +5691,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             photoPresentationGeneration &+= 1
             photoTokens.values.forEach(photoPipeline.cancelPreview)
             photoTokens.removeAll()
+            pendingPhotoContentOpen.removeAll()
             photoViews.removeAll()
             photoButtons.removeAll()
             photoActionKeysByControlID.removeAll()
@@ -5735,6 +5738,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         photoPipeline.removeCachedPreviews(for: account, chatID: chatID, messageIDs: messageIDs)
         if let key = photoViewerKey, matches(key) { closePhotoViewer() }
         for key in keys {
+            pendingPhotoContentOpen.removeValue(forKey: key)
             photoTokens.removeValue(forKey: key).map(photoPipeline.cancelPreview)
             if let imageView = photoViews.removeValue(forKey: key) {
                 imageView.image = nil
@@ -5844,6 +5848,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         do {
             guard let key = photoViews.keys.first(where: { $0.account == runtime.account && $0.chatID == chatID && $0.fileID == fileID }) else { return }
             if let localURL = photoLocalURLs[key] {
+                guard let userID = runtime.telegramUserID else { return }
+                pendingPhotoContentOpen[key] = PhotoContentOpenIntent(
+                    account: key.account,
+                    expectedTelegramUserID: userID,
+                    runtimeGeneration: runtime.generation,
+                    chatID: key.chatID,
+                    messageID: key.messageID,
+                    privacyEpoch: privacyDispatchBarrier.currentEpoch()
+                )
                 requestPhotoPreview(key, fileURL: localURL)
                 sender.isEnabled = false
                 sender.title = "Обрабатываю фото…"
@@ -5863,8 +5876,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             historyRequestCounter &+= 1
             let extra = "photo-\(historyRequestCounter)"
+            guard let userID = runtime.telegramUserID else { return }
             pendingPhotoByExtra[extra] = key
             photoDownloadsByConversation[conversation, default: []].insert(fileID)
+            pendingPhotoContentOpen[key] = PhotoContentOpenIntent(
+                account: key.account,
+                expectedTelegramUserID: userID,
+                runtimeGeneration: runtime.generation,
+                chatID: key.chatID,
+                messageID: key.messageID,
+                privacyEpoch: privacyDispatchBarrier.currentEpoch()
+            )
             try runtime.send(["@type": "downloadFile", "file_id": fileID, "priority": 16, "offset": 0, "limit": 0, "synchronous": false, "@extra": extra])
             sender.isEnabled = false
             sender.title = "Загружаю фото…"
@@ -5873,6 +5895,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             photoDownloadsByConversation[conversation]?.remove(fileID)
             pendingPhotoByExtra = pendingPhotoByExtra.filter {
                 $0.value.account != runtime.account || $0.value.chatID != chatID || $0.value.fileID != fileID
+            }
+            pendingPhotoContentOpen = pendingPhotoContentOpen.filter {
+                $0.key.account != runtime.account || $0.key.chatID != chatID || $0.key.fileID != fileID
             }
             sender.isEnabled = true
             sender.title = "Повторить загрузку фото"
@@ -6122,6 +6147,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 }
                 imageView.image = image
                 self.photoTokens.removeValue(forKey: key)
+                if let intent = self.pendingPhotoContentOpen.removeValue(forKey: key),
+                   let accountRuntime = self.runtimesByAccount[key.account],
+                   accountRuntime === self.runtime,
+                   accountRuntime.generation == intent.runtimeGeneration,
+                   accountRuntime.telegramUserID == intent.expectedTelegramUserID {
+                    do {
+                        _ = try intent.dispatch(
+                            through: self.privacyDispatchBarrier,
+                            currentAccount: accountRuntime.account,
+                            currentTelegramUserID: accountRuntime.telegramUserID ?? 0,
+                            currentGeneration: accountRuntime.generation
+                        ) {
+                            try accountRuntime.send([
+                                "@type": "openMessageContent",
+                                "chat_id": intent.chatID,
+                                "message_id": intent.messageID,
+                            ])
+                        }
+                    } catch {
+                        self.setStatus("Не удалось передать TDLib факт открытия фотографии.")
+                    }
+                }
                 if self.photoOriginalFileIDs[key] != nil,
                    self.photoOriginalCanBeDownloaded[key] == true || self.photoOriginalLocalURLs[key] != nil {
                     self.photoButtons[key]?.action = #selector(self.openPhotoOriginal(_:))

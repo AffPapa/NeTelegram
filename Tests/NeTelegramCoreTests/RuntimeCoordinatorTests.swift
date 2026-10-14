@@ -4127,6 +4127,56 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     #expect(PhotoSizeCatalog.preview(from: allowed)?.canBeDownloaded == true)
 }
 
+@Test func photoContentOpenIntentIsBoundToRuntimeAndPrivacyEpoch() {
+    let account = AccountUUID()
+    let otherAccount = AccountUUID()
+    let generation = RuntimeGeneration(7)
+    let barrier = PrivacyDispatchBarrier()
+    let intent = PhotoContentOpenIntent(
+        account: account,
+        expectedTelegramUserID: 501,
+        runtimeGeneration: generation,
+        chatID: 90,
+        messageID: 12,
+        privacyEpoch: barrier.currentEpoch()
+    )
+    var opened: [[Int64]] = []
+
+    #expect(intent.dispatch(
+        through: barrier,
+        currentAccount: account,
+        currentTelegramUserID: 501,
+        currentGeneration: generation
+    ) { opened.append([intent.chatID, intent.messageID]) })
+    #expect(!intent.dispatch(
+        through: barrier,
+        currentAccount: otherAccount,
+        currentTelegramUserID: 501,
+        currentGeneration: generation
+    ) { opened.append([intent.chatID, intent.messageID]) })
+    #expect(!intent.dispatch(
+        through: barrier,
+        currentAccount: account,
+        currentTelegramUserID: 501,
+        currentGeneration: RuntimeGeneration(8)
+    ) { opened.append([intent.chatID, intent.messageID]) })
+    _ = barrier.setLocked(true)
+    #expect(!intent.dispatch(
+        through: barrier,
+        currentAccount: account,
+        currentTelegramUserID: 501,
+        currentGeneration: generation
+    ) { opened.append([intent.chatID, intent.messageID]) })
+    _ = barrier.setLocked(false)
+    #expect(!intent.dispatch(
+        through: barrier,
+        currentAccount: account,
+        currentTelegramUserID: 501,
+        currentGeneration: generation
+    ) { opened.append([intent.chatID, intent.messageID]) })
+    #expect(opened == [[90, 12]])
+}
+
 @Test func authorizationStepCountsEmailRegistrationAndQrAsNeedingUserInput() {
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitPhoneNumber") == .phoneNumber)
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitCode").awaitsUserInput)
