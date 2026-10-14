@@ -120,6 +120,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var searchGeneration: UInt64 = 0
     private var searchResults = AccountSearchResults(maximumPerAccount: 21)
     private var searchResultByControlID: [String: AccountSearchResult] = [:]
+    private var conversationRowViewsByChatID: [Int64: ConversationListRowButton] = [:]
+    private var chatListStateView: NSView?
     private var pendingSearchRequests = AccountSearchRequestRegistry()
     private var deferredSearch: DeferredSearch?
     private var historyAnchorByConversation: [ConversationKey: Int64] = [:]
@@ -3426,14 +3428,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 row.lastMessageDate = nil
                 chatRowsByAccount[target.account, default: [:]][chatID] = row
             }
-            if target === runtime { refreshChatList() }
+            if target === runtime { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateChatReadInbox",
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let unreadCount = (object["unread_count"] as? NSNumber)?.intValue,
                   var row = chatRowsByAccount[target.account]?[chatID] {
             row.unreadCount = max(0, unreadCount)
             chatRowsByAccount[target.account, default: [:]][chatID] = row
-            if target === runtime, !lockState { refreshChatList() }
+            if target === runtime, !lockState { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateChatNotificationSettings",
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let settings = object["notification_settings"] as? [String: Any],
@@ -3442,7 +3444,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let muteFor = (settings["mute_for"] as? NSNumber)?.intValue ?? 0
             row.isMuted = !inheritsMute && muteFor > 0
             chatRowsByAccount[target.account, default: [:]][chatID] = row
-            if target === runtime, !lockState { refreshChatList() }
+            if target === runtime, !lockState { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateChatPosition",
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let position = object["position"] as? [String: Any] {
@@ -3451,7 +3453,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                let order = (position["order"] as? NSNumber)?.uint64Value {
                 chatOrderByAccount[target.account, default: [:]][chatID] = order
             }
-            if target === runtime { refreshChatList() }
+            if target === runtime { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateNewMessage",
                   let message = object["message"] as? [String: Any],
                   let chatID = (message["chat_id"] as? NSNumber)?.int64Value {
@@ -3473,7 +3475,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 row.lastText = messagePreview(message)
                 row.lastMessageDate = (message["date"] as? NSNumber)?.int64Value
                 chatRowsByAccount[target.account, default: [:]][chatID] = row
-                if target === runtime { refreshChatList() }
+                if target === runtime { refreshChatList(changedChatIDs: [chatID]) }
             }
         } else if let type = object["@type"] as? String, type == "chat" {
             upsertChat(object, for: target)
@@ -4066,7 +4068,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             defaultSenderTelegramUserID: senderUserID
         )
         if target === runtime {
-            refreshChatList()
+            refreshChatList(changedChatIDs: [id])
             if selectedChatByAccount[target.account] == id { refreshComposerState() }
         }
     }
@@ -4086,10 +4088,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
     }
 
-    private func refreshChatList() {
+    private func refreshChatList(changedChatIDs: Set<Int64>? = nil) {
         guard chatList != nil else { return }
-        clearStack(chatList)
         if !activeSearchQuery.isEmpty {
+            clearStack(chatList)
             if searchResults.isEmpty {
                 let state = pendingSearchRequests.isEmpty ? "Совпадений пока нет" : "Ищу в подключённых аккаунтах…"
                 chatList.addArrangedSubview(NSTextField(wrappingLabelWithString: state))
@@ -4118,6 +4120,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         })
         let loadState = runtime?.mainChatListLoadState ?? .needsLoad
         guard !rows.isEmpty else {
+            clearStack(chatList)
             switch loadState {
             case .needsLoad, .loading:
                 addChatListState("Загружаю переписки…")
@@ -4135,22 +4138,58 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
             return
         }
-        for (id, value) in rows {
+
+        removeChatListStateView()
+        let desiredIDs = Set(rows.map(\.key))
+        let removedIDs = conversationRowViewsByChatID.keys.filter { !desiredIDs.contains($0) }
+        for id in removedIDs {
+            guard let button = conversationRowViewsByChatID[id] else { continue }
+            chatList.removeArrangedSubview(button)
+            button.removeFromSuperview()
+            conversationRowViewsByChatID.removeValue(forKey: id)
+        }
+
+        for (index, entry) in rows.enumerated() {
+            let (id, value) = entry
             let isSelected = account.flatMap { selectedChatByAccount[$0] } == id
-            let button = ConversationListRowButton(
-                conversationTitle: value.title,
-                preview: value.lastText,
-                time: formattedChatTime(value.lastMessageDate),
-                unreadCount: value.unreadCount,
-                isMuted: value.isMuted,
-                isSelected: isSelected,
-                target: self,
-                action: #selector(openChatFromButton(_:))
-            )
-            button.identifier = NSUserInterfaceItemIdentifier(String(id))
-            button.translatesAutoresizingMaskIntoConstraints = false
-            button.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
-            chatList.addArrangedSubview(button)
+            let button: ConversationListRowButton
+            if let existing = conversationRowViewsByChatID[id] {
+                button = existing
+                if changedChatIDs.map({ $0.contains(id) }) ?? true {
+                    button.updatePresentation(
+                        conversationTitle: value.title,
+                        preview: value.lastText,
+                        time: formattedChatTime(value.lastMessageDate),
+                        unreadCount: value.unreadCount,
+                        isMuted: value.isMuted,
+                        isSelected: isSelected
+                    )
+                }
+            } else {
+                button = ConversationListRowButton(
+                    conversationTitle: value.title,
+                    preview: value.lastText,
+                    time: formattedChatTime(value.lastMessageDate),
+                    unreadCount: value.unreadCount,
+                    isMuted: value.isMuted,
+                    isSelected: isSelected,
+                    target: self,
+                    action: #selector(openChatFromButton(_:))
+                )
+                button.identifier = NSUserInterfaceItemIdentifier(String(id))
+                button.translatesAutoresizingMaskIntoConstraints = false
+                button.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
+                conversationRowViewsByChatID[id] = button
+            }
+
+            let currentIndex = chatList.arrangedSubviews.firstIndex(of: button)
+            if currentIndex != index {
+                if currentIndex != nil {
+                    chatList.removeArrangedSubview(button)
+                    button.removeFromSuperview()
+                }
+                chatList.insertArrangedSubview(button, at: min(index, chatList.arrangedSubviews.count))
+            }
         }
         switch loadState {
         case .loading:
@@ -4168,6 +4207,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         allowsRetry: Bool = false,
         retryTitle: String = "Повторить"
     ) {
+        removeChatListStateView()
         let label = NSTextField(wrappingLabelWithString: message)
         label.alignment = .center
         label.font = .systemFont(ofSize: 13, weight: .medium)
@@ -4194,6 +4234,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         chatList.addArrangedSubview(content)
         content.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
+        chatListStateView = content
+    }
+
+    private func removeChatListStateView() {
+        guard let chatListStateView else { return }
+        chatList.removeArrangedSubview(chatListStateView)
+        chatListStateView.removeFromSuperview()
+        self.chatListStateView = nil
     }
 
     @objc private func retryChatListLoad() {
@@ -6283,7 +6331,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func clearStack(_ stack: NSStackView) {
-        if stack === chatList { searchResultByControlID.removeAll() }
+        if stack === chatList {
+            searchResultByControlID.removeAll()
+            conversationRowViewsByChatID.removeAll()
+            chatListStateView = nil
+        }
         if stack === messageList {
             visibleReadReceiptTask?.cancel()
             visibleReadReceiptTask = nil

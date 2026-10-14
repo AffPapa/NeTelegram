@@ -3,12 +3,12 @@ import AppKit
 /// Native, data-only conversation row. It deliberately owns no account or chat
 /// state; AppDelegate supplies a snapshot derived from TDLib updates.
 final class ConversationListRowButton: NSButton {
-    private let conversationTitle: String
-    private let preview: String
-    private let time: String
-    private let unreadCount: Int
-    private let isMuted: Bool
-    private let isSelected: Bool
+    private var conversationTitle: String
+    private var preview: String
+    private var time: String
+    private var unreadCount: Int
+    private var isMuted: Bool
+    private var isSelected: Bool
     private var isHovered = false
 
     init(
@@ -47,6 +47,39 @@ final class ConversationListRowButton: NSButton {
 
     required init?(coder: NSCoder) {
         return nil
+    }
+
+    func updatePresentation(
+        conversationTitle: String,
+        preview: String,
+        time: String,
+        unreadCount: Int,
+        isMuted: Bool,
+        isSelected: Bool
+    ) {
+        let unreadCount = max(0, unreadCount)
+        guard self.conversationTitle != conversationTitle
+            || self.preview != preview
+            || self.time != time
+            || self.unreadCount != unreadCount
+            || self.isMuted != isMuted
+            || self.isSelected != isSelected else { return }
+
+        self.conversationTitle = conversationTitle
+        self.preview = preview
+        self.time = time
+        self.unreadCount = unreadCount
+        self.isMuted = isMuted
+        self.isSelected = isSelected
+        setAccessibilityLabel(Self.accessibilityDescription(
+            title: conversationTitle,
+            preview: preview,
+            time: time,
+            unreadCount: unreadCount,
+            isMuted: isMuted,
+            isSelected: isSelected
+        ))
+        needsDisplay = true
     }
 
     override var intrinsicContentSize: NSSize {
