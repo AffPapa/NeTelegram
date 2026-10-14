@@ -94,8 +94,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var removeUnverifiedProfileMenuItem: NSMenuItem?
     private var profileRestoreGenerationGate = ProfileRestoreGenerationGate()
     private var phoneCountries: [PhoneCountry] = []
-    private var selectedCallingCode = ""
-    private var selectedCountryRegionCode: String?
+    private var phoneCountrySelection = PhoneCountrySelectionState(suggestedRegionCode: Locale.current.region?.identifier)
+    private var selectedCallingCode: String { phoneCountrySelection.selectedCallingCode }
+    private var selectedCountryRegionCode: String? { phoneCountrySelection.selectedRegionCode }
     private var showingQR = false
     private var authRequestInFlight = false
     private var pendingAuthRequestsByExtra: [String: (account: AccountUUID, step: String)] = [:]
@@ -409,7 +410,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPicker.target = self
         countryPicker.action = #selector(selectCountry)
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
-        countryPicker.setAccessibilityHelp("Регион macOS предлагается автоматически, когда он известен. Выбранную страну можно изменить; полный номер с + принимается отдельно.")
+        countryPicker.setAccessibilityHelp("Регион macOS — только подсказка. Для местного номера выберите страну явно; полный номер с + принимается отдельно.")
         countrySearchField = NSSearchField(frame: .zero)
         countrySearchField.placeholderString = "Поиск страны или кода"
         countrySearchField.setAccessibilityLabel("Поиск страны или телефонного кода")
@@ -1371,6 +1372,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return nil
         }
         return number
+    }
+
+    private func phoneNumberEntryPrompt() -> String {
+        if let region = phoneCountrySelection.selectedRegionCode,
+           let country = phoneCountries.first(where: { $0.code == region }),
+           let callingCode = country.callingCodes.first {
+            return "Выбрана страна \(country.name) (+\(callingCode)). Введите номер или полный номер с +."
+        }
+        if let region = phoneCountrySelection.suggestedRegionCode,
+           let country = phoneCountries.first(where: { $0.code == region }),
+           let callingCode = country.callingCodes.first {
+            return "macOS предлагает \(country.name) (+\(callingCode)); страна ещё не выбрана. Выберите страну или введите полный номер, начиная с +."
+        }
+        return "Выберите страну и введите номер телефона или укажите полный номер с +."
     }
 
     private func beginFirstAccount() {
@@ -3178,12 +3193,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 $0.name.localizedStandardCompare($1.name) == .orderedAscending
             }
             phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
-            populateCountryPicker(preferredRegion: selectedRegion ?? Locale.current.region?.identifier)
+            populateCountryPicker(preferredRegion: selectedRegion)
             countryPickerStack.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
             if target === runtime && pendingAuthorizationType == "authorizationStateWaitPhoneNumber" {
                 statusLabel.stringValue = phoneCountries.isEmpty
                     ? "Введите полный номер с + и кодом страны. Список стран пока недоступен."
-                    : "Выберите страну и введите номер телефона."
+                    : phoneNumberEntryPrompt()
             }
         } else if let type = object["@type"] as? String, type == "updateNewChat",
                   let chat = object["chat"] as? [String: Any] {
@@ -6928,7 +6943,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         actionButton.isEnabled = !authRequestInFlight
         setStatus(phoneCountries.isEmpty
             ? "Введите полный номер с + и кодом страны. Загружаю список стран…"
-            : "Выберите страну и введите номер телефона.")
+            : phoneNumberEntryPrompt())
         phoneField.becomeFirstResponder()
     }
 
@@ -6946,12 +6961,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         guard countryPickerRegionCodes.indices.contains(index) else { return }
         guard let regionCode = countryPickerRegionCodes[index],
               let country = phoneCountries.first(where: { $0.code == regionCode }) else {
-            selectedCallingCode = ""
-            selectedCountryRegionCode = nil
+            phoneCountrySelection.clearSelection()
+            setStatus(phoneNumberEntryPrompt())
             return
         }
-        selectedCallingCode = country.callingCodes[0]
-        selectedCountryRegionCode = country.code
+        phoneCountrySelection.select(regionCode: country.code, callingCode: country.callingCodes[0])
+        setStatus(phoneNumberEntryPrompt())
     }
 
     @objc private func searchCountries() {
@@ -6975,7 +6990,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 callingCodes: [entry.callingCode]
             )
         }.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        selectedCountryRegionCode = Locale.current.region?.identifier
         phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
         populateCountryPicker(preferredRegion: selectedCountryRegionCode)
     }
@@ -7003,14 +7017,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
            let country = phoneCountries.first(where: { $0.code == preferredRegion }) {
             countryPicker.selectItem(at: visibleIndex)
             if !preserveSelectionWhenFiltered {
-                selectedCountryRegionCode = preferredRegion
-                selectedCallingCode = country.callingCodes[0]
+                phoneCountrySelection.select(regionCode: preferredRegion, callingCode: country.callingCodes[0])
             }
         } else {
             countryPicker.selectItem(at: 0)
             if !preserveSelectionWhenFiltered {
-                selectedCountryRegionCode = nil
-                selectedCallingCode = ""
+                phoneCountrySelection.clearSelection()
             }
         }
     }

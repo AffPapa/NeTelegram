@@ -217,6 +217,24 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("0812345678", selectedCallingCode: "") == .invalidCountryCode)
 }
 
+@Test func macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin() {
+    var selection = PhoneCountrySelectionState(suggestedRegionCode: "TH")
+    #expect(selection.suggestedRegionCode == "TH")
+    #expect(selection.selectedRegionCode == nil)
+    #expect(selection.selectedCallingCode.isEmpty)
+    #expect(PhoneNumberInputPolicy.validate("812345678", selectedCallingCode: selection.selectedCallingCode) == .invalidCountryCode)
+    #expect(PhoneNumberInputPolicy.validate("+66 81 234 5678", selectedCallingCode: selection.selectedCallingCode) == .accepted("+66812345678"))
+
+    selection.select(regionCode: "TH", callingCode: "66")
+    #expect(selection.selectedRegionCode == "TH")
+    #expect(PhoneNumberInputPolicy.validate("812345678", selectedCallingCode: selection.selectedCallingCode) == .accepted("+66812345678"))
+
+    selection.clearSelection()
+    #expect(selection.suggestedRegionCode == "TH")
+    #expect(selection.selectedRegionCode == nil)
+    #expect(selection.selectedCallingCode.isEmpty)
+}
+
 @Test func countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct() {
     let countries = [
         CountryPickerSearchEntry(regionCode: "US", name: "United States", callingCode: "1"),

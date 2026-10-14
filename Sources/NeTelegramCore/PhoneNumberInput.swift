@@ -9,6 +9,31 @@ public enum PhoneNumberInputResult: Equatable, Sendable {
     case invalidLength
 }
 
+/// Separates the macOS region hint from an explicit country selection. A
+/// locale suggestion can be shown in the UI, but never supplies a calling
+/// code for national-number normalization until the user chooses a country.
+public struct PhoneCountrySelectionState: Equatable, Sendable {
+    public let suggestedRegionCode: String?
+    public private(set) var selectedRegionCode: String?
+    public private(set) var selectedCallingCode: String
+
+    public init(suggestedRegionCode: String?) {
+        self.suggestedRegionCode = suggestedRegionCode
+        self.selectedRegionCode = nil
+        self.selectedCallingCode = ""
+    }
+
+    public mutating func select(regionCode: String, callingCode: String) {
+        selectedRegionCode = regionCode
+        selectedCallingCode = callingCode
+    }
+
+    public mutating func clearSelection() {
+        selectedRegionCode = nil
+        selectedCallingCode = ""
+    }
+}
+
 /// Conservative phone input normalization for TDLib's international phone field.
 /// It never silently strips letters or guesses whether a country code was pasted.
 public enum PhoneNumberInputPolicy {
