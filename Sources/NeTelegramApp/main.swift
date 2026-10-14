@@ -16,7 +16,7 @@ private extension NSLayoutConstraint {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSSearchFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSplitViewDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSSearchFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private var statusMenuItem: NSMenuItem!
@@ -96,6 +96,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var unlockInProgress = false
     private var chatPane: NSView!
     private var sidebarPane: NSView!
+    private var conversationPane: NSView!
+    private var chatWorkspaceSplit: NSSplitView!
     private var chatListScroll: NSScrollView!
     private var conversationTitleLabel: NSTextField!
     private var sidebarTitleLabel: NSTextField!
@@ -217,6 +219,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 #if DEBUG
     private var windowLifecycleSmokeRecorder: WindowLifecycleSmokeRecorder?
     private var authLayoutPreviewEnabled = false
+    private var chatShellLayoutPreviewEnabled = false
     private var authLayoutPreviewIndex = 0
     private var authLayoutPreviewEventMonitor: Any?
     private let authLayoutPreviewStates = ["phone", "code", "password", "qr", "registration"]
@@ -230,6 +233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loadBundledPhoneCountries()
 #if DEBUG
         authLayoutPreviewEnabled = configureAuthenticationLayoutPreviewIfRequested()
+        chatShellLayoutPreviewEnabled = configureChatShellLayoutPreviewIfRequested()
 #endif
         if !authLayoutPreviewEnabledForCurrentBuild {
             buildStatusItem()
@@ -246,7 +250,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 
     private var authLayoutPreviewEnabledForCurrentBuild: Bool {
 #if DEBUG
-        authLayoutPreviewEnabled
+        authLayoutPreviewEnabled || chatShellLayoutPreviewEnabled
 #else
         false
 #endif
@@ -539,67 +543,90 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))
         chatPane.autoresizingMask = [.width, .height]
         chatPane.isHidden = true
-        sidebarPane = NSView(frame: NSRect(x: 0, y: 0, width: 330, height: 720))
+        sidebarPane = NSView(frame: .zero)
+        sidebarPane.translatesAutoresizingMaskIntoConstraints = false
         sidebarPane.wantsLayer = true
         sidebarPane.layer?.backgroundColor = NSColor.controlBackgroundColor.cgColor
         sidebarTitleLabel = NSTextField(labelWithString: "Переписки")
         sidebarTitleLabel.font = .systemFont(ofSize: 22, weight: .semibold)
-        sidebarTitleLabel.frame = NSRect(x: 20, y: 674, width: 280, height: 30)
-        sidebarPane.addSubview(sidebarTitleLabel)
-        accountPicker.frame = NSRect(x: 16, y: 625, width: 298, height: 30)
-        accountProfileHint.frame = NSRect(x: 16, y: 582, width: 298, height: 36)
-        addAccountButton.frame = NSRect(x: 16, y: 548, width: 298, height: 26)
-        sidebarPane.addSubview(accountPicker)
-        sidebarPane.addSubview(accountProfileHint)
-        sidebarPane.addSubview(addAccountButton)
-        searchField = NSSearchField(frame: NSRect(x: 16, y: 506, width: 298, height: 30))
-        searchField.placeholderString = "Поиск аккаунтов, чатов и сообщений"
+        searchField = NSSearchField(frame: .zero)
+        searchField.placeholderString = "Поиск чатов и сообщений"
         searchField.target = self
         searchField.action = #selector(searchFieldChanged)
         searchField.sendsSearchStringImmediately = true
         searchField.setAccessibilityLabel("Поиск по аккаунтам, чатам и сообщениям")
-        sidebarPane.addSubview(searchField)
+        let sidebarControls = NSStackView(views: [
+            sidebarTitleLabel,
+            accountPicker,
+            accountProfileHint,
+            addAccountButton,
+            searchField,
+        ])
+        sidebarControls.orientation = .vertical
+        sidebarControls.alignment = .width
+        sidebarControls.spacing = 8
+        sidebarControls.translatesAutoresizingMaskIntoConstraints = false
+        sidebarPane.addSubview(sidebarControls)
         chatList = NSStackView()
         chatList.orientation = .vertical
         chatList.alignment = .leading
         chatList.spacing = 4
         chatList.translatesAutoresizingMaskIntoConstraints = false
         // Keep the list below account controls, profile hint, and search.
-        chatListScroll = NSScrollView(frame: NSRect(x: 0, y: 0, width: 330, height: 495))
+        chatListScroll = NSScrollView(frame: .zero)
+        chatListScroll.translatesAutoresizingMaskIntoConstraints = false
         chatListScroll.hasVerticalScroller = true
         chatListScroll.drawsBackground = false
         chatListScroll.setAccessibilityLabel("Список переписок и результатов поиска")
         chatListScroll.documentView = chatList
         sidebarPane.addSubview(chatListScroll)
         NSLayoutConstraint.activate([
+            sidebarControls.leadingAnchor.constraint(equalTo: sidebarPane.leadingAnchor, constant: 14),
+            sidebarControls.trailingAnchor.constraint(equalTo: sidebarPane.trailingAnchor, constant: -14),
+            sidebarControls.topAnchor.constraint(equalTo: sidebarPane.topAnchor, constant: 14),
+            sidebarTitleLabel.heightAnchor.constraint(equalToConstant: 30),
+            accountPicker.heightAnchor.constraint(equalToConstant: 30),
+            accountProfileHint.heightAnchor.constraint(greaterThanOrEqualToConstant: 28),
+            addAccountButton.heightAnchor.constraint(equalToConstant: 28),
+            searchField.heightAnchor.constraint(equalToConstant: 30),
+            chatListScroll.leadingAnchor.constraint(equalTo: sidebarPane.leadingAnchor),
+            chatListScroll.trailingAnchor.constraint(equalTo: sidebarPane.trailingAnchor),
+            chatListScroll.topAnchor.constraint(equalTo: sidebarControls.bottomAnchor, constant: 8),
+            chatListScroll.bottomAnchor.constraint(equalTo: sidebarPane.bottomAnchor),
             chatList.leadingAnchor.constraint(equalTo: chatListScroll.contentView.leadingAnchor, constant: 10),
             chatList.trailingAnchor.constraint(equalTo: chatListScroll.contentView.trailingAnchor, constant: -10),
             chatList.topAnchor.constraint(equalTo: chatListScroll.contentView.topAnchor, constant: -8),
             chatList.widthAnchor.constraint(equalTo: chatListScroll.contentView.widthAnchor, constant: -20),
         ])
-        chatPane.addSubview(sidebarPane)
+        conversationPane = NSView(frame: .zero)
+        conversationPane.translatesAutoresizingMaskIntoConstraints = false
         conversationTitleLabel = NSTextField(labelWithString: "Выберите чат")
         conversationTitleLabel.identifier = NSUserInterfaceItemIdentifier("conversationTitle")
         conversationTitleLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        conversationTitleLabel.frame = NSRect(x: 360, y: 674, width: 320, height: 30)
-        chatPane.addSubview(conversationTitleLabel)
-        topicPicker = NSPopUpButton(frame: NSRect(x: 690, y: 674, width: 340, height: 30), pullsDown: false)
+        conversationTitleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        conversationTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        topicPicker = NSPopUpButton(frame: .zero, pullsDown: false)
+        topicPicker.translatesAutoresizingMaskIntoConstraints = false
         topicPicker.isHidden = true
         topicPicker.target = self
         topicPicker.action = #selector(selectForumTopic)
         topicPicker.setAccessibilityLabel("Тема форума")
-        chatPane.addSubview(topicPicker)
         chatStatusLabel = NSTextField(labelWithString: "")
         chatStatusLabel.font = .systemFont(ofSize: 11)
         chatStatusLabel.textColor = .secondaryLabelColor
-        chatStatusLabel.frame = NSRect(x: 360, y: 646, width: 650, height: 20)
-        chatPane.addSubview(chatStatusLabel)
+        chatStatusLabel.translatesAutoresizingMaskIntoConstraints = false
+        let conversationHeader = NSView(frame: .zero)
+        conversationHeader.translatesAutoresizingMaskIntoConstraints = false
+        conversationHeader.addSubview(conversationTitleLabel)
+        conversationHeader.addSubview(topicPicker)
+        conversationHeader.addSubview(chatStatusLabel)
         messageList = NSStackView()
         messageList.orientation = .vertical
         messageList.alignment = .leading
         messageList.spacing = 10
         messageList.translatesAutoresizingMaskIntoConstraints = false
-        messageScroll = NSScrollView(frame: NSRect(x: 350, y: 125, width: 690, height: 520))
+        messageScroll = NSScrollView(frame: .zero)
+        messageScroll.translatesAutoresizingMaskIntoConstraints = false
         messageScroll.hasVerticalScroller = true
         messageScroll.drawsBackground = false
         messageScroll.setAccessibilityLabel("История переписки")
@@ -611,7 +638,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             object: messageScroll.contentView
         )
         messageScroll.documentView = messageList
-        chatPane.addSubview(messageScroll)
+        conversationPane.addSubview(messageScroll)
         NSLayoutConstraint.activate([
             messageList.leadingAnchor.constraint(equalTo: messageScroll.contentView.leadingAnchor, constant: 16),
             messageList.trailingAnchor.constraint(equalTo: messageScroll.contentView.trailingAnchor, constant: -16),
@@ -621,16 +648,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         replyStatusLabel = NSTextField(labelWithString: "")
         replyStatusLabel.font = .systemFont(ofSize: 11)
         replyStatusLabel.textColor = .secondaryLabelColor
-        replyStatusLabel.frame = NSRect(x: 440, y: 96, width: 460, height: 18)
+        replyStatusLabel.frame = .zero
+        replyStatusLabel.translatesAutoresizingMaskIntoConstraints = false
         replyStatusLabel.isHidden = true
-        chatPane.addSubview(replyStatusLabel)
         clearReplyButton = NSButton(title: "Отмена", target: self, action: #selector(clearReplyTarget))
         clearReplyButton.bezelStyle = .inline
-        clearReplyButton.frame = NSRect(x: 910, y: 92, width: 80, height: 24)
+        clearReplyButton.frame = .zero
+        clearReplyButton.translatesAutoresizingMaskIntoConstraints = false
         clearReplyButton.isHidden = true
         clearReplyButton.setAccessibilityLabel("Отменить ответ на сообщение")
-        chatPane.addSubview(clearReplyButton)
-        composerScroll = NSScrollView(frame: NSRect(x: 440, y: 18, width: 480, height: 72))
+        let replyRow = NSView(frame: .zero)
+        replyRow.translatesAutoresizingMaskIntoConstraints = false
+        replyRow.addSubview(replyStatusLabel)
+        replyRow.addSubview(clearReplyButton)
+        composerScroll = NSScrollView(frame: .zero)
+        composerScroll.translatesAutoresizingMaskIntoConstraints = false
         composerScroll.hasVerticalScroller = true
         composerScroll.borderType = .bezelBorder
         composer = NSTextView(frame: NSRect(x: 0, y: 0, width: 470, height: 68))
@@ -641,19 +673,80 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         composer.isRichText = false
         composer.isAutomaticQuoteSubstitutionEnabled = false
         composerScroll.documentView = composer
-        chatPane.addSubview(composerScroll)
         photoSendButton = NSButton(title: "Фото…", target: self, action: #selector(selectAndSendPhoto))
         photoSendButton.bezelStyle = .rounded
-        photoSendButton.frame = NSRect(x: 360, y: 32, width: 72, height: 34)
         photoSendButton.setAccessibilityLabel("Выбрать фотографию для отправки")
         photoSendButton.isEnabled = false
-        chatPane.addSubview(photoSendButton)
         sendButton = NSButton(title: "Отправить", target: self, action: #selector(sendText))
         sendButton.bezelStyle = .rounded
-        sendButton.frame = NSRect(x: 930, y: 32, width: 100, height: 34)
         sendButton.isEnabled = false
         sendButton.setAccessibilityLabel("Отправить сообщение")
-        chatPane.addSubview(sendButton)
+        let composerRow = NSStackView(views: [photoSendButton, composerScroll, sendButton])
+        composerRow.orientation = .horizontal
+        composerRow.alignment = .centerY
+        composerRow.distribution = .fill
+        composerRow.spacing = 10
+        composerRow.translatesAutoresizingMaskIntoConstraints = false
+        photoSendButton.widthAnchor.constraint(equalToConstant: 72).isActive = true
+        sendButton.widthAnchor.constraint(equalToConstant: 92).isActive = true
+        composerScroll.heightAnchor.constraint(equalToConstant: 72).isActive = true
+        let conversationComposer = NSStackView(views: [replyRow, composerRow])
+        conversationComposer.orientation = .vertical
+        conversationComposer.alignment = .width
+        conversationComposer.spacing = 4
+        conversationComposer.translatesAutoresizingMaskIntoConstraints = false
+        conversationPane.addSubview(conversationHeader)
+        conversationPane.addSubview(conversationComposer)
+        NSLayoutConstraint.activate([
+            conversationHeader.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor),
+            conversationHeader.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor),
+            conversationHeader.topAnchor.constraint(equalTo: conversationPane.topAnchor),
+            conversationHeader.heightAnchor.constraint(equalToConstant: 88),
+            conversationTitleLabel.leadingAnchor.constraint(equalTo: conversationHeader.leadingAnchor, constant: 16),
+            conversationTitleLabel.topAnchor.constraint(equalTo: conversationHeader.topAnchor, constant: 9),
+            conversationTitleLabel.trailingAnchor.constraint(equalTo: conversationHeader.trailingAnchor, constant: -16),
+            conversationTitleLabel.heightAnchor.constraint(equalToConstant: 28),
+            topicPicker.leadingAnchor.constraint(equalTo: conversationHeader.leadingAnchor, constant: 16),
+            topicPicker.topAnchor.constraint(equalTo: chatStatusLabel.bottomAnchor, constant: 1),
+            topicPicker.widthAnchor.constraint(lessThanOrEqualToConstant: 240),
+            topicPicker.heightAnchor.constraint(equalToConstant: 24),
+            chatStatusLabel.leadingAnchor.constraint(equalTo: conversationHeader.leadingAnchor, constant: 16),
+            chatStatusLabel.trailingAnchor.constraint(equalTo: conversationHeader.trailingAnchor, constant: -16),
+            chatStatusLabel.topAnchor.constraint(equalTo: conversationTitleLabel.bottomAnchor, constant: 1),
+            chatStatusLabel.heightAnchor.constraint(equalToConstant: 18),
+            messageScroll.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor),
+            messageScroll.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor),
+            messageScroll.topAnchor.constraint(equalTo: conversationHeader.bottomAnchor),
+            messageScroll.bottomAnchor.constraint(equalTo: conversationComposer.topAnchor),
+            conversationComposer.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor, constant: 12),
+            conversationComposer.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor, constant: -12),
+            conversationComposer.bottomAnchor.constraint(equalTo: conversationPane.bottomAnchor, constant: -10),
+            replyRow.heightAnchor.constraint(equalToConstant: 26),
+            replyStatusLabel.leadingAnchor.constraint(equalTo: replyRow.leadingAnchor, constant: 8),
+            replyStatusLabel.trailingAnchor.constraint(lessThanOrEqualTo: clearReplyButton.leadingAnchor, constant: -8),
+            replyStatusLabel.centerYAnchor.constraint(equalTo: replyRow.centerYAnchor),
+            clearReplyButton.trailingAnchor.constraint(equalTo: replyRow.trailingAnchor, constant: -8),
+            clearReplyButton.centerYAnchor.constraint(equalTo: replyRow.centerYAnchor),
+        ])
+
+        chatWorkspaceSplit = NSSplitView(frame: .zero)
+        chatWorkspaceSplit.isVertical = true
+        chatWorkspaceSplit.dividerStyle = .thin
+        chatWorkspaceSplit.translatesAutoresizingMaskIntoConstraints = false
+        chatWorkspaceSplit.delegate = self
+        chatWorkspaceSplit.addArrangedSubview(sidebarPane)
+        chatWorkspaceSplit.addArrangedSubview(conversationPane)
+        chatWorkspaceSplit.setHoldingPriority(.defaultHigh, forSubviewAt: 0)
+        chatPane.addSubview(chatWorkspaceSplit)
+        NSLayoutConstraint.activate([
+            chatWorkspaceSplit.leadingAnchor.constraint(equalTo: chatPane.leadingAnchor),
+            chatWorkspaceSplit.trailingAnchor.constraint(equalTo: chatPane.trailingAnchor),
+            chatWorkspaceSplit.topAnchor.constraint(equalTo: chatPane.topAnchor),
+            chatWorkspaceSplit.bottomAnchor.constraint(equalTo: chatPane.bottomAnchor),
+            sidebarPane.widthAnchor.constraint(greaterThanOrEqualToConstant: 250),
+            sidebarPane.widthAnchor.constraint(lessThanOrEqualToConstant: 360),
+            conversationPane.widthAnchor.constraint(greaterThanOrEqualToConstant: 360),
+        ])
         content.addSubview(chatPane)
 
         lockedView = NSView(frame: content.bounds)
@@ -689,7 +782,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // The auth flow includes code, 2FA, QR, and registration states. Keep
         // enough vertical room for these states so the centered form cannot
         // disappear above or below a short window.
-        window.minSize = NSSize(width: 900, height: 700)
+        window.minSize = NSSize(width: 760, height: 600)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
@@ -753,27 +846,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         content.layoutSubtreeIfNeeded()
 
         chatPane.frame = NSRect(origin: .zero, size: size)
-        let sidebarWidth = min(330, max(280, size.width * 0.32))
-        sidebarPane.frame = NSRect(x: 0, y: 0, width: sidebarWidth, height: size.height)
-        sidebarTitleLabel.frame = NSRect(x: 20, y: size.height - 46, width: sidebarWidth - 40, height: 30)
-        accountPicker.frame = NSRect(x: 16, y: size.height - 95, width: sidebarWidth - 32, height: 30)
-        accountProfileHint.frame = NSRect(x: 16, y: size.height - 138, width: sidebarWidth - 32, height: 36)
-        addAccountButton.frame = NSRect(x: 16, y: size.height - 172, width: sidebarWidth - 32, height: 26)
-        searchField.frame = NSRect(x: 16, y: size.height - 214, width: sidebarWidth - 32, height: 30)
-        chatListScroll.frame = NSRect(x: 0, y: 0, width: sidebarWidth, height: max(180, size.height - 225))
-
-        let mainX = sidebarWidth + 20
-        let mainWidth = max(200, size.width - mainX - 20)
-        conversationTitleLabel.frame = NSRect(x: mainX + 10, y: size.height - 46, width: min(320, max(220, mainWidth - 190)), height: 30)
-        topicPicker.frame = NSRect(x: mainX + 340, y: size.height - 46, width: max(180, size.width - mainX - 360), height: 30)
-        chatStatusLabel.frame = NSRect(x: mainX + 10, y: size.height - 74, width: mainWidth - 20, height: 20)
-        messageScroll.frame = NSRect(x: mainX, y: 125, width: mainWidth, height: max(200, size.height - 200))
-        replyStatusLabel.frame = NSRect(x: mainX + 90, y: 96, width: max(180, size.width - mainX - 240), height: 18)
-        clearReplyButton.frame = NSRect(x: size.width - 150, y: 92, width: 80, height: 24)
-        composerScroll.frame = NSRect(x: mainX + 90, y: 18, width: max(220, size.width - mainX - 230), height: 72)
-        composer.frame = NSRect(x: 0, y: 0, width: composerScroll.contentView.bounds.width, height: 68)
-        photoSendButton.frame = NSRect(x: mainX + 10, y: 32, width: 72, height: 34)
-        sendButton.frame = NSRect(x: size.width - 130, y: 32, width: 100, height: 34)
+        chatWorkspaceSplit.layoutSubtreeIfNeeded()
+        let currentSidebarWidth = sidebarPane.frame.width
+        let boundedSidebarWidth = min(360, max(250, currentSidebarWidth))
+        if abs(currentSidebarWidth - boundedSidebarWidth) > 1 {
+            chatWorkspaceSplit.setPosition(boundedSidebarWidth, ofDividerAt: 0)
+        }
 
         if let lockedTitle = lockedView.subviews.first(where: { $0.identifier?.rawValue == "lockedTitle" }) {
             lockedTitle.frame = NSRect(x: (size.width - 460) / 2, y: size.height / 2 + 20, width: 460, height: 40)
@@ -784,6 +862,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if let unlockButton = lockedView.subviews.first(where: { $0 is NSButton }) {
             unlockButton.frame = NSRect(x: (size.width - 200) / 2, y: size.height / 2 - 100, width: 200, height: 36)
         }
+    }
+
+    func splitView(_ splitView: NSSplitView, constrainMinCoordinate proposedMinimumPosition: CGFloat, ofSubviewAt dividerIndex: Int) -> CGFloat {
+        guard splitView === chatWorkspaceSplit, dividerIndex == 0 else { return proposedMinimumPosition }
+        return max(proposedMinimumPosition, 250)
+    }
+
+    func splitView(_ splitView: NSSplitView, constrainMaxCoordinate proposedMaximumPosition: CGFloat, ofSubviewAt dividerIndex: Int) -> CGFloat {
+        guard splitView === chatWorkspaceSplit, dividerIndex == 0 else { return proposedMaximumPosition }
+        return min(proposedMaximumPosition, 360)
     }
 
     private func buildStatusItem() {
@@ -6853,6 +6941,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if lockState { unlock() }
     }
 #if DEBUG
+    private func configureChatShellLayoutPreviewIfRequested() -> Bool {
+        guard CommandLine.arguments.contains("--ci-chat-shell-preview") else { return false }
+        guard runtime == nil, runtimesByClient.isEmpty, profileOrder.isEmpty, !profileRestoreInProgress else {
+            setStatus("Предпросмотр макета доступен только без локальных профилей и активных аккаунтов.")
+            return false
+        }
+        chatPane.isHidden = false
+        authCard.isHidden = true
+        accountPicker.isHidden = true
+        addAccountButton.isHidden = true
+        accountProfileHint.stringValue = "Предпросмотр интерфейса без подключённых аккаунтов."
+        accountProfileHint.isHidden = false
+        conversationTitleLabel.stringValue = "Выберите чат"
+        chatStatusLabel.stringValue = "Предпросмотр макета · аккаунты не подключены"
+        composer.isEditable = false
+        composer.isSelectable = false
+        searchField.isEnabled = false
+        photoSendButton.isEnabled = false
+        sendButton.isEnabled = false
+        window.title = "\(ProductIdentity.displayName) · предпросмотр макета без аккаунтов"
+        let compact = CommandLine.arguments.contains("--ci-chat-shell-preview-compact")
+        window.setContentSize(compact ? NSSize(width: 760, height: 600) : NSSize(width: 1060, height: 720))
+        window.center()
+        layoutWindowContents()
+        return true
+    }
+
     private func configureAuthenticationLayoutPreviewIfRequested() -> Bool {
         authLayoutPreviewEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)

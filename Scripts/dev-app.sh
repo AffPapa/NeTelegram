@@ -31,11 +31,18 @@ else
 fi
 DEV_DIRTY="$APP_SOURCE_DIRTY"
 MODE="build"
+LAUNCH_PREVIEW_ARGS=()
 
 if [[ "${1:-}" == "--launch" ]]; then
     MODE="launch"
+elif [[ "${1:-}" == "--launch-chat-shell-preview" ]]; then
+    MODE="launch"
+    LAUNCH_PREVIEW_ARGS=(--ci-chat-shell-preview)
+elif [[ "${1:-}" == "--launch-chat-shell-preview-compact" ]]; then
+    MODE="launch"
+    LAUNCH_PREVIEW_ARGS=(--ci-chat-shell-preview --ci-chat-shell-preview-compact)
 elif [[ $# -gt 0 ]]; then
-    echo "Usage: $0 [--launch]" >&2
+    echo "Usage: $0 [--launch|--launch-chat-shell-preview|--launch-chat-shell-preview-compact]" >&2
     exit 2
 fi
 
@@ -108,7 +115,7 @@ PY
         echo "Reusing verified canonical bundle for exact clean source $DEV_COMMIT."
         echo "Build record: $BUILD_RECORD"
         if [[ "$MODE" == "launch" ]]; then
-            open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT"
+            open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT" "${LAUNCH_PREVIEW_ARGS[@]}"
         fi
         exit 0
     fi
@@ -235,5 +242,5 @@ echo "Support root: $SUPPORT_ROOT"
 echo "Build record: $APP_PATH/Contents/Resources/BuildInfo.json"
 echo "Signed bytes record: $BUILD_RECORD"
 if [[ "$MODE" == "launch" ]]; then
-    open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT"
+    open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT" "${LAUNCH_PREVIEW_ARGS[@]}"
 fi
