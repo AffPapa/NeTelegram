@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "APP16 source 7fd0030 remains verified by hosted CI 38514102824 (167/167). Canonical arm64 Dev.app was rebuilt once, ad-hoc signature verified, and CUA confirmed the exact-source accountless login UI. The process-check and SwiftPM cache blockers are fixed in local tooling with focused tests. No credentials entered. Real login, 20-account certification, Developer ID notarization and Telegram compatibility gates remain incomplete.",
+  "status": "App-source 7fd0030 remains verified by exact CI 38514102824 (167/167), and tooling commit 0e88386 is pushed with successful metadata and pinned TDLib/Dev.app workflows. The existing public Site has advanced to v175 and anonymous CUA confirms the bilingual devlog entry; /downloads remains without a binary because no verified release exists. Login and 20-account certification remain incomplete.",
   "current_evidence": {
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "local_suite": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
@@ -537,21 +537,21 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 174,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_ff8218e6295c81919a51ca8f77a0660d",
-    "source_commit": "93ec41836897aac6fd66ad3374790ef23c40d281",
-    "app_repository_commit": "927f420886efd5256c9182df24931a5e95d8c73f",
+    "version": 175,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_7f1f5230cb688191afb604fe43d0be0b",
+    "source_commit": "6794e1c04775930ce779bfe3adc806c96d83ba94",
+    "app_repository_commit": "a539426ea3311195cd6270702479d7ceef5e9f4c",
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "deployment_id": "appgdep_6acf0d6864e88191b5061f877231e89b",
+    "deployment_id": "appgdep_6acf11bc50e08191a9b7b1cf102155a1",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-v174.tar.gz",
-    "archive_local_sha256": "d81a20b95c017f4d945d9671460bc5ba96442a50629b2e4cc9f537df9701cdda",
-    "archive_local_size_bytes": 191917,
-    "saved_archive_content_hash": "sha256:60f554092d6e85d20eb14e918da73cd8033da3f72328af99e0e2da2aaf160daf",
+    "archive_local_path": "/private/tmp/netelegram-site-v175.tar.gz",
+    "archive_local_sha256": "44d480fcefe7b71fd15767626897e3d74dfa5324b07bccdb6865a93c75d3280a",
+    "archive_local_size_bytes": 192478,
+    "saved_archive_content_hash": "sha256:9ad6d7e1e0c1b174701c5e846c099926aaa692c9f32f157d4832a39d4e74f16b",
     "saved_archive_size_bytes": 450560,
     "archive_file_count": 14,
-    "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
+    "public_verification": "Sites v175 deployment appgdep_6acf11bc50e08191a9b7b1cf102155a1 succeeded. Anonymous CUA loaded /devlog/?verify=v175 and confirmed the new bilingual tooling entry, exact GitHub commits and CI links, and the existing prior entry. Public audience was confirmed before deploy; no login was required. /downloads was not changed; no app binary is available."
   },
   "latest_source_audit": {
     "date": "2026-10-14",
@@ -569,7 +569,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Keep one canonical Dev.app and reuse its exact build record. Do not rerun unchanged Swift tests (CI 38514102824 is 167/167). Next highest-value gate is user-performed login when available; meanwhile finish independent release/setup gates. No Developer ID/notary release until notary credentials and Telegram title/sponsored-media compatibility decisions are resolved.",
+  "next_action": "Keep one canonical Dev.app at app source 7fd0030; do not repeat its unchanged Swift suite or build. Next high-value product evidence is user-performed login/read/send when the user chooses to enter credentials. Meanwhile continue independent architecture and release-preparation work. Do not publish a stable binary until notary credentials and the unresolved Telegram title/sponsored-video compatibility gates are resolved.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -628,13 +628,13 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP16 native Dev.app launch and build-tool friction",
+    "id": "SITE v175 bilingual tooling/build devlog",
     "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "local_focused_tests": "Scripts/check-app-process.sh regressions passed 6/6; bash -n and git diff --check passed.",
-    "hosted_serial_suite": "Unchanged exact-source run 38514102824 passed 167/167; not rerun.",
-    "native_bundle_workflow": "One canonical bundle rebuilt from exact source; codesign verification passed; CUA opened native login UI and confirmed title/source and phone/QR controls. No credentials entered.",
-    "implementation": "Process guard falls back to LaunchServices for positive running detection when pgrep cannot inspect processes; empty restricted-namespace results fail closed. Dev build puts Clang module cache under /private/tmp and uses SwiftPM --disable-sandbox because sandbox-exec is unavailable in this environment.",
-    "remaining": "Real login/read/send, 20 authorized accounts, performance, Developer ID/notarization and Telegram compatibility remain unverified or blocked."
+    "local_focused_tests": "Tooling commit 0e88386 process-check tests 6/6; checkpoint validator tests 5/5; static site validator passed 8 routes.",
+    "hosted_serial_suite": "Exact-source app CI 38514102824 passed 167/167; unchanged for this website-only milestone.",
+    "native_bundle_workflow": "Pinned TDLib and arm64 Dev.app workflow 38515770287 succeeded for tooling checkpoint; local CUA verified accountless login UI.",
+    "implementation": "Existing public Site v175 has a bilingual devlog entry for tooling commit 0e88386, accountless UI evidence, exact CI links, and explicit non-release limitations.",
+    "remaining": "Public download/release does not exist; real login, all-20 live account coverage, performance, notarization and Telegram compatibility gates remain open."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
