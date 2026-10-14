@@ -2189,7 +2189,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 // checks credentials before creating any account state.
                 pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
                 showPhoneEntry()
-                setStatus("Выберите страну и введите номер телефона.")
+                setStatus(phoneNumberEntryPrompt())
                 refreshOutgoingPhotoRecoveryStatus()
                 refreshStatusMenu()
                 return
@@ -2256,7 +2256,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             } else if authorized.isEmpty {
                 startupStatus = phoneCountries.isEmpty
                     ? "Введите полный номер с + и кодом страны. Список стран загружается."
-                    : "Выберите страну и введите номер телефона."
+                    : phoneNumberEntryPrompt()
             } else {
                 startupStatus = "Восстанавливаю аккаунты…"
             }
