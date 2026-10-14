@@ -1767,3 +1767,12 @@
 - Source commit `380428973eb3d17041768e47a1e7fe08a4d7b91e` was pushed to `AffPapa/NeTelegram` main. Exact-source macOS CI [38627826560](https://github.com/AffPapa/NeTelegram/actions/runs/38627826560) passed; pinned TDLib/Dev.app workflow [38627822050](https://github.com/AffPapa/NeTelegram/actions/runs/38627822050) passed. No duplicate workflow dispatch.
 - Rebuilt and opened the one canonical `/private/tmp/NeTelegram-Dev.app` from clean source 3804289. CUA confirms ordinary accountless sign-in view and AX identity; strict ad-hoc codesign verification passed. No login, profile creation, real Keychain query, or Telegram request.
 - The earlier real data-return Keychain timeout's cause remains unproven; a prior non-value presence check recorded no configured item. This turn did not inspect real Keychain state. The user must enter a fresh/current API hash in NeTelegram secure settings before login. No Site deployment or app release.
+
+
+## 2026-10-15 — AUTH-FORM-APPLE-HIG-14
+
+- Research: current Apple macOS HIG guidance for layout, windows, text fields, accessibility, and keyboard input; inspected the official Telegram Desktop intro flow and style for interaction structure only. Its Qt/GPL implementation is not copied into the AppKit app.
+- Changed `Sources/NeTelegramApp/main.swift`: reduced default auth window height to 560 pt; put country search and the native country menu on one aligned row; replaced the macOS-region disclosure with a short neutral format hint; focused the phone input first because a complete number can be entered without choosing a country. No auth/network/storage behavior changed.
+- Verification: `git diff --check` passed. The one canonical `/private/tmp/NeTelegram-Dev.app` was rebuilt from clean source `6a0b7bf96d821771df0e7045b8a7ccd635ef5581`; strict ad-hoc signature passed. CUA screenshot and AX confirm the compact alignment, no locale disclosure, phone-field initial focus, empty Continue disabled, and full non-affiliation note visible. No credentials, Keychain value, account or Telegram request was used.
+- Exact-source macOS CI [38629446608](https://github.com/AffPapa/NeTelegram/actions/runs/38629446608) and pinned TDLib/native app workflow [38629446622](https://github.com/AffPapa/NeTelegram/actions/runs/38629446622) passed. Source commit is pushed to `AffPapa/NeTelegram` main. No release or Site deployment.
+- Limits: dark accountless auth view only; VoiceOver speech, light appearance, IME/RTL, real login, authenticated chats and twenty-runtime behavior remain unverified.
