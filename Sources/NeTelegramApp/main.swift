@@ -2554,7 +2554,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-                setStatus("API hash приложения не задан. Откройте меню \(ProductIdentity.displayName) → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+            setStatus("API hash приложения ещё не настроен. Введите его в защищённом окне; локальный профиль пока не создан и вход не начат.")
+            // A first-run user should not have to discover the app menu after
+            // pressing Continue. The secure field remains the only entry path;
+            // profile creation and TDLib requests still wait for a later,
+            // explicit Continue action after the Keychain write succeeds.
+            configureTelegramAPIHash()
         } catch TelegramAPIHashReadinessError.timedOut {
             setStatus("Связка ключей macOS не ответила за 10 секунд. Профиль не создан; попробуйте продолжить вход позже. Повторное действие продолжит ожидание того же запроса.")
         } catch TelegramAPIHashReadinessError.invalidated {
