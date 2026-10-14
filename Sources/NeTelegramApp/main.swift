@@ -61,6 +61,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var countryFieldLabel: NSTextField!
     private var countrySuggestionLabel: NSTextField!
     private var countryPickerRegionCodes: [String?] = []
+    private var isUpdatingCountryPicker = false
     private var phoneFieldLabel: NSTextField!
     private var phoneField: NSTextField!
     private var emailField: NSTextField!
@@ -7426,6 +7427,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     @objc private func selectCountry() {
+        // Rebuilding an NSComboBox can select its first item automatically.
+        // That is a presentation detail, not consent to use that country code.
+        guard !isUpdatingCountryPicker else { return }
         let index = countryPicker.indexOfSelectedItem
         guard countryPickerRegionCodes.indices.contains(index),
               let regionCode = countryPickerRegionCodes[index],
@@ -7449,7 +7453,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func comboBoxSelectionDidChange(_ notification: Notification) {
-        guard (notification.object as? NSComboBox) === countryPicker else { return }
+        guard !isUpdatingCountryPicker,
+              (notification.object as? NSComboBox) === countryPicker else { return }
         selectCountry()
     }
 
@@ -7503,6 +7508,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {
         let query = countryPicker.stringValue
+        isUpdatingCountryPicker = true
+        defer { isUpdatingCountryPicker = false }
         countryPicker.removeAllItems()
         let visibleCountries = CountryPickerSearch.filter(phoneCountries.map {
             CountryPickerSearchEntry(regionCode: $0.code, name: $0.name, callingCode: $0.callingCodes[0], alternateNames: $0.alternateNames)
@@ -7526,6 +7533,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPicker.stringValue = countryPickerText(for: country)
             phoneCountrySelection.select(regionCode: preferredRegion, callingCode: country.callingCodes[0])
         } else {
+            let selectedIndex = countryPicker.indexOfSelectedItem
+            if selectedIndex >= 0 {
+                countryPicker.deselectItem(at: selectedIndex)
+            }
             countryPicker.stringValue = query
             phoneCountrySelection.clearSelection()
         }
