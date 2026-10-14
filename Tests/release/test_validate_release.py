@@ -30,6 +30,9 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
             "properties": [
                 {"name": "neTelegram:source:commit", "value": source_commit},
                 {"name": "neTelegram:sbom:release-binary-audit", "value": "passed"},
+                {"name": "neTelegram:sbom:audit-input", "value": "final-app-zip"},
+                {"name": "neTelegram:sbom:audited-app-zip-sha256", "value": hashlib.sha256(app_archive.read_bytes()).hexdigest()},
+                {"name": "neTelegram:signing:team-id", "value": "ABCDEFGHIJ"},
             ],
         }},
         "components": [{"name": "TDLib", "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(tdlib_bytes).hexdigest()}]}],
@@ -164,6 +167,22 @@ class CandidateValidationTests(unittest.TestCase):
             artifact["sha256"] = hashlib.sha256(data).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "not reconciled with the signed notarized"):
+                validate_candidate(manifest_path, assets)
+
+    def test_sbom_must_bind_the_exact_final_archive_hash(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            sbom_artifact = next(item for item in manifest["artifacts"] if item["kind"] == "sbom")
+            sbom_path = assets / sbom_artifact["path"]
+            sbom = json.loads(sbom_path.read_text(encoding="utf-8"))
+            props = sbom["metadata"]["component"]["properties"]
+            next(p for p in props if p["name"] == "neTelegram:sbom:audited-app-zip-sha256")["value"] = "0" * 64
+            data = json.dumps(sbom).encode()
+            sbom_path.write_bytes(data)
+            sbom_artifact["bytes"] = len(data)
+            sbom_artifact["sha256"] = hashlib.sha256(data).hexdigest()
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "final app ZIP hash"):
                 validate_candidate(manifest_path, assets)
 
     def test_release_asset_url_must_match_the_candidate_tag_and_filename(self):

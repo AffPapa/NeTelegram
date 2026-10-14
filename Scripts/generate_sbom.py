@@ -11,11 +11,16 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 import plistlib
 import re
+import shutil
 import subprocess
+import sys
+import tempfile
 import uuid
-from pathlib import Path
+import zipfile
+from pathlib import Path, PurePosixPath
 
 
 SPEC_VERSION = "1.6"
@@ -47,7 +52,8 @@ def component(name: str, version: str, license_id: str, *, scope: str,
     return result
 
 
-def audit_release_bundle(bundle: Path, version: str, source_commit: str) -> dict:
+def audit_release_bundle(bundle: Path, version: str, source_commit: str,
+                         expected_team_id: str | None = None) -> dict:
     """Return binary hashes only after Developer ID, stapling, and Gatekeeper checks."""
     if not bundle.is_dir() or bundle.suffix != ".app":
         raise SBOMError("--app-bundle must be an existing .app directory")
@@ -82,8 +88,12 @@ def audit_release_bundle(bundle: Path, version: str, source_commit: str) -> dict
         return result.stdout + result.stderr
 
     signature = run("/usr/bin/codesign", "-dv", "--verbose=4", str(bundle))
-    if "Authority=Developer ID Application:" not in signature or "TeamIdentifier=" not in signature:
+    team_match = re.search(r"^TeamIdentifier=([^\r\n]+)$", signature, re.MULTILINE)
+    if "Authority=Developer ID Application:" not in signature or not team_match:
         raise SBOMError("app bundle is not signed with a Developer ID Application identity")
+    team_id = team_match.group(1)
+    if expected_team_id and team_id != expected_team_id:
+        raise SBOMError("app bundle TeamIdentifier does not match --expected-team-id")
     run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(bundle))
     run("/usr/bin/xcrun", "stapler", "validate", str(bundle))
     run("/usr/sbin/spctl", "--assess", "--type", "execute", "--verbose=2", str(bundle))
@@ -103,14 +113,76 @@ def audit_release_bundle(bundle: Path, version: str, source_commit: str) -> dict
         "executable_name": executable_name,
         "bundle_identifier": bundle_id,
         "minimum_macos": str(info.get("LSMinimumSystemVersion", "")),
+        "team_id": team_id,
         "executable_sha256": digest(executable),
         "tdlib_sha256": digest(tdlib),
         "architectures": architectures,
     }
 
 
+def audit_release_zip(app_zip: Path, version: str, source_commit: str,
+                      expected_team_id: str | None = None) -> dict:
+    """Safely materialize and audit the exact final ZIP on macOS."""
+    if sys.platform != "darwin":
+        raise SBOMError("--app-zip final signature audit requires macOS")
+    if not app_zip.is_file():
+        raise SBOMError("--app-zip must be an existing finalized ZIP")
+    if not expected_team_id:
+        raise SBOMError("--expected-team-id is required for final app ZIP auditing")
+    try:
+        with zipfile.ZipFile(app_zip) as archive:
+            entries = archive.infolist()
+            if not entries or len(entries) > 100_000:
+                raise SBOMError("app ZIP has an invalid entry count")
+            names = [item.filename for item in entries]
+            if len(names) != len(set(names)):
+                raise SBOMError("app ZIP contains duplicate paths")
+            total_size = 0
+            for item in entries:
+                name = item.filename
+                path = Path(name)
+                path_parts = name.rstrip("/").split("/")
+                mode = (item.external_attr >> 16) & 0xFFFF
+                kind = mode & 0o170000
+                if (not name or "\\" in name or path.is_absolute()
+                        or any(part in ("", ".", "..") for part in path_parts)
+                        or (name.endswith("/") and not item.is_dir())
+                        or item.flag_bits & 0x1 or (kind and kind not in (0o100000, 0o040000))):
+                    raise SBOMError("app ZIP contains an unsafe, encrypted, or special entry")
+                total_size += item.file_size
+                if total_size > 8 * 1024 * 1024 * 1024:
+                    raise SBOMError("app ZIP uncompressed size exceeds the 8 GiB audit limit")
+                if item.file_size > 0 and item.compress_size == 0:
+                    raise SBOMError("app ZIP contains an invalid compressed entry")
+            roots = {PurePosixPath(name).parts[0] for name in names if PurePosixPath(name).parts}
+            if roots != {"NeTelegram.app"}:
+                raise SBOMError("app ZIP must contain exactly one NeTelegram.app root")
+            with tempfile.TemporaryDirectory(prefix="netelegram-final-zip-audit-") as directory:
+                root = Path(directory)
+                for item in entries:
+                    relative = PurePosixPath(item.filename)
+                    target = root.joinpath(*relative.parts)
+                    if item.is_dir():
+                        target.mkdir(parents=True, exist_ok=True)
+                    else:
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        with archive.open(item) as source, target.open("xb") as destination:
+                            shutil.copyfileobj(source, destination, 1024 * 1024)
+                        os.chmod(target, ((item.external_attr >> 16) & 0o777) or 0o644)
+                audit = audit_release_bundle(root / "NeTelegram.app", version, source_commit, expected_team_id)
+    except (OSError, zipfile.BadZipFile, RuntimeError) as error:
+        raise SBOMError(f"final app ZIP could not be safely audited: {error}") from error
+    digest = hashlib.sha256()
+    with app_zip.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    audit["app_zip_sha256"] = digest.hexdigest()
+    return audit
+
+
 def build_bom(root: Path, version: str, source_commit: str, timestamp: str | None = None,
-              app_bundle: Path | None = None) -> dict:
+              app_bundle: Path | None = None, app_zip: Path | None = None,
+              expected_team_id: str | None = None) -> dict:
     if not VERSION.fullmatch(version):
         raise SBOMError("version must be a concrete version string")
     if not SHA40.fullmatch(source_commit):
@@ -121,7 +193,11 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
     openssl = tdlib["build_dependencies"]["openssl"]
     gperf = tdlib["build_dependencies"]["gperf"]
 
-    binary_audit = audit_release_bundle(app_bundle, version, source_commit) if app_bundle else None
+    if app_bundle and app_zip:
+        raise SBOMError("use only one of --app-bundle or --app-zip")
+    binary_audit = (audit_release_zip(app_zip, version, source_commit, expected_team_id) if app_zip
+                    else audit_release_bundle(app_bundle, version, source_commit, expected_team_id) if app_bundle
+                    else None)
     components = [
         component(
             "TDLib", tdlib["version"], tdlib["license"]["spdx"], scope="required",
@@ -199,7 +275,7 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
                 ],
             },
             "properties": [
-                {"name": "neTelegram:sbom:completeness", "value": "source-pins-only; reconcile with final signed app bundle"},
+                {"name": "neTelegram:sbom:completeness", "value": "source-pins-only; reconcile against the exact final signed app ZIP before release"},
             ],
         },
         "components": components,
@@ -211,6 +287,12 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
             {"name": "neTelegram:bundle:minimum-macos", "value": binary_audit["minimum_macos"]},
             {"name": "neTelegram:binary:architectures", "value": ",".join(binary_audit["architectures"]["NeTelegram"])},
         ])
+        if binary_audit.get("app_zip_sha256"):
+            bom["metadata"]["component"]["properties"].extend([
+                {"name": "neTelegram:sbom:audit-input", "value": "final-app-zip"},
+                {"name": "neTelegram:sbom:audited-app-zip-sha256", "value": binary_audit["app_zip_sha256"]},
+                {"name": "neTelegram:signing:team-id", "value": binary_audit["team_id"]},
+            ])
         tdlib_component = next(item for item in components if item["name"] == "TDLib")
         tdlib_component["hashes"] = [{"alg": "SHA-256", "content": binary_audit["tdlib_sha256"]}]
         tdlib_component["properties"].append({
@@ -219,7 +301,7 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
         })
         bom["metadata"]["properties"].append({
             "name": "neTelegram:sbom:release-binary-audit-evidence",
-            "value": "Developer ID signature verified; notarization ticket stapled; Gatekeeper assessment accepted",
+            "value": "final app ZIP SHA-256 bound; Developer ID signature verified; notarization ticket stapled; Gatekeeper assessment accepted",
         })
     return bom
 
@@ -231,9 +313,12 @@ def main() -> int:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--timestamp", help="ISO-8601 timestamp; defaults to current UTC")
     parser.add_argument("--app-bundle", type=Path, help="Notarized Developer ID .app to reconcile for release")
+    parser.add_argument("--app-zip", type=Path, help="Final app ZIP; extract and verify its signature, stapling, and Gatekeeper status")
+    parser.add_argument("--expected-team-id", help="Require this exact Apple Developer Team ID")
     args = parser.parse_args()
     try:
-        bom = build_bom(Path(__file__).resolve().parent.parent, args.version, args.source_commit, args.timestamp, args.app_bundle)
+        bom = build_bom(Path(__file__).resolve().parent.parent, args.version, args.source_commit, args.timestamp,
+                        args.app_bundle, args.app_zip, args.expected_team_id)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(json.dumps(bom, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except (OSError, KeyError, json.JSONDecodeError, SBOMError) as error:

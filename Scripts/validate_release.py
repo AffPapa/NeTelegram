@@ -323,6 +323,15 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
     if not executable_digest or not tdlib_digest:
         raise ValidationError("SBOM must include SHA-256 hashes for the app executable and bundled TDLib")
     app_zip = next(assets_dir / item["path"] for item in artifacts if item["kind"] == "app_zip")
+    sbom_properties = {
+        prop.get("name"): prop.get("value")
+        for prop in metadata_component.get("properties", [])
+        if isinstance(prop, dict)
+    }
+    if sbom_properties.get("neTelegram:sbom:audit-input") != "final-app-zip":
+        raise ValidationError("release SBOM must audit the final app ZIP, not a pre-ZIP bundle")
+    if not re.fullmatch(r"[A-Z0-9]{10}", sbom_properties.get("neTelegram:signing:team-id", "")):
+        raise ValidationError("release SBOM must record the exact audited Developer Team ID")
     try:
         with zipfile.ZipFile(app_zip) as archive:
             names = archive.namelist()
@@ -340,6 +349,8 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                 raise ValidationError("SBOM app executable hash does not match app_zip bytes")
             if hashlib.sha256(archive.read(tdlib_binary)).hexdigest() != tdlib_digest:
                 raise ValidationError("SBOM TDLib hash does not match app_zip bytes")
+            if sbom_properties.get("neTelegram:sbom:audited-app-zip-sha256") != hashlib.sha256(app_zip.read_bytes()).hexdigest():
+                raise ValidationError("SBOM final app ZIP hash does not match the candidate app_zip bytes")
     except (OSError, zipfile.BadZipFile, StopIteration) as error:
         raise ValidationError(f"app_zip could not be reconciled with SBOM binary hashes: {error}") from error
 

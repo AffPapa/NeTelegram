@@ -569,15 +569,15 @@
     "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
     "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Resume application work from canonical app-source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b and the existing /private/tmp/NeTelegram-Dev.app. Do not rebuild unchanged source. Next product evidence requires user-entered phone/QR login followed by real read/send smoke; keep 20-account resource coverage as a separate later certification gate. In parallel, resolve notarization credentials and compatibility gates without requesting or exposing secrets.",
+  "next_action": "Continue from app-source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b and the canonical open /private/tmp/NeTelegram-Dev.app without rebuilding unchanged source. Next runtime evidence is user-entered single-account login/read/send; in parallel, run one metadata-only push/CI for final-ZIP signing-evidence tooling. Do not claim real ZIP signature/notarization until a notarized candidate exists; 20-account certification and Telegram compatibility gates remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
-    "base_commit": "4459cd817ffd4499cfc6e429e78ad6fa64bf55c1",
-    "result": "Local release metadata suite passed 36/36, including duplicate artifact-kind rejection. GitHub metadata CI 38518330268 passed for exact release-tooling commit 045ebb1.",
-    "checks": "Targeted duplicate-kind regression 1/1; full release metadata suite 36/36; checkpoint validation and git diff --check passed. SBOM and deterministic NOTICE generators succeeded. Generated notice SHA-256 7f4fe911172ea38c2f5c1c12f4b3af016e510538c4a7c3c05362de7e2c856325. No real signed/notarized bundle audited.",
-    "hosted_ci": "PASS: exact-tooling commit 045ebb12762794f3d5d8a5c14fa20be7f403328c, GitHub Actions run 38518330268.",
-    "scope": "Release tooling only. No app source change, native rebuild, real account coverage, signing/notarization, release upload, or Site deployment.",
-    "release_readiness": "No app release. Real login/read/send, 20 authorized runtime matrix, actual Developer ID/notarization, Telegram compatibility gates, Gatekeeper downloaded install/reopen, and updater smoke remain open."
+    "base_commit": "dd92a67f1a7fbb9ce3feaafedba1d44372486307",
+    "result": "Local final-ZIP audit tooling and release validator changed; all 39 release metadata tests passed in 0.836s. Checkpoint validation and git diff --check passed.",
+    "checks": "Final ZIP verifier rejects unsafe ZIP entries, verifies the extracted exact archive on macOS with Developer ID, stapler, Gatekeeper and arm64 checks, requires exact team identity, and records the archive SHA-256 in SBOM. The release validator binds it to candidate bytes. Fixture-only evidence; no real signed ZIP audit.",
+    "hosted_ci": "NOT_RUN: local changes are not pushed yet.",
+    "scope": "Release tooling only; app source unchanged. No app build, user login, signing, notarization, release upload, or Site deployment.",
+    "release_readiness": "No app release; real account and 20-runtime coverage, notarization, compatibility and downloaded Gatekeeper smoke remain open."
   },
   "latest_ci_scope_change": {
     "commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",

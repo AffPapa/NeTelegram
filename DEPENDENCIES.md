@@ -20,16 +20,19 @@ SHA-256 values to the final app ZIP:
 python3 Scripts/generate_sbom.py \
   --version 1.2.3 \
   --source-commit "$(git rev-parse HEAD)" \
-  --app-bundle /absolute/path/NeTelegram.app \
+  --app-zip /absolute/path/release-assets/NeTelegram.zip \
+  --expected-team-id H6VGU2M6JD \
   --output /absolute/path/release-assets/NeTelegram.cdx.json
 ```
 
-`--app-bundle` requires matching version/source metadata, an arm64 executable
-and TDLib library, Developer ID signature verification, a stapled notarization
-ticket, and an accepted Gatekeeper assessment. The release validator then
-rechecks the two binary hashes against the final ZIP and requires a separate
-third-party notice asset. It does not replace the post-download install/reopen
-smoke or final manual NOTICE review.
+`--app-zip` safely extracts the exact candidate archive on macOS and reruns
+matching version/source metadata, arm64, Developer ID signature, stapled ticket,
+and Gatekeeper checks. `--expected-team-id` is mandatory for this final archive
+audit. The resulting SBOM records the archive SHA-256 and exact Team ID; the
+release validator binds those values to the frozen candidate ZIP and rechecks
+the executable and TDLib hashes. A pre-ZIP `--app-bundle` audit may be useful
+for diagnosis but cannot qualify a release SBOM. This does not replace the
+post-download install/reopen smoke or final manual NOTICE review.
 `Package.swift` currently declares no third-party Swift package dependencies.
 
 Generate the release `THIRD-PARTY-NOTICES.txt` from the project NOTICE and the
