@@ -1015,3 +1015,8 @@
 - Source commit `05cfe67130b6c796a2baad062393158101a99c08` changes `PhotoFileVariant` so a missing TDLib `local.can_be_downloaded` flag is false. The AppKit preview action rechecks the captured capability immediately before dispatching `downloadFile`; missing or stale permission cannot trigger a request. Incomplete local files remain not downloaded.
 - Focused regression passed 1/1; full local serial suite passed 168/168 on arm64e / Xcode beta / Swift 6.4 (0.459s). Exact-source GitHub macOS CI [38521289189](https://github.com/AffPapa/NeTelegram/actions/runs/38521289189) passed 168/168 in 0.940s.
 - No real Telegram account/photo, memory-pressure, or content-protection test was performed. The canonical Dev.app remains at 7fd00308; no replacement bundle or native smoke is claimed. APP20 remains partial.
+
+## 2026-10-14 — Publish photo-permission evidence to the existing Site
+
+- Existing public Site project `appgprj_6acba85192e08191acdf7011928848cf` advanced to v179 from exact Site source `df96ad6548a39c5ad45f5330437ca1554fc3305d`. Anonymous `/devlog/` verification found app-source `05cfe67130b6c796a2baad062393158101a99c08`, Russian and English text, and the exact macOS CI link 38521289189.
+- Static validation passed all 8 routes. The v179 saved archive hash is `sha256:587478812d3e08decbf163d91cd55b4036eead856509365aee83483348bcb004` (14 files); deployment appgdep_6acf1f6cc66c8191b7ba93f18a99bf8d succeeded. Downloads page and updater feeds were not changed; no installable binary is claimed.
