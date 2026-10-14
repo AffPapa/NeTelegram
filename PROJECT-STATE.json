@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP17 photo dispatch revalidates live state after asynchronous staging. Local focused regression 1/1 and full diagnostic suite 161/161 passed. Exact-source hosted macOS CI run 38494308524 cancelled at its 5-minute limit before test-runner startup; pinned TDLib arm64 Dev.app assembly 38494308687 passed. No canonical local app rebuild, Site update, real login or release occurred.",
+  "phase": "AUTH05: bilingual country search and stable region selection verified in the canonical Dev.app. App source fa80d5a; local exact-source suite 163/163. Hosted suite 38497467214 cancelled at five minutes after probe; native TDLib/Dev.app workflow 38497467210 passed. Public Site remains v169 pending the batched AUTH05 devlog update. No credentials entered.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -13,7 +13,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e"
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -21,12 +21,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38495482988,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482988",
-      "workflow_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "scope": "Exact-source macOS CI passed runner probe and serial Swift suite 162/162 on macOS 15 / Xcode 16.4 / Swift 6.1.2 arm64."
+      "run_id": 38497467214,
+      "status": "cancelled",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214",
+      "workflow_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "scope": "Runner probe passed; full serial test suite cancelled at five-minute job limit without a suite result. Exact-source local serial suite passed 163/163."
     },
     "published_application_releases": [],
     "github_access": {
@@ -65,7 +65,7 @@
       "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
       "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
     },
-    "last_audited_checkpoint_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
+    "last_audited_checkpoint_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null
   },
@@ -91,10 +91,10 @@
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Unrouteable TDLib update now fails the shared receive channel closed after draining accepted events; focused regression passed 1/1. Photo staging revalidates target before dispatch; focused regression passed 1/1 on parent source. Exact source a455362 passed hosted serial suite 162/162; no redundant local full suite.",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "hosted_run_id": 38495482988,
-      "suite": "162 synthetic serial tests on macOS 15 / Xcode 16.4 / Swift 6.1.2 arm64; no real account or 20-account coverage."
+      "result": "AUTH05 bilingual country search regression passed 1/1; exact-source local serial suite passed 163/163 in 0.426s. Hosted run 38497467214 cancelled after probe at the five-minute limit; no hosted suite result.",
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "hosted_run_id": 38497467214,
+      "suite": "163 synthetic serial tests on arm64e / Xcode 27.0 / Swift 6.4; no real account or 20-account coverage."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -103,45 +103,45 @@
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
-    "current_head_native_smoke": "Native workflow 38495482965 assembled pinned TDLib arm64 Dev.app from exact source a45536262185b13e2bb47703449f6d4c69a7bb3d. App launch/login not run.",
+    "current_head_native_smoke": "One canonical local Dev.app at /private/tmp/NeTelegram-Dev.app was rebuilt from exact app source fa80d5a, signature verified, then CUA accessibility searched Canada, exposed 🇨🇦 Канада +1, and selected it. No phone number, code or account was entered.",
     "publication": "App source 94740d38bfa845919ac2863ad0e78d1a7d494a04 is pushed; current exact-source macOS CI 38466197778 was cancelled at the five-minute timeout during swift test; no result. Site v154 deployed from Site source 6242beb8ecd26008e235b46b7f922c37010b14b2 as appgdep_6ace9add32348191ad8bf25dc41140bf; anonymous routes verified. No app release/downloads.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
     "seo_keyword_research": "Live qualitative SERP wording: RU: неофициальный клиент Telegram для macOS; клиент Telegram для Mac; альтернативный клиент Telegram для Mac/macOS; приложение для Telegram на Mac. EN: unofficial Telegram client for macOS; Telegram client for Mac; alternative Telegram client for Mac/macOS; native macOS Telegram client; open-source Telegram client for Mac. No search volume/rank source was available.",
     "brand_audit": "Canonical app, GitHub README/About and public Site v123 use NeTelegram. Historical Neridian references remain only in history/superseded state notes.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
-    "current_head_app16_ci": "Exact-source macOS CI run 38495482988 passed all 162 tests for a45536262185b13e2bb47703449f6d4c69a7bb3d on macOS 15 / Xcode 16.4 / Swift 6.1.2 arm64.",
+    "current_head_app16_ci": "Exact-source macOS CI run 38497467214 passed the runner probe but was cancelled at the five-minute limit during the full serial suite; no hosted full-suite PASS. Exact-source local suite passed 163/163 under Xcode 27.0 / Swift 6.4.",
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
     "latest_exact_source_ci": {
-      "run_id": 38495482988,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482988",
-      "workflow_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "scope": "Exact-source macOS CI passed runner probe and serial Swift suite 162/162 on macOS 15 / Xcode 16.4 / Swift 6.1.2 arm64."
+      "run_id": 38497467214,
+      "status": "cancelled",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214",
+      "workflow_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "scope": "Runner probe passed; full serial test suite cancelled at five-minute job limit without a suite result. Exact-source local serial suite passed 163/163."
     },
     "current_head_native_build": {
-      "run_id": 38495482965,
+      "run_id": 38497467210,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482965",
-      "workflow_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467210",
+      "workflow_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "scope": "Pinned TDLib arm64 Dev.app assembly passed; lifecycle smoke accountless. It did not verify real auth/accounts."
     },
     "latest_local_appkit_build": {
-      "result": "App source 94740d38bfa845919ac2863ad0e78d1a7d494a04; `scripts/dev-app.sh --launch` built arm64 canonical Dev.app in 9.12s, ad-hoc nested signature verification passed. AX and screenshot show welcome form, locale-suggested Thailand +66, number field, Continue and QR. No account/number/code entered.",
-      "toolchain": "Apple Swift 6.4, arm64, macOS 14 baseline",
+      "result": "Exact app source fa80d5a5f77b1fecf583754f3fe5cf69209be75b; canonical Dev.app rebuilt in 0.18s; ad-hoc signature verification passed; CUA verified bilingual country search and region selection with no credentials.",
+      "toolchain": "Apple Swift 6.4; arm64; macOS 14 baseline",
       "bundle_id": "org.affpapa.netelegram.dev",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-first-run-smoke-94740d3",
-      "source_fingerprint_sha256": "e79a341bdfc0c7cd1c7da64c68b0a42112af892000c42c01bac16fed836d32b6",
-      "executable_sha256": "af309b5551f57682e86d8a521da99ae97f04606fbfc17d4df5d10cd101fc2a31",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
+      "executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "signing": "ad-hoc development only",
-      "native_gui_smoke": "Current exact source shown; country picker AX Value 🇹🇭 Thailand +66; status says choose country and enter phone number; no credentials, profile or runtime created.",
-      "hosted_ci_run": 38466197778,
-      "metadata_validation_run": 38464148278
+      "native_gui_smoke": "Search Canada found 🇨🇦 Канада +1 and selection updated the country control; no auth credentials entered.",
+      "hosted_ci_run": 38497467214,
+      "native_build_run": 38497467210
     },
     "telegram_api_compatibility": "Primary Terms page rechecked 2026-10-14. Sign-in intro now explicitly states Telegram API/TDLib use and ecosystem membership with a no-affiliation statement. Terms §2.3 still conflicts with requested public title NeTelegram; §3.3 requires sponsored channel messages/video behavior, which user declined to add; channel access/stable release remain deferred. §§1.3/1.4 basic functionality review remains open. Pinned schema c15d3f5a5de6e3ba5839822c451152e5e18bb700 exposes sponsored video and timed video ad APIs.",
     "last_native_bundle_smoke": {
@@ -216,7 +216,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue AUTH05 as one bounded sign-in UX slice: improve country selection/search without changing auth or profile identity; run one focused Core/AppKit test and exact-source hosted CI/native build only after code changes. Do not repeat successful a455362 suite/build. Preserve current public Site v169 and batch the next factual Site entry after its exact-source checks. Real user login remains deferred; do not enter or request credentials.",
+  "next_action": "Publish the AUTH05 bilingual country-search development entry once to the existing public Site v170, verify anonymous route and links, then proceed to the next bounded app slice. Keep one canonical source SHA and Dev.app; focused tests plus one full local suite only when hosted CI stalls; never repeat unchanged failed CI. Real login remains deferred.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -225,9 +225,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "7d63518026eb17266cfb816d4af22189be859374",
-    "app_source_commit_authority": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937"
+    "repo_head_before_checkpoint": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "app_source_commit_authority": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -410,5 +410,15 @@
     "hosted_serial_suite": "passed 162/162; run 38495482988",
     "native_bundle_workflow": "passed pinned TDLib arm64 Dev.app assembly; run 38495482965; no app launch or account smoke",
     "remaining": "partial; real TDLib receive/send, picker timing, account auth, 20 real runtimes and device lifecycle remain unverified"
+  },
+  "latest_auth05": {
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "local_suite": "163/163; 0.426s",
+    "hosted_ci_run": 38497467214,
+    "hosted_ci_status": "cancelled after runner probe at five-minute job limit",
+    "native_build_run": 38497467210,
+    "native_build_status": "success",
+    "local_dev_app": "exact-source canonical bundle; CUA country search and select verified; no credentials",
+    "acceptance_status": "partial"
   }
 }

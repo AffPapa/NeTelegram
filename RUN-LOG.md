@@ -1,3 +1,11 @@
+## 2026-10-14 — AUTH05 country search verified in the canonical Dev.app
+
+- App source commit: `fa80d5a5f77b1fecf583754f3fe5cf69209be75b`. Search now matches localized and English names, region codes, and calling codes; the currently selected country remains visible as a separate marked option while filtering. Selecting a result retains its exact region, including for shared `+1` calling codes.
+- Focused regression passed 1/1. Exact-source local serial Swift suite passed 163/163 in 0.426s on arm64e / Xcode 27.0 / Swift 6.4. Hosted macOS CI [38497467214](https://github.com/AffPapa/NeTelegram/actions/runs/38497467214) passed its runner probe, then was cancelled at the five-minute job limit during the full suite; no hosted suite result is claimed.
+- Pinned TDLib arm64 Dev.app workflow [38497467210](https://github.com/AffPapa/NeTelegram/actions/runs/38497467210) passed. The sole canonical local bundle `/private/tmp/NeTelegram-Dev.app` was rebuilt from this source in 0.18s; ad-hoc code signature verification passed. CUA confirmed search `Canada` returns `🇨🇦 Канада +1` and selecting it updates the control. No phone number or code was entered.
+- Site v169 remains live until one batched AUTH05 development update is deployed. No app release, real Telegram login, real-account coverage, or 20-runtime certification occurred.
+- Speed guard: one source commit, one canonical bundle, focused test plus one exact-source local full suite after hosted cancellation, one native workflow; no unchanged CI retry or duplicate app launch.
+
 # NeTelegram run log
 
 ## 2026-10-13 — Native smoke checkpoint wording corrected

@@ -1,40 +1,33 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; exact source a455362 adds fail-closed shared TDLib receive behavior for unknown client routes and includes photo-send post-staging validation. Hosted serial CI passed 162/162 (38495482988); pinned TDLib/Dev.app assembly passed (38495482965). No real Telegram login, 20-account certification, notarized app release, or channel compatibility clearance.",
+  "status": "implementation_in_progress; AUTH05 country search is now bilingual and preserves selected region at exact app source fa80d5a. Local exact-source Swift suite passed 163/163; hosted suite 38497467214 was cancelled after its probe at the five-minute limit; pinned TDLib Dev.app assembly 38497467210 passed. Real auth, 20-account coverage, signed release and compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
-    "app_tests": "Photo-send race regression photoSendRevalidatesLiveTargetAfterAsyncStaging passed locally 1/1; diagnostic full local serial suite passed 161/161 under arm64 / Xcode 27 / Swift 6.4. Exact hosted macOS CI run 38494308524 was cancelled at the 5-minute limit before any full-suite test result; the one-test probe passed, and logs show the test process built but never emitted 'Test run started'.",
-    "github_workflows": {
-      "current_app_source_ci": {
-        "run_id": 38494308524,
-        "workflow_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
-        "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
-        "result": "cancelled",
-        "scope": "5-minute job limit while full Swift Testing runner was starting; filtered runner probe passed and no full-suite test-level result was emitted. Local diagnostic exact-source serial suite passed 161/161."
-      },
-      "latest_native_bundle": {
-        "run_id": 38494308687,
-        "workflow_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
-        "app_source_commit": "5b40336754462cc767727a1bde9c553e2513d13e",
-        "result": "success",
-        "scope": "Pinned TDLib arm64 Dev.app build/assembly passed for exact Swift source 5b40336; not a real-account smoke."
-      }
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "local_suite": "163/163 passed in 0.426s; arm64e / Xcode 27.0 / Swift 6.4",
+    "focused_test": "countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct passed 1/1",
+    "hosted_ci": {
+      "run_id": 38497467214,
+      "status": "cancelled",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214",
+      "scope": "Runner probe passed; full serial suite cancelled at five-minute job limit without a test result."
     },
-    "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app rebuilt for app source 2d8a4e5; ad-hoc signature verified. CUA confirms accountless welcome, phone and QR entry. No login credentials entered.",
-    "product_branding": "NeTelegram. GitHub README.md is bilingual with full English and Russian project descriptions, natural RU/EN search phrases, and direct non-affiliation wording. GitHub About description is bilingual; homepage points to the existing public Site and topics are set. No keyword-volume/ranking dataset was found.",
-    "real_account_coverage": "none; user deferred login",
-    "twenty_authorized_runtime_coverage": "none; no authorized real accounts; synthetic tests do not certify 20 runtimes",
-    "release_status": "No public application release. Two valid Developer ID Application identities for team H6VGU2M6JD are present, but no notarytool profile was found; no distribution candidate was signed/notarized/stapled and no Gatekeeper install was performed.",
-    "site": "Public Site v168 from source 8a90bfa deployed as appgdep_6aced33c6180819180ed76df0094ad26 at https://netelegram.iryadom.chatgpt.site. Anonymous CUA verified the new devlog entry and /downloads/ NO RELEASE state; no empty binary CTA.",
-    "seo_research": "Qualitative live SERP review: RU phrases include неофициальный клиент Telegram для macOS, клиент Telegram для Mac, альтернативный клиент Telegram для Mac/macOS, приложение для Telegram на Mac; EN includes unofficial Telegram client for macOS, Telegram client for Mac, alternative Telegram client for Mac/macOS, native macOS Telegram client, open-source Telegram client for Mac. Search volumes and rankings were not measured.",
-    "github_repository_metadata": "Description is bilingual and explicitly says independent/unofficial, source implementation and no direct Telegram relationship; homepage https://netelegram.iryadom.chatgpt.site; topics telegram-client, macos, swift, appkit, tdlib, open-source.",
-    "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
-    "code_signing_preflight": "Read-only inventory on 2026-10-14: two consecutive `security find-identity -v -p codesigning` queries returned 4 valid identities, including 2 Developer ID Application identities for team H6VGU2M6JD; one adjacent query transiently returned 0, so identity enumeration was inconsistent once. No fingerprints/private keys were output or read. Read-only SecItem metadata lookup for Apple notarytool service com.apple.gke.notary.tool returned errSecItemNotFound; no APPLE_/ASC_/NOTARY_ environment variable names are configured. Identity availability is now confirmed by repeated enumeration; notarization credentials are not.",
-    "github_release_inventory": "GitHub REST GET https://api.github.com/repos/AffPapa/NeTelegram/releases?per_page=100 returned an empty release list. No public application release exists.",
-    "native_dev_app_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app, clean checkpoint 7f95e03c, source 209be94f, 0.23s build, ad-hoc signature verified, AX confirms phone/QR/disclosure, no auth data entered. App-menu Quit process exit verified by CUA inventory. Cmd+Q remains unverified; not inferred defective from automation.",
-    "previous_native_smoke_correction": "Workflow 38431733910 did run Scripts/window-lifecycle-smoke.sh: its logs report last-window close, LaunchServices reopen in the same PID, one-window state and quit. This is accountless only.",
-    "app_build": "Exact app-source SHA 6145b0156068f784e1eea3bf70df77a8b834bf83 built locally with swift build using /private/tmp/netelegram-swiftpm-cache on Xcode 27.0 / Swift 6.4 (5.27 seconds). No account or keychain data was accessed.",
-    "telegram_api_compatibility": "Primary current Terms and exact pinned TDLib schema rechecked 2026-10-14. App intro now says it uses Telegram API/TDLib and belongs to the Telegram ecosystem, while stating no direct affiliation. Terms §2.3 title conflict remains; §3.3 sponsored video is required for channel access, and user declined a video player; stable channel access is deferred. Terms §§1.3/1.4 basic functionality review remains open."
+    "native_build": {
+      "run_id": 38497467210,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467210",
+      "scope": "Pinned TDLib arm64 Dev.app assembly succeeded."
+    },
+    "local_dev_app": {
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
+      "executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "signature": "ad-hoc; codesign --verify --deep --strict passed",
+      "smoke": "CUA search Canada found 🇨🇦 Канада +1; selected value updated. No credentials entered."
+    }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -477,7 +470,7 @@
       "method": "AppKit empty-catalogue UI + deterministic catalog/phone tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial. The routine Dev.app script now defaults to a fresh isolated root; exact local smoke at checkpoint 3cba4c5 shows country +66, phone field, Continue, QR and neutral prompt without UUID profiles. No phone/code entered."
+      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial. The routine Dev.app script now defaults to a fresh isolated root; exact local smoke at checkpoint 3cba4c5 shows country +66, phone field, Continue, QR and neutral prompt without UUID profiles. No phone/code entered. Current app source fa80d5a5f77b1fecf583754f3fe5cf69209be75b adds bilingual country-name search and retains the selected region as a separate marked item while filtering. Focused search regression passed 1/1; exact-source local serial suite passed 163/163 in 0.426s on arm64e / Xcode 27.0 / Swift 6.4. Exact-source hosted macOS CI 38497467214 passed the runner probe but was cancelled at its five-minute job limit during the full suite; no hosted suite result is claimed. Pinned TDLib/arm64 Dev.app workflow 38497467210 passed. The one canonical local Dev.app at /private/tmp/NeTelegram-Dev.app was rebuilt from fa80d5a5f77b1fecf583754f3fe5cf69209be75b in 0.18s, ad-hoc codesign verification passed, and accessibility smoke searched 'Canada', found '🇨🇦 Канада +1', and selected it; current Thailand remains explicit when filtered. No phone, code, account, or session was entered. AUTH05 remains partial pending real auth and broader flow/accessibility coverage."
     }
   ],
   "last_verification": {
@@ -540,7 +533,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue AUTH05 as one bounded sign-in UX slice: improve country selection/search without changing auth or profile identity; run one focused Core/AppKit test and exact-source hosted CI/native build only after code changes. Do not repeat successful a455362 suite/build. Preserve current public Site v169 and batch the next factual Site entry after its exact-source checks. Real user login remains deferred; do not enter or request credentials.",
+  "next_action": "Publish this AUTH05 development milestone once to the existing public Site using the official source-helper flow, then choose the next bounded app slice. Keep using one canonical source commit and one Dev.app; run focused local tests, one full local suite only when hosted suite does not finish, and one exact-source native workflow. Do not repeat unchanged failed CI. Real user login remains deferred.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
