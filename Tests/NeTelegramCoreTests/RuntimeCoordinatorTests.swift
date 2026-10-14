@@ -1752,9 +1752,9 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         // Represents LocalAccountRuntime.consume suspending while the
         // verified Telegram identity is persisted.
         callbackStarted.set(true)
-        await consumeGate.wait()
-        let stillOwnsRoute = await RuntimeUpdateOwnership.isCurrent(
+        let stillOwnsRoute = await RuntimeUpdateOwnership.consumeThenCheck(
             oldRoute,
+            consume: { await consumeGate.wait() },
             coordinatorRouteIsCurrent: {
                 let wasCurrentBeforeSuspension = await coordinator.isCurrent(oldRoute)
                 coordinatorCheckStarted.set(true)

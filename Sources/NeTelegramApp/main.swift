@@ -2820,7 +2820,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let previousError = target.lastTDLibError
             let previousIdentityPersistenceFailure = target.identityPersistenceFailed
             let previousMainChatLoadRevision = target.mainChatLoadRevision
-            await target.consume(object)
             // consume may suspend while saving a verified identity. A close or
             // replacement can happen during that await, so revalidate both the
             // coordinator route and AppDelegate ownership before applying any
@@ -2829,8 +2828,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // MainActor may process close/reopen while the actor check is in
             // flight, so local ownership checks placed before this await are
             // stale as soon as control resumes.
-            guard await RuntimeUpdateOwnership.isCurrent(
+            guard await RuntimeUpdateOwnership.consumeThenCheck(
                 update.route,
+                consume: { await target.consume(object) },
                 coordinatorRouteIsCurrent: { await runtimeCoordinator.isCurrent(update.route) },
                 localOwnerIsCurrent: {
                     target.route == update.route

@@ -45,6 +45,23 @@ public struct RuntimeRoute: Sendable, Equatable {
 /// after that await, while executing on the main actor.
 @MainActor
 public enum RuntimeUpdateOwnership {
+    /// Runs the runtime's asynchronous update reduction and then checks that
+    /// the same route still owns the callback before the caller applies any
+    /// account, notification, or presentation side effects.
+    public static func consumeThenCheck(
+        _ route: RuntimeRoute,
+        consume: @MainActor () async -> Void,
+        coordinatorRouteIsCurrent: @Sendable () async -> Bool,
+        localOwnerIsCurrent: @MainActor () -> Bool
+    ) async -> Bool {
+        await consume()
+        return await isCurrent(
+            route,
+            coordinatorRouteIsCurrent: coordinatorRouteIsCurrent,
+            localOwnerIsCurrent: localOwnerIsCurrent
+        )
+    }
+
     public static func isCurrent(
         _ route: RuntimeRoute,
         coordinatorRouteIsCurrent: @Sendable () async -> Bool,
