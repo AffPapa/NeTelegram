@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "PHOTO-SLOT-01 photo completion reconciles outside the visible conversation — exact-source CI PASS; focused policy 2/2; canonical Dev.app build/signature/accountless launch verified; real photo interaction remains unverified.",
+  "phase": "CHAT-LIST-01: focused tests 2/2, exact-source CI 184/184, and canonical accountless Dev.app smoke passed; real chat-list interaction and account coverage remain unverified.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab"
+    "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38588737959,
+      "run_id": 38592440642,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38588737959",
-      "workflow_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "scope": "Exact-source GitHub macOS serial Swift tests completed successfully for this photo-slot change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38592440642",
+      "workflow_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "scope": "Exact-source GitHub macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2 serial suite passed 184/184 tests."
     },
     "published_application_releases": [],
     "github_access": {
@@ -124,26 +124,26 @@
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
+    "application_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "bfc08d16c7f082864bc208495fe1f51d1f037ac1c6921d4346a3fce773afd357",
-    "executable_sha256": "3191233eb5026ed2c73697a57ef4b20a7ad2f8688a2a690ab76d1a9459401ead",
+    "source_fingerprint_sha256": "857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31",
+    "executable_sha256": "2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical Dev.app built once from clean source 352a293c (352a293ccb93d7f74799d1852ca98065e32193ab), arm64, strict ad-hoc signature verification passed, then opened through CUA by exact bundle path. AX title `NeTelegram · dev 352a293c` matches embedded BuildInfo; phone and QR authorization screen is empty. No credentials or account were entered. This is not a photo/account E2E test.",
-    "scope": "Completed photo downloads now release admission slots by account and file ID even when UI is locked or another chat is selected; request correlation survives message-list rebuild until TDLib completion/error or explicit cancellation. Focused policy tests and exact-source CI pass; the canonical app builds and opens. Real TDLib photo presentation remains unverified without an owner-authorized account."
+    "smoke": "Canonical Dev.app built once from clean source 50445df3 in 5.27s, arm64, strict ad-hoc signature verification passed; BuildInfo fingerprint 857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31; executable SHA-256 2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. CUA AX title NeTelegram · dev 50445df3 matches BuildInfo; blank phone/QR form, no credentials or profile data. Accountless smoke cannot exercise actual chat rows or pagination.",
+    "scope": "Accountless exact-source build/login identity only. Real account/chat interaction remains unverified."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "PASS 2/2 PhotoDownloadSlotPolicyTests; exact-source full CI passed.",
-      "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "hosted_run_id": 38588737959
+      "result": "PASS 2/2 focused chat-list tests; exact-source macOS CI passed 184/184.",
+      "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "hosted_run_id": 38592440642
     },
     "real_telegram_account": "not tested; owner-operated login remains pending.",
     "real_twenty_runtime_coverage": "not tested",
@@ -338,7 +338,7 @@
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Continue one P0/P1 vertical slice toward usable account-backed messaging. The canonical Dev.app is open on a clean login form; the owner must enter Telegram credentials in the app when ready. Do not access the separate Telegram app or inspect session data. Then verify one real login/read/send/photo path; after working native scenarios, complete release gates, publish immutable GitHub assets, and only then update Site downloads.",
+  "next_action": "Continue one P0/P1 vertical slice toward account-backed messaging. The canonical Dev.app is open on the clean login form; the owner can enter credentials in that app when ready. Do not inspect the separate Telegram app or session data. After one real account supports login/read/send/photo smoke, proceed to release gates; only then publish immutable GitHub assets and add their verified link to the Site. Signing/notarization and Telegram policy gates remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -347,13 +347,13 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "app_source_commit_authority": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "repo_head": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "origin_main": "352a293ccb93d7f74799d1852ca98065e32193ab",
+    "repo_head_before_checkpoint": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "app_source_commit_authority": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "repo_head": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "origin_main": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
     "upstream": "origin/main",
-    "dirty_state": "Canonical checkout /private/tmp/netelegram-cli-work is clean at main/origin/main 352a293ccb93d7f74799d1852ca98065e32193ab; APP20 photo-slot fix is in exact-source CI and canonical Dev.app evidence is current. Legacy /Users/dumay/rumors-wtf/netelegram remains separate, divergent and untouched."
+    "dirty_state": "Canonical checkout /private/tmp/netelegram-cli-work is clean at main/origin/main 50445df3c19dc13f11dab65ec1385c12b9e431a4. CHAT-LIST-01 source is pushed; exact-source CI 184/184 passed. The single canonical arm64 Dev.app is built and open from this SHA on the blank login form. Legacy /Users/dumay/rumors-wtf/netelegram remains separate, divergent and untouched."
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -393,7 +393,11 @@
     "If the process guard and NSWorkspace disagree, trust the safer positive process detection, identify only the executable path, and never force-quit/rebuild the canonical app while it may hold an account session.",
     "2026-10-14 CORE-RUNTIME-05: on resume, compare canonical checkout HEAD/origin, app-source SHA, embedded Dev.app BuildInfo SHA, and Site version separately. Do not infer the running app updated after source push; never rebuild or launch a second bundle to resolve a stale checkpoint. First refresh the checkpoint, then wait for the owner to finish real-account input in the existing app.",
     "2026-10-14 CORE-RUNTIME-05 native candidate: `Scripts/dev-app.sh --launch` can return LaunchServices kLSNoExecutableErr even when the generated bundle is valid. Do not repeat launch variations or run the executable directly; verify build/signature, then bind the exact canonical bundle by path through CUA once and confirm the embedded commit.",
-    "2026-10-14 workflow efficiency: finish review and commit app-source changes before replacing the canonical Dev.app. Treat any dirty-tree UI preview as disposable evidence only; record the one final clean-source bundle by SHA and fingerprint. A direct LaunchServices launch must resolve the debug support root from embedded BuildInfo when argv is absent."
+    "2026-10-14 workflow efficiency: finish review and commit app-source changes before replacing the canonical Dev.app. Treat any dirty-tree UI preview as disposable evidence only; record the one final clean-source bundle by SHA and fingerprint. A direct LaunchServices launch must resolve the debug support root from embedded BuildInfo when argv is absent.",
+    "Freeze a code slice before building: run only its focused tests, commit/push one final source SHA, then build/launch the canonical Dev.app once from that exact clean SHA. If code changes afterward, that is a new candidate and needs an explicit new verification; never build intermediate code and call it current.",
+    "When SwiftPM cannot write the default user caches, do not repeat the same command. Set CLANG_MODULE_CACHE_PATH and --scratch-path under /private/tmp, disable sandbox only for that test invocation, and record the changed environment.",
+    "Swift Testing #expect autoclosures cannot contain mutating value-type calls; assign the result first, then assert. Resolve AppKit optional scroller and numeric type mismatches before rebuilding.",
+    "Use one source SHA for the focused tests, GitHub CI, and Dev.app. Close only NeTelegram through its own menu; use fresh CUA app inventory plus the exact process guard before replacing the bundle. If sandboxed pgrep cannot inspect processes, request the narrow read-only system process check instead of retrying builds or bypassing the guard."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
@@ -551,20 +555,20 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "PHOTO-SLOT-01 photo completion reconciles outside the visible conversation",
-    "source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "change": "Completion reconciliation now frees all matching account/file download slots regardless of selected chat or privacy-lock state. View intent is cleared on rebuild while TDLib request correlation remains until a terminal update/error or explicit cancellation.",
-    "focused_test": "PhotoDownloadSlotPolicyTests passed 2/2: releases matching file slots across chats/topics for one account, preserves other-account slots, and repeated completion is idempotent.",
+    "id": "CHAT-LIST-01",
+    "source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "change": "Chat-list loads now remain pending until TDLib replies; @extra/request IDs reject stale responses, 404 marks exhaustion, failures are retryable, and a guarded near-end scroll requests one page per user arrival. Loading/empty/error states are visible; an empty loaded list has an explicit “Загрузить ещё” action.",
+    "focused_test": "Focused RuntimeCoordinatorTests passed 2/2: reload after privacy lock/failure, page/exhaustion transitions, and stale response rejection.",
     "hosted_ci": {
-      "run_id": 38588737959,
+      "run_id": 38592440642,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38588737959",
-      "workflow_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "scope": "Exact-source GitHub macOS serial Swift tests completed successfully for this photo-slot change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38592440642",
+      "workflow_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "scope": "Exact-source GitHub macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2 serial suite passed 184/184 tests."
     },
-    "native_smoke": "Canonical Dev.app built once from clean source 352a293c (352a293ccb93d7f74799d1852ca98065e32193ab), arm64, strict ad-hoc signature verification passed, then opened through CUA by exact bundle path. AX title `NeTelegram · dev 352a293c` matches embedded BuildInfo; phone and QR authorization screen is empty. No credentials or account were entered. This is not a photo/account E2E test.",
-    "scope": "Completed photo downloads now release admission slots by account and file ID even when UI is locked or another chat is selected; request correlation survives message-list rebuild until TDLib completion/error or explicit cancellation. Focused policy tests and exact-source CI pass; the canonical app builds and opens. Real TDLib photo presentation remains unverified without an owner-authorized account."
+    "native_smoke": "Canonical Dev.app built once from clean source 50445df3 in 5.27s, arm64, strict ad-hoc signature verification passed; BuildInfo fingerprint 857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31; executable SHA-256 2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. CUA AX title NeTelegram · dev 50445df3 matches BuildInfo; blank phone/QR form, no credentials or profile data. Accountless smoke cannot exercise actual chat rows or pagination.",
+    "scope": "Accountless/deterministic checks only; actual TDLib chat list requires owner login."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -705,7 +709,7 @@
     "release_status": "No signed/notarized release. Canonical accountless Dev.app source is 3dc8a11e49438cf8e4e79280a4f851c86834db2c, ad-hoc development signed; no login/read/send or real 20-runtime evidence.",
     "api_id": "Source TelegramApplicationIdentity.apiID is 37110989, matching the owner-provided App api_id."
   },
-  "status": "PHOTO-SLOT-01 photo completion reconciles outside the visible conversation — exact-source CI PASS; focused policy 2/2; canonical Dev.app build/signature/accountless launch verified; real photo interaction remains unverified.",
+  "status": "CHAT-LIST-01: focused tests 2/2, exact-source CI 184/184, and canonical accountless Dev.app smoke passed; real chat-list interaction and account coverage remain unverified.",
   "latest_design_research": {
     "date": "2026-10-14",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
@@ -761,20 +765,39 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "PHOTO-SLOT-01 photo completion reconciles outside the visible conversation",
-    "source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "change": "Completion reconciliation now frees all matching account/file download slots regardless of selected chat or privacy-lock state. View intent is cleared on rebuild while TDLib request correlation remains until a terminal update/error or explicit cancellation.",
-    "focused_test": "PhotoDownloadSlotPolicyTests passed 2/2: releases matching file slots across chats/topics for one account, preserves other-account slots, and repeated completion is idempotent.",
+    "id": "CHAT-LIST-01",
+    "commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "parent_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
+    "push": "success; pushed once to AffPapa/NeTelegram main",
+    "local_tests": "Focused RuntimeCoordinatorTests passed 2/2: reload after privacy lock/failure, page/exhaustion transitions, and stale response rejection.",
     "hosted_ci": {
-      "run_id": 38588737959,
+      "run_id": 38592440642,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38588737959",
-      "workflow_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-      "scope": "Exact-source GitHub macOS serial Swift tests completed successfully for this photo-slot change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38592440642",
+      "workflow_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "scope": "Exact-source GitHub macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2 serial suite passed 184/184 tests."
     },
-    "native_smoke": "Canonical Dev.app built once from clean source 352a293c (352a293ccb93d7f74799d1852ca98065e32193ab), arm64, strict ad-hoc signature verification passed, then opened through CUA by exact bundle path. AX title `NeTelegram · dev 352a293c` matches embedded BuildInfo; phone and QR authorization screen is empty. No credentials or account were entered. This is not a photo/account E2E test.",
-    "scope": "Completed photo downloads now release admission slots by account and file ID even when UI is locked or another chat is selected; request correlation survives message-list rebuild until TDLib completion/error or explicit cancellation. Focused policy tests and exact-source CI pass; the canonical app builds and opens. Real TDLib photo presentation remains unverified without an owner-authorized account."
+    "change": "Chat-list loads now remain pending until TDLib replies; @extra/request IDs reject stale responses, 404 marks exhaustion, failures are retryable, and a guarded near-end scroll requests one page per user arrival. Loading/empty/error states are visible; an empty loaded list has an explicit “Загрузить ещё” action.",
+    "native_app": {
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "version": "0.0.0-dev",
+      "application_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "dirty_source": false,
+      "distribution_ready": false,
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31",
+      "executable_sha256": "2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Canonical Dev.app built once from clean source 50445df3 in 5.27s, arm64, strict ad-hoc signature verification passed; BuildInfo fingerprint 857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31; executable SHA-256 2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. CUA AX title NeTelegram · dev 50445df3 matches BuildInfo; blank phone/QR form, no credentials or profile data. Accountless smoke cannot exercise actual chat rows or pagination.",
+      "scope": "Accountless exact-source build/login identity only. Real account/chat interaction remains unverified."
+    },
+    "coverage_limit": "No owner-authenticated account; actual TDLib rows, end-of-list scroll, empty account, retry and real multi-page behavior remain unverified."
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
@@ -801,17 +824,18 @@
   "pending_native_candidate": null,
   "latest_pushed_commit": {
     "branch": "main",
-    "sha": "352a293ccb93d7f74799d1852ca98065e32193ab",
+    "sha": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
     "verified": "Git push to AffPapa/NeTelegram succeeded; exact-source macOS CI passed.",
-    "ci_status": "success"
+    "ci_status": "success",
+    "ci_run_id": 38592440642
   },
   "latest_exact_source_ci": {
-    "run_id": 38588737959,
+    "run_id": 38592440642,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38588737959",
-    "workflow_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "scope": "Exact-source GitHub macOS serial Swift tests completed successfully for this photo-slot change."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38592440642",
+    "workflow_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "scope": "Exact-source GitHub macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2 serial suite passed 184/184 tests."
   },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
@@ -822,30 +846,51 @@
   "checkpoint_pointer_policy": "Canonical current Dev.app identity lives only at local_development_candidate and is mirrored as required at ACCEPTANCE.current_evidence.local_dev_app. Older build/smoke evidence stays in append-only RUN-LOG.md; no competing latest/current native bundle pointers.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "command": "Scripts/dev-app.sh",
-    "result": "PASS: one canonical arm64 Dev.app built from clean source 352a293ccb93d7f74799d1852ca98065e32193ab (5.85s); fingerprint bfc08d16c7f082864bc208495fe1f51d1f037ac1c6921d4346a3fce773afd357; executable SHA-256 3191233eb5026ed2c73697a57ef4b20a7ad2f8688a2a690ab76d1a9459401ead; pinned TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; strict ad-hoc codesign verification passed."
+    "source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "command": "Scripts/dev-app.sh --launch",
+    "result": "PASS: one clean-source canonical arm64 Dev.app built in 5.27s; strict ad-hoc signature verification passed.",
+    "source_fingerprint_sha256": "857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31",
+    "executable_sha256": "2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
+    "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "bfc08d16c7f082864bc208495fe1f51d1f037ac1c6921d4346a3fce773afd357",
-    "executable_sha256": "3191233eb5026ed2c73697a57ef4b20a7ad2f8688a2a690ab76d1a9459401ead",
+    "source_fingerprint_sha256": "857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31",
+    "executable_sha256": "2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical Dev.app built once from clean source 352a293c (352a293ccb93d7f74799d1852ca98065e32193ab), arm64, strict ad-hoc signature verification passed, then opened through CUA by exact bundle path. AX title `NeTelegram · dev 352a293c` matches embedded BuildInfo; phone and QR authorization screen is empty. No credentials or account were entered. This is not a photo/account E2E test.",
-    "scope": "Completed photo downloads now release admission slots by account and file ID even when UI is locked or another chat is selected; request correlation survives message-list rebuild until TDLib completion/error or explicit cancellation. Focused policy tests and exact-source CI pass; the canonical app builds and opens. Real TDLib photo presentation remains unverified without an owner-authorized account."
+    "result": "Canonical Dev.app built once from clean source 50445df3 in 5.27s, arm64, strict ad-hoc signature verification passed; BuildInfo fingerprint 857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31; executable SHA-256 2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. CUA AX title NeTelegram · dev 50445df3 matches BuildInfo; blank phone/QR form, no credentials or profile data. Accountless smoke cannot exercise actual chat rows or pagination.",
+    "scope": "Exact-source accountless build/login identity only; chat rows and pagination require an owner-authenticated account."
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
-    "case": "APP20",
-    "receipt_id": "PHOTO-SLOT-01 photo completion reconciles outside the visible conversation",
-    "test_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "app_code_commit": "352a293ccb93d7f74799d1852ca98065e32193ab",
-    "test": "PhotoDownloadSlotPolicyTests",
-    "result": "PASS 2/2",
-    "command": "swift test --filter PhotoDownloadSlotPolicyTests",
-    "scope": "Pure admission-slot release policy across account/conversation boundaries and idempotent completion. Not a real TDLib photo test."
+    "case": "APP30",
+    "receipt_id": "CHAT-LIST-01 async chat-list state and on-demand pagination",
+    "test_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "app_code_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "test": "chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure; staleChatListPageResponseCannotCompleteReplacementSnapshot",
+    "result": "PASS 2/2 local; PASS 184/184 exact-source macOS CI",
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure|staleChatListPageResponseCannotCompleteReplacementSnapshot'",
+    "scope": "Request/reply state, stale @extra/request-ID rejection, next-page admission/exhaustion, privacy invalidation/reload, and retry; no live TDLib account test."
+  },
+  "latest_chat_list_pagination_slice": {
+    "date": "2026-10-14",
+    "id": "CHAT-LIST-01",
+    "source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+    "change": "Chat-list loads now remain pending until TDLib replies; @extra/request IDs reject stale responses, 404 marks exhaustion, failures are retryable, and an explicit near-end scroll requests one page without cascading. Empty/loading/error states are visible; an empty loaded list has an explicit “Загрузить ещё” action.",
+    "focused_test": "Focused RuntimeCoordinatorTests passed 2/2: reload after privacy lock/failure, page/exhaustion transitions, and stale response rejection.",
+    "test_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure|staleChatListPageResponseCannotCompleteReplacementSnapshot'",
+    "hosted_ci": {
+      "run_id": 38592440642,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38592440642",
+      "workflow_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "app_source_commit": "50445df3c19dc13f11dab65ec1385c12b9e431a4",
+      "scope": "Exact-source GitHub macOS 15 arm64 / Xcode 16.4 / Swift 6.1.2 serial suite passed 184/184 tests."
+    },
+    "native_smoke": "Canonical Dev.app built once from clean source 50445df3 in 5.27s, arm64, strict ad-hoc signature verification passed; BuildInfo fingerprint 857fa0b57ad57928b4b82f098593614369ea5ed3bfc22bb5db62611d0272de31; executable SHA-256 2cf127e245cf41e507f1a56c9afdc5b52d43ee440d78acc87e3627592bbefd7a; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1. CUA AX title NeTelegram · dev 50445df3 matches BuildInfo; blank phone/QR form, no credentials or profile data. Accountless smoke cannot exercise actual chat rows or pagination.",
+    "coverage_limit": "No owner-authenticated Telegram account. Actual TDLib chat updates, multi-page scroll, retry, and empty-account behavior remain unverified."
   }
 }
