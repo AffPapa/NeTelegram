@@ -108,27 +108,27 @@
       "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
     },
     "latest_exact_source_ci": {
-      "run_id": 38597901537,
+      "run_id": 38607088774,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38597901537",
-      "workflow_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-      "app_source_commit": "ae169ecf0e619eb27e7e8767266baacb6dbe2091",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift test suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
+      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
     },
     "latest_native_workflow_ci": {
-      "run_id": 38554499473,
+      "run_id": 38607088681,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38554499473",
-      "workflow_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
-      "app_source_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
-      "scope": "Exact-source pinned TDLib build and isolated arm64 Dev.app assembly/verification passed; build artifact uploaded for review. This is hosted build evidence, not real-account acceptance or a signed public release."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088681",
+      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed for the exact commit; hosted artifact is development evidence only."
     },
     "latest_pushed_commit": {
       "branch": "main",
-      "sha": "936c2cf2e09b00e3b0c8e5a8421de07544bdb2de",
-      "verified": "Pushed once to AffPapa/NeTelegram main; exact-source macOS CI passed.",
-      "ci_status": "success",
-      "ci_run_id": 38600662118
+      "sha": "4f9f083b20adb16c05d88b20afee24f5e4b2d64d",
+      "verified": "Pushed to AffPapa/NeTelegram main. Docs/checkpoint-only commit; app source remains 291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b.",
+      "ci_status": "not_run_docs_only",
+      "ci_run_id": null
     }
   },
   "local_development_candidate": {
@@ -309,19 +309,20 @@
     "public_application_download": false,
     "updater_feeds": "Stable and alpha feeds are valid XML and contain zero update items; no app download record.",
     "public_route_verified": "2026-10-15: anonymous in-app browser loaded fresh cache-busted / and /downloads/. Home shows AffPapa Chat, AUTH UI milestone 291cd0a and current CI; downloads explicitly says no release/installer and links to source. Original ?v=195 tab had cached v194; it was not counted as current proof.",
-    "archive_local_path": "/private/tmp/netelegram-site-auth-ui-291cd0a.tar",
-    "archive_local_sha256": "0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
-    "archive_local_size_bytes": 501760,
+    "archive_local_path": null,
+    "archive_local_sha256": null,
+    "archive_local_size_bytes": null,
     "saved_archive_content_hash": "sha256:0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
     "saved_archive_size_bytes": 501760,
-    "saved_archive_file_count": 14
+    "saved_archive_file_count": 14,
+    "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
   },
   "open_gates": [
-    "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
+    "A non-value Keychain presence check on 2026-10-15 returned not_found. Owner must enter a fresh/current app API hash directly in the secure in-app field; do not reuse the value pasted into chat.",
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Fresh 2026-10-14 security find-identity returned 0 valid identities; Developer ID signing unavailable. Notarization credentials remain unverified.",
     "Telegram Terms §1.3/1.4: review basic functionality and behavior; the official page gives no exhaustive checklist, so compatibility remains unproven.",
-    "Selected app name AffPapa Chat avoids the known §2.3 title conflict; final bundle/Site metadata and trademark clearance are not verified. §1.3/1.4 basic-functionality and §3.3 sponsored-media gates remain open.",
+    "AffPapa Chat is verified in the current Dev.app UI and Site metadata; trademark clearance is not established. Telegram Terms §1.3/1.4 basic-functionality and §3.3 sponsored-media gates remain open.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
@@ -423,12 +424,13 @@
     "public_application_download": false,
     "updater_feeds": "Stable and alpha feeds are valid XML and contain zero update items; no app download record.",
     "public_route_verified": "2026-10-15: anonymous in-app browser loaded fresh cache-busted / and /downloads/. Home shows AffPapa Chat, AUTH UI milestone 291cd0a and current CI; downloads explicitly says no release/installer and links to source. Original ?v=195 tab had cached v194; it was not counted as current proof.",
-    "archive_local_path": "/private/tmp/netelegram-site-auth-ui-291cd0a.tar",
-    "archive_local_sha256": "0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
-    "archive_local_size_bytes": 501760,
+    "archive_local_path": null,
+    "archive_local_sha256": null,
+    "archive_local_size_bytes": null,
     "saved_archive_content_hash": "sha256:0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
     "saved_archive_size_bytes": 501760,
-    "saved_archive_file_count": 14
+    "saved_archive_file_count": 14,
+    "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
   },
   "release_candidate_validation": {
     "status": "implemented_not_used_for_release",
@@ -473,12 +475,13 @@
     "public_application_download": false,
     "updater_feeds": "Stable and alpha feeds are valid XML and contain zero update items; no app download record.",
     "public_route_verified": "2026-10-15: anonymous in-app browser loaded fresh cache-busted / and /downloads/. Home shows AffPapa Chat, AUTH UI milestone 291cd0a and current CI; downloads explicitly says no release/installer and links to source. Original ?v=195 tab had cached v194; it was not counted as current proof.",
-    "archive_local_path": "/private/tmp/netelegram-site-auth-ui-291cd0a.tar",
-    "archive_local_sha256": "0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
-    "archive_local_size_bytes": 501760,
+    "archive_local_path": null,
+    "archive_local_sha256": null,
+    "archive_local_size_bytes": null,
     "saved_archive_content_hash": "sha256:0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e",
     "saved_archive_size_bytes": 501760,
-    "saved_archive_file_count": 14
+    "saved_archive_file_count": 14,
+    "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
   },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",
@@ -713,17 +716,17 @@
     "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
   },
   "latest_release_preflight": {
-    "date": "2026-10-14",
+    "date": "2026-10-15",
     "status": "blocked_before_signed_candidate",
-    "toolchain": "/Applications/Xcode-beta.app; app build is development-only and ad-hoc signed.",
-    "developer_id": "Fresh `security find-identity -v -p codesigning` returned 0 valid identities. Developer ID distribution signing cannot proceed on this host until a valid identity/private key is configured.",
-    "notary_credentials": "Prior metadata preflight reported absent or inaccessible. No credentials were read, and no submission was attempted in this continuation.",
-    "api_credentials": "The api_hash is absent from source and is read only through the app Keychain item. Its presence/value was not checked. The value previously pasted into chat remains retired and must not be copied or reused; if Keychain reports missing, the owner should enter a fresh/current value directly in the app secure settings UI.",
-    "telegram_compatibility": "Selected app display name is AffPapa Chat and repository codename is NeTelegram, so the known §2.3 title conflict is removed from this choice. Final bundle/Site metadata and trademark clearance remain unverified. §1.3/1.4 basic functionality review remains open. §3.3 requires sponsored channel content. The pinned TDLib documents fullscreen sponsored-video flows; the user previously declined adding a player and deferred channel access or stable release if required. Do not claim channels/stable compatibility.",
-    "github": "Public AffPapa/NeTelegram source commit 3dc8a11e49438cf8e4e79280a4f851c86834db2c passed exact-source macOS CI run 38587526545. No application release/tag/assets exist.",
-    "site": "Live anonymous GET https://netelegram.iryadom.chatgpt.site/downloads/ verified page title `Загрузки и установка — NeTelegram` and explicit state `Приложение для скачивания отсутствует`; no download CTA points to an asset. Existing Site remains v194; no Site mutation.",
-    "release_status": "No signed/notarized release. Canonical accountless Dev.app source is 3dc8a11e49438cf8e4e79280a4f851c86834db2c, ad-hoc development signed; no login/read/send or real 20-runtime evidence.",
-    "api_id": "Source TelegramApplicationIdentity.apiID is 37110989, matching the owner-provided App api_id."
+    "toolchain": "/Applications/Xcode-beta.app; current Dev.app is arm64/macOS 14 baseline and ad-hoc signed only.",
+    "developer_id": "Read-only release audit on 2026-10-15: `security find-identity -v -p codesigning` returned 0 valid identities. Developer ID signing cannot proceed until a valid identity/private key is configured.",
+    "notary_credentials": "Notarization credentials remain absent or unverified. No credentials were read and no submission was attempted.",
+    "api_credentials": "The 2026-10-15 non-value Keychain presence check returned not_found. User-facing secure entry exists; the hash previously pasted into chat is retired and must not be reused. Owner must enter a fresh/current value directly in the app secure settings UI before real login.",
+    "telegram_compatibility": "Public app display name and Site metadata are AffPapa Chat; NeTelegram remains repository codename. §1.3/1.4 basic-functionality review remains open. §3.3 sponsored-media requirements are unresolved; user declined a sponsored-video player, so channel access and stable compatibility remain deferred.",
+    "github": "Public AffPapa/NeTelegram app source `291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b` passed exact-source macOS CI 38607088774 and pinned TDLib build 38607088681. Latest remote HEAD is docs/checkpoint commit 4f9f083b20adb16c05d88b20afee24f5e4b2d64d. No app release/tag/assets exist.",
+    "site": "Public Site v195 is active at https://netelegram.iryadom.chatgpt.site. Sites API confirms saved version source 1adba5a1410ed186c389dc701ce8e9ad9d37b26f, provider archive hash sha256:0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e (501760 bytes, 14 files), deployment appgdep_6acfbddce1d48191bf095654b4586a4e. Anonymous fresh browser checks of `/` and `/downloads/` confirm current milestone and no download asset. Local export path is overwritten and is not byte evidence.",
+    "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
+    "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
   "status": "AUTH-UI-DESIGN-04: compact AppKit authentication layout visually verified; duplicated country guidance removed; exact-source CI and canonical arm64 Dev.app pass. Real authentication and authenticated screens remain unverified.",
   "latest_design_research": {
@@ -766,37 +769,47 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "AUTH-UI-DESIGN-03",
-    "commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-    "push": "PASS: source pushed to AffPapa/NeTelegram main.",
-    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
-    "local_tests": "No new unit test; local AppKit visual/AX preview checked five accountless auth states. Local swift test unavailable under sandbox; see exact-source CI.",
-    "exact_source_ci": {
-      "run_id": 38602110387,
+    "id": "AUTH-UI-DESIGN-04",
+    "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+    "change": "Apple HIG-guided first-run layout now uses the full available scroll viewport with a consistent centered form column; the country search prompt fits, the macOS region hint does not silently select a calling code, and duplicate country guidance is hidden. Public app identity is AffPapa Chat; NeTelegram stays the repo codename.",
+    "focused_test": "Targeted local product identity/account-label suite passed 5/5. Full exact-source GitHub macOS serial test workflow passed. Native screenshot and AX showed one country hint, aligned search/country/phone/action controls, and no credentials or account data.",
+    "hosted_ci": {
+      "run_id": 38607088774,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
-      "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-      "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
+      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
     },
-    "native_app": {
-      "bundle_id": "org.affpapa.netelegram.dev",
-      "version": "0.0.0-dev",
-      "application_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-      "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-      "dirty_source": false,
-      "distribution_ready": false,
-      "path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "37c1885e4562b40f8deb9358901087e85332544e9d13e57dc0df0306f3bd7b5f",
-      "executable_sha256": "ccc348d0f7064d18d742a457b573ec3daab879f6472ef7d253ee7a37d082500c",
+    "exact_source_ci": {
+      "run_id": 38607088774,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
+      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
+    },
+    "native_workflow": {
+      "run_id": 38607088681,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088681",
+      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed for the exact commit; hosted artifact is development evidence only."
+    },
+    "native_smoke": {
+      "date": "2026-10-15",
+      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+      "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
+      "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical Dev.app rebuilt once from clean source 45a5451 after process guard confirmed the prior app was closed. CUA cycled accountless phone, code, 2FA, QR and registration preview; code/2FA no longer expose duplicate status in AX, while distinct phone guidance and fake-QR preview status remain visible. No credentials or real account used."
+      "result": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
+      "scope": "Accountless native auth phone-entry visual/AX smoke only; does not verify Telegram login, authenticated screens, accessibility speech, real chats, or runtime behavior."
     },
-    "coverage_limit": "Accountless visual/AX preview only. Real login, authenticated screens, VoiceOver speech, RTL/IME and real account/runtime behavior remain unverified."
+    "coverage_limit": "Accountless visual/AX check in compact dark appearance. Light appearance, VoiceOver speech, real auth, authenticated views, CJK IME, RTL, and real account/runtime behavior are not certified.",
+    "status": "partial"
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
@@ -823,10 +836,10 @@
   "pending_native_candidate": null,
   "latest_pushed_commit": {
     "branch": "main",
-    "sha": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-    "verified": "Pushed to AffPapa/NeTelegram main; exact-source CI and pinned native bundle workflow passed.",
-    "ci_status": "success",
-    "ci_run_id": 38602110387
+    "sha": "4f9f083b20adb16c05d88b20afee24f5e4b2d64d",
+    "verified": "Pushed to AffPapa/NeTelegram main. Docs/checkpoint-only commit; app source remains 291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b.",
+    "ci_status": "not_run_docs_only",
+    "ci_run_id": null
   },
   "latest_exact_source_ci": {
     "run_id": 38602110387,
