@@ -555,6 +555,14 @@
     "status": "passed",
     "scope": "Filtered probe and full serial Swift suite passed. Trigger path is Tests/NeTelegramCoreTests/**; release Python tests remain in the Ubuntu metadata workflow."
   },
+  "latest_native_workflow_efficiency": {
+    "date": "2026-10-14",
+    "change": "Narrowed automatic pinned-TDLib/Dev.app builds to package, TDLib pin, and native build/lifecycle inputs. Sources/** and edits to native-app.yml no longer start that expensive workflow; manual workflow_dispatch remains available.",
+    "validation": "YAML syntax passed; trigger-scope regressions 2/2; release metadata suite 13/13; git diff --check passed.",
+    "app_source_changed": false,
+    "native_build_run": null,
+    "status": "validated locally; hosted metadata run pending publication"
+  },
   "current_local_candidate": {
     "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
     "parent": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",

@@ -4,9 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/native-app.yml'
       - 'Package.swift'
-      - 'Sources/**'
       - 'Scripts/build-tdlib.sh'
       - 'Scripts/dev-app.sh'
       - 'Scripts/window-lifecycle-smoke.sh'
@@ -14,9 +12,7 @@ on:
       - 'TDLIB.lock.json'
   pull_request:
     paths:
-      - '.github/workflows/native-app.yml'
       - 'Package.swift'
-      - 'Sources/**'
       - 'Scripts/build-tdlib.sh'
       - 'Scripts/dev-app.sh'
       - 'Scripts/window-lifecycle-smoke.sh'
