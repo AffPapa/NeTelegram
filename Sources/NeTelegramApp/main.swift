@@ -664,7 +664,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             statusLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            actionButton.widthAnchor.constraint(equalToConstant: 240).withPriority(.defaultHigh),
+            // Align the primary action with the input column. A narrower
+            // default button made the phone step look like two unrelated
+            // layouts despite sharing the same form.
+            actionButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             qrButton.widthAnchor.constraint(equalToConstant: 240).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
             changePhoneButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
