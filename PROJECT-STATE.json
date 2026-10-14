@@ -35,7 +35,7 @@
     }
   },
   "product": {
-    "public_name": "NeTelegram",
+    "public_name": "AffPapa Chat",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
     "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb"
@@ -166,7 +166,7 @@
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
     "seo_keyword_research": "Live qualitative SERP wording: RU: неофициальный клиент Telegram для macOS; клиент Telegram для Mac; альтернативный клиент Telegram для Mac/macOS; приложение для Telegram на Mac. EN: unofficial Telegram client for macOS; Telegram client for Mac; alternative Telegram client for Mac/macOS; native macOS Telegram client; open-source Telegram client for Mac. No search volume/rank source was available.",
-    "brand_audit": "Canonical app, GitHub README/About and public Site v123 use NeTelegram. Historical Neridian references remain only in history/superseded state notes.",
+    "brand_audit": "Selected source/app display name is AffPapa Chat; NeTelegram is the repository codename. README drafts are updated. Canonical bundle, GitHub About metadata, and public Site still require verification/update. Historical Neridian references remain only in history/superseded state notes.",
     "security_scan": "Gitleaks 8.30.1 scanned all 241 Git commits (5.15 MB) and the current source working tree (218.91 MB), with no matches. Saved Site v121 archive scan found no matches; the exact saved v122 archive was also scanned before publication and found no matches (187,375 bytes). Tracked-path inventory: 99 files; two paths containing 'private' are Swift source files, not user data; no session/database/log/export/certificate data paths found. This is scanner plus filename inventory only; it does not prove absence of arbitrary sensitive content or validate final app binary/private receipts. OPS02 remains partial pending release-time asset/receipt review.",
     "current_head_app16_ci": "Exact-source macOS CI run 38497467214 passed the runner probe but was cancelled at the five-minute limit during the full serial suite; no hosted full-suite PASS. Exact-source local suite passed 163/163 under Xcode 27.0 / Swift 6.4.",
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
@@ -341,7 +341,7 @@
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Fresh 2026-10-14 security find-identity returned 0 valid identities; Developer ID signing unavailable. Notarization credentials remain unverified.",
     "Telegram Terms §1.3/1.4: review basic functionality and behavior; the official page gives no exhaustive checklist, so compatibility remains unproven.",
-    "Telegram title conflict: user requires NeTelegram; official API Terms §2.3 require “Unofficial” before “Telegram”. Do not rename silently; compatibility/stable-release claim remains open.",
+    "Selected app name AffPapa Chat avoids the known §2.3 title conflict; final bundle/Site metadata and trademark clearance are not verified. §1.3/1.4 basic-functionality and §3.3 sponsored-media gates remain open.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
@@ -745,7 +745,7 @@
     "developer_id": "Fresh `security find-identity -v -p codesigning` returned 0 valid identities. Developer ID distribution signing cannot proceed on this host until a valid identity/private key is configured.",
     "notary_credentials": "Prior metadata preflight reported absent or inaccessible. No credentials were read, and no submission was attempted in this continuation.",
     "api_credentials": "The api_hash is absent from source and is read only through the app Keychain item. Its presence/value was not checked. The value previously pasted into chat remains retired and must not be copied or reused; if Keychain reports missing, the owner should enter a fresh/current value directly in the app secure settings UI.",
-    "telegram_compatibility": "Official API Terms §2.3 forbids Telegram in app title unless preceded by Unofficial; the current requested display name NeTelegram conflicts and remains unresolved. §1.3/1.4 basic functionality review remains open. §3.3 requires sponsored channel content. The pinned TDLib documents fullscreen sponsored-video flows; the user previously declined adding a player and deferred channel access or stable release if required. Do not claim channels/stable compatibility.",
+    "telegram_compatibility": "Selected app display name is AffPapa Chat and repository codename is NeTelegram, so the known §2.3 title conflict is removed from this choice. Final bundle/Site metadata and trademark clearance remain unverified. §1.3/1.4 basic functionality review remains open. §3.3 requires sponsored channel content. The pinned TDLib documents fullscreen sponsored-video flows; the user previously declined adding a player and deferred channel access or stable release if required. Do not claim channels/stable compatibility.",
     "github": "Public AffPapa/NeTelegram source commit 3dc8a11e49438cf8e4e79280a4f851c86834db2c passed exact-source macOS CI run 38587526545. No application release/tag/assets exist.",
     "site": "Live anonymous GET https://netelegram.iryadom.chatgpt.site/downloads/ verified page title `Загрузки и установка — NeTelegram` and explicit state `Приложение для скачивания отсутствует`; no download CTA points to an asset. Existing Site remains v194; no Site mutation.",
     "release_status": "No signed/notarized release. Canonical accountless Dev.app source is 3dc8a11e49438cf8e4e79280a4f851c86834db2c, ad-hoc development signed; no login/read/send or real 20-runtime evidence.",

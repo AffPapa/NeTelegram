@@ -194,7 +194,7 @@ public enum AccountPresentation {
     ) -> String {
         let ordinal = max(1, localOrdinal)
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate)
-        let identity = name.map { "\($0) · аккаунт \(ordinal)" } ?? "Вход NeTelegram \(ordinal)"
+        let identity = name.map { "\($0) · аккаунт \(ordinal)" } ?? "Вход \(ProductIdentity.displayName) \(ordinal)"
         let status = pickerStatus(
             telegramUserID: telegramUserID,
             authorizationState: authorizationState,
@@ -216,7 +216,7 @@ public enum AccountPresentation {
         candidate: String?
     ) -> String {
         guard telegramUserID != nil else {
-            return "Локальный вход NeTelegram \(max(1, localOrdinal)): запись создана в этом приложении. Сессии других приложений не импортируются."
+            return "Локальный вход \(ProductIdentity.displayName) \(max(1, localOrdinal)): запись создана в этом приложении. Сессии других приложений не импортируются."
         }
         let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate) ?? "Аккаунт"
         return "Выбран аккаунт \(name). Остальные авторизованные аккаунты продолжают работу."

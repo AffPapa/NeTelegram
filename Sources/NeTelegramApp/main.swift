@@ -42,6 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var countryPicker: NSPopUpButton!
     private var countryPickerStack: NSStackView!
     private var countrySearchField: NSSearchField!
+    private var countrySuggestionLabel: NSTextField!
     private var countryPickerRegionCodes: [String?] = []
     private var phoneField: NSTextField!
     private var emailField: NSTextField!
@@ -56,7 +57,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var loginHeading: NSTextField!
     private var loginSubtitle: NSTextField!
     private var loginDisclosure: NSTextField!
-    private var authCard: AuthenticationCardView!
+    private var authCard: NSView!
     private var authScroll: NSScrollView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
@@ -370,8 +371,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildWindow() {
-        let contentWidth: CGFloat = 760
-        let contentHeight: CGFloat = 600
+        let contentWidth: CGFloat = 640
+        let contentHeight: CGFloat = 680
         let content = NSView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
@@ -382,7 +383,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         mark.wantsLayer = true
         mark.layer?.backgroundColor = NSColor.systemBlue.cgColor
         mark.layer?.cornerRadius = 28
-        let markLabel = NSTextField(labelWithString: "N")
+        let markLabel = NSTextField(labelWithString: "A")
         markLabel.font = .systemFont(ofSize: 30, weight: .bold)
         markLabel.textColor = .white
         markLabel.alignment = .center
@@ -396,7 +397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
-        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
+        loginDisclosure = NSTextField(wrappingLabelWithString: "Независимое приложение AffPapa Chat; не связано с Telegram Messenger LLP.")
         loginDisclosure.font = .systemFont(ofSize: 12)
         loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
@@ -407,14 +408,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountPicker.isHidden = true
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
-        accountPicker.setAccessibilityLabel("Аккаунты NeTelegram и статус входа")
-        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в NeTelegram на этом Mac. Сессии других приложений не импортируются.")
+        accountPicker.setAccessibilityLabel("Аккаунты AffPapa Chat и статус входа")
+        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в AffPapa Chat на этом Mac. Сессии других приложений не импортируются.")
 
-        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в NeTelegram отдельно. Сессии других приложений не используются.")
+        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в AffPapa Chat отдельно. Сессии других приложений не используются.")
         accountProfileHint.font = .systemFont(ofSize: 11)
         accountProfileHint.textColor = .secondaryLabelColor
         accountProfileHint.maximumNumberOfLines = 2
-        accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
+        accountProfileHint.setAccessibilityLabel("О входе в аккаунты AffPapa Chat")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.target = self
@@ -422,7 +423,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
         countryPicker.setAccessibilityHelp("Регион macOS — только подсказка. Для местного номера выберите страну явно; полный номер с + принимается отдельно.")
         countrySearchField = NSSearchField(frame: .zero)
-        countrySearchField.placeholderString = "Страна / код"
+        countrySearchField.placeholderString = "Страна или код"
         countrySearchField.setAccessibilityLabel("Поиск страны или телефонного кода")
         countrySearchField.target = self
         countrySearchField.action = #selector(searchCountries)
@@ -433,6 +434,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPickerStack.distribution = .fill
         countryPickerStack.spacing = 8
         countryPickerStack.isHidden = true
+        countrySuggestionLabel = NSTextField(wrappingLabelWithString: "")
+        countrySuggestionLabel.font = .systemFont(ofSize: 12)
+        countrySuggestionLabel.textColor = .secondaryLabelColor
+        countrySuggestionLabel.alignment = .left
+        countrySuggestionLabel.maximumNumberOfLines = 2
+        countrySuggestionLabel.isHidden = true
+        countrySuggestionLabel.setAccessibilityLabel("Подсказка страны macOS; код применяется только после выбора страны")
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -515,6 +523,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
         actionButton = NSButton(title: "Продолжить", target: self, action: #selector(primaryAction))
         actionButton.bezelStyle = .rounded
+        actionButton.keyEquivalent = "\r"
         actionButton.frame = .zero
         actionButton.setAccessibilityLabel("Продолжить вход")
         qrButton = NSButton(title: "Войти по QR-коду", target: self, action: #selector(beginQRLogin))
@@ -528,17 +537,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
         authStack.spacing = 10
-        authStack.setCustomSpacing(24, after: mark)
+        authStack.setCustomSpacing(18, after: mark)
         authStack.setCustomSpacing(6, after: loginHeading)
-        authStack.setCustomSpacing(16, after: loginSubtitle)
-        authStack.setCustomSpacing(18, after: loginDisclosure)
+        authStack.setCustomSpacing(12, after: loginSubtitle)
+        authStack.setCustomSpacing(16, after: loginDisclosure)
         authStack.translatesAutoresizingMaskIntoConstraints = false
-        authCard = AuthenticationCardView(frame: .zero)
+        authCard = NSView(frame: .zero)
         authCard.translatesAutoresizingMaskIntoConstraints = false
         content.addSubview(authCard)
         authScroll = NSScrollView(frame: .zero)
@@ -554,10 +563,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authCard.addSubview(authScroll)
         NSLayoutConstraint.activate([
             authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
-            authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
-            authCard.widthAnchor.constraint(equalToConstant: 520).withPriority(.defaultHigh),
+            authCard.topAnchor.constraint(equalTo: content.topAnchor, constant: 20),
+            authCard.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20),
+            authCard.widthAnchor.constraint(equalToConstant: 488).withPriority(.defaultHigh),
             authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
-            authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
             authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 20),
             authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -20),
             authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 14),
@@ -571,41 +580,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
             loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginHeading.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
+            loginHeading.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginSubtitle.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
+            loginSubtitle.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginDisclosure.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
+            loginDisclosure.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
+            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPickerStack.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh),
-            countrySearchField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 132).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
-            countryPicker.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPicker.widthAnchor.constraint(equalToConstant: 220).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 156), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.widthAnchor.constraint(equalToConstant: 236), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
+            phoneField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            emailField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
+            emailField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 40),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            inputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
+            inputField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 40),
             secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            secureInputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
+            secureInputField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 40),
             firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            firstNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
+            firstNameField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 40),
             lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            lastNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
+            lastNameField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 40),
             registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationConsent.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            statusLabel.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh),
+            statusLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            actionButton.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
+            actionButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            qrButton.widthAnchor.constraint(equalToConstant: 320).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 28),
+            qrButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
         ])
 
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))
@@ -854,10 +862,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // by Auto Layout inside that coordinate space, independent of window size.
         window.setContentSize(NSSize(width: contentWidth, height: contentHeight))
         window.center()
-        // The auth flow includes code, 2FA, QR, and registration states. Keep
-        // enough vertical room for these states so the centered form cannot
-        // disappear above or below a short window.
-        window.minSize = NSSize(width: 760, height: 600)
+        // Longer authorization steps remain reachable through the enclosing
+        // scroll view while the first-run window stays compact.
+        window.minSize = NSSize(width: 560, height: 520)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
@@ -878,6 +885,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func setAuthCardVisible(_ visible: Bool) {
         authCard.isHidden = !visible
+        if visible {
+            countrySuggestionLabel.isHidden = true
+            window.minSize = NSSize(width: 560, height: 520)
+            let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
+                ? NSSize(width: 620, height: 640)
+                : NSSize(width: 640, height: 680)
+            if window.contentView?.bounds.size != compactSize {
+                window.setContentSize(compactSize)
+                window.center()
+            }
+        } else {
+            window.minSize = NSSize(width: 760, height: 600)
+            if let size = window.contentView?.bounds.size, size.width < 760 || size.height < 600 {
+                window.setContentSize(NSSize(width: 1060, height: 720))
+                window.center()
+            }
+        }
         guard visible else { return }
         Task { @MainActor [weak self] in
             await Task.yield()
@@ -1327,7 +1351,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         field.setAccessibilityLabel("Telegram API hash приложения")
         field.setAccessibilityHelp("Сохраняется только в Связке ключей macOS. Не вводите код входа или пароль Telegram сюда.")
         let alert = NSAlert()
-        alert.messageText = "Настройка подключения NeTelegram"
+        alert.messageText = "Настройка подключения \(ProductIdentity.displayName)"
         alert.informativeText = "Введите API hash этого приложения из my.telegram.org. Значение хранится в Связке ключей macOS и не записывается в файлы проекта."
         alert.accessoryView = field
         alert.addButton(withTitle: "Сохранить в Связку ключей")
@@ -1660,7 +1684,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 }
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
-                self.setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+                self.setStatus("API hash приложения не задан. Откройте меню \(ProductIdentity.displayName) → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
             } catch TelegramAPIHashReadinessError.timedOut {
                 self.setStatus("Связка ключей macOS пока не ответила. Профиль и его данные сохранены; выберите профиль позже, чтобы продолжить ожидание того же запроса.")
             } catch TelegramAPIHashReadinessError.invalidated {
@@ -1867,7 +1891,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         firstNameField.stringValue = ""
         lastNameField.stringValue = ""
         let accountNumber = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
-        loginHeading.stringValue = "Вход NeTelegram \(accountNumber)"
+        loginHeading.stringValue = "Вход AffPapa Chat \(accountNumber)"
         loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные другого аккаунта скрыты."
         statusLabel.stringValue = "Открываю вход \(accountNumber)…"
         window.title = identifiedWindowTitle(ProductIdentity.displayName)
@@ -2075,7 +2099,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Удалить «\(title)»?"
-        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные NeTelegram. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
+        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные AffPapa Chat. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
         alert.addButton(withTitle: "Удалить незавершённый вход")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
@@ -2147,7 +2171,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Выйти из аккаунта «\(title)»?"
-        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; NeTelegram также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
+        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; AffPapa Chat также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
         alert.addButton(withTitle: "Выйти и удалить локальные данные")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
@@ -2373,7 +2397,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
-                setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню \(ProductIdentity.displayName) → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
         } catch TelegramAPIHashReadinessError.timedOut {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             refreshAccountPicker()
@@ -2460,7 +2484,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
-                setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+                setStatus("API hash приложения не задан. Откройте меню \(ProductIdentity.displayName) → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
         } catch TelegramAPIHashReadinessError.timedOut {
             setStatus("Связка ключей macOS не ответила за 10 секунд. Профиль не создан; попробуйте продолжить вход позже. Повторное действие продолжит ожидание того же запроса.")
         } catch TelegramAPIHashReadinessError.invalidated {
@@ -3299,6 +3323,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
             populateCountryPicker(preferredRegion: selectedRegion)
             countryPickerStack.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
+            updateCountrySuggestion()
             if target === runtime && pendingAuthorizationType == "authorizationStateWaitPhoneNumber" {
                 statusLabel.stringValue = phoneCountries.isEmpty
                     ? "Введите полный номер с + и кодом страны. Список стран пока недоступен."
@@ -7150,6 +7175,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginHeading.stringValue = "Добро пожаловать"
         loginSubtitle.stringValue = "Введите номер телефона, чтобы войти в свой аккаунт."
         countryPickerStack.isHidden = phoneCountries.isEmpty
+        updateCountrySuggestion()
         emailField.isHidden = true
         firstNameField.isHidden = true
         lastNameField.isHidden = true
@@ -7184,10 +7210,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         guard let regionCode = countryPickerRegionCodes[index],
               let country = phoneCountries.first(where: { $0.code == regionCode }) else {
             phoneCountrySelection.clearSelection()
+            updateCountrySuggestion()
             setStatus(phoneNumberEntryPrompt())
             return
         }
         phoneCountrySelection.select(regionCode: country.code, callingCode: country.callingCodes[0])
+        updateCountrySuggestion()
         setStatus(phoneNumberEntryPrompt())
     }
 
@@ -7214,6 +7242,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
         phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
         populateCountryPicker(preferredRegion: selectedCountryRegionCode)
+        updateCountrySuggestion()
+    }
+
+    private func updateCountrySuggestion() {
+        guard !countryPickerStack.isHidden,
+              selectedCountryRegionCode == nil,
+              let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
+              let country = phoneCountries.first(where: { $0.code == suggestedRegion }),
+              let callingCode = country.callingCodes.first else {
+            countrySuggestionLabel.isHidden = true
+            countrySuggestionLabel.stringValue = ""
+            return
+        }
+        countrySuggestionLabel.stringValue = "Подсказка macOS: \(country.name) (+\(callingCode)). Выберите страну, чтобы применить код."
+        countrySuggestionLabel.isHidden = false
     }
 
     private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {
@@ -7310,7 +7353,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // Authorization instructions already appear in the subtitle. Keep the
         // status row only for distinct progress, validation, and error text.
         // The subtitle is the single source of truth for the current step.
-        statusLabel?.isHidden = authCard?.isHidden == false && value == loginSubtitle?.stringValue
+        let repeatsCountryGuidance = pendingAuthorizationType == "authorizationStateWaitPhoneNumber"
+            && value == phoneNumberEntryPrompt()
+        statusLabel?.isHidden = authCard?.isHidden == false
+            && (value.isEmpty || value == loginSubtitle?.stringValue || repeatsCountryGuidance)
         chatStatusLabel?.stringValue = value
     }
 
@@ -7404,8 +7450,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             NSRect(
                 origin: window.frame.origin,
                 size: CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
-                    ? NSSize(width: 760, height: 600)
-                    : NSSize(width: 900, height: 700)
+                    ? NSSize(width: 620, height: 640)
+                    : NSSize(width: 640, height: 680)
             ),
             display: true
         )
@@ -8116,26 +8162,6 @@ private final class WindowLifecycleSmokeRecorder {
     }
 }
 #endif
-
-private final class AuthenticationCardView: NSView {
-    override var wantsUpdateLayer: Bool { true }
-
-    override func updateLayer() {
-        super.updateLayer()
-        guard let layer else { return }
-        effectiveAppearance.performAsCurrentDrawingAppearance {
-            layer.backgroundColor = NSColor.windowBackgroundColor.cgColor
-            layer.borderColor = NSColor.clear.cgColor
-        }
-        layer.borderWidth = 1 / max(window?.backingScaleFactor ?? 2, 1)
-        layer.cornerRadius = 0
-    }
-
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        updateLayer()
-    }
-}
 
 let app = NSApplication.shared
 let delegate = AppDelegate()

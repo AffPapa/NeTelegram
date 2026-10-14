@@ -1,5 +1,5 @@
-/// Public-facing product identity. The GitHub repository uses the same name.
+/// Public-facing app identity is intentionally separate from the repository codename.
 public enum ProductIdentity {
-    public static let displayName = "NeTelegram"
+    public static let displayName = "AffPapa Chat"
     public static let repositoryCodename = "NeTelegram"
 }
