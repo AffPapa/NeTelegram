@@ -2697,15 +2697,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard !Task.isCancelled, !closingForTermination else { return }
             let runtime = LocalAccountRuntime(account: profile.id, expectedTelegramUserID: profile.telegramUserID, paths: prepared.paths, databaseKey: prepared.databaseKey, appStateKey: prepared.appStateKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
             startupRuntime = runtime
-            let route = try runtime.registerRoute()
-            try await runtimeCoordinator.registerBeforeFirstRequest(route)
-            didRegisterStartupRoute = true
-            guard !Task.isCancelled, !closingForTermination else {
-                _ = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
+            let startupOutcome = try await ProfileRuntimeStartupSequence.execute(
+                createRoute: { try runtime.registerRoute() },
+                registerRoute: { route in
+                    try await runtimeCoordinator.registerBeforeFirstRequest(route)
+                    didRegisterStartupRoute = true
+                },
+                shouldContinue: { !Task.isCancelled && !closingForTermination },
+                removeUnretainedRoute: { route in
+                    _ = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
+                },
+                retainRuntime: { route in runtimeOwnership.retain(runtime, for: route) },
+                startUpdatePipeline: {
+                    if updatePipeline == nil {
+                        let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)
+                        updatePipeline = pipeline
+                        pipeline.start(
+                            onEvent: { [weak self] event in
+                                // Each client has an ordered async delivery lane. Awaiting
+                                // MainActor here preserves that client's order without
+                                // holding the shared TDLib reducer behind another account.
+                                switch event {
+                                case .routed(let update):
+                                    let document = try? await TDLibJSONDocument.decodeOffMainActor(update.json)
+                                    await self?.receive(event, decodedDocument: document)
+                                case .routingFailure:
+                                    await self?.receive(event)
+                                }
+                            },
+                            onReceiveFailure: { [weak self] failure in
+                                await self?.handleTDLibReceiveFailure(failure)
+                            }
+                        )
+                    }
+                },
+                markWaitingForAuthorization: { route in
+                    _ = await runtimeCoordinator.setState(.waitingForAuthorization, from: route)
+                },
+                enqueueInitializationRequest: { _ in
+                    try runtime.send(parametersRequest(for: runtime))
+                }
+            )
+            switch startupOutcome {
+            case .cancelledBeforeRetention, .cancelledAfterRetention:
                 return
-            }
-            guard runtimeOwnership.retain(runtime, for: route) else {
-                throw RuntimeOwnershipError.duplicateOwner
+            case .initializationQueued:
+                break
             }
             refreshStatusMenu()
             let presentsThisRuntime = accountStartupPresentation.shouldPresentStartupRuntime(
@@ -2717,30 +2754,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 self.runtime = runtime
                 accountStartupPresentation.adoptStartupPresentationIfUnselected(profile.id)
             }
-            if updatePipeline == nil {
-                let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)
-                updatePipeline = pipeline
-                pipeline.start(
-                    onEvent: { [weak self] event in
-                        // Each client has an ordered async delivery lane. Awaiting
-                        // MainActor here preserves that client's order without
-                        // holding the shared TDLib reducer behind another account.
-                        switch event {
-                        case .routed(let update):
-                            let document = try? await TDLibJSONDocument.decodeOffMainActor(update.json)
-                            await self?.receive(event, decodedDocument: document)
-                        case .routingFailure:
-                            await self?.receive(event)
-                        }
-                    },
-                    onReceiveFailure: { [weak self] failure in
-                        await self?.handleTDLibReceiveFailure(failure)
-                    }
-                )
-            }
-            _ = await runtimeCoordinator.setState(.waitingForAuthorization, from: route)
-            guard !Task.isCancelled, !closingForTermination else { return }
-            try runtime.send(parametersRequest(for: runtime))
             do {
                 try runtime.applyNetworkType(currentTDLibNetworkType)
             } catch {

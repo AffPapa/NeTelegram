@@ -8,6 +8,83 @@ import Testing
 
 private final class RuntimeOwnershipProbe {}
 
+@MainActor
+@Test func profileRuntimeStartupSequencePreservesRouteOwnershipAndRequestOrder() async throws {
+    let account = AccountUUID(UUID(uuidString: "65000000-0000-0000-0000-000000000001")!)
+    let route = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(71))
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    var events: [String] = []
+
+    let outcome = try await ProfileRuntimeStartupSequence.execute(
+        createRoute: {
+            events.append("create")
+            return route
+        },
+        registerRoute: { registeredRoute in
+            try await coordinator.registerBeforeFirstRequest(registeredRoute)
+            events.append("register")
+        },
+        shouldContinue: { true },
+        removeUnretainedRoute: { _ in Issue.record("Unexpected route cleanup") },
+        retainRuntime: { retainedRoute in
+            #expect(retainedRoute == route)
+            events.append("retain")
+            return true
+        },
+        startUpdatePipeline: { events.append("pipeline") },
+        markWaitingForAuthorization: { waitingRoute in
+            #expect(await coordinator.setState(.waitingForAuthorization, from: waitingRoute))
+            events.append("waiting")
+        },
+        enqueueInitializationRequest: { queuedRoute in
+            #expect(queuedRoute == route)
+            events.append("first-request")
+        }
+    )
+
+    if case .initializationQueued(let queuedRoute) = outcome {
+        #expect(queuedRoute == route)
+    } else {
+        Issue.record("A live profile must reach the first initialization request")
+    }
+    #expect(events == ["create", "register", "retain", "pipeline", "waiting", "first-request"])
+    #expect(await coordinator.state(for: account) == .waitingForAuthorization)
+}
+
+@MainActor
+@Test func profileRuntimeStartupCancellationBeforeRetentionRemovesOnlyTheRegisteredRoute() async throws {
+    let route = RuntimeRoute(
+        account: AccountUUID(UUID(uuidString: "65000000-0000-0000-0000-000000000002")!),
+        generation: RuntimeGeneration(1),
+        client: ClientID(72)
+    )
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    var retained = false
+    var pipelineStarted = false
+    var initializationQueued = false
+
+    let outcome = try await ProfileRuntimeStartupSequence.execute(
+        createRoute: { route },
+        registerRoute: { try await coordinator.registerBeforeFirstRequest($0) },
+        shouldContinue: { false },
+        removeUnretainedRoute: { _ = await coordinator.removeRouteAfterInitializationRequestRejected($0) },
+        retainRuntime: { _ in retained = true; return true },
+        startUpdatePipeline: { pipelineStarted = true },
+        markWaitingForAuthorization: { _ in Issue.record("Canceled startup must not enter authorization") },
+        enqueueInitializationRequest: { _ in initializationQueued = true }
+    )
+
+    if case .cancelledBeforeRetention(let canceledRoute) = outcome {
+        #expect(canceledRoute == route)
+    } else {
+        Issue.record("Cancellation before retention must return its distinct outcome")
+    }
+    #expect(await coordinator.route(for: route.client) == nil)
+    #expect(!retained)
+    #expect(!pipelineStarted)
+    #expect(!initializationQueued)
+}
+
 @Test func authReturnDoesNotSubmitDuringMarkedIMEComposition() {
     #expect(AuthTextFieldKeyboardPolicy.shouldSubmit(
         isAuthenticationField: true,
@@ -2031,24 +2108,40 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let routesByProfile = LockedTestValue<[AccountUUID: RuntimeRoute]>([:])
     let failedProfiles = LockedTestValue<Set<AccountUUID>>([])
 
-    let registerAndQueueFirstRequest: @Sendable (AccountProfile, RuntimeGeneration) async -> Void = { profile, generation in
+    let registerAndQueueFirstRequest: @MainActor @Sendable (AccountProfile, RuntimeGeneration) async -> Void = { profile, generation in
         let suffix = Int32(profile.telegramUserID! - 20_000)
         let client = ClientID(suffix + Int32(generation.value - 1) * 100)
         let route = RuntimeRoute(account: profile.id, generation: generation, client: client)
+        let injectedRejection = profile.telegramUserID == 20_002 && generation == RuntimeGeneration(1)
+        var rejectedRoute: RuntimeRoute?
         do {
-            try await coordinator.registerBeforeFirstRequest(route)
-            if profile.telegramUserID == 20_002, generation == RuntimeGeneration(1) {
-                // The injected TDLib first-request rejection removes only this
-                // uninitialized route; it does not strand the startup permit.
-                if await coordinator.removeRouteAfterInitializationRequestRejected(route) {
-                    failedProfiles.mutate { $0.insert(profile.id) }
+            _ = try await ProfileRuntimeStartupSequence.execute(
+                createRoute: { route },
+                registerRoute: { try await coordinator.registerBeforeFirstRequest($0) },
+                shouldContinue: { true },
+                removeUnretainedRoute: { _ = await coordinator.removeRouteAfterInitializationRequestRejected($0) },
+                retainRuntime: { $0 == route },
+                startUpdatePipeline: {},
+                markWaitingForAuthorization: { waitingRoute in
+                    _ = await coordinator.setState(.waitingForAuthorization, from: waitingRoute)
+                },
+                enqueueInitializationRequest: { queuedRoute in
+                    if injectedRejection {
+                        // A rejected first request removes only this
+                        // uninitialized route and does not strand the permit.
+                        rejectedRoute = queuedRoute
+                        throw CancellationError()
+                    }
+                    routesByProfile.mutate { $0[profile.id] = queuedRoute }
                 }
-                return
-            }
-            await coordinator.setState(.waitingForAuthorization, for: profile.id)
-            routesByProfile.mutate { $0[profile.id] = route }
+            )
         } catch {
-            Issue.record("Synthetic runtime route registration unexpectedly failed: \(error)")
+            if injectedRejection, let rejectedRoute,
+               await coordinator.removeRouteAfterInitializationRequestRejected(rejectedRoute) {
+                failedProfiles.mutate { $0.insert(profile.id) }
+            } else if !injectedRejection {
+                Issue.record("Synthetic runtime startup unexpectedly failed: \(error)")
+            }
         }
     }
 
