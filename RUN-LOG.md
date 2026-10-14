@@ -1071,3 +1071,9 @@
 
 - The current app source `fc4485b174b61fb14a085fea67d41a2b2606ef2e` compiled as SwiftPM product `NeTelegram` in 5.01s using the existing canonical development build scratch cache. This fills the gap left by the Core-only test CI without rebuilding TDLib or replacing/opening a second Dev.app.
 - Build passed with SwiftPM cache-permission warnings and the existing macOS 11 deprecation warning for `kSecUseAuthenticationUIFail`. This is compile evidence only. The single canonical Dev.app still runs source `87c0c06560ac0986f7e004d6578b1e3b034c9244`; exact-source native bundle/UI smoke waits for its normal exit.
+
+## 2026-10-14 — Make canonical Dev.app process guard diagnostics explicit
+
+- `Scripts/check-app-process.sh` now prints the PID(s) returned by `pgrep`; the LaunchServices fallback names the detected NeTelegram bundle, and an empty fallback explicitly says absence could not be proven. `Scripts/dev-app.sh` displays that evidence when refusing to replace a running bundle.
+- Focused process-guard tests passed 6/6; the full release metadata suite passed 41/41 in 1.136s. `bash -n` and `git diff --check` passed. No Swift source/fingerprint changed, and no app build or Swift test rerun was needed.
+- A live elevated check reported NeTelegram process PID 79726; the canonical Dev.app remains on app-source `87c0c06560ac0986f7e004d6578b1e3b034c9244`. The guard correctly prevented replacement. No account or API-hash field was inspected.

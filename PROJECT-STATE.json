@@ -9,6 +9,15 @@
     "hosted_validation": "Run 38506939379 on workflow commit 9cf35eb: runner probe passed; full test bundle built in 0.38s; no test output followed before the two-minute step timeout. The cap bounds the stall but does not fix it. Prior exact-hosted suite run 38504170791 passed 164/164 on parent test source 67341bab; current aab6a4a source passes locally 164/164. No hosted PASS is claimed for current source.",
     "prior_baseline": "Hosted run 38478591456: test binary build 31.65s, then no test output for 272s before cancellation; no test-level root cause or hosted PASS."
   },
+  "process_check_diagnostics_change": {
+    "date": "2026-10-14",
+    "change": "check-app-process.sh now reports the PID when pgrep confirms NeTelegram, reports a positive LaunchServices detection when process enumeration is restricted, and states explicitly when LaunchServices cannot prove absence. dev-app.sh preserves that diagnostic when it refuses bundle replacement.",
+    "validation": "Focused process-check tests 6/6; full release metadata suite 41/41; bash -n and git diff --check passed.",
+    "app_source_changed": false,
+    "app_source_fingerprint_changed": false,
+    "native_bundle_rebuilt": false,
+    "observed_process_state": "Canonical Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244; replacement correctly refused."
+  },
   "product": {
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",

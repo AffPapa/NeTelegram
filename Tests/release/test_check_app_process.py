@@ -9,11 +9,16 @@ SCRIPT = Path(__file__).resolve().parents[2] / "Scripts/check-app-process.sh"
 
 
 class AppProcessCheckTests(unittest.TestCase):
-    def run_check(self, pgrep_status, swift_result=None, swift_status=0):
+    def run_check(self, pgrep_status, swift_result=None, swift_status=0, pgrep_output="4242"):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             pgrep = root / "pgrep"
-            pgrep.write_text(f"#!/bin/sh\nexit {pgrep_status}\n", encoding="utf-8")
+            pgrep.write_text(
+                "#!/bin/sh\n"
+                f"printf '%b\\n' '{pgrep_output}'\n"
+                f"exit {pgrep_status}\n",
+                encoding="utf-8",
+            )
             pgrep.chmod(0o755)
             swift = root / "swift"
             swift.write_text(
@@ -38,16 +43,22 @@ class AppProcessCheckTests(unittest.TestCase):
             )
 
     def test_pgrep_running_is_authoritative(self):
-        self.assertEqual(self.run_check(0).returncode, 0)
+        result = self.run_check(0, pgrep_output="4242\\n4343")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("running process NeTelegram (pid 4242,4343)", result.stdout)
 
     def test_pgrep_no_match_is_authoritative(self):
         self.assertEqual(self.run_check(1).returncode, 1)
 
     def test_launch_services_fallback_detects_running_app(self):
-        self.assertEqual(self.run_check(3, "running").returncode, 0)
+        result = self.run_check(3, "running")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("running app NeTelegram (org.affpapa.netelegram.dev) detected by LaunchServices", result.stdout)
 
     def test_launch_services_empty_result_fails_closed(self):
-        self.assertEqual(self.run_check(3, "absent").returncode, 2)
+        result = self.run_check(3, "absent")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unable to prove process absence", result.stderr)
 
     def test_unknown_fallback_output_fails_closed(self):
         self.assertEqual(self.run_check(3, "maybe").returncode, 2)

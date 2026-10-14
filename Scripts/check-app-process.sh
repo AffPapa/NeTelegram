@@ -12,7 +12,9 @@ PGREP_BIN="${NETELEGRAM_PGREP_BIN:-/usr/bin/pgrep}"
 SWIFT_BIN="${NETELEGRAM_PROCESS_SWIFT_BIN:-/usr/bin/swift}"
 MODULE_CACHE="${NETELEGRAM_PROCESS_SWIFT_CACHE:-/private/tmp/netelegram-process-check-swift-modules}"
 
-if "$PGREP_BIN" -x "$PROCESS_NAME" >/dev/null 2>&1; then
+if running_pids="$("$PGREP_BIN" -x "$PROCESS_NAME" 2>/dev/null)"; then
+    running_pids="${running_pids//$'\n'/,}"
+    printf 'running process %s (pid %s)\n' "$PROCESS_NAME" "$running_pids"
     exit 0
 else
     pgrep_status=$?
@@ -36,7 +38,13 @@ print(running ? "running" : "absent")
 ' 2>/dev/null)" || exit 2
 
 case "$swift_result" in
-    running) exit 0 ;;
-    absent) exit 2 ;;
+    running)
+        printf 'running app %s (%s) detected by LaunchServices\n' "$PROCESS_NAME" "$BUNDLE_ID"
+        exit 0
+        ;;
+    absent)
+        printf 'unable to prove process absence for %s (%s)\n' "$PROCESS_NAME" "$BUNDLE_ID" >&2
+        exit 2
+        ;;
     *) exit 2 ;;
 esac

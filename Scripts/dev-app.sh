@@ -113,7 +113,8 @@ PY
         exit 0
     fi
 fi
-if "$ROOT_DIR/Scripts/check-app-process.sh" NeTelegram org.affpapa.netelegram.dev; then
+if process_check_output="$("$ROOT_DIR/Scripts/check-app-process.sh" NeTelegram org.affpapa.netelegram.dev)"; then
+    echo "$process_check_output" >&2
     echo "NeTelegram is already running. Quit the canonical development app before rebuilding it." >&2
     exit 1
 else
