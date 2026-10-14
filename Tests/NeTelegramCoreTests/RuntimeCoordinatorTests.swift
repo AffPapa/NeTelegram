@@ -4117,6 +4117,121 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@MainActor
+@Test func restorePlannerAndStartupRegistryDeduplicateWhileOneKeychainPreparationStalls() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let profiles = (1...20).map { index in
+        AccountProfile(
+            id: AccountUUID(UUID(uuidString: String(format: "42000000-0000-0000-0000-%012d", index))!),
+            telegramUserID: Int64(42_000 + index)
+        )
+    }
+    let candidates = AccountRestorePlanner.profilesToRestore(
+        authorized: profiles,
+        pending: [],
+        pendingWithStoredDatabase: []
+    )
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let startupTasks = AccountStartupTaskRegistry()
+    let beginPreparation = AsyncTestGate()
+    let stalledAccount = profiles[0].id
+    let failedAccount = profiles[1].id
+    let stalledKeychainEntered = LockedTestValue(false)
+    let releaseStalledKeychain = DispatchSemaphore(value: 0)
+    defer { releaseStalledKeychain.signal() }
+    let preparedAccounts = LockedTestValue<Set<AccountUUID>>([])
+    let preparedCount = LockedTestValue(0)
+    let failedAccounts = LockedTestValue<Set<AccountUUID>>([])
+
+    let failedPaths = try AccountStoragePaths(rootURL: root, account: failedAccount)
+    let databaseMarker = failedPaths.database.appendingPathComponent("existing.db")
+    let draftMarker = failedPaths.appState.appendingPathComponent("drafts.aesgcm")
+    try Data("preserve database".utf8).write(to: databaseMarker)
+    try Data("preserve draft".utf8).write(to: draftMarker)
+
+    var tasksByAccount: [AccountUUID: Task<Void, Never>] = [:]
+    let firstPass = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: candidates,
+        running: [],
+        starting: startupTasks.startingAccounts
+    ) { profile in
+        let account = profile.id
+        let accountName = account.id.uuidString.lowercased()
+        let backend = FakeKeychainItemBackend(
+            values: [
+                FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.database-key"): Data(repeating: 1, count: 32),
+                FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.app-state-key"): Data(repeating: 2, count: 32),
+            ],
+            readFailure: account == failedAccount ? errSecInteractionNotAllowed : nil
+        )
+        let task = startupTasks.start(
+            account: account,
+            scheduler: scheduler,
+            operation: {
+                await beginPreparation.wait()
+                try await SecretsStore.performKeychainOperation {
+                    if account == stalledAccount {
+                        stalledKeychainEntered.set(true)
+                        releaseStalledKeychain.wait()
+                    }
+                    _ = try ProfileStoragePreparer.prepare(
+                        account: account,
+                        rootURL: root,
+                        secrets: SecretsStore(backend: backend)
+                    )
+                }
+                preparedAccounts.mutate { $0.insert(account) }
+                preparedCount.mutate { $0 += 1 }
+            },
+            onCompletion: { result in
+                if case .failure = result { failedAccounts.mutate { $0.insert(account) } }
+            }
+        )
+        tasksByAccount[account] = task
+        return true
+    }
+
+    #expect(firstPass.queued == profiles.map(\.id))
+    #expect(firstPass.rejected.isEmpty)
+    #expect(startupTasks.startingAccounts == Set(profiles.map(\.id)))
+
+    // A second restore pass must observe registered in-flight starts and must
+    // not create another database preparation/owner for any of those profiles.
+    var duplicateEnqueueCalls = 0
+    let secondPass = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: candidates,
+        running: [],
+        starting: startupTasks.startingAccounts
+    ) { _ in
+        duplicateEnqueueCalls += 1
+        return false
+    }
+    #expect(secondPass.queued.isEmpty)
+    #expect(secondPass.rejected.isEmpty)
+    #expect(duplicateEnqueueCalls == 0)
+    #expect(tasksByAccount.count == 20)
+
+    await beginPreparation.open()
+    #expect(await waitForTrue(stalledKeychainEntered, timeout: .seconds(2)))
+    #expect(await waitForCount(preparedCount, atLeast: 18, timeout: .seconds(5)))
+    #expect(failedAccounts.get() == [failedAccount])
+    #expect(preparedAccounts.get().count == 18)
+    #expect(startupTasks.startingAccounts == [stalledAccount])
+
+    releaseStalledKeychain.signal()
+    for task in tasksByAccount.values { await task.value }
+
+    #expect(preparedAccounts.get().count == 19)
+    #expect(failedAccounts.get() == [failedAccount])
+    #expect(try Data(contentsOf: databaseMarker) == Data("preserve database".utf8))
+    #expect(try Data(contentsOf: draftMarker) == Data("preserve draft".utf8))
+    #expect(startupTasks.startingAccounts.isEmpty)
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func quittingInvalidatesAProfileRestoreThatMayResumeLate() {
     var gate = ProfileRestoreGenerationGate()
     let firstRestore = gate.begin()
