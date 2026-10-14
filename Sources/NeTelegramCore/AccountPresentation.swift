@@ -207,6 +207,21 @@ public enum AccountPresentation {
         return "\(identity) — \(status)\(networkStatus)"
     }
 
+    /// Explains the origin of an unfinished local login instead of implying
+    /// that the entry was discovered in another Telegram client. A server
+    /// identity is named only after TDLib has verified and persisted it.
+    public static func selectionStatus(
+        localOrdinal: Int,
+        telegramUserID: Int64?,
+        candidate: String?
+    ) -> String {
+        guard telegramUserID != nil else {
+            return "Локальный вход NeTelegram \(max(1, localOrdinal)): запись создана в этом приложении. Сессии других приложений не импортируются."
+        }
+        let name = verifiedDisplayName(telegramUserID: telegramUserID, candidate: candidate) ?? "Аккаунт"
+        return "Выбран аккаунт \(name). Остальные авторизованные аккаунты продолжают работу."
+    }
+
     public static func pickerStatus(
         telegramUserID: Int64?,
         authorizationState: String?,

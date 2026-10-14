@@ -990,6 +990,26 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     ) == .unsupported)
 }
 
+@Test func unfinishedAccountSelectionExplainsItsLocalOriginWithoutShowingUUID() {
+    let localUUID = "6BFF7C49-92B1-4883-8262-BF1E56906A42"
+    let pending = AccountPresentation.selectionStatus(
+        localOrdinal: 2,
+        telegramUserID: nil,
+        candidate: localUUID
+    )
+    #expect(pending.contains("Локальный вход NeTelegram 2"))
+    #expect(pending.contains("запись создана в этом приложении"))
+    #expect(pending.contains("Сессии других приложений не импортируются"))
+    #expect(!pending.contains(localUUID))
+
+    let verified = AccountPresentation.selectionStatus(
+        localOrdinal: 2,
+        telegramUserID: 123,
+        candidate: "Test User"
+    )
+    #expect(verified == "Выбран аккаунт Test User. Остальные авторизованные аккаунты продолжают работу.")
+}
+
 @Test func statusMenuKeepsClosedBackgroundProfileInFailureCount() {
     let active = AccountUUID()
     let waiting = AccountUUID()
@@ -1075,7 +1095,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(query[kSecAttrAccount as String] as? String == "test-account")
     #expect(query[kSecAttrService as String] as? String == "test-service")
     #expect(context != nil)
-    #expect(context?.interactionNotAllowed == true)
+    #expect(query[kSecUseAuthenticationUI as String] as? String == kSecUseAuthenticationUIFail as String)
 }
 
 @Test func telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters() {

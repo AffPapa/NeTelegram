@@ -1229,7 +1229,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         inputField.isHidden = true
         secureInputField.isHidden = true
         actionButton.isEnabled = false
-        setStatus("Выбран аккаунт \(safeAccountName(selected) ?? "Аккаунт"). Остальные авторизованные аккаунты продолжают работу.")
+        setStatus(AccountPresentation.selectionStatus(
+            localOrdinal: profileOrder.firstIndex(of: selected.account).map { $0 + 1 } ?? 1,
+            telegramUserID: selected.telegramUserID,
+            candidate: selected.displayName
+        ))
         let selectedConversation = selectedChatByAccount[selected.account].map {
             currentConversationKey(for: selected.account, chatID: $0)
         }
