@@ -74,6 +74,37 @@ public struct ChatSendPermission: Sendable, Equatable {
     }
 }
 
+/// Revalidates a photo send after asynchronous staging, immediately before
+/// persisting ownership and dispatching it through the privacy barrier.
+public enum PhotoSendDispatchGuard {
+    public static func allows(
+        _ intent: SendIntent,
+        currentAccount: AccountUUID,
+        currentTelegramUserID: Int64?,
+        currentGeneration: RuntimeGeneration,
+        runtimeIsRegistered: Bool,
+        authorizationReady: Bool,
+        privacyUnlocked: Bool,
+        currentPrivacyEpoch: UInt64,
+        permission: ChatSendPermission?
+    ) -> Bool {
+        guard privacyUnlocked,
+              runtimeIsRegistered,
+              authorizationReady,
+              intent.account == currentAccount,
+              intent.conversation.account == currentAccount,
+              intent.expectedTelegramUserID == currentTelegramUserID,
+              intent.runtimeGeneration == currentGeneration,
+              intent.privacyEpoch == currentPrivacyEpoch,
+              let permission else { return false }
+        return permission.permitsTextSend(
+            as: intent.sendAsUserID ?? intent.expectedTelegramUserID,
+            topic: intent.conversation.topic,
+            paidStars: SendIntent.maximumPaidStars
+        )
+    }
+}
+
 /// Immutable account and UI context captured before any asynchronous work.
 public struct SendIntent: Sendable {
     public let account: AccountUUID

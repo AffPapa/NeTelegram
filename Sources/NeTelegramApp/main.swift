@@ -4297,6 +4297,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 attachments: [SendAttachment(localFileURL: stagedURL)],
                 privacyEpoch: context.privacyEpoch
             )
+            // Photo staging suspends this MainActor task. Rights, auth state,
+            // runtime ownership, or privacy epoch may have changed while
+            // ImageIO worked off-main, so revalidate before registering or
+            // dispatching the staged file.
+            guard PhotoSendDispatchGuard.allows(
+                intent,
+                currentAccount: runtime.account,
+                currentTelegramUserID: runtime.telegramUserID,
+                currentGeneration: runtime.generation,
+                runtimeIsRegistered: self.runtimesByAccount[context.account] === runtime,
+                authorizationReady: runtime.authorizationState == "authorizationStateReady",
+                privacyUnlocked: !self.lockState,
+                currentPrivacyEpoch: self.privacyDispatchBarrier.currentEpoch(),
+                permission: self.sendEligibilityByAccount[context.account]?[context.conversation.chatID]
+            ), self.canSendInTopic(context.conversation.topic, account: context.account, chatID: context.conversation.chatID) else {
+                try? FileManager.default.removeItem(at: stagedURL)
+                self.setStatus("Отправка фото отменена: права или состояние аккаунта изменились. Подпись оставлена в черновике.")
+                return
+            }
             guard let photoStore = self.outgoingPhotoManifestStoresByAccount[context.account] else {
                 try? FileManager.default.removeItem(at: stagedURL)
                 self.setStatus("Не удалось безопасно сохранить состояние фото. Отправка не начата.")

@@ -2742,6 +2742,51 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(intent.replyToMessageID == 42)
 }
 
+@Test func photoSendRevalidatesLiveTargetAfterAsyncStaging() {
+    let account = AccountUUID()
+    let intent = SendIntent(
+        account: account,
+        expectedTelegramUserID: 101,
+        runtimeGeneration: RuntimeGeneration(4),
+        conversation: ConversationKey(account: account, chatID: 9001, topic: .forum(topicID: 7)),
+        sendAsUserID: 101,
+        text: "caption",
+        privacyEpoch: 12
+    )
+    let permission = ChatSendPermission(canSendBasicMessages: true, isChannel: false, defaultSenderTelegramUserID: 101)
+    func allows(
+        userID: Int64? = 101,
+        generation: RuntimeGeneration = RuntimeGeneration(4),
+        registered: Bool = true,
+        ready: Bool = true,
+        unlocked: Bool = true,
+        epoch: UInt64 = 12,
+        currentPermission: ChatSendPermission? = permission
+    ) -> Bool {
+        PhotoSendDispatchGuard.allows(
+            intent,
+            currentAccount: account,
+            currentTelegramUserID: userID,
+            currentGeneration: generation,
+            runtimeIsRegistered: registered,
+            authorizationReady: ready,
+            privacyUnlocked: unlocked,
+            currentPrivacyEpoch: epoch,
+            permission: currentPermission
+        )
+    }
+
+    #expect(allows())
+    #expect(!allows(currentPermission: ChatSendPermission(canSendBasicMessages: false, isChannel: false, defaultSenderTelegramUserID: 101)))
+    #expect(!allows(currentPermission: nil))
+    #expect(!allows(userID: 202))
+    #expect(!allows(generation: RuntimeGeneration(5)))
+    #expect(!allows(registered: false))
+    #expect(!allows(ready: false))
+    #expect(!allows(unlocked: false))
+    #expect(!allows(epoch: 13))
+}
+
 @Test func runtimeCommandGateOrdersAcceptedCommandsBeforeCloseAndRejectsLateDispatch() {
     let gate = RuntimeCommandGate()
     let commandEntered = DispatchSemaphore(value: 0)
