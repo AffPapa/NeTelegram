@@ -576,8 +576,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
             authStack.leadingAnchor.constraint(equalTo: authScrollContent.leadingAnchor, constant: 4),
             authStack.trailingAnchor.constraint(equalTo: authScrollContent.trailingAnchor, constant: -4),
-            authStack.topAnchor.constraint(equalTo: authScrollContent.topAnchor, constant: 12),
-            authStack.bottomAnchor.constraint(equalTo: authScrollContent.bottomAnchor, constant: -12),
+            // Keep the form as one compact group in tall windows. The previous
+            // edge-to-edge constraints made NSStackView distribute spare
+            // height through the controls, which produced large uneven gaps.
+            authStack.centerYAnchor.constraint(equalTo: authScrollContent.centerYAnchor),
+            authStack.topAnchor.constraint(greaterThanOrEqualTo: authScrollContent.topAnchor, constant: 12),
+            authStack.bottomAnchor.constraint(lessThanOrEqualTo: authScrollContent.bottomAnchor, constant: -12),
+            authScrollContent.heightAnchor.constraint(greaterThanOrEqualTo: authScroll.contentView.heightAnchor),
             mark.widthAnchor.constraint(equalToConstant: 56), mark.heightAnchor.constraint(equalToConstant: 56),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
