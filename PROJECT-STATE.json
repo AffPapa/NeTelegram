@@ -32,21 +32,29 @@
     "github_access": {
       "verified_at": "2026-10-14",
       "repo": "AffPapa/NeTelegram",
+      "repository_permissions": "GitHub connector verified repository exists and reported admin/maintain/pull/push/triage for the connected account.",
       "git_transport_push": {
         "result": "success",
-        "commit": "045ebb12762794f3d5d8a5c14fa20be7f403328c",
+        "commits": [
+          "05cfe67130b6c796a2baad062393158101a99c08",
+          "2ca2fa448ab6ca79233f4a8463d015407f3eabd8",
+          "4a21ab708fcc0115550cdef73597e23ba9d1d7ef"
+        ],
         "remote": "AffPapa/NeTelegram main",
-        "method": "authorized Git push through existing configured credential helper; initial sandbox DNS denial resolved using approved network access; no new credential created"
+        "method": "Existing configured Git credential helper; approved network access resolved sandbox DNS denial. No new credential was created."
       },
       "gh_cli": {
         "version": "2.88.1",
-        "status": "last checked before this push: invalid stored credentials; not used for this operation",
-        "accounts": [
-          "AffPapa (active)",
-          "mrdumay-source (inactive)"
-        ]
+        "status": "Both stored gh accounts (AffPapa and mrdumay-source) reported invalid tokens; gh was not used for the pushes.",
+        "action": "No login, new token, logout, or credential reset."
       },
-      "note": "Checkpoint c646b9e was pushed to origin/main and metadata validation 38514841734 passed. No new credential was created or printed."
+      "latest_checkpoint_metadata_ci": {
+        "run_id": 38521890229,
+        "status": "success",
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521890229",
+        "workflow_commit": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
+        "scope": "Metadata validation and checkpoint validator passed for the v179 evidence checkpoint."
+      }
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
@@ -226,13 +234,13 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "2ca2fa448ab6ca79233f4a8463d015407f3eabd8",
+    "repo_head_before_checkpoint": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
     "app_source_commit_authority": "05cfe67130b6c796a2baad062393158101a99c08",
     "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-    "repo_head": "2ca2fa448ab6ca79233f4a8463d015407f3eabd8",
-    "origin_main": "2ca2fa448ab6ca79233f4a8463d015407f3eabd8",
+    "repo_head": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
+    "origin_main": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
     "upstream": "origin/main",
-    "dirty_state": "APP20 source 05cfe67 and checkpoint reconciliation 2ca2fa4 are pushed to origin/main; latest v179 Site commit is df96ad6. Site v179 is publicly verified; this checkpoint update is being prepared."
+    "dirty_state": "APP20 source 05cfe67, evidence checkpoint 2ca2fa4, and Site v179 checkpoint 4a21ab7 are pushed; the v179 metadata CI passed. gh CLI stored tokens were invalid, but the existing Git credential helper successfully fetched and pushed with approved network access; no new token was created."
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -271,11 +279,11 @@
   "latest_site_source_commit": "df96ad6548a39c5ad45f5330437ca1554fc3305d",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38519326151,
+    "run_id": 38521890229,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38519326151",
-    "workflow_commit": "428f49d8963a799c71fcf05ec4eb8fdfa31808ad",
-    "scope": "Exact release-tooling commit passed GitHub metadata validation, including the 39-test release suite and checkpoint validation. A later checkpoint-only mirror commit follows and triggers the same metadata workflow."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521890229",
+    "workflow_commit": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
+    "scope": "Exact v179 checkpoint commit passed metadata validation and checkpoint consistency."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -553,10 +561,10 @@
     "public_site": "PASS: public Site v178 deployment appgdep_6acf1c9813788191b4e17f6f6ae951d6; anonymous Playwright confirmed devlog and no-download gate."
   },
   "latest_checkpoint_metadata": {
-    "run_id": 38520311093,
+    "run_id": 38521890229,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38520311093",
-    "workflow_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
-    "scope": "Exact commit metadata validation passed, including checkpoint consistency and the release metadata suite."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521890229",
+    "workflow_commit": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
+    "scope": "Exact v179 checkpoint commit passed metadata validation and checkpoint consistency."
   }
 }

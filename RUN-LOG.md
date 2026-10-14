@@ -1020,3 +1020,7 @@
 
 - Existing public Site project `appgprj_6acba85192e08191acdf7011928848cf` advanced to v179 from exact Site source `df96ad6548a39c5ad45f5330437ca1554fc3305d`. Anonymous `/devlog/` verification found app-source `05cfe67130b6c796a2baad062393158101a99c08`, Russian and English text, and the exact macOS CI link 38521289189.
 - Static validation passed all 8 routes. The v179 saved archive hash is `sha256:587478812d3e08decbf163d91cd55b4036eead856509365aee83483348bcb004` (14 files); deployment appgdep_6acf1f6cc66c8191b7ba93f18a99bf8d succeeded. Downloads page and updater feeds were not changed; no installable binary is claimed.
+
+## 2026-10-14 — Confirm the existing Git publication route
+
+- The authenticated GitHub connector confirmed the existing `AffPapa/NeTelegram` repository and push permission. `gh auth status` reported invalid stored tokens for both configured accounts, so neither CLI credential was used or changed. The already-configured Git credential helper successfully fetched and pushed the authorized `main` commits after approved network access resolved sandbox DNS restrictions. No new token was created. Exact metadata CI 38521890229 passed for the v179 checkpoint commit.
