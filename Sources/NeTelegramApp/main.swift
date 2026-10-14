@@ -3004,7 +3004,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                             ? "Аккаунт вышел из Telegram, локальные данные и профиль удалены."
                             : "Выход в Telegram завершён, но локальная очистка не закончена. Профиль сохранён для безопасного восстановления очистки.")
                     }
-                } else if target.isLogoutRequested {
+                } else if target.isLogoutRequested,
+                          accountStartupPresentation.selectionIsCurrent(
+                            account: target.account,
+                            revision: selectionRevisionAtClose
+                          ) {
                     setStatus("Соединение закрылось до подтверждения выхода Telegram; локальный профиль сохранён.")
                 }
                 if let client {
