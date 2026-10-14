@@ -370,7 +370,7 @@
     "local_validation": "Ruby YAML parse passed; two Python scope regressions passed; release metadata suite passed 13/13; git diff --check passed.",
     "app_source_changed": false,
     "native_bundle_rebuilt": false,
-    "hosted_validation": "Pending push; metadata workflow is expected because the trigger regression is under Tests/release. Native bundle workflow is intentionally not triggered by this workflow-only/test-only change.",
+    "hosted_validation": "PASS: metadata validation run 38499847748 on commit b5184c252ed8bd9a4e1e67ff744543a40dd0901d. The commit triggered no pinned-TDLib/Dev.app run, as intended.",
     "rationale": "Ordinary Swift edits already run exact-source serial macOS CI. Bundled TDLib/Dev.app lifecycle smoke remains manually dispatchable for changes that need a native candidate, avoiding a second expensive package build for every Swift edit."
   },
   "latest_keychain_executor_verification": {

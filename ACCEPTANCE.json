@@ -561,7 +561,10 @@
     "validation": "YAML syntax passed; trigger-scope regressions 2/2; release metadata suite 13/13; git diff --check passed.",
     "app_source_changed": false,
     "native_build_run": null,
-    "status": "validated locally; hosted metadata run pending publication"
+    "hosted_metadata_run": 38499847748,
+    "hosted_metadata_status": "success",
+    "code_commit": "b5184c252ed8bd9a4e1e67ff744543a40dd0901d",
+    "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
     "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",

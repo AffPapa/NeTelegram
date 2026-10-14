@@ -799,3 +799,4 @@
 - Added `Tests/release/test_native_workflow_scope.py` so the trigger split and manual dispatch cannot silently regress. Updated `DEV-WORKFLOW.md` to match the route.
 - Validation: Ruby YAML parser passed; trigger-scope tests passed 2/2; complete release metadata Python suite passed 13/13; `git diff --check` passed. No Swift source, app binary, canonical Dev.app, account data, release asset, or Site changed. Hosted metadata CI is expected after push; native app packaging is intentionally not part of this workflow-only change.
 - This removes a duplicate heavy job from ordinary Swift changes: cached serial macOS CI remains automatic for Swift source; native packaging is now run only when its integration evidence is needed.
+- Publication verification: commit `b5184c252ed8bd9a4e1e67ff744543a40dd0901d` is `origin/main`; GitHub metadata validation [38499847748](https://github.com/AffPapa/NeTelegram/actions/runs/38499847748) passed. No native bundle workflow ran.
