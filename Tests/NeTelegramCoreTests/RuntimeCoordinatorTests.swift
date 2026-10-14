@@ -4105,6 +4105,28 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     #expect(PhotoSizeCatalog.original(from: []) == nil)
 }
 
+@Test func photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened() {
+    let missingCapability: [[String: Any]] = [[
+        "width": 320, "height": 240,
+        "photo": ["id": 11, "local": ["path": "/tmp/partial-photo.jpg", "is_downloading_completed": false]],
+    ]]
+    let denied: [[String: Any]] = [[
+        "width": 320, "height": 240,
+        "photo": ["id": 12, "local": ["can_be_downloaded": false, "path": "", "is_downloading_completed": false]],
+    ]]
+    let allowed: [[String: Any]] = [[
+        "width": 320, "height": 240,
+        "photo": ["id": 13, "local": ["can_be_downloaded": true, "path": "", "is_downloading_completed": false]],
+    ]]
+
+    let missing = PhotoSizeCatalog.preview(from: missingCapability)
+    #expect(missing?.canBeDownloaded == false)
+    #expect(missing?.localPath == "/tmp/partial-photo.jpg")
+    #expect(missing?.isDownloaded == false)
+    #expect(PhotoSizeCatalog.preview(from: denied)?.canBeDownloaded == false)
+    #expect(PhotoSizeCatalog.preview(from: allowed)?.canBeDownloaded == true)
+}
+
 @Test func authorizationStepCountsEmailRegistrationAndQrAsNeedingUserInput() {
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitPhoneNumber") == .phoneNumber)
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitCode").awaitsUserInput)

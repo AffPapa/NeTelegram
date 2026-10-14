@@ -137,6 +137,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var photoActionKeysByControlID: [String: PhotoPresentationKey] = [:]
     private var photoLocalURLs: [PhotoPresentationKey: URL] = [:]
     private var photoOriginalFileIDs: [PhotoPresentationKey: Int32] = [:]
+    private var photoCanBeDownloadedByKey: [PhotoPresentationKey: Bool] = [:]
     private var photoOriginalCanBeDownloaded: [PhotoPresentationKey: Bool] = [:]
     private var photoOriginalLocalURLs: [PhotoPresentationKey: URL] = [:]
     private var photoOriginalKeysByFileID: [AccountUUID: [Int32: Set<PhotoPresentationKey>]] = [:]
@@ -1687,6 +1688,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             photoButtons.removeValue(forKey: key)?.removeFromSuperview()
             photoLocalURLs.removeValue(forKey: key)
             photoOriginalFileIDs.removeValue(forKey: key)
+            photoCanBeDownloadedByKey.removeValue(forKey: key)
             photoOriginalCanBeDownloaded.removeValue(forKey: key)
             photoOriginalLocalURLs.removeValue(forKey: key)
             photoTokens.removeValue(forKey: key)
@@ -5692,6 +5694,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             photoActionKeysByControlID.removeAll()
             photoLocalURLs.removeAll()
             photoOriginalFileIDs.removeAll()
+            photoCanBeDownloadedByKey.removeAll()
             photoOriginalCanBeDownloaded.removeAll()
             photoOriginalLocalURLs.removeAll()
             photoOriginalKeysByFileID.removeAll()
@@ -5740,6 +5743,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             photoButtons.removeValue(forKey: key)?.removeFromSuperview()
             photoLocalURLs.removeValue(forKey: key)
             photoOriginalFileIDs.removeValue(forKey: key)
+            photoCanBeDownloadedByKey.removeValue(forKey: key)
             photoOriginalCanBeDownloaded.removeValue(forKey: key)
             photoOriginalLocalURLs.removeValue(forKey: key)
         }
@@ -5785,6 +5789,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         let key = PhotoPresentationKey(account: runtime.account, chatID: chatID, messageID: messageID, fileID: variant.fileID)
+        photoCanBeDownloadedByKey[key] = variant.canBeDownloaded
         photoOriginalFileIDs[key] = original.fileID
         photoOriginalCanBeDownloaded[key] = original.canBeDownloaded
         photoOriginalKeysByFileID[runtime.account, default: [:]][original.fileID, default: []].insert(key)
@@ -5842,6 +5847,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 requestPhotoPreview(key, fileURL: localURL)
                 sender.isEnabled = false
                 sender.title = "Обрабатываю фото…"
+                return
+            }
+            guard photoCanBeDownloadedByKey[key] == true else {
+                sender.isEnabled = false
+                sender.title = "Фото сейчас недоступно"
+                setStatus("TDLib не подтвердил возможность загрузить это фото.")
                 return
             }
             let conversation = ConversationKey(account: key.account, chatID: key.chatID)

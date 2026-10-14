@@ -22,7 +22,9 @@ public struct PhotoFileVariant: Equatable, Sendable {
         self.height = height
         self.expectedSize = (photo["expected_size"] as? NSNumber)?.int64Value
             ?? (photo["size"] as? NSNumber)?.int64Value ?? 0
-        self.canBeDownloaded = local?["can_be_downloaded"] as? Bool ?? true
+        // A missing capability is not permission. TDLib normally supplies this
+        // flag; sparse, stale, or malformed updates must not enable a download.
+        self.canBeDownloaded = local?["can_be_downloaded"] as? Bool ?? false
         self.localPath = local?["path"] as? String
         self.isDownloaded = local?["is_downloading_completed"] as? Bool ?? false
     }
