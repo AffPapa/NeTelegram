@@ -242,7 +242,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue from exact APP22 source 87c0c06560ac0986f7e004d6578b1e3b034c9244. Safe Cmd+Return composer send passed local 170/170 and exact-source macOS CI 38524122936; canonical Dev.app rebuilt from the same source with strict ad-hoc signature verification. No real account was entered. Next highest-value slice: review the remaining native acceptance P0/P1 items and implement the smallest independent blocker; keep real-login coverage explicitly user driven. 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public download remain open.",
+  "next_action": "Await user entry of the Telegram app api_hash into the already-open NSSecureTextField in NeTelegram Dev; verify only success status, never inspect or record the value. Then continue the next native acceptance blocker without reading sessions from any other client. Current source 87c0c06560ac0986f7e004d6578b1e3b034c9244 has local serial 170/170, exact macOS CI 38524122936, Dev.app lifecycle smoke, and public Site v182. No real account login has been requested or performed. 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public installer remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
