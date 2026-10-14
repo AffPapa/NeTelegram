@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "AUTH05 first-run country suggestion copy — exact-source macOS CI PASS; canonical Dev.app ad530335 rebuilt and AX verified; real account login remains unverified.",
+  "phase": "APP26 reentrant quit during runtime close/drain — focused test PASS 1/1; exact-source CI PASS; canonical Dev.app 8689c0f1 rebuilt and verified; real multi-account quit remains unverified.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8"
+    "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38580883608,
+      "run_id": 38581958699,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
-      "workflow_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-      "scope": "Exact-source macOS CI passed for ad530335; the existing phone-country regression suite ran on this SHA. No real Telegram login."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38581958699",
+      "workflow_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "scope": "Exact-source macOS serial Swift test suite passed for APP26 reentrant-quit barrier change; no real account lifecycle run."
     },
     "published_application_releases": [],
     "github_access": {
@@ -124,26 +124,26 @@
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-    "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+    "application_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+    "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "fc6ceb24ce32b6d709ee0f750a9afff158097db884664da087a9803b4c83ceab",
-    "executable_sha256": "f039d55620849841a8fd0a4f5be913f815091c2581e2c244e6e6912e24f1e10f",
+    "source_fingerprint_sha256": "3540f8ff34fa99dd351f8c783c14ade001b588ac28f1e268cdbc4961a660e9a1",
+    "executable_sha256": "155d3f7cc0f9866c8e9086ff7b2841c6dd50e9b363072edc99ddcc30dcff3f1c",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical Dev.app rebuilt once from clean source ad530335 in 5.28s. BuildInfo, build record, CUA title and AX agree. AX shows placeholder country (not selected), macOS Thailand +66 only as suggestion, blank phone field, Continue and QR. No credentials entered.",
-    "scope": "Accountless first-run auth UI only; no Telegram login, chats, 20-runtime coverage, Developer ID, or notarization."
+    "smoke": "Canonical Dev.app rebuilt once from clean source 8689c0f1 in 5.63s. BuildInfo/build record, CUA title and AX agree. Accountless login remains visible; country stays unselected, macOS Thailand +66 is only a suggestion, phone field blank, QR available.",
+    "scope": "Accountless startup UI and exact bundle identity only. APP26 repeated-quit/drain race has deterministic Core test coverage, not real multi-account/TDLib close coverage."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
-      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-      "hosted_run_id": 38580883608
+      "result": "PASS 1/1 runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain; exact-source full serial CI passed.",
+      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "hosted_run_id": 38581958699
     },
     "real_telegram_account": "not tested; owner-operated login remains pending.",
     "real_twenty_runtime_coverage": "not tested",
@@ -551,19 +551,19 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH05 first-run country suggestion copy",
-    "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-    "local_focused_test": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
+    "id": "APP26 reentrant quit during runtime close/drain",
+    "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+    "local_focused_test": "PASS 1/1 runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain; AppKit/Core sources compiled.",
     "hosted_ci": {
-      "run_id": 38580883608,
+      "run_id": 38581958699,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
-      "workflow_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
-      "scope": "Exact-source macOS CI passed for ad530335; the existing phone-country regression suite ran on this SHA. No real Telegram login."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38581958699",
+      "workflow_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "scope": "Exact-source macOS serial Swift test suite passed for APP26 reentrant-quit barrier change; no real account lifecycle run."
     },
-    "native_smoke": "PASS: exact source ad530335 launched in the single canonical Dev.app. AX confirms country remains unselected, locale is explicitly only a suggestion, phone is empty, and QR is available. No credentials entered.",
-    "scope": "The locale is a suggestion only. Both first-run and empty-auth restore status now use the shared prompt that distinguishes suggested from explicitly selected country. Real authentication, chats, account scale, Developer ID and notarization remain unverified."
+    "native_smoke": "PASS: exact source 8689c0f1 launched in the canonical Dev.app; Info.plist, BuildInfo, record and CUA title match. Country remains unselected and phone empty. Native multi-account quit was not exercised.",
+    "scope": "Repeated macOS termination requests are rejected while the accepted quit barrier is pending, including during receiver/reducer drain; only a finished barrier permits immediate termination. Synthetic coordinator test and accountless native app smoke do not prove 20 real TDLib runtimes."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -760,35 +760,37 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "UX-ACCOUNT-01 clarify account and login labels",
-    "commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-    "parent_source_commit": "134c445d2ccc8be500687eb8bab57979babf8004",
-    "push": "success; pushed once to AffPapa/NeTelegram main",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-account-label-check --filter accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus",
-    "local_result": "PASS 1/1 accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus; SwiftPM compiled Core, AppKit and test targets.",
+    "id": "APP26 reentrant quit during runtime close/drain",
+    "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+    "change": "AppKit rejects reentrant termination while RuntimeShutdownCoordinator is pending; only finished shutdown returns terminateNow.",
+    "local_test": "PASS 1/1 runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain.",
     "exact_source_ci": {
-      "run_id": 38577631851,
+      "run_id": 38581958699,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38577631851",
-      "workflow_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-      "app_source_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-      "scope": "Exact-source macOS arm64 serial Swift suite passed for ae21665fae9e3d72b3bd1a22ca437e8cd59b0137; no real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38581958699",
+      "workflow_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "scope": "Exact-source macOS serial Swift test suite passed for APP26 reentrant-quit barrier change; no real account lifecycle run."
     },
-    "change": "User-facing pending identities now say “Вход NeTelegram N”; verified identities say “аккаунт N”. Sidebar explanation and accessibility labels distinguish NeTelegram entries from imported Telegram sessions; no UUID is displayed.",
-    "coverage_limit": "Account labels and one accountless native launch only. Real authenticated selection, message flow, 20 runtimes and distribution remain unverified.",
     "canonical_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
-      "path": "/private/tmp/NeTelegram-Dev.app",
-      "running": true,
-      "source_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-      "source_fingerprint_sha256": "c6bb7d3f5a15758506f4f8b0ed37bf57a44c7fab4e6616bfc46b6d6396fd86f8",
+      "version": "0.0.0-dev",
+      "application_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+      "dirty_source": false,
       "distribution_ready": false,
-      "smoke": "Canonical arm64 Dev.app rebuilt once from clean app source ae21665fae9e3d72b3bd1a22ca437e8cd59b0137. BuildInfo and CUA title `NeTelegram · dev ae21665f` match; accountless phone/QR login visible. No credentials entered."
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "3540f8ff34fa99dd351f8c783c14ade001b588ac28f1e268cdbc4961a660e9a1",
+      "executable_sha256": "155d3f7cc0f9866c8e9086ff7b2841c6dd50e9b363072edc99ddcc30dcff3f1c",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Canonical Dev.app rebuilt once from clean source 8689c0f1 in 5.63s. BuildInfo/build record, CUA title and AX agree. Accountless login remains visible; country stays unselected, macOS Thailand +66 is only a suggestion, phone field blank, QR available.",
+      "scope": "Accountless startup UI and exact bundle identity only. APP26 repeated-quit/drain race has deterministic Core test coverage, not real multi-account/TDLib close coverage."
     },
-    "real_account": "not tested; owner-operated login remains pending.",
-    "site": "public v194; no download; unchanged.",
-    "release": "No app release/assets; Developer ID and notarization gates remain open.",
-    "native_smoke": "Canonical arm64 Dev.app rebuilt once from clean app source ae21665fae9e3d72b3bd1a22ca437e8cd59b0137. BuildInfo and CUA title `NeTelegram · dev ae21665f` match; accountless phone/QR login visible. No credentials entered."
+    "scope": "Repeated macOS termination requests are rejected while the accepted quit barrier is pending, including during receiver/reducer drain; only a finished barrier permits immediate termination. Synthetic coordinator test and accountless native app smoke do not prove 20 real TDLib runtimes."
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
