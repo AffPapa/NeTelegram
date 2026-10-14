@@ -1573,3 +1573,11 @@
 - Focused `AuthenticationCodePrompt` tests passed 2/2. Exact-source GitHub macOS CI [38595571377](https://github.com/AffPapa/NeTelegram/actions/runs/38595571377) passed for `66128ef445a1bc4edd3db20d57a01495be18112f`. The single canonical arm64 `/private/tmp/NeTelegram-Dev.app` was rebuilt once in 5.52s; `codesign --verify --deep --strict` passed. Fingerprint `aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179`, executable SHA-256 `ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862`, TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`. CUA title `NeTelegram · dev 66128ef4` matches the bundle.
 - The app is still on a blank phone/QR login form. The user said they will save the app API hash, but no success status is visible; Codex did not inspect Keychain or handle credentials. No account was used, so AUTH01 remains partial pending an actual code step. No GitHub release or Site change.
 - Read-only schema check against pinned TDLib `c15d3f5` confirmed `registerUser` takes only first name, last name and notification preference; it has no terms-of-service ID field. No registration patch is needed.
+
+## 2026-10-14 — PHOTO-FAILURE-01 decode error recovery
+
+- Evidence: `PhotoPipeline` previously returned silently when preview decoding produced no data, leaving the UI in a loading state. A focused regression now verifies that the current request receives a nil completion, the bounded decode slot is released, and a retry can succeed. Cancellation/deletion/Privacy Lock regression checks still pass.
+- Local verification: 3 focused Swift tests passed.
+- Source: `5f414650a139bb62bdf12fd198495faf4b246f10` pushed once to `AffPapa/NeTelegram` main. Exact-source macOS CI run `38596948225` passed (https://github.com/AffPapa/NeTelegram/actions/runs/38596948225).
+- Native verification: one canonical arm64 Dev.app built from the clean source SHA; strict ad-hoc `codesign --verify --deep --strict` passed. CUA confirmed title `NeTelegram · dev 5f414650` and blank phone/QR form. No account credentials were used.
+- Limits: this is synthetic decoder coverage plus accountless UI smoke. Real Telegram photo behavior, one-account login/read/send, all-20 runtime, Developer ID/notarization, policy gates and public downloads remain unverified. Site unchanged.

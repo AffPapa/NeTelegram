@@ -1,34 +1,34 @@
 {
   "schema_version": 2,
-  "status": "AUTH01 follow-up: preserve the TDLib code-delivery prompt across account switches using masked text only; focused tests 2/2, exact-source CI passed, canonical Dev.app smoke passed. Real authorization remains unverified.",
+  "status": "PHOTO-FAILURE-01: focused tests 3/3, exact-source macOS CI passed, and canonical accountless Dev.app smoke passed. Real Telegram photo behavior and account coverage remain unverified.",
   "current_evidence": {
-    "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "local_suite": "Exact-source GitHub macOS serial suite passed; focused AuthenticationCodePrompt tests passed 2/2.",
-    "focused_test": "Focused AuthenticationCodePrompt tests passed 2/2; they verify the TDLib delivery instruction and two-digit masked phone suffix.",
+    "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "local_suite": "Focused photo failure/deletion/privacy tests passed 3/3; exact-source GitHub macOS arm64 serial Swift suite passed.",
+    "focused_test": "PASS 3/3 focused: photoPipelineReportsDecodeFailureAndReleasesSlotForRetry; photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview; privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock.",
     "hosted_ci": {
-      "run_id": 38595571377,
+      "run_id": 38596948225,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38595571377",
-      "workflow_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "scope": "Exact-source GitHub macOS arm64 / Swift 6.4 serial suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38596948225",
+      "workflow_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift test suite passed."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+      "application_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-      "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+      "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+      "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA exact title NeTelegram · dev 66128ef4; blank phone/QR form; no account data."
+      "smoke": "CUA exact title NeTelegram · dev 5f414650; blank phone/QR form; no account data."
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -597,41 +597,41 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'authenticationCodePromptUsesMaskedTDLibDestination|authenticationCodePromptHandlesUnknownMethodWithoutLeakingShortNumbers'; Scripts/dev-app.sh --launch; codesign --verify --deep --strict; CUA exact bundle identity check",
-    "local_result": "Focused tests 2/2 passed; one canonical arm64 Dev.app built once in 5.52s; strict ad-hoc signature passed; CUA exact title/SHA and blank phone/QR form verified.",
-    "hosted_ci_run_id": 38595571377,
+    "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-cli-module-cache swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'photoPipelineReportsDecodeFailureAndReleasesSlotForRetry|photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview|privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock'; Scripts/dev-app.sh --launch; codesign --verify --deep --strict; CUA exact bundle title/SHA check",
+    "local_result": "Focused tests passed 3/3; one canonical arm64 Dev.app built once after exact-source CI success; strict ad-hoc signature passed; CUA exact title/SHA and blank phone/QR form verified.",
+    "hosted_ci_run_id": 38596948225,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38595571377",
-    "scope": "AUTH01 account-switch prompt follow-up; no live account or code step used."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38596948225",
+    "scope": "PHOTO-FAILURE-01 regression and accountless native smoke; real account and 20-runtime coverage not tested."
   },
   "current_local_slice": {
-    "id": "AUTH01 follow-up",
-    "commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "push": "PASS: pushed once to AffPapa/NeTelegram main; source checkout clean.",
-    "local_tests": "Focused AuthenticationCodePrompt tests passed 2/2; they verify the TDLib delivery instruction and two-digit masked phone suffix.",
+    "id": "PHOTO-FAILURE-01",
+    "commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "push": "PASS: pushed once to AffPapa/NeTelegram main; checkout clean at source SHA.",
+    "local_tests": "PASS 3/3 focused: photoPipelineReportsDecodeFailureAndReleasesSlotForRetry; photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview; privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock.",
     "exact_source_ci": {
-      "run_id": 38595571377,
+      "run_id": 38596948225,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38595571377",
-      "workflow_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "scope": "Exact-source GitHub macOS arm64 / Swift 6.4 serial suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38596948225",
+      "workflow_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift test suite passed."
     },
-    "change": "Retain a presentation-safe TDLib delivery prompt per authorization state so switching away from and back to an account keeps Telegram-message/SMS/call guidance; cache only the masked prompt, never the full number.",
+    "change": "PhotoPipeline now reports a nil preview completion on the main queue when decode fails and the request remains current. The operation is retained through callback delivery, and bounded decode capacity is released so retry can succeed; cancellation and generation checks remain active.",
     "native_smoke": {
       "date": "2026-10-14",
-      "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+      "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-      "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+      "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+      "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "Canonical bundle built once from clean source 66128ef in 5.52s; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 66128ef4 and blank phone/QR first-run form. No profile, API hash save confirmation, phone, or code is visible. This proves bundle identity and accountless UI only.",
+      "result": "Canonical bundle built once from clean source 5f414650; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 5f414650 and blank phone/QR first-run form. No account data or credentials were used.",
       "scope": "Exact-source accountless native smoke; does not prove API hash saved, Telegram login, read/send, or account coverage."
     },
-    "coverage_limit": "Accountless authorization screen only; real delivery method, login/read/send and twenty-account runtime remain unverified."
+    "coverage_limit": "Synthetic decoder tests and accountless native launch only. Real Telegram photo/account behavior and twenty-account runtime remain unverified."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -672,7 +672,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "The sole canonical Dev.app is open at its blank first-run login. The user said they will save the app API hash, but the visible UI does not confirm success; Codex must not inspect Keychain or read secret values. When the user sees a success status after saving through the app menu, they can enter phone/code/2FA only in NeTelegram Dev. Continue app work; use one authorized account for login/read/send/photo before twenty-runtime tests. Do not publish a download until all required runtime, policy, signing and notarization gates pass.",
+  "next_action": "Continue with one bounded native acceptance slice. Keep the canonical Dev.app at 5f414650 until a new exact-source CI pass and explicit rebuild decision. User performs API hash setup and Telegram auth only inside NeTelegram Dev; do not inspect Keychain or handle credentials. Do not publish downloads until runtime, policy, Developer ID and notarization gates pass.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -702,54 +702,64 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "branch": "main",
-    "working_tree": "Clean at app source 66128ef445a1bc4edd3db20d57a01495be18112f; pushed to origin/main.",
-    "local_tests": "Focused AuthenticationCodePrompt tests passed 2/2; they verify the TDLib delivery instruction and two-digit masked phone suffix.",
-    "hosted_validation": "Exact-source GitHub macOS arm64 / Swift 6.4 serial suite passed; run 38595571377.",
+    "bundle_id": "org.affpapa.netelegram.dev",
+    "version": "0.0.0-dev",
+    "application_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "dirty_source": false,
+    "distribution_ready": false,
+    "path": "/private/tmp/NeTelegram-Dev.app",
+    "support_root": "/private/tmp/netelegram-dev-support-clean",
+    "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+    "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "architecture": "arm64",
+    "minimum_macos": "14.0",
+    "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+    "smoke": "CUA exact title NeTelegram · dev 5f414650; blank phone/QR form; no account data.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+      "application_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-      "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+      "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+      "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA exact title NeTelegram · dev 66128ef4; blank phone/QR form; no account data."
+      "smoke": "CUA exact title NeTelegram · dev 5f414650; blank phone/QR form; no account data."
     }
   },
   "latest_acceptance_slice": {
-    "id": "AUTH01 follow-up",
-    "source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-    "change": "Retain a presentation-safe TDLib delivery prompt per authorization state so switching away from and back to an account keeps Telegram-message/SMS/call guidance; cache only the masked prompt, never the full number.",
-    "focused_test": "Focused AuthenticationCodePrompt tests passed 2/2; they verify the TDLib delivery instruction and two-digit masked phone suffix.",
+    "id": "PHOTO-FAILURE-01",
+    "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+    "change": "PhotoPipeline now reports a nil preview completion on the main queue when decode fails and the request remains current. The operation is retained through callback delivery, and bounded decode capacity is released so retry can succeed; cancellation and generation checks remain active.",
+    "focused_test": "PASS 3/3 focused: photoPipelineReportsDecodeFailureAndReleasesSlotForRetry; photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview; privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock.",
     "hosted_ci": {
-      "run_id": 38595571377,
+      "run_id": 38596948225,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38595571377",
-      "workflow_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
-      "scope": "Exact-source GitHub macOS arm64 / Swift 6.4 serial suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38596948225",
+      "workflow_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift test suite passed."
     },
     "native_smoke": {
       "date": "2026-10-14",
-      "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+      "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-      "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+      "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+      "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "Canonical bundle built once from clean source 66128ef in 5.52s; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 66128ef4 and blank phone/QR first-run form. No profile, API hash save confirmation, phone, or code is visible. This proves bundle identity and accountless UI only.",
+      "result": "Canonical bundle built once from clean source 5f414650; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 5f414650 and blank phone/QR first-run form. No account data or credentials were used.",
       "scope": "Exact-source accountless native smoke; does not prove API hash saved, Telegram login, read/send, or account coverage."
     },
-    "scope": "Accountless code-prompt policy/build smoke only; actual authorization, read/send and 20-account runtime remain unverified."
+    "coverage_limit": "Synthetic decoder tests and accountless native launch only. Real Telegram photo/account behavior and twenty-account runtime remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -812,12 +822,12 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
-    "case": "AUTH01",
-    "receipt_id": "AUTH01 code prompt survives account switching",
-    "test": "authenticationCodePromptUsesMaskedTDLibDestination; authenticationCodePromptHandlesUnknownMethodWithoutLeakingShortNumbers",
-    "result": "PASS 2/2 focused; exact-source GitHub macOS CI PASS; canonical Dev.app identity PASS for 66128ef4.",
-    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'authenticationCodePromptUsesMaskedTDLibDestination|authenticationCodePromptHandlesUnknownMethodWithoutLeakingShortNumbers'",
-    "scope": "The unit tests cover delivery copy/masking; native smoke was accountless. AUTH01 remains partial pending an actual authorization code step."
+    "case": "PHOTO-FAILURE-01",
+    "receipt_id": "Photo preview decode failure delivery and bounded-slot retry",
+    "test": "PASS 3/3 focused: photoPipelineReportsDecodeFailureAndReleasesSlotForRetry; photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview; privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock.",
+    "result": "PASS 3/3 focused; exact-source GitHub macOS CI PASS; canonical Dev.app identity and blank-login smoke PASS for 5f414650.",
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-cli-module-cache swift test --disable-sandbox --scratch-path .build/canonical-dev-build/swift-test --filter 'photoPipelineReportsDecodeFailureAndReleasesSlotForRetry|photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview|privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock'",
+    "scope": "Validates failure delivery for a live request, release of decode capacity for retry, and stale callback suppression after deletion or Privacy Lock. Does not validate real account/media or 20-account behavior."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -831,25 +841,25 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH01 follow-up: preserve the TDLib code-delivery prompt across account switches using masked text only; focused tests 2/2, exact-source CI passed, canonical Dev.app smoke passed. Real authorization remains unverified.",
+  "phase": "PHOTO-FAILURE-01: focused tests 3/3, exact-source macOS CI passed, and canonical accountless Dev.app smoke passed. Real Telegram photo behavior and account coverage remain unverified.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+    "source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
     "command": "Scripts/dev-app.sh --launch",
-    "result": "PASS: one canonical arm64 Dev.app built in 5.52s from clean source; strict ad-hoc codesign verification passed.",
-    "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-    "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+    "result": "PASS: one canonical arm64 Dev.app built once from clean source after exact-SHA macOS CI passed; strict ad-hoc codesign verification passed.",
+    "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+    "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "66128ef445a1bc4edd3db20d57a01495be18112f",
+    "app_source_commit": "5f414650a139bb62bdf12fd198495faf4b246f10",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "aeca3055a76d27491cc5a8f88869d4814cc0a2da5050809ee74db738e18b6179",
-    "executable_sha256": "ca9e32eab9b14c50ca8e4063fad8241e5af172c8a271e4302873856814356862",
+    "source_fingerprint_sha256": "8aea42f4e39a32add757d1047ff779ef66dba6ae8e9eb1feeb6a82fb722a2768",
+    "executable_sha256": "7f5ab3eb31a5e3d2429db67e5c45f6263b5fa56e0e2e8d899323721c62da5c32",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical bundle built once from clean source 66128ef in 5.52s; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 66128ef4 and blank phone/QR first-run form. No profile, API hash save confirmation, phone, or code is visible. This proves bundle identity and accountless UI only.",
+    "result": "Canonical bundle built once from clean source 5f414650; strict ad-hoc codesign verification passed; CUA confirms exact title NeTelegram · dev 5f414650 and blank phone/QR first-run form. No account data or credentials were used.",
     "scope": "Exact-source accountless native smoke; does not prove API hash saved, Telegram login, read/send, or account coverage."
   }
 }
