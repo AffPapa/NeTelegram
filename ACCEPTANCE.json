@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
-  "status": "APP04-AUTH-COUNTRY-EXPLICIT-CHOICE-01: Prevented NSComboBox population events from silently selecting a country. Focused Swift test, exact-source macOS CI, pinned TDLib/Dev.app workflow, canonical accountless Dev.app screenshot/AX smoke, and anonymous public Site v201 devlog check passed. This is a narrow auth-layout/selection correction; broader product and release gates remain open.",
+  "status": "AUTH05-COUNTRY-SELECT-NATIVE-01: Canonical Dev.app filtered country search and keyboard selection were verified with Canada +1; empty phone and disabled Continue preserved. Existing exact-source macOS CI and pinned TDLib/Dev.app build remain green. No account data or Telegram request was used; broader product and release gates remain open.",
   "current_evidence": {
     "app_source_commit": "f7afa4b6f92d58f624e5c368dc6892dd1db5506a",
-    "local_suite": "Swift 6.4 focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 and compiled NeTelegramApp. First exact-source execution failed only because SwiftPM tried a protected user module-cache path; rerun with module cache redirected under /private/tmp passed.",
-    "focused_test": "Swift 6.4 focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 and compiled NeTelegramApp. First exact-source execution failed only because SwiftPM tried a protected user module-cache path; rerun with module cache redirected under /private/tmp passed.",
+    "local_suite": "Swift 6.4 regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1; exact-source macOS CI 38648192535 passed for app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a.",
+    "focused_test": "Swift 6.4 regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1; exact-source macOS CI 38648192535 passed for app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a.",
     "hosted_ci": {
       "run_id": 38648192535,
       "status": "success",
@@ -36,9 +36,9 @@
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke."
+      "smoke": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request."
     },
-    "scope": "Accountless dark-appearance sign-in UI only. Verified no country preselection, clear country prompt, empty phone field and disabled Continue. No credentials, Keychain value, profile creation or Telegram request. VoiceOver speech, light appearance, IME/RTL, real login/chat, and twenty authorized runtimes remain unverified.",
+    "scope": "Credential-free native sign-in UI interaction only. Search value was set through the accessibility value setter before opening results; keyboard navigation confirmed explicit selection. No phone number, auth code, API hash, profile creation, or Telegram request. Does not cover sign-in, VoiceOver speech, light appearance, IME/RTL, real chats, or twenty authorized runtimes.",
     "latest_site_deployment": {
       "date": "2026-10-15",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -89,8 +89,8 @@
       "executable_sha256": "2f08ded39a2adad4fb0167c8d8477f8e41641a0cbe419c7d5d576d4653d31545",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke.",
-      "scope": "Accountless dark-appearance sign-in UI only. Verified no country preselection, clear country prompt, empty phone field and disabled Continue. No credentials, Keychain value, profile creation or Telegram request. VoiceOver speech, light appearance, IME/RTL, real login/chat, and twenty authorized runtimes remain unverified."
+      "result": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request.",
+      "scope": "Credential-free native sign-in UI interaction only. Search value was set through the accessibility value setter before opening results; keyboard navigation confirmed explicit selection. No phone number, auth code, API hash, profile creation, or Telegram request. Does not cover sign-in, VoiceOver speech, light appearance, IME/RTL, real chats, or twenty authorized runtimes."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -611,7 +611,7 @@
   "last_verification": {
     "date": "2026-10-15",
     "app_source_commit": "f7afa4b6f92d58f624e5c368dc6892dd1db5506a",
-    "summary": "Focused country-choice regression, exact-source CI, pinned TDLib/Dev.app workflow, native accountless UI smoke and public Site v201 devlog verified."
+    "summary": "Exact-source native AppKit country filtering and keyboard selection were verified in canonical Dev.app without authentication. Selected Canada +1, phone empty, Continue disabled. CI/native pinned build remain successful."
   },
   "current_local_slice": {
     "id": "AUTH-FORM-APPLE-HIG-17",
@@ -695,7 +695,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Next product-critical gate: diagnose the existing NeTelegram API-hash Keychain data-read stall without reading or replacing secrets; then owner-operated real single-account login/read/send/quit smoke. Keep the single canonical Dev.app and exact-source checkpoint. After that, pursue real all-active runtime and notification coverage. Do not repeat country-picker work absent a new failure. No Developer ID identity or notarization credentials are currently verified; no signed download/release exists.",
+  "next_action": "Next product-critical gate: diagnose the existing NeTelegram API-hash Keychain data-read stall without reading or replacing secrets; then owner-operated real single-account login/read/send/quit smoke. Keep one canonical Dev.app and exact-source checkpoint. The country-search/selection interaction is now natively verified; do not repeat it absent a failure. After real single-account acceptance, prioritize all-active runtime and notifications evidence. No Developer ID identity or notarization credentials are currently verified; no signed download/release exists.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -739,7 +739,7 @@
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke.",
+    "smoke": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
@@ -755,15 +755,15 @@
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke."
+      "smoke": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request."
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP04-AUTH-COUNTRY-EXPLICIT-CHOICE-01",
+    "id": "AUTH05-COUNTRY-SELECT-NATIVE-01",
     "source_commit": "f7afa4b6f92d58f624e5c368dc6892dd1db5506a",
     "test_commit": "f7afa4b6f92d58f624e5c368dc6892dd1db5506a",
-    "change": "AppKit NSComboBox population no longer treats an automatic row as a user choice; no selected country now leaves the explicit prompt visible and local-number continuation disabled. Preserved native AppKit/window chrome, Auto Layout and semantic colors. No auth storage or runtime behavior changed.",
-    "focused_test": "Swift 6.4 focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 and compiled NeTelegramApp. First exact-source execution failed only because SwiftPM tried a protected user module-cache path; rerun with module cache redirected under /private/tmp passed.",
+    "change": "Native searchable country combo was exercised end-to-end without authentication: filter Canada, open native result, choose via Down/Return, then verify selected calling code and phone form state.",
+    "focused_test": "Swift 6.4 regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1; exact-source macOS CI 38648192535 passed for app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a.",
     "hosted_ci": {
       "run_id": 38648192535,
       "status": "success",
@@ -796,10 +796,10 @@
       "executable_sha256": "2f08ded39a2adad4fb0167c8d8477f8e41641a0cbe419c7d5d576d4653d31545",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke.",
-      "scope": "Accountless dark-appearance sign-in UI only. Verified no country preselection, clear country prompt, empty phone field and disabled Continue. No credentials, Keychain value, profile creation or Telegram request. VoiceOver speech, light appearance, IME/RTL, real login/chat, and twenty authorized runtimes remain unverified."
+      "result": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request.",
+      "scope": "Credential-free native sign-in UI interaction only. Search value was set through the accessibility value setter before opening results; keyboard navigation confirmed explicit selection. No phone number, auth code, API hash, profile creation, or Telegram request. Does not cover sign-in, VoiceOver speech, light appearance, IME/RTL, real chats, or twenty authorized runtimes."
     },
-    "coverage_limit": "Accountless dark-appearance sign-in UI only. Verified no country preselection, clear country prompt, empty phone field and disabled Continue. No credentials, Keychain value, profile creation or Telegram request. VoiceOver speech, light appearance, IME/RTL, real login/chat, and twenty authorized runtimes remain unverified."
+    "coverage_limit": "Credential-free native sign-in UI interaction only. Search value was set through the accessibility value setter before opening results; keyboard navigation confirmed explicit selection. No phone number, auth code, API hash, profile creation, or Telegram request. Does not cover sign-in, VoiceOver speech, light appearance, IME/RTL, real chats, or twenty authorized runtimes."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -891,7 +891,7 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "APP04-AUTH-COUNTRY-EXPLICIT-CHOICE-01: Prevented NSComboBox population events from silently selecting a country. Focused Swift test, exact-source macOS CI, pinned TDLib/Dev.app workflow, canonical accountless Dev.app screenshot/AX smoke, and anonymous public Site v201 devlog check passed. This is a narrow auth-layout/selection correction; broader product and release gates remain open.",
+  "phase": "AUTH05-COUNTRY-SELECT-NATIVE-01: Canonical Dev.app filtered country search and keyboard selection were verified with Canada +1; empty phone and disabled Continue preserved. Existing exact-source macOS CI and pinned TDLib/Dev.app build remain green. No account data or Telegram request was used; broader product and release gates remain open.",
   "latest_local_build": {
     "date": "2026-10-15",
     "source_commit": "f7afa4b6f92d58f624e5c368dc6892dd1db5506a",
@@ -911,8 +911,8 @@
     "executable_sha256": "2f08ded39a2adad4fb0167c8d8477f8e41641a0cbe419c7d5d576d4653d31545",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: canonical arm64 Dev.app built from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a; native screenshot/AX confirm no country preselection, clear country prompt, empty phone field and disabled Continue; strict ad-hoc signature verified. Search/filter followed by explicit country selection was not verified in this smoke.",
-    "scope": "Accountless dark-appearance sign-in UI only. Verified no country preselection, clear country prompt, empty phone field and disabled Continue. No credentials, Keychain value, profile creation or Telegram request. VoiceOver speech, light appearance, IME/RTL, real login/chat, and twenty authorized runtimes remain unverified."
+    "result": "PASS: one canonical arm64 Dev.app from exact app source f7afa4b6f92d58f624e5c368dc6892dd1db5506a. Native AX/screenshot smoke set country search to Canada, opened filtered results, selected via Down/Return, and verified 🇨🇦 Canada +1, phone label visible, phone empty, Continue disabled. Strict ad-hoc signature verified. No account data or Telegram request.",
+    "scope": "Credential-free native sign-in UI interaction only. Search value was set through the accessibility value setter before opening results; keyboard navigation confirmed explicit selection. No phone number, auth code, API hash, profile creation, or Telegram request. Does not cover sign-in, VoiceOver speech, light appearance, IME/RTL, real chats, or twenty authorized runtimes."
   },
   "current_ui_design_slice": {
     "id": "AUTH-FORM-APPLE-HIG-15",
