@@ -1820,6 +1820,15 @@
 - Control: the same query shape for a deliberately nonexistent service/account returned `errSecItemNotFound` (-25300) in 11 ms. Prior attributes-only lookup of the configured item returned `errSecSuccess` in 3 ms.
 - Interpretation: the delay is specific to retrieving data for the existing item, not a general slow Keychain lookup. Root cause is still unproven; this does not establish whether the canonical app can read the item. Do not delete/reset it or claim the value is missing. Owner-side recovery/authorization in the app is still needed before login.
 
+## 2026-10-15 — AUTH-COUNTRY-EXPLICIT-CHOICE-01
+
+- Design review: current Apple HIG on macOS windows, layout, text fields, keyboard access and accessibility; official Telegram for macOS (`overtake/TelegramSwift`, GPL-2.0) and Telegram Desktop (`telegramdesktop/tdesktop`, GPL-3.0) inspected read-only for interaction patterns. NeTelegram remains native AppKit; no upstream code, styles or assets copied.
+- Observed defect in the canonical `1606fac8` screen: the country combo displayed Thailand +66 although `PhoneCountrySelectionState` had no explicit selection. A person could reasonably think the country was chosen while Continue remained disabled. This was caused by AppKit selection events during combo repopulation.
+- Fix in `Sources/NeTelegramApp/main.swift`: suppress selection callbacks while rebuilding the combo and clear the visual row selection when no country was explicitly chosen. The placeholder now remains visible; local-number guidance says to select a country, while full international numbers remain supported.
+- Verification: focused `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1; `git diff --check` passed. Canonical `/private/tmp/NeTelegram-Dev.app` was rebuilt once from exact clean commit `f7afa4b6f92d58f624e5c368dc6892dd1db5506a`, ad-hoc signature verified, and CUA/AX/screenshot confirmed blank country placeholder, explicit-choice guidance, empty phone field, disabled Continue and non-affiliation notice. No login, Keychain data read, profile creation or Telegram request.
+- Exact-source macOS CI [38648192535](https://github.com/AffPapa/NeTelegram/actions/runs/38648192535) and pinned TDLib/native workflow [38648192560](https://github.com/AffPapa/NeTelegram/actions/runs/38648192560) passed. Commit pushed to `AffPapa/NeTelegram:main`.
+- Limits: accountless auth flow in dark appearance only. Full keyboard country selection after the fix, VoiceOver speech, light/high-contrast appearance, IME/RTL, real login/chats, twenty authorized runtimes and resource measurements remain unverified. No release or download was created.
+
 
 ## 2026-10-15 — AUTH-FORM-APPLE-HIG-17
 
