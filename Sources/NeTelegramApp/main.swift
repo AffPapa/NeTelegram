@@ -206,6 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var notificationTargets: [String: RoutedTDLibNotification] = [:]
     private var notificationUnlockHandoff = NotificationUnlockHandoff()
     private var notificationAuthorizationRequestGate = NotificationAuthorizationRequestGate()
+    private let telegramAPIHashReadiness = TelegramAPIHashReadiness()
 #if DEBUG
     private var windowLifecycleSmokeRecorder: WindowLifecycleSmokeRecorder?
 #endif
@@ -1028,7 +1029,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         setStatus("Сохраняю API hash в Связку ключей macOS…")
+        telegramAPIHashReadiness.beginReplacement()
         Task { @MainActor [weak self] in
+            defer { self?.telegramAPIHashReadiness.finishReplacement() }
             do {
                 try await SecretsStore.performKeychainOperation {
                     try SecretsStore().storeTelegramAPIHash(value)
@@ -1303,8 +1306,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 self.refreshStatusMenu()
             }
             do {
-                let apiHash = try await SecretsStore.performKeychainOperation {
-                    try SecretsStore().telegramAPIHash()
+                let apiHash = try await self.telegramAPIHashReadiness.value {
+                    try await SecretsStore.performKeychainOperation {
+                        try SecretsStore().telegramAPIHash()
+                    }
                 }
                 if let startup = self.scheduleProfileStartup(profile, apiHash: apiHash, select: true) {
                     await startup.value
@@ -1312,6 +1317,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             } catch SecretsStoreError.missing {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+            } catch TelegramAPIHashReadinessError.timedOut {
+                self.setStatus("Связка ключей macOS пока не ответила. Профиль и его данные сохранены; выберите профиль позже, чтобы продолжить ожидание того же запроса.")
+            } catch TelegramAPIHashReadinessError.invalidated {
+                self.setStatus("API hash приложения изменён во время чтения. Профиль не запускался; выберите его снова для проверки актуального значения.")
             } catch {
                 self.profileStartupFailures.insert(account)
                 self.setStatus("Не удалось повторно открыть локальный профиль. Сохранённые данные не изменены.")
@@ -1898,8 +1907,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 return
             }
             setStatus("Проверяю доступ к Связке ключей macOS для восстановления сохранённых профилей…")
-            let apiHash = try await SecretsStore.performKeychainOperation {
-                try SecretsStore().telegramAPIHash()
+            let apiHash = try await telegramAPIHashReadiness.value {
+                try await SecretsStore.performKeychainOperation {
+                    try SecretsStore().telegramAPIHash()
+                }
             }
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             let authorized = profiles.filter { $0.telegramUserID != nil && $0.logoutCleanupPending != true }
@@ -1982,6 +1993,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             profileStartupFailures.formUnion(profileOrder)
             refreshAccountPicker()
                 setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Вход не начат; данные других Telegram-приложений не читались.")
+        } catch TelegramAPIHashReadinessError.timedOut {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            refreshAccountPicker()
+            setStatus("Связка ключей macOS не ответила за 10 секунд. Профили и базы сохранены; выберите профиль, чтобы продолжить ожидание того же запроса без дубликатов.")
+        } catch TelegramAPIHashReadinessError.invalidated {
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            refreshAccountPicker()
+            setStatus("API hash приложения изменён во время чтения. Профили не запускались; выберите профиль, чтобы начать с актуальным значением.")
         } catch SecretsStoreError.keychain(errSecInteractionNotAllowed) {
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profileStartupFailures.formUnion(profileOrder)
@@ -2049,8 +2068,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         do {
             guard !closingForTermination else { return }
             _ = try prepareAccountStorage()
-            let apiHash = try await SecretsStore.performKeychainOperation {
-                try SecretsStore().telegramAPIHash()
+            let apiHash = try await telegramAPIHashReadiness.value {
+                try await SecretsStore.performKeychainOperation {
+                    try SecretsStore().telegramAPIHash()
+                }
             }
             let catalogue = try accountCatalogue()
             let profile = try await catalogue.addProfile()
@@ -2064,6 +2085,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshAccountPicker(select: profile.id)
         } catch SecretsStoreError.missing {
                 setStatus("API hash приложения не задан. Откройте меню NeTelegram → «Настроить или заменить API hash приложения…». Новый аккаунт не добавлен; данные других Telegram-приложений не читались.")
+        } catch TelegramAPIHashReadinessError.timedOut {
+            setStatus("Связка ключей macOS не ответила за 10 секунд. Профиль не создан; попробуйте продолжить вход позже. Повторное действие продолжит ожидание того же запроса.")
+        } catch TelegramAPIHashReadinessError.invalidated {
+            setStatus("API hash приложения изменён во время чтения. Профиль не создан; попробуйте продолжить вход снова.")
         } catch let error as AccountStorageLeaseError {
             setStatus(error.localizedDescription)
         } catch let error as AccountStorageUpgradeError {

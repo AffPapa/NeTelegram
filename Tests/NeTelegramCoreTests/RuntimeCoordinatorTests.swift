@@ -507,6 +507,22 @@ private final class LockedTestValue<Value: Sendable>: @unchecked Sendable {
     }
 }
 
+private actor AsyncStringGate {
+    private var continuation: CheckedContinuation<String, Never>?
+    private var storedValue: String?
+
+    func wait() async -> String {
+        if let storedValue { return storedValue }
+        return await withCheckedContinuation { continuation = $0 }
+    }
+
+    func open(_ value: String) {
+        storedValue = value
+        continuation?.resume(returning: value)
+        continuation = nil
+    }
+}
+
 private struct FakeKeychainCoordinate: Hashable {
     let account: String
     let service: String
@@ -2954,6 +2970,85 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
     #expect(!executionContext.0)
     #expect(executionContext.1)
+}
+
+@Test func apiHashReadTimeoutRetriesJoinOneLookupAndCacheItsLateResult() async throws {
+    let readiness = TelegramAPIHashReadiness()
+    let gate = AsyncStringGate()
+    let loadCount = LockedTestValue(0)
+
+    let first = Task {
+        try await readiness.value(timeout: 0.04) {
+            loadCount.mutate { $0 += 1 }
+            return await gate.wait()
+        }
+    }
+    do {
+        _ = try await first.value
+        Issue.record("The first waiter should time out while the Keychain lookup is stalled")
+    } catch TelegramAPIHashReadinessError.timedOut {
+        #expect(true)
+    }
+
+    let retry = Task {
+        try await readiness.value(timeout: 2) {
+            loadCount.mutate { $0 += 1 }
+            return "duplicate lookup"
+        }
+    }
+    try await Task.sleep(for: .milliseconds(30))
+    await gate.open("late-value")
+    #expect(try await retry.value == "late-value")
+    #expect(loadCount.get() == 1)
+
+    #expect(try await readiness.value {
+        loadCount.mutate { $0 += 1 }
+        return "unexpected second lookup"
+    } == "late-value")
+    #expect(loadCount.get() == 1)
+
+    readiness.invalidate()
+    #expect(try await readiness.value {
+        loadCount.mutate { $0 += 1 }
+        return "replacement-value"
+    } == "replacement-value")
+    #expect(loadCount.get() == 2)
+}
+
+@Test func replacingAPIHashDiscardsOldInFlightLookupBeforeStartingProfiles() async throws {
+    let readiness = TelegramAPIHashReadiness()
+    let oldGate = AsyncStringGate()
+    let loadCount = LockedTestValue(0)
+    let oldWaiter = Task {
+        try await readiness.value(timeout: 2) {
+            loadCount.mutate { $0 += 1 }
+            return await oldGate.wait()
+        }
+    }
+    #expect(await waitForCount(loadCount, atLeast: 1, timeout: .seconds(2)))
+
+    readiness.beginReplacement()
+    do {
+        _ = try await oldWaiter.value
+        Issue.record("A waiter for the previous API hash must be invalidated")
+    } catch TelegramAPIHashReadinessError.invalidated {
+        #expect(true)
+    }
+
+    let freshWaiter = Task {
+        try await readiness.value(timeout: 2) {
+            loadCount.mutate { $0 += 1 }
+            return "current-api-hash"
+        }
+    }
+    await oldGate.open("stale-api-hash")
+    try await Task.sleep(for: .milliseconds(30))
+    #expect(loadCount.get() == 1)
+    readiness.finishReplacement()
+    #expect(try await freshWaiter.value == "current-api-hash")
+    #expect(loadCount.get() == 2)
+    #expect(try await readiness.value { "unexpected-third-lookup" } == "current-api-hash")
+    #expect(loadCount.get() == 2)
 }
 
 @Test func blockedKeychainOperationDoesNotBlockSwiftCooperativeTasks() async throws {
