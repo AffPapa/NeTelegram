@@ -87,15 +87,27 @@ public enum PhotoSizeCatalog {
     }
 
     public static func preview(from sizes: [[String: Any]], targetPixelSize: Int32 = 960) -> PhotoFileVariant? {
-        let candidates = variants(from: sizes)
-        guard !candidates.isEmpty else { return nil }
+        let allCandidates = variants(from: sizes)
+        guard !allCandidates.isEmpty else { return nil }
+        let candidates = selectableCandidates(from: allCandidates)
         let targetArea = Int64(max(1, targetPixelSize)) * Int64(max(1, targetPixelSize))
         return candidates.filter { $0.pixelArea >= targetArea }.min(by: preferredOrder)
             ?? candidates.max(by: preferredOrder)
     }
 
     public static func original(from sizes: [[String: Any]]) -> PhotoFileVariant? {
-        variants(from: sizes).max(by: preferredOrder)
+        let allCandidates = variants(from: sizes)
+        guard !allCandidates.isEmpty else { return nil }
+        return selectableCandidates(from: allCandidates).max(by: preferredOrder)
+    }
+
+    private static func selectableCandidates(from candidates: [PhotoFileVariant]) -> [PhotoFileVariant] {
+        let available = candidates.filter {
+            $0.canBeDownloaded || ($0.isDownloaded && !($0.localPath ?? "").isEmpty)
+        }
+        // Preserve a useful variant for the UI to explain an unavailable photo
+        // when TDLib marks every size as inaccessible.
+        return available.isEmpty ? candidates : available
     }
 
     private static func preferredOrder(_ lhs: PhotoFileVariant, _ rhs: PhotoFileVariant) -> Bool {

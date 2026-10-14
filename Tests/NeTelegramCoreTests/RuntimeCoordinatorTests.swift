@@ -4930,6 +4930,38 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     #expect(PhotoSizeCatalog.preview(from: allowed)?.canBeDownloaded == true)
 }
 
+@Test func photoCatalogPrefersAccessibleVariantsAndKeepsUnavailableFallback() {
+    let sizes: [[String: Any]] = [
+        ["width": 320, "height": 240, "photo": ["id": 21, "local": ["can_be_downloaded": true]]],
+        ["width": 640, "height": 480, "photo": ["id": 22, "local": ["can_be_downloaded": true]]],
+        ["width": 1280, "height": 960, "photo": ["id": 23, "local": ["can_be_downloaded": false]]],
+    ]
+    #expect(PhotoSizeCatalog.preview(from: sizes)?.fileID == 22)
+    #expect(PhotoSizeCatalog.original(from: sizes)?.fileID == 22)
+
+    let locallyAvailable: [[String: Any]] = sizes + [[
+        "width": 2560,
+        "height": 1920,
+        "photo": ["id": 24, "local": [
+            "can_be_downloaded": false,
+            "path": "/tmp/already-downloaded-photo.jpg",
+            "is_downloading_completed": true,
+        ]],
+    ]]
+    #expect(PhotoSizeCatalog.preview(from: locallyAvailable)?.fileID == 24)
+    #expect(PhotoSizeCatalog.original(from: locallyAvailable)?.fileID == 24)
+
+    let unavailable = sizes.map { size -> [String: Any] in
+        var copy = size
+        var photo = copy["photo"] as! [String: Any]
+        photo["local"] = ["can_be_downloaded": false]
+        copy["photo"] = photo
+        return copy
+    }
+    #expect(PhotoSizeCatalog.preview(from: unavailable)?.fileID == 23)
+    #expect(PhotoSizeCatalog.original(from: unavailable)?.fileID == 23)
+}
+
 @Test func photoContentOpenIntentIsBoundToRuntimeAndPrivacyEpoch() {
     let account = AccountUUID()
     let otherAccount = AccountUUID()
