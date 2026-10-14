@@ -808,3 +808,10 @@
 - Reused the one canonical `/private/tmp/NeTelegram-Dev.app`; embedded BuildInfo identifies source `e43bcd0`, fingerprint `f020523821ea483e933cc7bf5712e4df3d06ab62b284bb1e816046fc39ad6229`, arm64, macOS 14 baseline, pinned TDLib `c15d3f5a5de6e3ba5839822c451152e5e18bb700`, ad-hoc development signature. Its executable SHA-256 is `ed17b1e108223fd97e921cf2691abdee6c4ab927539326471b28a7bdfdb4c461`.
 - CUA confirms the app title/source and accessible accountless login controls. No phone, code, Telegram account or session was used. This is a presentation check, not real-auth or accessibility certification. Public Site remains v170 and has no app download.
 - Checkpoint update only; no app rebuild, full local suite, Site deployment, or release asset change. Next: use the exact current-source partial acceptance list to select one bounded implementation slice; keep the real-account step deferred until the user logs in.
+
+## 2026-10-14 — Auth disclosure contrast correction; native replacement guarded
+
+- Source commit `0a7cbe627d253c5cb9751573b014145ee9f630d3` changes only the disclosure color from tertiary to secondary label contrast. Exact-source macOS CI [38501111688](https://github.com/AffPapa/NeTelegram/actions/runs/38501111688) passed; no test count is claimed from the available output.
+- Native visual verification is pending. CUA Cmd+Q and menu Quit did not terminate the old accountless app at `e43bcd0`; `Scripts/dev-app.sh` refused replacement. Sandbox `pgrep` cannot access macOS process state (`sysmond service not found`); the guarded unsandboxed invocation confirmed the app is still running. No second bundle or forced kill was used.
+- Added a checkpoint rule/test so a stale running bundle can be recorded only when the pending candidate names the exact new source, old bundle source, blocked state, and reason. This prevents a false claim that an old UI is the current binary while still allowing an honest resumable checkpoint.
+- Next: diagnose/complete the normal quit barrier, then rebuild only the canonical Dev.app from `0a7cbe6` and inspect the contrast once. Real account entry remains deferred.

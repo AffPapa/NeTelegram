@@ -21,9 +21,7 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
-def validate() -> None:
-    project = read_json("PROJECT-STATE.json")
-    acceptance = read_json("ACCEPTANCE.json")
+def validate_records(project: dict, acceptance: dict) -> None:
     evidence = acceptance["current_evidence"]
     app_sha = evidence["app_source_commit"]
     site = project["site"]
@@ -36,8 +34,8 @@ def validate() -> None:
          "PROJECT-STATE.product.app_source_commit != ACCEPTANCE.current_evidence.app_source_commit"),
         (acceptance["last_verification"]["app_source_commit"] == app_sha,
          "ACCEPTANCE.last_verification is stale; use current_evidence for the resume checkpoint"),
-        (local_app["application_source_commit"] == app_sha == bundle["source_commit"],
-         "canonical Dev.app source does not match the current app source evidence"),
+        (local_app["application_source_commit"] == bundle["source_commit"],
+         "canonical Dev.app source differs between checkpoint files"),
         (local_app["source_fingerprint_sha256"] == bundle["source_fingerprint_sha256"],
          "canonical Dev.app fingerprint differs across checkpoint files"),
         (deployment["version"] == site_checkpoint["version"] == site["latest_version"],
@@ -54,8 +52,23 @@ def validate() -> None:
          "latest_acceptance_slice is stale"),
     ]
     errors = [message for condition, message in checks if not condition]
+    pending = project.get("pending_native_candidate")
+    if local_app["application_source_commit"] != app_sha:
+        pending_matches = (
+            isinstance(pending, dict)
+            and pending.get("source_commit") == app_sha
+            and pending.get("running_bundle_source_commit") == local_app["application_source_commit"]
+            and pending.get("status") == "blocked_running_canonical_app"
+            and bool(pending.get("reason"))
+        )
+        if not pending_matches:
+            errors.append("canonical Dev.app is stale without a matching documented pending native candidate")
     if errors:
         raise ValueError("\n".join(errors))
+
+
+def validate() -> None:
+    validate_records(read_json("PROJECT-STATE.json"), read_json("ACCEPTANCE.json"))
 if __name__ == "__main__":
     try:
         validate()
