@@ -4,12 +4,12 @@
   "verified_at": "2026-10-15",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
-    "method": "macOS security CLI lookup by fixed service/account attributes without -w",
+    "method": "security find-generic-password with fixed service/account and no -w option",
     "service": "org.affpapa.netelegram.telegram-api",
     "account": "api-hash",
     "result": "not_found",
     "secret_value_read": false,
-    "meaning": "The previously selected Save action did not persist a Keychain item. Do not reuse the earlier chat-exposed hash."
+    "meaning": "No current API hash is stored under the application key. Existing preview process remains running; preserve it until the owner confirms save or cancel."
   },
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -329,7 +329,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Next: after the owner closes the protected Keychain dialog and the canonical Dev.app process is proven absent, build/reopen the single /private/tmp/NeTelegram-Dev.app from 9e0af7a and visually verify chat-row updates/reordering. Then continue owner-operated one-account login/read/send/close smoke. Do not create a second app bundle. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled until a verified release exists.",
+  "next_action": "Next: in the still-running canonical Dev.app, save the current API hash directly to Keychain or intentionally cancel the protected entry; then quit normally and verify PID 81742 is absent. Only then rebuild/reopen the same /private/tmp/NeTelegram-Dev.app once from 9e0af7a and visually verify incremental chat-row updates. Continue owner-operated one-account login/read/send/close smoke. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -833,7 +833,7 @@
     "source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
     "running_bundle_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
     "status": "blocked_running_canonical_app",
-    "reason": "Scripts/check-app-process.sh could not prove the canonical process absent while the protected Keychain dialog may still be open. The existing app was not replaced; use only the one canonical bundle after its owner closes it and absence is positively verified."
+    "reason": "Canonical process is positively present as PID 81742 at /private/tmp/NeTelegram-Dev.app/Contents/MacOS/NeTelegram with --app-support-root /private/tmp/netelegram-dev-support-clean --ci-auth-layout-preview --ci-auth-layout-preview-compact --ci-appearance-dark. The process guard therefore correctly refused bundle replacement. A non-value `security find-generic-password -s org.affpapa.netelegram.telegram-api -a api-hash` lookup returned not_found without reading a secret. Do not close the current app until the owner confirms the protected API-hash entry is saved or intentionally cancelled."
   },
   "latest_pushed_commit": {
     "branch": "main",

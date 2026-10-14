@@ -675,7 +675,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Next: after the owner closes the protected Keychain dialog and the canonical Dev.app process is proven absent, build/reopen the single /private/tmp/NeTelegram-Dev.app from 9e0af7a and visually verify chat-row updates/reordering. Then continue owner-operated one-account login/read/send/close smoke. Do not create a second app bundle. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled until a verified release exists.",
+  "next_action": "Next: in the still-running canonical Dev.app, save the current API hash directly to Keychain or intentionally cancel the protected entry; then quit normally and verify PID 81742 is absent. Only then rebuild/reopen the same /private/tmp/NeTelegram-Dev.app once from 9e0af7a and visually verify incremental chat-row updates. Continue owner-operated one-account login/read/send/close smoke. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -771,10 +771,10 @@
       "date": "2026-10-15",
       "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Not run for this slice. The process guard cannot prove the existing canonical Dev.app is absent; no replacement or second bundle was created.",
+      "result": "Not run for this slice. Process inspection positively found PID 81742 running the canonical /private/tmp/NeTelegram-Dev.app in compact auth preview. Non-value Keychain lookup returned not_found. No window interaction, process termination or bundle replacement was attempted.",
       "scope": "Local source-to-bundle GUI behavior remains unverified for CHAT-LIST-RECONCILE-01."
     },
-    "coverage_limit": "Hosted CI verifies compile/tests and isolated native bundle assembly only. Canonical local app remains at prior source 291cd0a; chat-row behavior has not been visually exercised in the app. Account login and authenticated conversation behavior remain unverified."
+    "coverage_limit": "Hosted CI verifies compile/tests and isolated native bundle assembly only. Local GUI remains blocked pending the owner saving or cancelling the current protected API-hash entry and normal app quit; account login and authenticated conversation behavior remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",

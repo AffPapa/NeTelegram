@@ -1664,3 +1664,10 @@
 - Local verification: isolated `swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-chatrows-3eabf4b` passed in 10.05 s. The canonical Dev.app process guard returned “unable to prove process absence”; no local bundle replacement or UI smoke was attempted.
 - Exact-source hosted checks passed on `9e0af7a46c1904600cdfc8eeb1e3716239b7cb95`: [macOS serial Swift CI](https://github.com/AffPapa/NeTelegram/actions/runs/38611394780) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38611394887). Hosted development bundle does not count as local UX evidence.
 - Coverage limit: no measured 1k/10k chat benchmark, no local visual/AX check, no real account smoke. Current local Dev.app remains on `291cd0a`; only one canonical bundle is allowed.
+
+
+## 2026-10-15 — Canonical Dev.app process and Keychain recheck
+
+- Read-only `pgrep` positively found PID `81742` running the single canonical `/private/tmp/NeTelegram-Dev.app` with compact auth-preview flags. The process guard refusal is therefore expected; no app window was closed, no process was terminated, and the canonical bundle was not replaced.
+- Non-value Keychain lookup (`security find-generic-password -s org.affpapa.netelegram.telegram-api -a api-hash`, with no `-w`) returned `not_found`; no credential value was read. Leave the app open until the owner confirms the protected entry is saved or intentionally cancelled.
+- Exact-source app code, isolated build, Swift CI and pinned TDLib workflow remain verified at `9e0af7a`; the active local bundle is still the prior `291cd0a`. Local visual smoke for this source remains pending.
