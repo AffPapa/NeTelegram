@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "Privacy-lock menu source 752f684 passed exact-SHA Swift CI, pinned-TDLib Dev.app lifecycle smoke and metadata validation. Canonical Dev.app was reused after fingerprint/hash/signature validation and AX confirms accountless first-run UI. Public development Site v167 is live. Full local Swift suite was not duplicated; no-op reuse check took under one second. Fresh signing preflight found four valid identities (two Developer ID Application for team H6VGU2M6JD); no notarytool Keychain profile is configured.",
-  "verified_at": "2026-10-14T07:34:00+07:00",
+  "phase": "API-hash reads are now gated across the full Keychain replacement write. Final consolidated source candidate 2d8a4e5 passes exact serial local Swift suite 160/160 and focused replacement-race test 1/1. It is not pushed; one fast-forward push and exact-SHA hosted CI/native workflows remain.",
+  "verified_at": "2026-10-14T07:49:31+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -65,7 +65,18 @@
       "scope": "Pinned TDLib arm64 Dev.app bundle assembly and lifecycle smoke passed for exact app source 752f684."
     },
     "last_audited_checkpoint_commit": "752f6842855373061f3a5e8cafb2b164838cf417",
-    "pre_edit_working_tree_clean": true
+    "pre_edit_working_tree_clean": true,
+    "candidate_pending_publication": {
+      "commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+      "parent": "d9e1fda7a203002d283ccd6eac314eaf07b304c3",
+      "branch": "main",
+      "git_push": "not published; one push attempt remains after checkpoint commit",
+      "github_api_observation": "At local resume, origin/main is d9e1fda; this candidate is one fast-forward commit ahead. No fresh remote write observation this turn.",
+      "hosted_validation": "pending exact source commit publication",
+      "local_validation": "Exact consolidated source 2d8a4e5: serial swift test passed 160/160 under arm64 / Xcode 27 / Swift 6.4; focused replacement-race test passed 1/1; git diff --check passed.",
+      "implementation": "Single-flight API-hash Keychain lookup with bounded wait; invalidates prior generation on replacement; old result is discarded; fresh lookup is held until the Keychain write finishes or fails. Timeout leaves profiles and account storage unchanged.",
+      "next": "Commit this checkpoint and push the two-commit fast-forward (source plus checkpoint) once. Verify exact-SHA Swift, pinned-TDLib Dev.app lifecycle and metadata workflows. Keep the existing Dev.app until native workflow passes."
+    }
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
@@ -83,14 +94,16 @@
     "app_executable_sha256": "b5c3e7ea589027d9e69b9cdbd1b1ab5401845c2a03935508890c78d01ddd82f5",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "reuse_validation": "Scripts/dev-app.sh validated the exact clean source, toolchain, pinned TDLib, support root, hashes, plist and signature; reused in <1 second without rebuild or relaunch."
+    "reuse_validation": "Scripts/dev-app.sh validated the exact clean source, toolchain, pinned TDLib, support root, hashes, plist and signature; reused in <1 second without rebuild or relaunch.",
+    "pending_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "candidate_state": "not built: canonical Dev.app remains running at source 752f684. Wait for exact-source native CI, then reuse the same bundle path once after the existing process closes."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Exact app source 752f684 passed hosted serial macOS Swift CI (run 38489454775). The CI test count was not recorded in this checkpoint. No duplicate local full-suite run was performed.",
-      "app_source_commit": "752f6842855373061f3a5e8cafb2b164838cf417",
-      "hosted_run_id": 38489454775,
-      "suite": "Hosted exact-source serial suite passed; accountless/synthetic coverage only. No real Telegram accounts tested."
+      "result": "PASS: consolidated app source 2d8a4e5 passed exact serial Swift suite 160/160 under arm64 / Xcode 27 / Swift 6.4. Focused API-hash replacement-race test passed 1/1. Exact-SHA hosted CI remains pending publication.",
+      "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+      "hosted_run_id": null,
+      "suite": "160 serial tests; synthetic readiness and account/runtime coverage only; no physical Keychain stall or real Telegram session."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -227,7 +240,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue the next incomplete product acceptance slice from this checkpoint. Before distribution, configure/verify a notarytool Keychain profile through Apple’s supported flow; do not request secrets in chat. Real login remains deferred, and all-20 certification plus Telegram compatibility gates remain open.",
+  "next_action": "Commit the updated checkpoint, then attempt one Git push of source plus checkpoint. Inspect exact-SHA serial Swift, pinned-TDLib Dev.app and metadata workflows. Do not replace the open Dev.app until native workflow passes. Reuse local test evidence unless source changes or hosted CI fails for a local-only reason.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -340,21 +353,20 @@
     "public_verification": "Deployment succeeded. Anonymous in-app browser rendered /devlog/ and showed the exact 752f684 entry and all three CI links. Downloads remains without an app release or download link."
   },
   "current_native_smoke": {
-    "repository_head": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
-    "app_source_commit": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
+    "repository_head": "d9e1fda7a203002d283ccd6eac314eaf07b304c3",
+    "app_source_commit": "752f6842855373061f3a5e8cafb2b164838cf417",
     "bundle_id": "org.affpapa.netelegram.dev",
-    "source_fingerprint_sha256": "0ba27cbc24782d7e8b44311b4d83cdb6efd660f64ff26c54961ba06b643f4603",
-    "executable_sha256": "acb986552bf2f1dcb1ed73c50ffce9900482a61dcc174baca687f739f9692c30",
+    "source_fingerprint_sha256": "6cd043e3d7b4f4241503faf4626faa8a641f35b9cdcdd34c4b90dee3fffc39f4",
+    "executable_sha256": "b5c3e7ea589027d9e69b9cdbd1b1ab5401845c2a03935508890c78d01ddd82f5",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "build_seconds": 6.61,
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
-    "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "live_ui": "CUA verified window title NeTelegram · dev 4f7cb6f2, country +66, phone, Continue and QR controls, disclosure; no credentials/profile entered.",
+    "signature": "ad-hoc development only; codesign --verify --deep --strict passed on 2026-10-14",
+    "live_ui": "CUA observed title NeTelegram · dev 752f6842, country +66, phone entry and QR controls, disclosure, and no selected account. No number/code/API hash was entered.",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "scope": "The only canonical local Dev.app was replaced after confirming the previous accountless process exited. Not a login/send, authorized account, 20-runtime, performance, Developer ID or notarization test."
+    "scope": "Existing canonical candidate only, app source 752f684; not the unbuilt 80b69f3 candidate. No login/read/send, physical Keychain recovery, 20-account, notarization or release test."
   },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",

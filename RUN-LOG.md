@@ -691,3 +691,31 @@
 - Свежий `security find-identity -v -p codesigning` read-only inventory дважды возвратил четыре валидные identity: Apple Development, Apple Distribution и две Developer ID Application identity для Team ID `H6VGU2M6JD`. Один соседний вызов вернул ноль; повторные enumeration дали четыре, поэтому нестабильное чтение отмечено явно. Отпечатки и private keys не выводились.
 - Read-only Keychain metadata query к штатной notarytool службе `com.apple.gke.notary.tool` вернул `errSecItemNotFound`; содержимое credential не запрашивалось. Проверка имён environment variables не обнаружила `APPLE_`, `ASC_` или `NOTARY_` credential names. Notarization profile пока не подтверждён.
 - Это снимает только прежнее утверждение «Developer ID identity отсутствует». Никакой app signing, upload в Apple, notarization, release, аккаунтный тест или новый Site deploy не выполнялся. Stable release по-прежнему закрыт реальным login/20-account и Telegram compatibility gates.
+
+
+## 2026-10-14 — Bound profile restore waiting on the shared API hash
+
+- Source commit: `80b69f338e9df01955ffacb8925f4c56800e576c` (parent `d9e1fda7a203002d283ccd6eac314eaf07b304c3`). Added a single-flight `TelegramAPIHashReadiness` shared by saved-profile restore, profile retry, and new-account creation. A wait ends with a clear 10-second status; the blocking Security operation remains bounded in the existing Keychain queue and is not duplicated by a retry. A late successful value is reused and invalidated after the user replaces the app API hash. Timeout leaves profile failure state and account storage untouched.
+- Focused local SwiftPM test `apiHashReadTimeoutRetriesJoinOneLookupAndCacheItsLateResult` passed 1/1; app and test targets compiled; `git diff --check` passed. No full suite was repeated locally. The running canonical Dev.app remains source `752f684`; no bundle replacement, login, or credential use occurred.
+- Git push was attempted twice and failed before authentication with `Could not resolve host: github.com`. Connected GitHub API read verified `main` remains at the expected parent `d9e1fda`; no hosted CI or Site publication exists for `80b69f3`. Keep this exact commit and push it when DNS is available, then inspect its exact-source Swift, pinned-TDLib Dev.app, and metadata workflows. Physical Keychain stall/recovery remains unverified.
+
+
+## 2026-10-14 — Offline exact-source serial validation
+
+- With GitHub DNS still unavailable, ran the project’s exact serial offline command on app-source commit `80b69f338e9df01955ffacb8925f4c56800e576c`: `swift test --package-path . --scratch-path .build/canonical-dev-build/swift --no-parallel --verbose`. Result: **159/159 passed** in one suite; Swift compiled `NeTelegramApp` and `NeTelegramCoreTests` under arm64 / Xcode 27 / Swift 6.4. The focused timeout/single-flight regression passed 1/1, and release metadata validation passed 11/11. JSON parsing and `git diff --check` passed.
+- This proves synthetic logic and compilation for the local source only. It is not hosted CI, a packaged Dev.app smoke, a physical Keychain stall/recovery, real account login, or 20-account certification. The open canonical Dev.app stays at source `752f684`; no second bundle was created.
+- The GitHub API read still reports `main` at `d9e1fda`; Git transport cannot resolve `github.com`. The exact two local commits remain queued for one push when DNS is available. Site remains public development version 167, unchanged.
+
+
+## 2026-10-14 — Discard stale API hash after in-flight replacement
+
+- Final source commit `5e47c4eec6bf57d03e76b92dcb449b5eaf7c0f56` folds the bounded API-hash wait and its replacement-race fix into one source revision. Replacing the app hash invalidates existing waiters; the non-cancellable old SecItem read may finish, but its value is discarded. New waiters queue one fresh lookup after it finishes. No old hash can be cached or passed to a profile startup after invalidation.
+- Both focused regressions passed 2/2, including replacement during a blocked lookup. Full serial Swift suite passed **160/160** under arm64 / Xcode 27 / Swift 6.4; release metadata suite passed 11/11; JSON and diff checks passed. No real Keychain daemon was blocked and no account credentials were used.
+- Candidate is local only. GitHub API last confirmed `main` at `d9e1fda`; Git transport still failed to resolve `github.com`, so no hosted CI, native bundle workflow, Dev.app replacement, or Site publication has occurred. Current canonical Dev.app stays at source `752f684`.
+
+## 2026-10-14 — Gate API-hash reads during Keychain replacement
+
+- Consolidated source commit `2d8a4e5964211c9fbd40136f5470da7d47266937` starts the readiness replacement barrier before the Keychain write and releases it after either success or failure. A profile restore arriving during the write waits; it cannot read/cache the old hash during that write. Local history was consolidated against `origin/main` so one source candidate replaces the abandoned unpublished intermediate commits.
+- Focused `replacingAPIHashDiscardsOldInFlightLookupBeforeStartingProfiles` passed 1/1. The exact consolidated source passed serial SwiftPM suite 160/160 under arm64 / Xcode 27 / Swift 6.4. `git diff --check` and checkpoint JSON parsing passed.
+- No app bundle was rebuilt or launched, no Telegram credentials were read, and no Dev.app was replaced. This is synthetic readiness coverage, not physical Keychain daemon recovery or a real Telegram login.
+- Source is local only and one commit ahead of `origin/main` at `d9e1fda`. Next: commit this checkpoint, make one push attempt, then inspect exact-SHA CI/native workflows. Reuse the existing Dev.app only after its exact-source native workflow passes.

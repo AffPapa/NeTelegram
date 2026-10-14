@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; app source 752f684 passed exact-source hosted serial Swift CI (run 38489454775), pinned-TDLib native Dev.app lifecycle smoke (38489454777), and metadata validation (38489454774). Canonical Dev.app matches source/fingerprint and was reused in under one second; accountless UI confirmed. Public development Site v167 is live. No release; real login deferred; 20 authorized runtime coverage and signing remain open. Fresh read-only signing preflight found 4 valid identities, including 2 Developer ID Application for team H6VGU2M6JD; the notarytool Keychain profile is not configured, so no signed/notarized build exists.",
+  "status": "implementation_in_progress; last published app source 752f684 passed exact-source hosted serial Swift CI (38489454775), pinned-TDLib Dev.app lifecycle smoke (38489454777), and metadata validation (38489454774); those are not evidence for the current candidate. Current consolidated local source 2d8a4e5 passes 160/160 serial Swift tests and the focused API-hash replacement race test 1/1. It is not pushed; exact-SHA hosted Swift/native checks are pending. Canonical Dev.app remains source 752f684 and has not been replaced. Site v167 remains live. Real login remains deferred; 20 real-account coverage, Developer ID/notarization, Telegram compatibility, and public app release remain open.",
   "current_evidence": {
     "app_source_commit": "752f6842855373061f3a5e8cafb2b164838cf417",
     "app_tests": "Exact app-source 752f684 passed hosted serial Swift CI run 38489454775. Test count was not captured in the checkpoint. No duplicate local full-suite execution.",
@@ -256,7 +256,7 @@
       "method": "native fault cases",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "SecretsStore Security reads now attach LAContext with interactionNotAllowed=true; synchronous Security operations use a dedicated serial DispatchQueue, outside AppKit and the Swift cooperative executor. Three focused local tests and exact-source CI 38475546446 passed (157/157). A test-only semaphore ordering deadlock was diagnosed and fixed before those passes. Current canonical Dev.app still awaits SecItemCopyMatching for >20 seconds while visibly reporting the Keychain restore step; actual local Keychain ACL/access cause, interaction result, system biometric flow and user login remain unverified. No profiles/keys were reset or read during diagnosis; status stays partial."
+      "evidence": "SecretsStore performs Security reads outside AppKit and the Swift cooperative executor. TelegramAPIHashReadiness bounds each waiter to 10 seconds and shares one in-flight Keychain lookup. Replacing the app hash invalidates old waiters/results and gates new reads for the full Keychain write, then resumes a fresh lookup after success or failure. Focused timeout/single-flight and replacement-race regressions pass; consolidated source 2d8a4e5 passed 160/160 serial local Swift tests under arm64 / Xcode 27 / Swift 6.4. This is synthetic coverage only: actual Keychain daemon stall/recovery and real account login remain unverified. The canonical Dev.app remains at source 752f684; exact-source hosted CI/native workflow await publication."
     },
     {
       "id": "APP24",
@@ -564,7 +564,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Continue from the canonical main checkout and current 752f684 source. Choose the next incomplete user-facing acceptance slice; use one full exact-SHA hosted Swift suite, one native Dev.app build/smoke only for changed app source, and a Site update after a coherent milestone. Do not duplicate a passing check. Real login remains deferred; 20-account, signing/notarization and Telegram compatibility gates remain open.",
+  "next_action": "Commit the current checkpoint, then make one push of source plus checkpoint. Inspect exact-SHA serial Swift, pinned-TDLib Dev.app and metadata workflows. Reuse the existing Dev.app only after native workflow passes. Keep real login deferred as previously requested; 20-account, signing/notarization and Telegram compatibility gates remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -580,5 +580,14 @@
     "run_id": 38484677460,
     "status": "passed",
     "scope": "Filtered probe and full serial Swift suite passed. Trigger path is Tests/NeTelegramCoreTests/**; release Python tests remain in the Ubuntu metadata workflow."
+  },
+  "current_local_candidate": {
+    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "parent": "d9e1fda7a203002d283ccd6eac314eaf07b304c3",
+    "branch": "main",
+    "working_tree": "clean app source; checkpoint files are being updated in this commit",
+    "local_tests": "Serial Swift suite 160/160; focused API-hash replacement race test 1/1; arm64 / Xcode 27 / Swift 6.4.",
+    "hosted_validation": "not run; candidate has not been pushed",
+    "dev_app": "existing canonical Dev.app remains source 752f684; do not replace until exact-source native workflow passes"
   }
 }
