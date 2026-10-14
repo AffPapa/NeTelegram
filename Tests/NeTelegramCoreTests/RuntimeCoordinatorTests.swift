@@ -2102,6 +2102,75 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     await #expect(throws: TDLibRoutingError.unregisteredClientID(rejectedFirstClient)) {
         try await coordinator.routeUpdate(Data("{\"@client_id\":2,\"@type\":\"updateAuthorizationState\"}".utf8))
     }
+
+    // Carry the same twenty restored routes through the shared production
+    // receive/reducer/delivery pipeline. A delayed callback for one account
+    // must not strand the other accounts, and selection changes cannot alter
+    // the client identity attached to their updates.
+    let updatePayloads = [1, 2].flatMap { sequence in
+        routes.map { route in
+            Data("{\"@client_id\":\(route.client.value),\"@type\":\"updateConnectionState\",\"sequence\":\(sequence)}".utf8)
+        }
+    }
+    let pollIndex = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let index = pollIndex.get()
+        pollIndex.set(index + 1)
+        guard updatePayloads.indices.contains(index) else { return .timeout }
+        return .update(updatePayloads[index])
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator)
+    let stalledDelivery = AsyncTestGate()
+    let stalledDeliveryEntered = LockedTestValue(false)
+    let completedUpdates = LockedTestValue<[Int32: [Int]]>([:])
+    let completedCount = LockedTestValue(0)
+    let pipelineFailed = LockedTestValue(false)
+    let stalledClient = first.client.value
+    var selectedAccountForPipeline = first.account
+
+    pipeline.start(
+        onEvent: { event in
+            guard case .routed(let update) = event,
+                  let object = try? JSONSerialization.jsonObject(with: update.json) as? [String: Any],
+                  let sequence = object["sequence"] as? Int else { return }
+            if update.route.client.value == stalledClient, sequence == 1 {
+                stalledDeliveryEntered.set(true)
+                await stalledDelivery.wait()
+            }
+            completedUpdates.mutate { $0[update.route.client.value, default: []].append(sequence) }
+            completedCount.mutate { $0 += 1 }
+        },
+        onReceiveFailure: { _ in pipelineFailed.set(true) }
+    )
+
+    let firstLaneEntered = await waitForTrue(stalledDeliveryEntered, timeout: .seconds(2))
+    #expect(firstLaneEntered, "The injected first account update must enter its delayed delivery lane")
+    guard firstLaneEntered else {
+        pipeline.requestInputStop()
+        await gateway.waitForReceiveWorkerExit()
+        await pipeline.finishInputAndDrain()
+        return
+    }
+    selectedAccountForPipeline = second.account
+    let otherRoutes = Set(routes.dropFirst().map { $0.client.value })
+    let otherLanesAdvanced = await waitForCount(completedCount, atLeast: 38, timeout: .seconds(3))
+    #expect(otherLanesAdvanced, "All nineteen background clients must deliver both updates while account one is delayed")
+    #expect(Set(completedUpdates.get().keys).isSuperset(of: otherRoutes))
+    #expect(selectedAccountForPipeline == second.account)
+
+    await stalledDelivery.open()
+    let everyUpdateDelivered = await waitForCount(completedCount, atLeast: updatePayloads.count, timeout: .seconds(3))
+    #expect(everyUpdateDelivered)
+    pipeline.requestInputStop()
+    await gateway.waitForReceiveWorkerExit()
+    await pipeline.finishInputAndDrain()
+
+    let expectedSequences = Dictionary(uniqueKeysWithValues: routes.map { ($0.client.value, [1, 2]) })
+    #expect(completedUpdates.get() == expectedSequences, "Each restored route must receive its own ordered update sequence")
+    #expect(!pipelineFailed.get(), "Synthetic valid client updates must not fail-stop the shared receiver")
+    for route in routes {
+        #expect(await coordinator.isCurrent(route), "UI selection and background updates must not replace a runtime route")
+    }
 }
 
 @MainActor @Test func lateBackgroundStartupCannotStealNewerAccountSelection() {
