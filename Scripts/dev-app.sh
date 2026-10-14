@@ -215,7 +215,8 @@ cat > "$APP_PATH/Contents/Info.plist" <<PLIST
 <key>CFBundleExecutable</key><string>NeTelegram</string>
 <key>CFBundleIdentifier</key><string>org.affpapa.netelegram.dev</string>
 <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
-<key>CFBundleName</key><string>AffPapa Chat Dev</string>
+<key>CFBundleName</key><string>NeTelegram Dev</string>
+<key>CFBundleDisplayName</key><string>NeTelegram Dev</string>
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleShortVersionString</key><string>0.0.0-dev</string>
 <key>CFBundleVersion</key><string>0</string>

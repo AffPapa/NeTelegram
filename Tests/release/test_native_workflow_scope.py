@@ -3,6 +3,7 @@ from pathlib import Path
 
 
 WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/native-app.yml"
+DEV_APP_SCRIPT = Path(__file__).resolve().parents[2] / "Scripts/dev-app.sh"
 
 
 class NativeWorkflowScopeTests(unittest.TestCase):
@@ -41,6 +42,12 @@ class NativeWorkflowScopeTests(unittest.TestCase):
 
     def test_manual_native_bundle_gate_remains_available(self):
         self.assertIn("  workflow_dispatch:", WORKFLOW.read_text(encoding="utf-8"))
+
+    def test_development_bundle_uses_ne_telegram_product_name(self):
+        script = DEV_APP_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn("<key>CFBundleName</key><string>NeTelegram Dev</string>", script)
+        self.assertIn("<key>CFBundleDisplayName</key><string>NeTelegram Dev</string>", script)
+        self.assertNotIn("AffPapa Chat Dev", script)
 
 
 if __name__ == "__main__":
