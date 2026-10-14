@@ -21,6 +21,12 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 6. Launch the canonical Dev.app only for auth, lifecycle, or visible UI changes. Verify its embedded source SHA and reuse fingerprint before opening. Do not use `swift run` to start a second app instance.
 7. Keep real-account checks separate from synthetic tests. Never seed fake Telegram identities or inspect installed Telegram app data. Passing synthetic tests do not prove real login/send, 20 authorized runtimes, sleep/wake, resource limits, or distribution signing.
 
+## Preview and real-client boundary
+
+- `--ci-auth-layout-preview` and `--ci-chat-shell-preview` are offline visual fixtures. They skip profile restoration and connection observers; login and QR actions intentionally send no requests. Never use a preview window for owner login or account acceptance.
+- Before a real login, launch the canonical bundle in normal `--launch` mode and verify the window title and process arguments contain no `--ci-*-preview` flags. A screenshot title or old process is not evidence for the current source.
+- `open --args` does not change arguments on an already-running macOS app. `Scripts/dev-app.sh` now compares requested preview flags with the live process and refuses a mode mismatch; quit the current instance before switching between preview and normal client. If process arguments cannot be checked, stop rather than infer a successful switch.
+
 ## Fast feedback and release boundary
 
 - One canonical checkout, one source SHA, and one Dev.app path are used for a milestone. Do not switch among stale bundles or rebuild the same candidate after a Site-only failure.

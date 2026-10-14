@@ -127,6 +127,35 @@ PY
         echo "Reusing verified canonical bundle for exact clean source $DEV_COMMIT."
         echo "Build record: $BUILD_RECORD"
         if [[ "$MODE" == "launch" ]]; then
+            if running_pid="$(/usr/bin/pgrep -x NeTelegram 2>/dev/null)"; then
+                if [[ "$running_pid" == *$'\n'* ]]; then
+                    echo "Multiple NeTelegram processes are running; refusing to claim this launch changed the active app mode." >&2
+                    exit 1
+                fi
+                if ! running_command="$(/bin/ps -ww -p "$running_pid" -o command= 2>/dev/null)" || [[ -z "$running_command" ]]; then
+                    echo "Cannot inspect the running NeTelegram launch mode; refusing to reuse it for a different launch request." >&2
+                    exit 1
+                fi
+                requested_preview_flags=()
+                for argument in "${LAUNCH_ARGS[@]}"; do
+                    case "$argument" in
+                        --ci-auth-layout-preview|--ci-auth-layout-preview-compact|--ci-chat-shell-preview|--ci-chat-shell-preview-compact|--ci-appearance-dark)
+                            requested_preview_flags+=("$argument")
+                            ;;
+                    esac
+                done
+                requested_preview_json="$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "${requested_preview_flags[@]}")"
+                if ! python3 "$ROOT_DIR/Scripts/dev_app_launch_mode.py" "$requested_preview_json" "$running_command"; then
+                    echo "Quit the existing NeTelegram window, then run this command again. `open --args` cannot change arguments of an already-running app." >&2
+                    exit 1
+                fi
+            else
+                process_check_status=$?
+                if [[ $process_check_status -ne 1 ]]; then
+                    echo "Unable to prove whether NeTelegram is running; refusing to reuse the canonical app." >&2
+                    exit 1
+                fi
+            fi
             open "$APP_PATH" --args "${LAUNCH_ARGS[@]}"
         fi
         exit 0
