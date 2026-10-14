@@ -1253,3 +1253,20 @@
 - Rebuilt the single canonical `/private/tmp/NeTelegram-Dev.app` from that clean SHA once; AppKit build and strict ad-hoc signature verification passed. CUA confirmed `NeTelegram · dev 62ee5434` on the clean accountless entry screen. No credentials or Telegram account were used.
 - This is synthetic recovery evidence plus accountless native smoke. OS-level disk-full and native quit-barrier behavior, real login, 20 authorized runtimes, Developer ID/notarization, and release remain open. No app release was created.
 - Process lesson: sandboxed process enumeration returned “unable to prove absence” even after CUA showed the app closed. The release guard was kept intact; one escalated read-only process check proved exit, then the same canonical build ran once. Do not fake a negative process result or repeat the blocked check in the same sandbox.
+
+## 2026-10-14 — UI-SHELL-01 adaptive AppKit chat shell
+
+- Reviewed the official Telegram Desktop UI architecture at `mainwidget.cpp`, `dialogs_widget.cpp`, `dialogs_row.cpp`, `history_view_top_bar_widget.cpp`, `history_view_list_widget.cpp`, and `history_view_compose_controls.cpp`. Applied only the structural pattern: resizable two-pane navigation, distinct chat header/history/composer regions, compact search, and native typography/colors. No upstream code, assets, logo, or unsupported feature was copied.
+- Replaced hard-coded chat-shell coordinates with an `NSSplitView`, constrained sidebar controls, a separate conversation header, a scrollable history viewport, and a bottom-anchored composer. Added DEBUG-only compact shell preview with an explicit “no accounts” label; it creates no profiles and starts no account restore.
+- Fixed two issues found in the 760×600 visual check: the title was constrained by a hidden topic selector, and proportional split resizing reduced the sidebar below its minimum. The follow-up preview shows the full title and 258 pt sidebar; composer, search, scroll areas, and disabled actions remain visible.
+- `Scripts/dev-app.sh --launch-chat-shell-preview-compact` built the canonical `/private/tmp/NeTelegram-Dev.app`, verified its ad-hoc signature, and launched the accountless preview. AppKit target build passed; no Core behavior changed, so no Swift unit suite was run. UI changes remain uncommitted and are not covered by CI run 38550170386, which validates only base commit `62ee543`.
+- Reconciled the resume checkpoints against the live Sites provider: v194 is current, not v193. Its source is `664f3efdb8cd49952341fb0bdca03aaffdb1ba71`; it records app source `62ee543` and still has no application download. No Site publication was repeated. `Scripts/validate_checkpoint.py` passed after synchronizing the duplicated pointers.
+- Process lesson: on macOS, `cua.getApp()` can relaunch the app after Cmd+Q. For canonical replacement, close once, perform the elevated read-only process guard immediately, and do not query/rebind the app between those steps. This preview uses no fake account identities.
+
+## 2026-10-14 — UI-SHELL-01 adaptive AppKit chat shell
+
+- Replaced the fixed-coordinate chat workspace with a resizable native split view, constrained header/history/composer, and compact window minimum. Used Telegram Desktop source only to study pane hierarchy and navigation patterns; no source or assets copied.
+- Fixed title/topic overlap and sidebar compression after inspecting the 760×600 native preview. The preview explicitly states that no accounts are connected; no real account or profile was accessed.
+- Published app source commit `990f97ae9d4f68e1f870e9e2023848e2abd44226`; exact-source macOS CI run [38552967052](https://github.com/AffPapa/NeTelegram/actions/runs/38552967052) passed. Rebuilt and relaunched the single canonical `/private/tmp/NeTelegram-Dev.app` from that exact clean SHA.
+- The public Site remains at v194 and has no download asset. No Site deployment was needed for this app-only slice.
+- Next: proceed with functional native chat slice. Authenticated account smoke remains deferred by the user; no real-account or 20-runtime claim is made.
