@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a"
+    "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38541341263,
+      "run_id": 38543010984,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38541341263",
-      "workflow_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
-      "app_source_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
-      "scope": "Exact-source macOS CI passed the serial Swift suite 173/173."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38543010984",
+      "workflow_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+      "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+      "scope": "Exact-source macOS CI passed for auth error accessibility behavior."
     },
     "published_application_releases": [],
     "github_access": {
@@ -109,24 +109,22 @@
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
-    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
     "version": "0.0.0-dev",
-    "build_info_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
-    "application_source_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
+    "application_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
     "dirty_source": false,
+    "distribution_ready": false,
+    "path": "/private/tmp/NeTelegram-Dev.app",
+    "support_root": "/private/tmp/netelegram-dev-support-clean",
+    "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
+    "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "distribution_ready": false,
-    "process_state": "AUTH03 local preview completed and app quit; process guard confirmed absence. No real Telegram login.",
-    "source_fingerprint_sha256": "1b21278d7c112b9e245bff15329fc2254afc621ad317e6c115879bd13ce3d931",
-    "app_executable_sha256": "461f5918937733df46e0ea9d52d0f83ac8bdbec6f89d7f0f66bc8a3ca4512082",
-    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-    "build_info_sha256": "a19653352dc74934ea89de6d2d73a80fbc7cc707286407b93ae774b965f18363",
-    "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "build_duration_seconds": 4.95,
-    "reuse_validation": "BuildInfo matches clean source 0ab1fec and fingerprint; executable, TDJSON, BuildInfo hashes recorded; strict ad-hoc codesign verification passed.",
-    "candidate_state": "Native AppKit CUA auth-layout preview at 900x700 covered phone, code, 2FA password, QR, and registration; all fields, status, help, and actions were visible. Local synthetic data only; TDLib requests disabled. App was quit after preview and process absence confirmed. This does not establish real login, VoiceOver, IME, RTL, or lifecycle reopen on this exact SHA."
+    "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
+    "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
+    "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login."
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -286,7 +284,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "AUTH04: implement the next accountless authentication slice with one focused regression if needed, one standard serial suite for changed app source, exact-source CI, and at most one canonical Dev.app build plus native smoke. Reuse the existing five-screen preview evidence; do not repeat AUTH03/APP15/APP26 checks. Keep login deferred and preserve no-download status until real account and release gates are satisfied.",
+  "next_action": "AUTH05: continue one accountless auth integration/accessibility slice. Preserve the exact-source AUTH04 CI and canonical Dev.app hashes; do not repeat the full serial suite/build unless app source changes. Real Telegram login remains deferred; request fresh API credentials only through the app settings UI when user resumes login.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -331,7 +329,8 @@
     "Launch a native app through LaunchServices/CUA; direct executable launch is not a valid GUI smoke path. Never replace the canonical Dev.app while its process is present.",
     "For Sites, use the official source helper in open mode, retain its returned checkout/source result, then publish from that checkout. If default sandbox DNS fails, inspect whether the failure is only sandbox networking and retry the same helper once with authorized network access; never switch to direct Git or guessed endpoints.",
     "Query only tool names and the exact signature needed; do not dump the full registry/tool descriptions into output.",
-    "Batch checks by their real input SHA and reuse passing evidence. Distinguish app-source SHA, docs/checkpoint commit, Site-source SHA, saved version, deployment, and built bundle hashes; never rebuild or retest an unchanged app source."
+    "Batch checks by their real input SHA and reuse passing evidence. Distinguish app-source SHA, docs/checkpoint commit, Site-source SHA, saved version, deployment, and built bundle hashes; never rebuild or retest an unchanged app source.",
+    "Do not treat a process-guard exit of unable-to-prove as proof that a GUI app is running or stopped. Cross-check with fresh CUA app inventory/LaunchServices; report the exact evidence source and keep process status unverified when sources disagree."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
@@ -345,11 +344,12 @@
   "latest_site_source_commit": "5556c2b7a84d61d60fc4ff6619eaefa60bcca973",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38523639678,
+    "run_id": 38543010984,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523639678",
-    "workflow_commit": "e14382b01cdfad79ad96ae12567c18a1c89849db",
-    "scope": "Exact checkpoint with canonical Dev.app hashes and lifecycle evidence passed metadata validation."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38543010984",
+    "workflow_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "scope": "Exact-source app CI passed for AUTH04; serial suite 174/174."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -503,13 +503,27 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH03 native authorization layout preview at 900x700",
-    "source_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
-    "local_focused_tests": "No new tests added for this preview. The standard serial Swift suite passed 173/173; the initial default-parallel invocation produced two stress-test timing failures and is not the project validation command.",
-    "hosted_serial_suite": "GitHub macOS CI 38541341263 passed exact app-source 0ab1fecb60b5beaa40c4bd2655735725927edc8a; serial suite 173/173.",
-    "native_bundle_workflow": "Canonical arm64 Dev.app built once from clean exact source 0ab1fec; strict ad-hoc signature verification passed. CUA verified five local auth preview screens at 900x700; app quit and process absence confirmed.",
-    "implementation": "DEBUG-only keyboard preview cycles phone, code, 2FA, QR, and registration states. Preview launch bypasses profile restore and network observers; primary and QR actions are guarded against TDLib requests. All interactive content remained visible at 900x700, so no scrolling-layout change was needed.",
-    "remaining": "This is layout evidence only. Real Telegram login is deferred; no account auth, VoiceOver, keyboard-only, IME/RTL, or 20-runtime evidence. No public app download."
+    "id": "AUTH04 VoiceOver announcements for authentication failures",
+    "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1",
+    "local_suite": "PASS 174/174 serial",
+    "hosted_ci": "GitHub macOS CI 38543010984 success for exact app-source SHA 0666ff8cb7a40ed5203847f9cfdea088cb4480fe.",
+    "native_bundle": {
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+      "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
+      "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
+      "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
+      "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login."
+    },
+    "implementation": "Maps eligible auth submission failures to static localized announcements and posts NSAccessibility.announcementRequested at medium priority. Does not include raw server errors or entered values. Generic transient status updates remain unannounced.",
+    "remaining": "Actual VoiceOver speech and auth failure were not exercised; no real account login, 20-runtime coverage, or release readiness."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
