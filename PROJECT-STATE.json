@@ -336,7 +336,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Keep the single canonical Dev.app open on prior source 92b8ca3 (PID 67677); do not interact with the protected credential UI. After it is safely closed, build source 632bf551 once and run the short native first-run/auth UI smoke. Real Telegram login/read/send remains owner-driven. Current local codesign inventory is 0 identities; notary credentials are unverified, so no signed release or download button can be produced. Site v194 stays unchanged until verified signed/notarized assets exist.",
+  "next_action": "The canonical Dev.app (PID 67677, source 92b8ca3) remains open. Its graceful quit request returned user-cancelled (-128); do not retry or interact with it. When the owner closes it, build the canonical Dev.app exactly once from source 632bf551, then run the short native first-run/auth smoke. API hash is never read from chat or logged. No Developer ID identity is currently available and notary credentials are unverified; keep Site v194 unchanged until signed/notarized assets exist.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -768,14 +768,14 @@
     "push": "success; GitHub connector verified exact commit",
     "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests",
     "exact_source_ci": "PASS 179/179; run 38560168478",
-    "canonical_dev_app": "Fresh Scripts/check-app-process.sh confirms PID 67677 still running prior source 92b8ca3; rebuild intentionally deferred to avoid replacing or duplicating the open app.",
+    "canonical_dev_app": "PID 67677 still running source 92b8ca3; graceful quit request returned user-cancelled (-128), so no rebuild was attempted.",
     "real_account": "not used"
   },
   "pending_native_candidate": {
     "source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7",
     "running_bundle_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
     "status": "blocked_running_canonical_app",
-    "reason": "Canonical /private/tmp/NeTelegram-Dev.app is open as PID 67677. Preserve it until safely closed; then build this exact commit once.",
+    "reason": "Canonical /private/tmp/NeTelegram-Dev.app remains open as PID 67677. Graceful quit returned user-cancelled (-128); do not retry. After the owner closes it, build this exact commit once.",
     "source_ci_run_id": 38560168478
   }
 }

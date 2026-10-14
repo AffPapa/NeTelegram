@@ -1333,3 +1333,10 @@
 - Focused local SwiftPM test passed 1/1 and compiled `NeTelegramApp` plus `NeTelegramCoreTests`; exact-source GitHub macOS CI [38560168478](https://github.com/AffPapa/NeTelegram/actions/runs/38560168478) passed 179/179 on macOS arm64. The job ran on Xcode 27 / Swift 6.4. First sandboxed invocation failed before compilation due SwiftPM sandbox setup; the identical command succeeded with approved host execution and caches under `/private/tmp`.
 - Source commit `632bf5514ffa2851a55665e95db5d17dae8fa1b7` was pushed to `AffPapa/NeTelegram/main`. Canonical Dev.app remains running old source `92b8ca3` (PID 67677); it was not touched or rebuilt. No account auth or real TDLib close integration was tested.
 - Fresh `security find-identity -v -p codesigning` returned 0 valid identities, superseding conflicting older checkpoint data. Notary credentials remain unverified. Public Site v194 remains unchanged with no app download.
+
+
+## 2026-10-14 — Candidate rebuild preserved after app rejected quit
+
+- After exact-source CI passed, read-only process check confirmed canonical Dev.app PID 67677 was still running source 92b8ca3. A graceful quit request returned `user-cancelled (-128)`; a second read-only check confirmed the process remains open.
+- No repeat quit, force termination, replacement build, or second app copy was attempted. The candidate build is deferred until the owner closes the app. Source `632bf5514ffa2851a55665e95db5d17dae8fa1b7` and CI run 38560168478 remain the fixed candidate inputs.
+- No API hash was read from chat, process state, files, or Keychain. Site v194 and GitHub releases were not changed.
