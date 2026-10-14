@@ -4111,7 +4111,9 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
             "type": ["@type": "notificationTypeNewPushMessage"],
         ],
     ]
+    #expect(TDLibNotificationRouter.isPendingPushReplacement(partialPush))
     #expect(TDLibNotificationRouter.routeUpdate(account: account, update: partialPush) == nil)
+    #expect(!TDLibNotificationRouter.isPendingPushReplacement(["@type": "updateNotificationGroup"]))
     #expect(TDLibNotificationRouter.routeUpdate(account: account, update: ["@type": "updateNotificationGroup"]) == nil)
 }
 

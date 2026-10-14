@@ -3382,6 +3382,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             notificationID: notificationID
         )
 
+        // TDLib's push-only form is transient and has no reliable chat/topic
+        // destination. Preserve the current presentation until NewMessage
+        // replaces it instead of deleting it as an unsupported notification.
+        if TDLibNotificationRouter.isPendingPushReplacement(update) { return }
+
         guard let routed = TDLibNotificationRouter.routeUpdate(
             account: target.account,
             update: update,

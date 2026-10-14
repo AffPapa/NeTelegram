@@ -54,6 +54,16 @@ public struct TDLibNotificationPresentation: Equatable, Sendable {
 /// Converts TDLib's per-client update payloads into explicit account/chat/topic
 /// targets. Unknown topics and non-message notification kinds fail closed.
 public enum TDLibNotificationRouter {
+    /// TDLib may temporarily replace a full message notification with a push
+    /// payload that has no chat/topic route, then replace it again with the
+    /// downloaded `NewMessage`. Keep any existing presentation until then.
+    public static func isPendingPushReplacement(_ update: [String: Any]) -> Bool {
+        guard update["@type"] as? String == "updateNotification",
+              let notification = update["notification"] as? [String: Any],
+              let type = notification["type"] as? [String: Any] else { return false }
+        return type["@type"] as? String == "notificationTypeNewPushMessage"
+    }
+
     /// Routes an update that replaces the content of an active notification.
     /// A NewPushMessage may not yet contain enough information to open a
     /// conversation; TDLib can later send this update with a full NewMessage.
