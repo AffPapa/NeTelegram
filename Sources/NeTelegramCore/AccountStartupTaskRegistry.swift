@@ -52,6 +52,29 @@ public final class AccountStartupTaskRegistry {
         return task
     }
 
+    /// Starts the profile through the same bounded local-open permit used by
+    /// production restore. The permit is released as soon as `operation`
+    /// returns, so authorization/network waits must remain outside that open
+    /// phase. Keeping task registration and permit acquisition together makes
+    /// it possible to exercise the production fan-out path deterministically.
+    @discardableResult
+    public func start(
+        account: AccountUUID,
+        scheduler: RuntimeStartupScheduler,
+        operation: @escaping @MainActor @Sendable () async throws -> Void,
+        onCompletion: @escaping @MainActor (Result<Void, Error>) -> Void = { _ in }
+    ) -> Task<Void, Never> {
+        start(
+            account: account,
+            operation: {
+                try await scheduler.withPermit {
+                    try await operation()
+                }
+            },
+            onCompletion: onCompletion
+        )
+    }
+
     /// Removes registrations before cancellation, making new startup attempts
     /// explicit and ensuring canceled tasks cannot remain visible as pending.
     @discardableResult

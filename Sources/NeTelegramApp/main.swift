@@ -2373,9 +2373,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         guard !closingForTermination, runtimesByAccount[profile.id] == nil else { return nil }
         let task = accountStartupTasks.start(
             account: profile.id,
+            scheduler: startupScheduler,
             operation: { [weak self] in
-                guard let self else { return }
-                await self.openProfile(profile, apiHash: apiHash, select: select)
+                guard let self, !Task.isCancelled, !self.closingForTermination else { return }
+                await self.openProfileWhileHoldingStartupPermit(profile, apiHash: apiHash, select: select)
             },
             onCompletion: { [weak self] _ in
                 guard let self else { return }
@@ -2385,15 +2386,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         )
         refreshAccountPicker(select: runtime?.account == profile.id ? profile.id : nil)
         return task
-    }
-
-    private func openProfile(_ profile: AccountProfile, apiHash: String, select: Bool = false) async {
-        guard !Task.isCancelled, !closingForTermination,
-              runtimesByAccount[profile.id] == nil else { return }
-        await startupScheduler.withPermit { [weak self] in
-            guard let self, !Task.isCancelled else { return }
-            await self.openProfileWhileHoldingStartupPermit(profile, apiHash: apiHash, select: select)
-        }
     }
 
     private func openProfileWhileHoldingStartupPermit(_ profile: AccountProfile, apiHash: String, select: Bool) async {

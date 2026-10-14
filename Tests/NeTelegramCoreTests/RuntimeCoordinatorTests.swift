@@ -1717,6 +1717,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(gate.verify(9104) == .mismatch(expected: 9103, actual: 9104))
 }
 
+@MainActor
 @Test func twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges() async throws {
     let profiles = (1...20).map { n in
         AccountProfile(
@@ -1733,6 +1734,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 
     let coordinator = RuntimeCoordinator(startupParallelism: 2)
     let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let startupTasks = AccountStartupTaskRegistry()
     let stalledOpen = AsyncTestGate()
     let stalledOpenEntered = LockedTestValue(false)
     let routesByProfile = LockedTestValue<[AccountUUID: RuntimeRoute]>([:])
@@ -1762,14 +1764,16 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     // Exercise the same synchronous fan-out helper that restoreProfiles uses.
     // Each accepted profile must immediately become an independent startup
     // task; the scheduler limits only simultaneous opens, never the task count.
-    var starts: [Task<Void, Never>] = []
+    var startsByAccount: [AccountUUID: Task<Void, Never>] = [:]
     let enqueueResult = AccountRestorePlanner.enqueueStartupProfiles(
         candidates: plan,
         running: [],
         starting: []
     ) { profile in
-        let task = Task {
-            await scheduler.withPermit {
+        let task = startupTasks.start(
+            account: profile.id,
+            scheduler: scheduler,
+            operation: {
                 if profile.id == profiles[0].id {
                     stalledOpenEntered.set(true)
                     await stalledOpen.wait()
@@ -1777,31 +1781,39 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
                 let generation = await coordinator.nextGeneration(for: profile.id)
                 await registerAndQueueFirstRequest(profile, generation)
             }
-        }
-        starts.append(task)
+        )
+        startsByAccount[profile.id] = task
         return true
     }
     #expect(enqueueResult.queued == profiles.map(\.id))
     #expect(enqueueResult.rejected.isEmpty)
-    #expect(starts.count == 20)
+    #expect(startsByAccount.count == 20)
 
     #expect(await waitForTrue(stalledOpenEntered, timeout: .seconds(2)))
-    for start in starts.dropFirst() { await start.value }
+    for profile in profiles.dropFirst() {
+        await startsByAccount[profile.id]?.value
+    }
     #expect(await coordinator.startupParallelism == 2)
     #expect(await scheduler.activeStarts() == 1)
     #expect(await scheduler.queuedStarts() == 0)
+    #expect(startupTasks.startingAccounts == Set([profiles[0].id]))
     #expect(routesByProfile.get().count == 18)
     #expect(failedProfiles.get() == [profiles[1].id])
 
     // The stalled profile completes after the other startup attempts have
     // made progress. The failed profile is retried with a fresh generation.
     await stalledOpen.open()
-    await starts[0].value
+    await startsByAccount[profiles[0].id]?.value
     #expect(routesByProfile.get().count == 19)
-    await scheduler.withPermit {
-        let generation = await coordinator.nextGeneration(for: profiles[1].id)
-        await registerAndQueueFirstRequest(profiles[1], generation)
-    }
+    let retry = startupTasks.start(
+        account: profiles[1].id,
+        scheduler: scheduler,
+        operation: {
+            let generation = await coordinator.nextGeneration(for: profiles[1].id)
+            await registerAndQueueFirstRequest(profiles[1], generation)
+        }
+    )
+    await retry.value
     #expect(routesByProfile.get().count == 20)
     #expect(failedProfiles.get() == [profiles[1].id])
     #expect(await scheduler.activeStarts() == 0)
