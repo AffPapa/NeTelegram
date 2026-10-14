@@ -1180,3 +1180,8 @@
 - Reused the existing public Site project `appgprj_6acba85192e08191acdf7011928848cf`. Official Sites helper source commit `a9c4bd892b048e177704a217b73150811f42158a` rendered 8 static routes; `validate_site.py` passed. Saved version 190 as `appgprj_6acba85192e08191acdf7011928848cf~appgver_5c5e79aa9ae88191bd1d2944b6799084`; deployment `appgdep_6acf4d260c0081918114116b74441ab2` succeeded.
 - Anonymous public checks passed: `/devlog/` 200 `text/html` with exact AUTH04 source/CI and the VoiceOver verification limit; `/downloads/` 200 `text/html` with no application release; stable and alpha feeds 200 `text/xml` with zero update items. No download link or release was created.
 - Local archive `/private/tmp/netelegram-site-auth04.tar`, SHA-256 `53af8780ec25d52bcd27396247a6cf8a8629aef5aeb3e08ec5f149bbb98ae2f1`, 199325 bytes. Provider saved content hash `sha256:e60251ece60ec6badd370c4886c8b1461c4ca3396689d92193e9854283792329`, 14 files / 481280 bytes. Site and app source identities remain separate.
+
+## 2026-10-14 — Normalize milestone IDs to avoid acceptance-case collisions
+
+- The previous checkpoint reused `AUTH04` and `AUTH05`, which are already identifiers for different acceptance cases. Renamed the AUTH04 VoiceOver error-announcement slice to `A11Y-ANNOUNCE-02` and the next action to `CORE-RUNTIME-01`; the underlying app evidence, Site v190 and release state are unchanged. `ACCEPTANCE.status` now names Site v190 accurately.
+- This is a checkpoint clarity correction only; no app rebuild, Swift suite, or Site deployment was needed. Local checkpoint validator and 10 focused metadata tests are the required checks.

@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "AUTH04 VoiceOver announcements for authentication failures; serial suite 174/174 and exact CI pass; canonical arm64 Dev.app built once. Actual VoiceOver speech and real login remain unverified; Site v189 is still live.",
+  "status": "A11Y-ANNOUNCE-02 authentication failure announcements; serial suite 174/174 and exact-source CI pass; canonical arm64 Dev.app built once; Site v190 deployed. Actual VoiceOver speech and real login remain unverified.",
   "current_evidence": {
     "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
     "local_suite": "PASS 174/174 using the standard serial Swift command with CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules and --disable-sandbox.",
@@ -125,7 +125,7 @@
       "download_available": false
     },
     "latest_acceptance_slice": {
-      "id": "AUTH04 VoiceOver announcements for authentication failures",
+      "id": "A11Y-ANNOUNCE-02 authentication failure announcements",
       "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
       "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1",
       "local_suite": "PASS 174/174 serial",
@@ -641,7 +641,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "AUTH05: continue one accountless auth integration/accessibility slice. Preserve the exact-source AUTH04 CI and canonical Dev.app hashes; do not repeat the full serial suite/build unless app source changes. Real Telegram login remains deferred; request fresh API credentials only through the app settings UI when user resumes login.",
+  "next_action": "CORE-RUNTIME-01: inspect the all-active account startup/recovery path against the v2.0 invariants; select one concrete production code gap, implement one vertical slice with a focused regression, run the standard serial suite and exact-source CI only if app code changes. Preserve the current canonical Dev.app until source changes. Do not re-use AUTHxx identifiers from acceptance cases for milestone labels. Real login remains user-deferred.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -693,7 +693,7 @@
     "date": "2026-10-14"
   },
   "latest_acceptance_slice": {
-    "id": "AUTH04 VoiceOver announcements for authentication failures",
+    "id": "A11Y-ANNOUNCE-02 authentication failure announcements",
     "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
     "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1",
     "local_suite": "PASS 174/174 serial",
