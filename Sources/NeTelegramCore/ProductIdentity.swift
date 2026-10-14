@@ -1,5 +1,5 @@
-/// Public-facing app identity is intentionally separate from the repository codename.
+/// Product identity is kept separate from repository and bundle identifiers.
 public enum ProductIdentity {
-    public static let displayName = "AffPapa Chat"
+    public static let displayName = "NeTelegram"
     public static let repositoryCodename = "NeTelegram"
 }

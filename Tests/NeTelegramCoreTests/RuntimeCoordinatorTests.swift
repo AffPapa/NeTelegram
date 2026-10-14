@@ -1092,13 +1092,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         unverifiedRemovalPending: true
     )
 
-    #expect(firstPending == "Вход AffPapa Chat 1 — ожидает номер")
-    #expect(secondPending == "Вход AffPapa Chat 2 — ожидает код")
+    #expect(firstPending == "Вход NeTelegram 1 — ожидает номер")
+    #expect(secondPending == "Вход NeTelegram 2 — ожидает код")
     #expect(verified == "Test User · аккаунт 3 — подключён")
     #expect(networkUpdatePending == "Test User · аккаунт 3 — подключён · ожидает обновление сети")
     #expect(closedBackgroundProfile == "Test User · аккаунт 3 — ошибка")
     #expect(logoutCleanup == "Test User · аккаунт 4 — очистка после выхода ожидает")
-    #expect(removalCleanup == "Вход AffPapa Chat 5 — удаление незавершённого входа ожидает")
+    #expect(removalCleanup == "Вход NeTelegram 5 — удаление незавершённого входа ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
@@ -1128,7 +1128,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         telegramUserID: nil,
         candidate: localUUID
     )
-    #expect(pending.contains("Локальный вход AffPapa Chat 2"))
+    #expect(pending.contains("Локальный вход NeTelegram 2"))
     #expect(pending.contains("запись создана в этом приложении"))
     #expect(pending.contains("Сессии других приложений не импортируются"))
     #expect(!pending.contains(localUUID))

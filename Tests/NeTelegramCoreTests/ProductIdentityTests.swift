@@ -3,10 +3,9 @@ import Testing
 @testable import NeTelegramCore
 
 struct ProductIdentityTests {
-    @Test func publicDisplayNameIsSeparateFromRepositoryCodename() {
-        #expect(ProductIdentity.displayName == "AffPapa Chat")
+    @Test func productDisplayNameMatchesCurrentProductIdentity() {
+        #expect(ProductIdentity.displayName == "NeTelegram")
         #expect(ProductIdentity.repositoryCodename == "NeTelegram")
-        #expect(!ProductIdentity.displayName.localizedCaseInsensitiveContains("telegram"))
     }
 
     @Test func accountStorageUsesOnlyTheApplicationsOwnSupportDirectory() {

@@ -399,8 +399,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
-        loginDisclosure = NSTextField(wrappingLabelWithString: "Независимое приложение AffPapa Chat; не связано с Telegram Messenger LLP.")
-        loginDisclosure.font = .systemFont(ofSize: 12)
+        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
+        loginDisclosure.font = .systemFont(ofSize: 13)
         loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
         loginDisclosure.alignment = .center
@@ -410,14 +410,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountPicker.isHidden = true
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
-        accountPicker.setAccessibilityLabel("Аккаунты AffPapa Chat и статус входа")
-        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в AffPapa Chat на этом Mac. Сессии других приложений не импортируются.")
+        accountPicker.setAccessibilityLabel("Аккаунты NeTelegram и статус входа")
+        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в NeTelegram на этом Mac. Сессии других приложений не импортируются.")
 
-        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в AffPapa Chat отдельно. Сессии других приложений не используются.")
+        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в NeTelegram отдельно. Сессии других приложений не используются.")
         accountProfileHint.font = .systemFont(ofSize: 11)
         accountProfileHint.textColor = .secondaryLabelColor
         accountProfileHint.maximumNumberOfLines = 2
-        accountProfileHint.setAccessibilityLabel("О входе в аккаунты AffPapa Chat")
+        accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
         countryPicker.target = self
@@ -1893,7 +1893,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         firstNameField.stringValue = ""
         lastNameField.stringValue = ""
         let accountNumber = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
-        loginHeading.stringValue = "Вход AffPapa Chat \(accountNumber)"
+        loginHeading.stringValue = "Вход NeTelegram \(accountNumber)"
         loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные другого аккаунта скрыты."
         statusLabel.stringValue = "Открываю вход \(accountNumber)…"
         window.title = identifiedWindowTitle(ProductIdentity.displayName)
@@ -2101,7 +2101,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Удалить «\(title)»?"
-        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные AffPapa Chat. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
+        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные NeTelegram. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
         alert.addButton(withTitle: "Удалить незавершённый вход")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
@@ -2173,7 +2173,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Выйти из аккаунта «\(title)»?"
-        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; AffPapa Chat также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
+        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; NeTelegram также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
         alert.addButton(withTitle: "Выйти и удалить локальные данные")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
