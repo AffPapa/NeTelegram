@@ -39,6 +39,10 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # App identity is the last commit touching the Swift/dependency inputs,
+          # which may predate docs-only commits that trigger this workflow.
+          fetch-depth: 0
 
       - name: Record toolchain
         run: |
@@ -75,7 +79,8 @@ jobs:
           /usr/bin/lipo "$APP/Contents/MacOS/NeTelegram" -verify_arch arm64
           /usr/bin/lipo "$APP/Contents/Frameworks/libtdjson.dylib" -verify_arch arm64
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" | grep -Fx 'org.affpapa.netelegram.dev'
-          /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentCommit' "$APP/Contents/Info.plist" | grep -Fx "$GITHUB_SHA"
+          APP_SOURCE_COMMIT="$(git log -1 --format=%H -- Package.swift Sources TDLIB.lock.json)"
+          /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentCommit' "$APP/Contents/Info.plist" | grep -Fx "$APP_SOURCE_COMMIT"
           /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentDirty' "$APP/Contents/Info.plist" | grep -Fx false
           /usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$APP/Contents/Info.plist" | grep -Fx '14.0'
           python3 -m json.tool "$APP/Contents/Resources/BuildInfo.json" >/dev/null

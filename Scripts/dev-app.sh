@@ -9,12 +9,27 @@ SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support-cle
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
 FRAMEWORKS="$APP_PATH/Contents/Frameworks"
-DEV_COMMIT="$(git -C "$ROOT_DIR" rev-parse HEAD)"
-if [[ -n "$(git -C "$ROOT_DIR" status --porcelain)" ]]; then
-    DEV_DIRTY=true
-else
-    DEV_DIRTY=false
+DEV_COMMIT="$(git -C "$ROOT_DIR" log -1 --format=%H -- Package.swift Sources TDLIB.lock.json)"
+ORIGIN_URL="$(git -C "$ROOT_DIR" remote get-url origin)"
+ORIGIN_URL_LOWER="$(printf '%s' "$ORIGIN_URL" | tr '[:upper:]' '[:lower:]')"
+case "$ORIGIN_URL_LOWER" in
+    https://github.com/affpapa/netelegram.git|git@github.com:affpapa/netelegram.git|ssh://git@github.com/affpapa/netelegram.git) ;;
+    *)
+        echo "Refusing to replace the canonical Dev.app from unexpected origin: $ORIGIN_URL" >&2
+        exit 1
+        ;;
+esac
+if [[ "${GITHUB_ACTIONS:-false}" != "true" && "$ROOT_DIR" != "${NETELEGRAM_CANONICAL_CHECKOUT:-/private/tmp/netelegram-cli-work}" ]]; then
+    echo "Refusing to replace the canonical Dev.app from non-canonical checkout: $ROOT_DIR" >&2
+    echo "Set NETELEGRAM_CANONICAL_CHECKOUT only when intentionally relocating the canonical checkout." >&2
+    exit 1
 fi
+if [[ -n "$(git -C "$ROOT_DIR" status --porcelain -- Package.swift Sources TDLIB.lock.json)" ]]; then
+    APP_SOURCE_DIRTY=true
+else
+    APP_SOURCE_DIRTY=false
+fi
+DEV_DIRTY="$APP_SOURCE_DIRTY"
 MODE="build"
 
 if [[ "${1:-}" == "--launch" ]]; then
@@ -25,6 +40,79 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
+# Reuse only a byte-for-byte verified bundle for this exact clean source
+# commit, source fingerprint, toolchain, pinned TDLib, support root and build.
+# This check is deliberately before the process guard: an already-running
+# matching app can be focused with --launch, while any mismatch still refuses
+# replacement until the existing process exits.
+if [[ "$APP_SOURCE_DIRTY" == "false" && -f "$APP_PATH/Contents/Resources/BuildInfo.json" && -f "$BUILD_RECORD" ]]; then
+    if python3 - "$ROOT_DIR" "$APP_PATH" "$BUILD_RECORD" "$SUPPORT_ROOT" "$DEV_COMMIT" <<'PY'
+import hashlib, json, pathlib, plistlib, subprocess, sys
+root, app, build_record = map(pathlib.Path, sys.argv[1:4])
+support, expected_head = sys.argv[4:6]
+try:
+    files = [root / "Package.swift", root / "TDLIB.lock.json"]
+    files += sorted((root / "Sources").rglob("*"))
+    h = hashlib.sha256()
+    for path in (path for path in files if path.is_file()):
+        h.update(path.relative_to(root).as_posix().encode())
+        h.update(b"\0")
+        h.update(path.read_bytes())
+    source_fingerprint = h.hexdigest()
+    swift_lines = subprocess.check_output(["swift", "--version"], text=True).splitlines()
+    swift_version = next((line for line in swift_lines if line.startswith("Apple Swift version")), swift_lines[0])
+    tdlib_commit = json.loads((root / "TDLIB.lock.json").read_text())["ref"]
+    build = json.loads(build_record.read_text())
+    embedded = json.loads((app / "Contents/Resources/BuildInfo.json").read_text())
+    with (app / "Contents/Info.plist").open("rb") as stream:
+        info = plistlib.load(stream)
+    executable_hash = hashlib.sha256((app / "Contents/MacOS/NeTelegram").read_bytes()).hexdigest()
+    tdjson_hash = hashlib.sha256((app / "Contents/Frameworks/libtdjson.dylib").read_bytes()).hexdigest()
+    expected = {
+        "bundle_id": "org.affpapa.netelegram.dev",
+        "bundle_path": str(app),
+        "support_root": support,
+        "working_tree_dirty": False,
+        "source_fingerprint_sha256": source_fingerprint,
+        "swift_version": swift_version,
+        "tdlib_commit": tdlib_commit,
+        "architecture": "arm64",
+        "minimum_macos": "14.0",
+    }
+    build_source_commit = build.get("app_source_commit", build.get("git_head"))
+    embedded_source_commit = embedded.get("app_source_commit", embedded.get("git_head"))
+    metadata_matches = (build_source_commit == expected_head and embedded_source_commit == expected_head
+                        and all(build.get(k) == v and embedded.get(k) == v for k, v in expected.items()))
+    bytes_match = (build.get("app_executable_sha256") == executable_hash
+                   and build.get("tdjson_sha256") == tdjson_hash
+                   and build.get("signature") == "ad-hoc; codesign --verify --deep --strict passed")
+    plist_matches = (info.get("CFBundleIdentifier") == expected["bundle_id"]
+                     and info.get("CFBundleExecutable") == "NeTelegram"
+                     and info.get("CFBundleShortVersionString") == "0.0.0-dev"
+                     and info.get("CFBundleVersion") == "0"
+                     and info.get("LSMinimumSystemVersion") == "14.0"
+                     and info.get("NeTelegramDevelopmentCommit") == expected_head
+                     and info.get("NeTelegramDevelopmentDirty") is False)
+    signature_ok = subprocess.run(
+        ["/usr/bin/codesign", "--verify", "--deep", "--strict", str(app)],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    ).returncode == 0
+    if metadata_matches and bytes_match and plist_matches and signature_ok:
+        print("verified")
+        sys.exit(0)
+except Exception:
+    pass
+sys.exit(1)
+PY
+    then
+        echo "Reusing verified canonical bundle for exact clean source $DEV_COMMIT."
+        echo "Build record: $BUILD_RECORD"
+        if [[ "$MODE" == "launch" ]]; then
+            open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT"
+        fi
+        exit 0
+    fi
+fi
 if "$PGREP_BIN" -x NeTelegram >/dev/null 2>&1; then
     echo "NeTelegram is already running. Quit the canonical development app before rebuilding it." >&2
     exit 1
@@ -106,14 +194,16 @@ for p in files:
 def command(*args):
     try: return subprocess.check_output(args, text=True).strip()
     except Exception: return "unavailable"
+swift_lines = command("swift", "--version").splitlines()
+swift_version = next((line for line in swift_lines if line.startswith("Apple Swift version")), swift_lines[0] if swift_lines else "unavailable")
 info = {
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": str(app),
     "support_root": str(support),
-    "git_head": command("git", "-C", str(root), "rev-parse", "HEAD"),
+    "app_source_commit": command("git", "-C", str(root), "log", "-1", "--format=%H", "--", "Package.swift", "Sources", "TDLIB.lock.json"),
     "working_tree_dirty": working_tree_dirty,
     "source_fingerprint_sha256": h.hexdigest(),
-    "swift_version": command("swift", "--version").splitlines()[0],
+    "swift_version": swift_version,
     "tdlib_commit": json.loads((root / "TDLIB.lock.json").read_text()).get("ref"),
     "architecture": "arm64",
     "minimum_macos": "14.0",
