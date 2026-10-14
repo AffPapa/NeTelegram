@@ -1655,3 +1655,12 @@
 - Sites `get_site_version` independently reconfirmed v195 source `1adba5a1410ed186c389dc701ce8e9ad9d37b26f`, deployment `appgdep_6acfbddce1d48191bf095654b4586a4e`, and saved server-side archive metadata: hash `sha256:0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e`, 501760 bytes, 14 files. The old local export path now contains different bytes (SHA-256 `52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d`, 202367 bytes); removed it as local-byte evidence. No v196 repackage/redeploy was made.
 - Current read-only release audit: repo main synced at docs-only `4f9f083`; app CI/native bundle workflows pass on `291cd0a`; valid Developer ID identities 0; no signed candidate or release assets. Non-value Keychain lookup reports app API hash not_found; the hash pasted in chat remains retired. No Keychain value was read or changed.
 - `Scripts/validate_checkpoint.py` passes after reconciliation; exact public URL, cache-busted anonymous home/download routes, and no-download state remain verified.
+
+
+## 2026-10-15 — CHAT-LIST-RECONCILE-01: preserve native conversation rows across TDLib updates
+
+- Finding: ordinary chat-list refresh cleared and recreated every AppKit row, even for a single unread, mute, message-preview or position update. This added avoidable view churn and could discard view identity/focus state.
+- Change: `ConversationListRowButton` now updates its data/accessibility label in place. `refreshChatList(changedChatIDs:)` retains keyed row views, updates only the affected row for single-chat TDLib events, inserts/removes changed IDs, and reorders existing views to match the server snapshot. Search, empty/loading, revoked-profile and privacy clear paths still discard view caches.
+- Local verification: isolated `swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-chatrows-3eabf4b` passed in 10.05 s. The canonical Dev.app process guard returned “unable to prove process absence”; no local bundle replacement or UI smoke was attempted.
+- Exact-source hosted checks passed on `9e0af7a46c1904600cdfc8eeb1e3716239b7cb95`: [macOS serial Swift CI](https://github.com/AffPapa/NeTelegram/actions/runs/38611394780) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38611394887). Hosted development bundle does not count as local UX evidence.
+- Coverage limit: no measured 1k/10k chat benchmark, no local visual/AX check, no real account smoke. Current local Dev.app remains on `291cd0a`; only one canonical bundle is allowed.
