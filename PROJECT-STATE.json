@@ -2,6 +2,15 @@
   "schema_version": 1,
   "phase": "AUTH-UI-DESIGN-03: Apple HIG-aligned auth cleanup; duplicate code/2FA status removed; exact-source CI 187/187 and one canonical arm64 Dev.app build/smoke passed. Authenticated screens and real account use remain unverified.",
   "verified_at": "2026-10-14",
+  "latest_api_hash_presence_check": {
+    "date": "2026-10-15",
+    "method": "macOS security CLI lookup by fixed service/account attributes without -w",
+    "service": "org.affpapa.netelegram.telegram-api",
+    "account": "api-hash",
+    "result": "not_found",
+    "secret_value_read": false,
+    "meaning": "The previously selected Save action did not persist a Keychain item. Do not reuse the earlier chat-exposed hash."
+  },
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Use a SwiftPM cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json. Keep the filtered runner probe, and cap the serial full-suite step at two minutes so a silent test-runner hang fails without waiting for the five-minute job timeout.",

@@ -1627,3 +1627,9 @@
 - No checkbox was changed, no Login Items entry was registered/unregistered, and the existing Dev.app was left open at the accountless phone screen.
 - This confirms the previous APP25 gap is an environment/package boundary: the temporary ad-hoc development bundle is not eligible for `SMAppService.mainApp`; policy tests and CI cannot certify installed-app persistence/removal. APP25 remains `partial`. Complete it only against a disposable installation of the real app bundle, then verify both registration and removal without leaving startup enabled.
 - No source code/build changed. Checkpoint validation and current branch/commit verification follow this entry.
+
+## 2026-10-15 — API credential presence preflight
+
+- Read-only Keychain lookup used only the app's fixed service/account attributes (`org.affpapa.netelegram.telegram-api` / `api-hash`); command omitted `-w`, did not return secret data, and reported item not found.
+- This confirms that selecting the Save action in an earlier UI prompt did not result in a stored item. The API hash previously exposed in chat remains retired; do not copy it back into Keychain or ask for it in chat. The protected in-app API-hash field is the only approved entry path once the owner provisions a replacement credential.
+- No authentication request, Telegram account data, app source, build, user preference, or Site state changed. Fresh checkpoint validation follows.
