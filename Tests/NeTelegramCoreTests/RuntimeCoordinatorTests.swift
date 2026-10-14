@@ -1514,10 +1514,18 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         }
     }
 
-    let starts = plan.enumerated().map { index, profile in
-        Task {
+    // Exercise the same synchronous fan-out helper that restoreProfiles uses.
+    // Each accepted profile must immediately become an independent startup
+    // task; the scheduler limits only simultaneous opens, never the task count.
+    var starts: [Task<Void, Never>] = []
+    let enqueueResult = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: plan,
+        running: [],
+        starting: []
+    ) { profile in
+        let task = Task {
             await scheduler.withPermit {
-                if index == 0 {
+                if profile.id == profiles[0].id {
                     stalledOpenEntered.set(true)
                     await stalledOpen.wait()
                 }
@@ -1525,7 +1533,12 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
                 await registerAndQueueFirstRequest(profile, generation)
             }
         }
+        starts.append(task)
+        return true
     }
+    #expect(enqueueResult.queued == profiles.map(\.id))
+    #expect(enqueueResult.rejected.isEmpty)
+    #expect(starts.count == 20)
 
     #expect(await waitForTrue(stalledOpenEntered, timeout: .seconds(2)))
     for start in starts.dropFirst() { await start.value }
