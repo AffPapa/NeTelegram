@@ -171,3 +171,41 @@ check, not a real-login or authenticated-view result. Conversation rows/avatar
 rendering, light/increased-contrast appearance, VoiceOver speech, IME/RTL and
 photo-bearing conversations still need their own review; real account behavior
 requires owner-operated login.
+
+## 2026-10-15 — sign-in form refinement
+
+The current sign-in screen uses AppKit controls, system colors, native window
+chrome, and an Auto Layout stack. Review of the supplied screenshot and the
+current AX tree found that the visible flow still felt loose: the introductory
+and legal copy competed for attention, text used a wider measure than fields,
+and the OS-region hint read like a second country-selection state.
+
+The focused source change in `Sources/NeTelegramApp/main.swift` keeps one
+centered, single-column form and the existing searchable native country menu;
+it does not alter country selection or authentication behavior. Header copy,
+country controls, phone input, status, and primary action now share the same
+400 pt preferred measure, with constraints allowing narrower windows. The
+independence disclosure sits below the QR alternative as quiet secondary copy.
+Spacing now uses a short 8/12/16 pt rhythm, and the region hint says explicitly
+that the Mac locale is only a suggestion and the calling code is applied only
+after selection. The window remains system-framed and resizable.
+
+This uses Apple's guidance to adapt windows fluidly, keep text fields aligned
+and consistently sized, use plain action-oriented copy, and preserve native
+system control behavior: [macOS design](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/),
+[windows](https://developer.apple.com/design/human-interface-guidelines/windows),
+[layout](https://developer.apple.com/design/human-interface-guidelines/layout),
+[text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields),
+[accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility),
+and [writing](https://developer.apple.com/design/human-interface-guidelines/writing).
+The platform does not prescribe a specific sign-in window size or spacing
+token; those remain NeTelegram design choices and must be checked on the real
+window.
+
+The official [Telegram Desktop phone-entry source](https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/intro/intro_phone.cpp)
+was reviewed as a structural reference. It groups country selection and phone
+entry, makes the next action deliberate, and exposes QR login as an alternate
+path. NeTelegram retains its own AppKit control system and account policy; no
+Telegram source, assets, or styling are copied. This research does not certify
+VoiceOver speech, IME/RTL, contrast variants, a real login, or authenticated
+screens; those remain explicit follow-up checks.

@@ -394,7 +394,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         mark.addSubview(markLabel)
 
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
-        loginHeading.font = .systemFont(ofSize: 26, weight: .semibold)
+        loginHeading.font = .systemFont(ofSize: 24, weight: .semibold)
         loginHeading.alignment = .center
         loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
         loginSubtitle.font = .systemFont(ofSize: 14)
@@ -446,7 +446,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySuggestionLabel.alignment = .left
         countrySuggestionLabel.maximumNumberOfLines = 2
         countrySuggestionLabel.isHidden = true
-        countrySuggestionLabel.setAccessibilityLabel("Подсказка страны macOS; код применяется только после выбора страны")
+        countrySuggestionLabel.setAccessibilityLabel("Регион macOS — только подсказка; телефонный код применяется после явного выбора страны")
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -550,15 +550,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
-        authStack.spacing = 10
-        authStack.setCustomSpacing(18, after: mark)
-        authStack.setCustomSpacing(6, after: loginHeading)
-        authStack.setCustomSpacing(12, after: loginSubtitle)
-        authStack.setCustomSpacing(16, after: loginDisclosure)
+        authStack.spacing = 8
+        authStack.setCustomSpacing(16, after: mark)
+        authStack.setCustomSpacing(8, after: loginHeading)
+        authStack.setCustomSpacing(16, after: loginSubtitle)
+        authStack.setCustomSpacing(12, after: qrButton)
         authStack.translatesAutoresizingMaskIntoConstraints = false
         authCard = NSView(frame: .zero)
         authCard.translatesAutoresizingMaskIntoConstraints = false
@@ -598,11 +598,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
             loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginHeading.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
+            loginHeading.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginSubtitle.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
+            loginSubtitle.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginDisclosure.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
+            loginDisclosure.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
@@ -610,7 +610,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             countrySearchField.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countryPicker.heightAnchor.constraint(equalToConstant: 34),
-            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400),
+            countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
+            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             phoneField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -7402,7 +7403,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countrySuggestionLabel.stringValue = ""
             return
         }
-        countrySuggestionLabel.stringValue = "Подсказка macOS: \(country.name) (+\(callingCode)). Выберите страну, чтобы применить код."
+        countrySuggestionLabel.stringValue = "Регион Mac: \(country.name) (+\(callingCode)). Код применится только после выбора страны."
         countrySuggestionLabel.isHidden = false
     }
 
