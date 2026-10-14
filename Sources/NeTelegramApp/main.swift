@@ -467,12 +467,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         registrationTermsTextView = NSTextView(frame: NSRect(x: 0, y: 0, width: 500, height: 144))
         registrationTermsTextView.isEditable = false
         registrationTermsTextView.isSelectable = true
+        registrationTermsTextView.isHorizontallyResizable = false
+        registrationTermsTextView.isVerticallyResizable = true
+        registrationTermsTextView.autoresizingMask = [.width]
         registrationTermsTextView.font = .systemFont(ofSize: 12)
         registrationTermsTextView.textContainerInset = NSSize(width: 10, height: 8)
+        registrationTermsTextView.textContainer?.widthTracksTextView = true
+        registrationTermsTextView.textContainer?.containerSize = NSSize(width: 0, height: CGFloat.greatestFiniteMagnitude)
         registrationTermsTextView.setAccessibilityLabel("Условия регистрации Telegram")
         registrationTermsScroll = NSScrollView()
         registrationTermsScroll.documentView = registrationTermsTextView
         registrationTermsScroll.hasVerticalScroller = true
+        registrationTermsScroll.hasHorizontalScroller = false
         registrationTermsScroll.borderType = .bezelBorder
         registrationTermsScroll.isHidden = true
 
@@ -937,6 +943,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
         authStack?.needsUpdateConstraints = true
         content.layoutSubtreeIfNeeded()
+        layoutRegistrationTermsDocument()
 
         chatPane.frame = NSRect(origin: .zero, size: size)
         chatWorkspaceSplit.layoutSubtreeIfNeeded()
@@ -954,6 +961,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         if let unlockButton = lockedView.subviews.first(where: { $0 is NSButton }) {
             unlockButton.frame = NSRect(x: (size.width - 200) / 2, y: size.height / 2 - 100, width: 200, height: 36)
+        }
+    }
+
+    private func layoutRegistrationTermsDocument() {
+        guard let textView = registrationTermsTextView,
+              let scrollView = registrationTermsScroll,
+              let textContainer = textView.textContainer,
+              let layoutManager = textView.layoutManager else { return }
+
+        let viewportWidth = scrollView.contentView.bounds.width
+        guard viewportWidth > 0 else { return }
+
+        textView.frame.size.width = viewportWidth
+        textView.isHorizontallyResizable = false
+        textView.isVerticallyResizable = true
+        textView.autoresizingMask = [.width]
+        textContainer.widthTracksTextView = true
+        textContainer.containerSize = NSSize(width: viewportWidth, height: CGFloat.greatestFiniteMagnitude)
+        layoutManager.ensureLayout(for: textContainer)
+
+        let usedHeight = layoutManager.usedRect(for: textContainer).maxY + textView.textContainerInset.height * 2
+        let documentHeight = max(scrollView.contentSize.height, ceil(usedHeight))
+        if abs(textView.frame.height - documentHeight) > 1 {
+            textView.frame.size.height = documentHeight
         }
     }
 
@@ -6914,6 +6945,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         lastNameField.stringValue = ""
         firstNameField.becomeFirstResponder()
         setStatus("Telegram запрашивает данные для создания нового аккаунта.")
+        window?.contentView?.layoutSubtreeIfNeeded()
+        layoutRegistrationTermsDocument()
     }
 
     private func passwordPrompt(_ auth: [String: Any]) -> String {
