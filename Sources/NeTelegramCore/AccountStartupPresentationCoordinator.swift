@@ -13,6 +13,15 @@ public final class AccountStartupPresentationCoordinator {
         selectionRevision &+= 1
     }
 
+    /// A first restored or explicitly requested startup runtime can initialize
+    /// an otherwise unselected window. Record that implicit choice so async
+    /// close/cleanup work can finish its presentation transition safely.
+    /// Never replace an intent that arrived while this runtime was starting.
+    public func adoptStartupPresentationIfUnselected(_ account: AccountUUID) {
+        guard selectedAccountIntent == nil else { return }
+        select(account)
+    }
+
     /// Async cleanup may only update the window if the user's selection has
     /// not changed since that cleanup began.
     public func selectionIsCurrent(account: AccountUUID, revision: UInt64) -> Bool {

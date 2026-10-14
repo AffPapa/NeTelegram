@@ -1823,6 +1823,17 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         explicitlySelected: false,
         hasPresentedRuntime: false
     ), "The first runtime may initialize the window when no account was selected")
+    initialWindowPresentation.adoptStartupPresentationIfUnselected(first)
+    let initialRuntimeCloseRevision = initialWindowPresentation.selectionRevision
+    #expect(initialWindowPresentation.selectionIsCurrent(
+        account: first,
+        revision: initialRuntimeCloseRevision
+    ), "The first auto-presented runtime becomes the current presentation intent")
+    initialWindowPresentation.select(second)
+    #expect(!initialWindowPresentation.selectionIsCurrent(
+        account: first,
+        revision: initialRuntimeCloseRevision
+    ), "A later user choice invalidates first-runtime cleanup presentation")
     #expect(!initialWindowPresentation.shouldPresentStartupRuntime(
         account: first,
         explicitlySelected: false,

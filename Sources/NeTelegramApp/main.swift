@@ -2425,7 +2425,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 explicitlySelected: select,
                 hasPresentedRuntime: self.runtime != nil
             )
-            if presentsThisRuntime { self.runtime = runtime }
+            if presentsThisRuntime {
+                self.runtime = runtime
+                accountStartupPresentation.adoptStartupPresentationIfUnselected(profile.id)
+            }
             if updatePipeline == nil {
                 let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: runtimeCoordinator)
                 updatePipeline = pipeline
