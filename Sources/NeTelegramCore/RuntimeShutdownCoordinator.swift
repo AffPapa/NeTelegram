@@ -1,5 +1,24 @@
 import Foundation
 
+public enum RuntimeShutdownRejection: Sendable, Equatable {
+    case alreadyPending
+    case alreadyFinished
+
+    public var userMessage: String {
+        switch self {
+        case .alreadyPending:
+            return "Выход уже выполняется: дождитесь подтверждения закрытия аккаунтов и TDLib. Повторная команда не отправлена."
+        case .alreadyFinished:
+            return "Завершение TDLib уже подтверждено; повторная команда выхода не отправлена."
+        }
+    }
+}
+
+public enum RuntimeShutdownStartResult: Sendable, Equatable {
+    case began
+    case rejected(RuntimeShutdownRejection)
+}
+
 /// Owns the quit-only account-close acknowledgements and shared receiver drain.
 /// Profile logout and identity-recovery closes remain outside this coordinator.
 public struct RuntimeShutdownCoordinator: Sendable, Equatable {
@@ -16,10 +35,19 @@ public struct RuntimeShutdownCoordinator: Sendable, Equatable {
     /// Starts one quit attempt with the exact set of clients the app will close.
     @discardableResult
     public mutating func begin(clients: Set<Int32>) -> Bool {
-        guard !barrier.isPending, !barrier.isFinished else { return false }
+        if case .began = beginReportingRejection(clients: clients) { return true }
+        return false
+    }
+
+    /// Starts one quit attempt and preserves a user-visible reason when the
+    /// existing close/drain barrier correctly refuses a duplicate attempt.
+    @discardableResult
+    public mutating func beginReportingRejection(clients: Set<Int32>) -> RuntimeShutdownStartResult {
+        guard !barrier.isPending else { return .rejected(.alreadyPending) }
+        guard !barrier.isFinished else { return .rejected(.alreadyFinished) }
         barrier.begin()
         pendingClients = clients
-        return true
+        return .began
     }
 
     /// Records one TDLib authorizationStateClosed update. Unknown or duplicate

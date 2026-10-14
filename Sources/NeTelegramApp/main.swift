@@ -265,7 +265,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let cancelledProfileStarts = cancelPendingProfileStartsForTermination()
         if runtimesByClient.isEmpty {
             guard let gateway, !gateway.receiveWorkerHasExited else { return .terminateNow }
-            guard shutdownCoordinator.begin(clients: []) else { return .terminateCancel }
+            guard beginTerminationShutdown(clients: []) else { return .terminateCancel }
             terminationReply = { [weak self] allow in
                 NSApp.reply(toApplicationShouldTerminate: allow)
                 self?.terminationReply = nil
@@ -274,7 +274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return .terminateLater
         }
         let clientIDs = Set(runtimesByClient.keys)
-        guard shutdownCoordinator.begin(clients: clientIDs) else { return .terminateCancel }
+        guard beginTerminationShutdown(clients: clientIDs) else { return .terminateCancel }
         pendingClosures = Set(runtimesByClient.keys)
         let rejected = runtimesByClient.compactMap { client, target in
             target.close() ? nil : client
@@ -303,6 +303,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             self.setStatus("TDLib всё ещё закрывает базы. Выход продолжится после подтверждения; не запускайте аккаунты повторно.")
         }
         return .terminateLater
+    }
+
+    private func beginTerminationShutdown(clients: Set<Int32>) -> Bool {
+        switch shutdownCoordinator.beginReportingRejection(clients: clients) {
+        case .began:
+            return true
+        case let .rejected(reason):
+            setStatus(reason.userMessage)
+            return false
+        }
     }
 
     private func buildWindow() {

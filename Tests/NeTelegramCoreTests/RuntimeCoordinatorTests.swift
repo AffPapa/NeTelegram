@@ -459,6 +459,32 @@ import Testing
     #expect(barrier.isFinished)
 }
 
+
+@Test func terminationCancellationReportsCauseAndPreservesBarrier() {
+    var shutdown = RuntimeShutdownCoordinator()
+    let clients: Set<Int32> = [11, 12]
+    #expect(shutdown.beginReportingRejection(clients: clients) == .began)
+
+    let duplicate = shutdown.beginReportingRejection(clients: [])
+    #expect(duplicate == .rejected(.alreadyPending))
+    #expect(shutdown.pendingClientIDs == clients)
+    #expect(RuntimeShutdownRejection.alreadyPending.userMessage.contains("дождитесь подтверждения"))
+    #expect(RuntimeShutdownRejection.alreadyPending.userMessage.contains("не отправлена"))
+
+    let closedFirst = shutdown.acknowledgeClosed(clientID: 11)
+    let closedSecond = shutdown.acknowledgeClosed(clientID: 12)
+    #expect(closedFirst)
+    #expect(closedSecond)
+    let drainBegan = shutdown.beginReceiverDrain()
+    #expect(drainBegan)
+    let drainFinished = shutdown.finishReceiverDrain()
+    #expect(drainFinished)
+
+    #expect(shutdown.beginReportingRejection(clients: clients) == .rejected(.alreadyFinished))
+    #expect(RuntimeShutdownRejection.alreadyFinished.userMessage.contains("уже подтверждено"))
+    #expect(shutdown.pendingClientIDs.isEmpty)
+}
+
 @Test func runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain() {
     var shutdown = RuntimeShutdownCoordinator()
     let clients = Set((0..<20).map(Int32.init))
