@@ -74,11 +74,15 @@ checks passed; exact-source macOS CI
 passed for final source `1408ab5`. This is implementation evidence, not live
 visual parity.
 
-At current app source `352a293ccb93d7f74799d1852ca98065e32193ab`, the AppKit
+At current app source `97228153bf8c77bca42efbde9b54fe0f0d452c96`, the AppKit
 shell still has the researched two-pane hierarchy, separate header/history/
-composer, search, selected chat and visible unsupported content. The canonical
-Dev.app is open on its accountless first-run screen. There are no fabricated
-profile rows. Conversation rows, message surfaces and avatar behavior have not
-been visually accepted with real account data; VoiceOver, IME, RTL and
-photo-bearing conversations also remain unverified. The next visual acceptance
-is owner-operated login followed by review of that same account's actual chats.
+composer, search, selected chat and visible unsupported content. The prior
+chat-list pagination trigger could become stuck when the viewport reached the
+end before the first TDLib page completed; it now gates per account, waits for
+`.loaded`, and rechecks the same viewport after completion. Deterministic
+regressions pass 3/3, and exact-source macOS CI passes 185/185. Synthetic
+chat-ID-colored initials were removed in favor of a neutral system placeholder,
+so the UI does not imply a discovered avatar or identity. The canonical Dev.app
+is open on its accountless first-run screen. Real chat rows/avatar rendering,
+VoiceOver, IME, RTL and photo-bearing conversations still require a
+user-authorized account and visual review.
