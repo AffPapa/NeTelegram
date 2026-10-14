@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP16 verified at 7fd0030; exact-source hosted Swift CI 167/167 and two targeted shutdown regressions 20/20 each. Public Site v174 now documents the fix. Do not rebuild while canonical Dev.app at 4dcddcc remains open. Real login, 20-account certification, notarization and compatibility gates remain open.",
+  "phase": "APP16 source 7fd0030 verified; hosted Swift CI 167/167. Canonical Dev.app rebuilt once and the native accountless login opened in CUA. Build launch path now handles pgrep failure and Swift cache sandbox; no login credentials entered. Release gates remain open.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -73,21 +73,21 @@
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
     "version": "0.0.0-dev",
-    "build_info_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "application_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "build_info_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "application_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "CUA inventory on 2026-10-14 confirms the one canonical NeTelegram Dev.app is still running. Its recorded BuildInfo/source is 4dcddcc; do not replace it until that process exits.",
-    "source_fingerprint_sha256": "6fcd6855fc47f2d7f34b9ae8e8a03af539f3ac6a6f0f85ee95f434c36a6713bb",
-    "app_executable_sha256": "bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d",
+    "process_state": "CUA shows the canonical app open at source 7fd00308. pgrep cannot inspect processes in this sandbox and NSRunningApplication returns empty; the process guard fails closed on that ambiguity. Do not rebuild until process absence is positively established.",
+    "source_fingerprint_sha256": "2ee2323a4834c1ec5017c934e3fff56081fcf09ab09875f724301ca1f2239583",
+    "app_executable_sha256": "07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "reuse_validation": "BuildInfo and build record source SHA/fingerprint match; executable and TDJSON hashes recorded; ad-hoc signature verified.",
-    "pending_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "candidate_state": "Built once from exact source in 5.29s; app executable and TDJSON hashes recorded; ad-hoc signature verified; accountless UI smoke passed."
+    "reuse_validation": "BuildInfo/build record match exact clean app-source SHA and fingerprint; hashes recorded; codesign verification passed.",
+    "pending_source_commit": null,
+    "candidate_state": "Built once from source 7fd0030; SwiftPM build completed in 0.21s after one initial 5.70s cache-warming build. CUA opened native app and confirmed accountless phone/QR login; no credentials."
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -212,7 +212,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Wait for the already-running canonical NeTelegram Dev.app at source 4dcddcc to exit through normal Quit. Then rebuild only /private/tmp/NeTelegram-Dev.app once from app source 7fd0030 and run one native launch/reopen smoke. Do not rerun unchanged Swift suite (exact-source hosted PASS is 38514102824) or duplicate Site deploy. Real login and authorized 20-account testing remain pending; notarization credentials and two Telegram compatibility gates remain open.",
+  "next_action": "Keep one canonical Dev.app and reuse its exact build record. Do not rerun unchanged Swift tests (CI 38514102824 is 167/167). Next highest-value gate is user-performed login when available; meanwhile finish independent release/setup gates. No Developer ID/notary release until notary credentials and Telegram title/sponsored-media compatibility decisions are resolved.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -227,7 +227,7 @@
     "repo_head": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "origin_main": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "upstream": "origin/main",
-    "dirty_state": "Clean at source commit; this checkpoint records app-source 7fd0030 and the existing single Dev.app at 4dcddcc."
+    "dirty_state": "Product source is clean at 7fd0030; only build/launch helper and focused regression test are uncommitted. Canonical app bundle built from exact app-source SHA 7fd0030 and opened by CUA."
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -336,17 +336,17 @@
     "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
   },
   "current_native_smoke": {
-    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "6fcd6855fc47f2d7f34b9ae8e8a03af539f3ac6a6f0f85ee95f434c36a6713bb",
-    "executable_sha256": "bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d",
+    "source_fingerprint_sha256": "2ee2323a4834c1ec5017c934e3fff56081fcf09ab09875f724301ca1f2239583",
+    "executable_sha256": "07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signature": "ad-hoc; codesign --verify --deep --strict passed",
-    "live_ui": "Prior CUA smoke for exact source 4dcddcc confirmed the accountless login. Current CUA inventory confirms that same canonical Dev.app process remains running; no auth credentials were entered.",
-    "scope": "Current canonical development bundle, older than app source 7fd0030. Accountless UI smoke only; no real login or authorized account."
+    "live_ui": "CUA opened the canonical bundle; window title NeTelegram · dev 7fd00308; accessibility tree shows the welcome, country selector, phone field, Continue, and QR login. No account list, credentials, or imported sessions.",
+    "scope": "Native accountless UI launch confirmed for exact source 7fd0030. No login/read/send or real-account evidence."
   },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",

@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_ROOT="$ROOT_DIR/.build/canonical-dev-build"
+SWIFT_MODULE_CACHE="${NETELEGRAM_SWIFT_MODULE_CACHE:-/private/tmp/netelegram-dev-swift-modules}"
 APP_PATH="/private/tmp/NeTelegram-Dev.app"
-PGREP_BIN="${NETELEGRAM_PGREP_BIN:-/usr/bin/pgrep}"
 SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support-clean}"
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
@@ -113,19 +113,20 @@ PY
         exit 0
     fi
 fi
-if "$PGREP_BIN" -x NeTelegram >/dev/null 2>&1; then
+if "$ROOT_DIR/Scripts/check-app-process.sh" NeTelegram org.affpapa.netelegram.dev; then
     echo "NeTelegram is already running. Quit the canonical development app before rebuilding it." >&2
     exit 1
 else
-    pgrep_status=$?
-    if [[ $pgrep_status -ne 1 ]]; then
-        echo "Unable to confirm whether NeTelegram is running (pgrep exit $pgrep_status); refusing to replace the canonical app." >&2
+    process_check_status=$?
+    if [[ $process_check_status -ne 1 ]]; then
+        echo "Unable to confirm whether NeTelegram is running (process check exit $process_check_status); refusing to replace the canonical app." >&2
         exit 1
     fi
 fi
 
-SWIFT_BIN_PATH="$(swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --show-bin-path)"
-swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift"
+mkdir -p "$SWIFT_MODULE_CACHE"
+SWIFT_BIN_PATH="$(CLANG_MODULE_CACHE_PATH="$SWIFT_MODULE_CACHE" swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --disable-sandbox --show-bin-path)"
+CLANG_MODULE_CACHE_PATH="$SWIFT_MODULE_CACHE" swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --disable-sandbox
 BUILT_EXECUTABLE="$SWIFT_BIN_PATH/NeTelegram"
 if [[ ! -x "$BUILT_EXECUTABLE" ]]; then
     # SwiftPM has changed the executable output layout across toolchain
