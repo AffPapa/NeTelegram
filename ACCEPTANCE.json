@@ -15,25 +15,18 @@
     },
     "native_build": {
       "status": "success_local",
-      "scope": "Single canonical arm64 Dev.app from app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b; executable SHA-256 07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; codesign --verify --deep --strict passed.",
-      "hosted_run": {
-        "run_id": 38515770287,
-        "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38515770287",
-        "workflow_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
-        "scope": "Pinned TDLib and arm64 Dev.app assembled and verified; CI development bundle uploaded. Not signed for distribution; no account login."
-      }
+      "scope": "Canonical arm64 Dev.app rebuilt in place from exact app source 870b8946eb6441955e035084f099dcacef04a99b in 26.58s; BuildInfo source fingerprint matches; ad-hoc strict codesign verification passed. This is not a distribution signature."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-      "source_fingerprint_sha256": "2ee2323a4834c1ec5017c934e3fff56081fcf09ab09875f724301ca1f2239583",
-      "executable_sha256": "07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25",
+      "source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "source_fingerprint_sha256": "6354d9a53c4db19f7f747ae4bc45bfa865cc34453ab256cbd841a944df5875cc",
+      "executable_sha256": "51b3fb618043acd3e455a14a98096c09a482678cad43b53ddc7749a2b81534bf",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA opened the native accountless login UI, title NeTelegram · dev 7fd00308; no credentials or profile imports."
+      "smoke": "Scripts/window-lifecycle-smoke.sh passed on /private/tmp/NeTelegram-Dev.app and isolated clean support root: one window launched; closing last window kept PID 71819 alive with zero visible windows; LaunchServices reopen restored one visible window with the same PID; normal Cmd+Q terminated it. Process absence confirmed afterward. The process was absent after normal quit."
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -529,8 +522,8 @@
     "local_command": "swift test --no-parallel",
     "local_result": "PASS 169/169 serial macOS Swift suite on Xcode beta / Swift 6.4 in 0.456s; focused photo-content-open regression PASS 1/1. An initial unrestricted invocation had transient Keychain test timing assertions; isolated rerun passed in 0.116s; explicit serial suite passed.",
     "hosted_ci": "PASS exact-source GitHub macOS CI 169/169: https://github.com/AffPapa/NeTelegram/actions/runs/38522612798",
-    "native_dev_app_smoke": "Not run. Canonical Dev.app remains at 7fd00308 and was not replaced or relaunched.",
-    "scope": "Explicit photo reveal now reports openMessageContent only after successful preview decode; command is account/user/runtime/privacy bound. No real Telegram account, actual photo download, memory pressure, Developer ID signing, notarization, or release."
+    "native_dev_app_smoke": "Scripts/window-lifecycle-smoke.sh passed on /private/tmp/NeTelegram-Dev.app and isolated clean support root: one window launched; closing last window kept PID 71819 alive with zero visible windows; LaunchServices reopen restored one visible window with the same PID; normal Cmd+Q terminated it. Process absence confirmed afterward. Source/build SHA is exact; UI was accountless and no credentials were entered.",
+    "scope": "Explicit photo reveal now reports openMessageContent only after successful preview decode; command is account/user/runtime/privacy bound. No real Telegram account, actual photo download, memory pressure, Developer ID signing, notarization, or release. Canonical Dev.app was rebuilt in place and the window close/reopen/quit lifecycle smoke passed."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -571,7 +564,7 @@
     "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
     "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Canonical Dev.app is still running at 7fd00308. Preserve it; after normal Quit and positive process-absence verification, rebuild the same canonical bundle from source 870b8946eb6441955e035084f099dcacef04a99b and run the accountless photo/lifecycle smoke. Do not create or launch a second app bundle. Real login remains user-deferred; 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public downloads remain open.",
+  "next_action": "Continue APP20/native implementation from exact app source 870b8946eb6441955e035084f099dcacef04a99b. The canonical accountless Dev.app was rebuilt and its same-PID close-window, LaunchServices reopen, and Cmd+Q smoke passed; leave it closed after the smoke. Real Telegram login/photo coverage remains user-deferred; 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public download remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -634,7 +627,7 @@
     "source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
     "local_focused_tests": "photoContentOpenIntentIsBoundToRuntimeAndPrivacyEpoch PASS 1/1; full serial suite PASS 169/169 in 0.456s. Isolated prior Keychain timing test passed 0.116s.",
     "hosted_serial_suite": "GitHub macOS CI 38522612798 passed exact source 870b8946eb6441955e035084f099dcacef04a99b, 169/169.",
-    "native_bundle_workflow": "Not rerun. Canonical Dev.app remains at 7fd00308; no new app bundle was created or launched.",
+    "native_bundle_workflow": "Canonical arm64 Dev.app rebuilt in place from exact source 870b8946eb6441955e035084f099dcacef04a99b in 26.58s; strict ad-hoc signature verification passed; accountless lifecycle smoke passed with same PID and no running process afterward.",
     "implementation": "Explicit photo reveal now dispatches openMessageContent only after successful decode, bound to AccountUUID, verified Telegram identity, RuntimeGeneration, and PrivacyEpoch. Automatic history preview decode does not dispatch.",
     "remaining": "APP20 remains partial: real Telegram account/photo, native viewer/picker acceptance, memory pressure, protected/paid/expiring media, and canonical Dev.app rebuild/smoke remain open."
   },

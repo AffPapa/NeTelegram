@@ -76,39 +76,38 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38523210998,
+      "run_id": 38523286071,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523210998",
-      "workflow_commit": "5bb20b9c760d88427a28d135e0b4167dbd6ce1c2",
-      "scope": "Exact Site v181 receipt checkpoint passed metadata validation and PROJECT-STATE/ACCEPTANCE consistency."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523286071",
+      "workflow_commit": "6f38e06c67ec6b1dab49ae57f3f298c306128b03",
+      "scope": "Metadata validation passed for the exact Site v181 receipt checkpoint and consistency checks."
     }
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
     "version": "0.0.0-dev",
-    "build_info_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "application_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "build_info_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+    "application_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "signing": "ad-hoc; codesign --verify --deep --strict passed",
+    "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "CUA shows the canonical app open at source 7fd00308. pgrep cannot inspect processes in this sandbox and NSRunningApplication returns empty; the process guard fails closed on that ambiguity. Do not rebuild until process absence is positively established.",
-    "source_fingerprint_sha256": "2ee2323a4834c1ec5017c934e3fff56081fcf09ab09875f724301ca1f2239583",
-    "app_executable_sha256": "07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25",
+    "process_state": "Lifecycle smoke completed and the process is absent after normal Cmd+Q.",
+    "source_fingerprint_sha256": "6354d9a53c4db19f7f747ae4bc45bfa865cc34453ab256cbd841a944df5875cc",
+    "app_executable_sha256": "51b3fb618043acd3e455a14a98096c09a482678cad43b53ddc7749a2b81534bf",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "reuse_validation": "BuildInfo/build record match exact clean app-source SHA and fingerprint; hashes recorded; codesign verification passed.",
+    "reuse_validation": "BuildInfo/build record match exact clean app-source SHA and fingerprint; executable/TDJSON hashes recorded; strict codesign verification passed.",
     "pending_source_commit": null,
-    "candidate_state": "Existing canonical Dev.app remains at 7fd00308 and was not replaced. APP20 source 870b8946eb6441955e035084f099dcacef04a99b passed focused test 1/1, local serial suite 169/169, and exact-source hosted CI; rebuild the same bundle only after normal Quit and confirmed process absence."
+    "candidate_state": "Canonical Dev.app was rebuilt in place from exact source 870b8946eb6441955e035084f099dcacef04a99b and passed accountless lifecycle smoke. This is ad-hoc development code only, not a signed/notarized release."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
-      "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-      "hosted_run_id": 38514102824,
-      "suite": "Local targeted shutdown stress: 20/20 repetitions per test; exact-source hosted serial Swift suite 167/167. No real-account or 20-runtime measurement."
+      "result": "Focused photo-content-open intent regression PASS 1/1; full explicit serial Swift suite PASS 169/169 in 0.456s. Initial unrestricted run exposed two transient Keychain timing assertions; isolated rerun passed in 0.116s.",
+      "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "hosted_run_id": 38522612798
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -137,9 +136,9 @@
     },
     "current_head_native_build": {
       "status": "success_local",
-      "workflow_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "scope": "Canonical arm64 Dev.app built from exact source in 5.29s; codesign --verify --deep --strict passed; CUA showed matching source title and accountless login."
+      "workflow_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "scope": "Canonical arm64 Dev.app rebuilt in place in 26.58s; BuildInfo/source fingerprint match; codesign strict verification passed; same-PID last-window close, LaunchServices reopen, and normal quit smoke passed."
     },
     "latest_local_appkit_build": {
       "result": "Built exact source e7cc4b3 in 5.29s; codesign --verify --deep --strict passed.",
@@ -154,12 +153,18 @@
     },
     "telegram_api_compatibility": "Official Telegram API Terms rechecked 2026-10-14: §1.3 requires all basic features of the main Telegram apps to work correctly but supplies no exhaustive checklist here; §1.4 prohibits interference with basic behavior. This broad requirement remains an open compatibility review, not a PASS. §2.3 says the app title must not include “Telegram” unless preceded by “Unofficial”; user instructions require the product name NeTelegram, so public naming remains an explicit conflict and must not be silently changed. §3.3 requires sponsored messages for channel access; the official sponsored-messages API also requires a fullscreen video playback path with timed sponsored overlays when viewing channel videos. User declined a player, so channel access and stable release remain deferred. Primary sources: https://core.telegram.org/api/terms and https://core.telegram.org/api/sponsored-messages.",
     "last_native_bundle_smoke": {
-      "run_id": 38495482965,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482965",
-      "workflow_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
+      "status": "success_local",
+      "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "6354d9a53c4db19f7f747ae4bc45bfa865cc34453ab256cbd841a944df5875cc",
+      "executable_sha256": "51b3fb618043acd3e455a14a98096c09a482678cad43b53ddc7749a2b81534bf",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "scope": "Scripts/window-lifecycle-smoke.sh passed on /private/tmp/NeTelegram-Dev.app and isolated clean support root: one window launched; closing last window kept PID 71819 alive with zero visible windows; LaunchServices reopen restored one visible window with the same PID; normal Cmd+Q terminated it. Process absence confirmed afterward. No Telegram credentials or real account used."
     },
     "current_head_site_release_note": "Site v172 is a development milestone only; no release or download was created.",
     "privacy_lock_notification_cache": {
@@ -237,7 +242,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Canonical Dev.app is still running at 7fd00308. Preserve it; after normal Quit and positive process-absence verification, rebuild the same canonical bundle from source 870b8946eb6441955e035084f099dcacef04a99b and run the accountless photo/lifecycle smoke. Do not create or launch a second app bundle. Real login remains user-deferred; 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public downloads remain open.",
+  "next_action": "Continue APP20/native implementation from exact app source 870b8946eb6441955e035084f099dcacef04a99b. The canonical accountless Dev.app was rebuilt and its same-PID close-window, LaunchServices reopen, and Cmd+Q smoke passed; leave it closed after the smoke. Real Telegram login/photo coverage remains user-deferred; 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public download remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -291,11 +296,11 @@
   "latest_site_source_commit": "a82cfec5bdc0fcc692fcaa31138bd034fd2a0554",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38523210998,
+    "run_id": 38523286071,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523210998",
-    "workflow_commit": "5bb20b9c760d88427a28d135e0b4167dbd6ce1c2",
-    "scope": "Exact Site v181 receipt checkpoint passed metadata validation and PROJECT-STATE/ACCEPTANCE consistency."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523286071",
+    "workflow_commit": "6f38e06c67ec6b1dab49ae57f3f298c306128b03",
+    "scope": "Metadata validation passed for the exact Site v181 receipt checkpoint and consistency checks."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -463,12 +468,7 @@
     "acceptance_status": "partial",
     "remaining": "real auth, minimum-window/appearance edge cases and full accessibility checks remain open."
   },
-  "pending_native_candidate": {
-    "source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
-    "running_bundle_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "status": "blocked_running_canonical_app",
-    "reason": "Exact-source local serial suite and CI passed, but canonical Dev.app is still running at its prior source. Preserve it; rebuild the same path only after normal Quit and positively verified process absence."
-  },
+  "pending_native_candidate": null,
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
     "workflow_commit": "306f2c86cf35db3bbf1fa27f99cc4c5923e34db2",
