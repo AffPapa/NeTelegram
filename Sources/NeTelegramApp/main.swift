@@ -1501,6 +1501,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         return number
     }
 
+    private func updatePhoneEntryActionAvailability() {
+        guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber",
+              !phoneField.isHidden,
+              !authRequestInFlight,
+              !profileRestoreInProgress,
+              !closingForTermination else {
+            actionButton.isEnabled = false
+            return
+        }
+        actionButton.isEnabled = PhoneNumberInputPolicy.canContinue(
+            phoneField.stringValue,
+            selectedCallingCode: selectedCallingCode,
+            countryCatalogAvailable: !phoneCountries.isEmpty
+        )
+    }
+
     private func phoneNumberEntryPrompt() -> String {
         if let region = phoneCountrySelection.selectedRegionCode,
            let country = phoneCountries.first(where: { $0.code == region }),
@@ -7242,10 +7258,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         qrButton.isEnabled = !authRequestInFlight
         actionButton.isHidden = false
         actionButton.title = "Продолжить"
-        actionButton.isEnabled = !authRequestInFlight
+        actionButton.isEnabled = false
         setStatus(phoneCountries.isEmpty
             ? "Введите полный номер с + и кодом страны. Загружаю список стран…"
             : phoneNumberEntryPrompt())
+        updatePhoneEntryActionAvailability()
         phoneField.becomeFirstResponder()
     }
 
@@ -7266,11 +7283,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             phoneCountrySelection.clearSelection()
             updateCountrySuggestion()
             setStatus(phoneNumberEntryPrompt())
+            updatePhoneEntryActionAvailability()
             return
         }
         phoneCountrySelection.select(regionCode: country.code, callingCode: country.callingCodes[0])
         updateCountrySuggestion()
         setStatus(phoneNumberEntryPrompt())
+        updatePhoneEntryActionAvailability()
     }
 
     @objc private func searchCountries() {
@@ -7278,8 +7297,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func controlTextDidChange(_ notification: Notification) {
-        guard (notification.object as? NSTextField) === countrySearchField else { return }
-        searchCountries()
+        guard let field = notification.object as? NSTextField else { return }
+        if field === countrySearchField {
+            searchCountries()
+        } else if field === phoneField {
+            updatePhoneEntryActionAvailability()
+        }
     }
 
     private func loadBundledPhoneCountries() {

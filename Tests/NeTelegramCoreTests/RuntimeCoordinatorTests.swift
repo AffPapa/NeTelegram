@@ -240,6 +240,16 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("0812345678", selectedCallingCode: "") == .invalidCountryCode)
 }
 
+@Test func phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal() {
+    #expect(!PhoneNumberInputPolicy.canContinue("", selectedCallingCode: "", countryCatalogAvailable: true))
+    #expect(!PhoneNumberInputPolicy.canContinue("812345678", selectedCallingCode: "", countryCatalogAvailable: true))
+    #expect(!PhoneNumberInputPolicy.canContinue("abc", selectedCallingCode: "66", countryCatalogAvailable: true))
+    #expect(!PhoneNumberInputPolicy.canContinue("8", selectedCallingCode: "66", countryCatalogAvailable: true))
+    #expect(PhoneNumberInputPolicy.canContinue("812345678", selectedCallingCode: "66", countryCatalogAvailable: true))
+    #expect(PhoneNumberInputPolicy.canContinue("+66 81 234 5678", selectedCallingCode: "", countryCatalogAvailable: false))
+    #expect(!PhoneNumberInputPolicy.canContinue("0812345678", selectedCallingCode: "", countryCatalogAvailable: false))
+}
+
 @Test func macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin() {
     var selection = PhoneCountrySelectionState(suggestedRegionCode: "TH")
     #expect(selection.suggestedRegionCode == "TH")

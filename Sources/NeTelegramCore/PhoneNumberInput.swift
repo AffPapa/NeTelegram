@@ -37,6 +37,23 @@ public struct PhoneCountrySelectionState: Equatable, Sendable {
 /// Conservative phone input normalization for TDLib's international phone field.
 /// It never silently strips letters or guesses whether a country code was pasted.
 public enum PhoneNumberInputPolicy {
+    /// Controls whether the phone-entry action is currently available. A
+    /// national number requires an explicitly selected country; an explicit
+    /// international number can be entered even before the country catalog
+    /// finishes loading.
+    public static func canContinue(
+        _ raw: String,
+        selectedCallingCode: String,
+        countryCatalogAvailable: Bool
+    ) -> Bool {
+        let input = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard countryCatalogAvailable || input.hasPrefix("+") else { return false }
+        if case .accepted = validate(input, selectedCallingCode: selectedCallingCode) {
+            return true
+        }
+        return false
+    }
+
     public static func validate(_ raw: String, selectedCallingCode: String) -> PhoneNumberInputResult {
         let input = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !input.isEmpty else { return .empty }
