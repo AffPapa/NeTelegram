@@ -7404,13 +7404,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return
         }
         let title = countryPickerText(for: country)
-        guard countryPicker.stringValue == title else { return }
         phoneCountrySelection.select(regionCode: country.code, callingCode: country.callingCodes[0])
         countryPicker.stringValue = title
         updateCountrySuggestion()
         setStatus(phoneNumberEntryPrompt())
         updatePhoneEntryActionAvailability()
         phoneField.becomeFirstResponder()
+    }
+
+    func comboBoxSelectionDidChange(_ notification: Notification) {
+        guard (notification.object as? NSComboBox) === countryPicker else { return }
+        selectCountry()
     }
 
     @objc private func searchCountries() {
