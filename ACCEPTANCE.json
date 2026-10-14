@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "APPLE-HIG-CURRENT-AUTH-AUDIT-01: HIG audit confirmed the running b685192 AppKit auth window is compact and native; the attachment was an older build. Corrected stale public-name records to NeTelegram. Fresh public /downloads/ still shows AffPapa Chat, so the Site-wide repair remains open. Overall acceptance remains partial.",
+  "status": "SITE-205-CANONICAL-ROUTE-VERIFIED-01: Anonymous canonical /downloads/ shows NeTelegram branding and correctly reports no verified app download. The earlier query URL was stale. Overall product acceptance remains partial.",
   "current_evidence": {
     "app_source_commit": "b6851921778867fc5d0233236e59bd6c40b61af8",
     "local_suite": "Focused APIHash suite passed 6/6 on exact source. The full exact-source macOS CI and pinned TDLib/Dev.app workflow both succeeded; no full local suite was run in this visual audit.",
@@ -666,7 +666,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Keep canonical app build unchanged for the HIG audit: current b685192 source already opens a compact 600x560 auth window with native AppKit controls. First repair public product name consistently in GitHub docs and all Site routes; then return to the higher-priority Keychain access and all-active runtime gates. Do not claim §2.3 compatibility or stable release.",
+  "next_action": "App-first: do not repeat the HIG review or rebuild canonical b685192. Implement a narrow injectable boundary around the production profile-start sequence, then exercise that same path with 20 synthetic profiles while keeping synthetic evidence separate from real-account certification. Before real login, require the owner to enter a fresh/current app API hash directly in NeTelegram; the hash pasted into chat is retired and must not be reused. Then run one owner-operated login/read/send/logout before expanding to available authorized accounts. Keep Telegram Terms gates unresolved and do not claim compatibility or stable release.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -730,11 +730,11 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APPLE-HIG-CURRENT-AUTH-AUDIT-01",
+    "id": "SITE-205-CANONICAL-ROUTE-VERIFIED-01",
     "source_commit": "b6851921778867fc5d0233236e59bd6c40b61af8",
     "test_commit": "b6851921778867fc5d0233236e59bd6c40b61af8",
-    "change": "Compared the user's screenshot (window title dev 5f414650) with the exact canonical Dev.app b6851921. The supplied screenshot predates the current build. The current AppKit auth screen uses the native macOS window frame, semantic system colors, native text/combo controls, clear labels, consistent field widths, a disabled Continue action until valid input, QR alternative, accessible non-affiliation note, and a scroll container for longer auth states. Apple HIG and official Telegram GitHub source were reviewed; no extra visual restyle was warranted because the current screen already follows the relevant macOS conventions. No application source was changed in this audit.",
-    "focused_test": "No app test or rebuild was needed for this read-only visual audit. Current Dev.app bundle metadata, exact source SHA, executable/TDLib digests and strict ad-hoc code signature were checked. Native AX inspection and screenshot: /var/folders/tq/cx6qnzks0nd8_c0y80rf3j300000gp/T/codex-shot-2026-10-15_06-07-38.png. Existing b685192 APIHash tests passed 6/6; exact-source macOS CI 38651617037 and pinned TDLib/Dev.app workflow 38651617028 succeeded.",
+    "change": "Verified the exact public canonical downloads route and confirmed the previous AffPapa Chat result came from a stale query URL. Local source at the current Site commit rendered and passed validation for 8 routes. No app build, Site source change, save, or deployment.",
+    "focused_test": "Anonymous canonical route CUA/AX verification; build_site.py + validate_site.py passed for 8 static routes. No application tests or build were needed.",
     "hosted_ci": {
       "run_id": 38651617037,
       "status": "success",
@@ -852,7 +852,7 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "APPLE-HIG-CURRENT-AUTH-AUDIT-01: current native AppKit authorization window audited against Apple HIG; attached screenshot was an older 5f414650 build, while b6851921 is the running canonical build. No unnecessary restyle was made. Current exact-source CI and pinned TDLib/Dev.app checks passed; public Site v205 now uses NeTelegram branding and current b685192 status. Overall product/release acceptance remains partial.",
+  "phase": "SITE-205-CANONICAL-ROUTE-VERIFIED-01: Anonymous canonical /downloads/ shows NeTelegram branding and correctly reports no verified app download. The earlier query URL was stale. Overall product acceptance remains partial.",
   "latest_local_build": {
     "date": "2026-10-15",
     "source_commit": "b6851921778867fc5d0233236e59bd6c40b61af8",
@@ -1039,5 +1039,15 @@
     "interpretation": "The delay is specific to retrieving data for the existing item, not a general delay for all Keychain queries. This does not establish the root cause or prove whether the app process can read it. Do not delete, reset, or replace the existing item without successful recovery.",
     "secret_value_observed_or_printed": false,
     "item_modified": false
+  },
+  "latest_public_site_verification": {
+    "date": "2026-10-15",
+    "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
+    "url": "https://netelegram.iryadom.chatgpt.site/downloads/",
+    "audience": "public",
+    "latest_version": 205,
+    "source_commit": "9806d3cfe7c884b9d99f8b212cf37cc5b129a6ad",
+    "result": "Anonymous CUA verification of canonical /downloads/ showed NeTelegram in title, header and footer, and correctly stated no verified app download exists. The previously open tab used ?verify=291cd0a7 and showed stale AffPapa Chat content; navigating to the canonical route without that query showed the current public page. No Site source change, save, or deployment was made.",
+    "local_validation": "Official Site helper opened the existing checkout at the exact source commit. build_site.py rendered 8 routes; validate_site.py passed all routes, shared shell, active navigation, canonical metadata, local links and assets."
   }
 }
