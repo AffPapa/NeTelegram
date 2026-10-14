@@ -525,7 +525,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         NSLayoutConstraint.activate([
             authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
-            authCard.widthAnchor.constraint(equalToConstant: 568),
+            authCard.widthAnchor.constraint(equalToConstant: 568).withPriority(.defaultHigh),
             authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
             authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
             authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 14),
@@ -540,31 +540,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             mark.widthAnchor.constraint(equalToConstant: 64), mark.heightAnchor.constraint(equalToConstant: 64),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
-            loginHeading.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             loginHeading.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
-            loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             loginSubtitle.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
-            loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             loginDisclosure.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
-            registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
-            countryPickerStack.widthAnchor.constraint(equalToConstant: 300),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 300), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
-            countryPicker.widthAnchor.constraint(equalToConstant: 300), countryPicker.heightAnchor.constraint(equalToConstant: 34),
-            phoneField.widthAnchor.constraint(equalToConstant: 360), phoneField.heightAnchor.constraint(equalToConstant: 38),
-            emailField.widthAnchor.constraint(equalToConstant: 360), emailField.heightAnchor.constraint(equalToConstant: 38),
-            inputField.widthAnchor.constraint(equalToConstant: 360), inputField.heightAnchor.constraint(equalToConstant: 38),
-            secureInputField.widthAnchor.constraint(equalToConstant: 360), secureInputField.heightAnchor.constraint(equalToConstant: 38),
-            firstNameField.widthAnchor.constraint(equalToConstant: 360), firstNameField.heightAnchor.constraint(equalToConstant: 38),
-            lastNameField.widthAnchor.constraint(equalToConstant: 360), lastNameField.heightAnchor.constraint(equalToConstant: 38),
-            registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            countryPickerStack.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh),
+            countrySearchField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
+            countryPicker.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            countryPicker.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            phoneField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
+            emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            emailField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
+            inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            inputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
+            secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            secureInputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
+            firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            firstNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
+            lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            lastNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
+            registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationConsent.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
-            statusLabel.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
+            statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             statusLabel.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
-            actionButton.widthAnchor.constraint(equalToConstant: 360), actionButton.heightAnchor.constraint(equalToConstant: 38),
-            qrButton.widthAnchor.constraint(equalToConstant: 280), qrButton.heightAnchor.constraint(equalToConstant: 28),
+            actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            actionButton.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
+            qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            qrButton.widthAnchor.constraint(equalToConstant: 280).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 28),
         ])
 
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))
@@ -2939,6 +2950,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             if authType == "authorizationStateClosed" {
                 let client = target.route?.client.value
                 let wasSelected = target === runtime
+                let selectionRevisionAtClose = accountStartupPresentation.selectionRevision
                 let confirmedLogout = target.logoutWasAccepted
                 let unverifiedRemovalPending = knownProfilesByAccount[target.account]?.unverifiedRemovalPending == true
                 let loggedOutUserID = target.telegramUserID
@@ -2984,9 +2996,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     purgeInMemoryAccountState(target.account)
                     let cleanup = await finishLogoutProfile(target, expectedTelegramUserID: loggedOutUserID)
                     removedLogoutProfile = cleanup
-                    setStatus(cleanup
-                        ? "Аккаунт вышел из Telegram, локальные данные и профиль удалены."
-                        : "Выход в Telegram завершён, но локальная очистка не закончена. Профиль сохранён для безопасного восстановления очистки.")
+                    if accountStartupPresentation.selectionIsCurrent(account: target.account, revision: selectionRevisionAtClose) {
+                        setStatus(cleanup
+                            ? "Аккаунт вышел из Telegram, локальные данные и профиль удалены."
+                            : "Выход в Telegram завершён, но локальная очистка не закончена. Профиль сохранён для безопасного восстановления очистки.")
+                    }
                 } else if target.isLogoutRequested {
                     setStatus("Соединение закрылось до подтверждения выхода Telegram; локальный профиль сохранён.")
                 }
@@ -3002,23 +3016,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         // removed above; only now may the DB directory/keys go.
                         try await completePendingUnverifiedProfileCleanup(target.account)
                         removedUnverifiedProfile = true
-                        setStatus("Незавершённый вход и его локальные данные удалены.")
+                        if accountStartupPresentation.selectionIsCurrent(account: target.account, revision: selectionRevisionAtClose) {
+                            setStatus("Незавершённый вход и его локальные данные удалены.")
+                        }
                     } catch {
                         profileStartupFailures.insert(target.account)
-                        setStatus("TDLib закрыл профиль, но локальная очистка не завершилась. Профиль сохранён для безопасного повтора.")
+                        if accountStartupPresentation.selectionIsCurrent(account: target.account, revision: selectionRevisionAtClose) {
+                            setStatus("TDLib закрыл профиль, но локальная очистка не завершилась. Профиль сохранён для безопасного повтора.")
+                        }
                     }
                 }
-                if wasSelected, confirmedLogout, let next = runtime {
+                let selectionStillBelongsToClosedAccount = wasSelected
+                    && accountStartupPresentation.selectionIsCurrent(account: target.account, revision: selectionRevisionAtClose)
+                if selectionStillBelongsToClosedAccount, confirmedLogout, let next = runtime {
                     refreshAccountPicker(select: next.account)
                     presentRuntime(next)
-                } else if wasSelected, !confirmedLogout, !unverifiedRemovalPending, !closingForTermination {
+                } else if selectionStillBelongsToClosedAccount, !confirmedLogout, !unverifiedRemovalPending, !closingForTermination {
                     closedProfileToRetry = target.account
                     profileStartupFailures.insert(target.account)
                     if !lockState { showClosedProfileRecovery(target.account) }
                     refreshAccountPicker()
-                } else if wasSelected, confirmedLogout, removedLogoutProfile, runtimesByAccount.isEmpty {
+                } else if selectionStillBelongsToClosedAccount, confirmedLogout, removedLogoutProfile, runtimesByAccount.isEmpty {
                     Task { @MainActor [weak self] in await self?.addAccountProfile() }
-                } else if wasSelected, confirmedLogout, runtimesByAccount.isEmpty {
+                } else if selectionStillBelongsToClosedAccount, confirmedLogout, runtimesByAccount.isEmpty {
                     chatPane.isHidden = true
                     setAuthCardVisible(true)
                     loginHeading.stringValue = "Очистка профиля не завершена"
@@ -3028,14 +3048,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     secureInputField.isHidden = true
                     qrImageView.isHidden = true
                     actionButton.isHidden = true
-                } else if wasSelected, unverifiedRemovalPending, let next = runtime {
+                } else if selectionStillBelongsToClosedAccount, unverifiedRemovalPending, let next = runtime {
                     refreshAccountPicker(select: next.account)
                     presentRuntime(next)
-                } else if wasSelected, removedUnverifiedProfile, runtimesByAccount.isEmpty {
+                } else if selectionStillBelongsToClosedAccount, removedUnverifiedProfile, runtimesByAccount.isEmpty {
                     runtime = nil
                     pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
                     showPhoneEntry()
-                } else if wasSelected, unverifiedRemovalPending, runtimesByAccount.isEmpty {
+                } else if selectionStillBelongsToClosedAccount, unverifiedRemovalPending, runtimesByAccount.isEmpty {
                     runtime = nil
                     chatPane.isHidden = true
                     setAuthCardVisible(true)

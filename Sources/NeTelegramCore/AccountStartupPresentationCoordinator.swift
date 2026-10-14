@@ -4,11 +4,19 @@
 @MainActor
 public final class AccountStartupPresentationCoordinator {
     public private(set) var selectedAccountIntent: AccountUUID?
+    public private(set) var selectionRevision: UInt64 = 0
 
     public init() {}
 
     public func select(_ account: AccountUUID) {
         selectedAccountIntent = account
+        selectionRevision &+= 1
+    }
+
+    /// Async cleanup may only update the window if the user's selection has
+    /// not changed since that cleanup began.
+    public func selectionIsCurrent(account: AccountUUID, revision: UInt64) -> Bool {
+        selectedAccountIntent == account && selectionRevision == revision
     }
 
     public func shouldPresentStartupRuntime(

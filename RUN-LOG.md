@@ -1295,3 +1295,32 @@
 - Validator commit `a20cce0103006bedcd455499195998c127675dea` defines two linked stages. `--stage assets` checks GitHub public bytes, Gatekeeper/quarantine, and install/reopen without claiming Site results. `--stage delivery --asset-receipt ...` verifies all Site link/feed checks after deployment and binds the final receipt to the exact pre-Site receipt bytes and the same frozen manifest. `DEV-WORKFLOW.md` and `RELEASE.md` now state that order; the release manifest stays immutable.
 - Targeted `python3 -m unittest Tests.release.test_validate_release -v` passed 19/19. Exact-source GitHub Metadata validation [38556741758](https://github.com/AffPapa/NeTelegram/actions/runs/38556741758) passed. The test verifies both stages and rejects a missing or mismatched prior receipt.
 - REL05 remains `not_run`: no real release assets exist, no GitHub release was created, and no Site deployment or download button was published. This change fixes the validator's sequencing deadlock only.
+
+
+## 2026-10-14 — AUTH03 responsive form constraints (local, visual check pending)
+
+- Made the authentication card and its phone/email/code/2FA/registration/country/action controls shrink to their available AppKit container width while retaining their preferred widths on normal windows. This addresses the fixed-width layout risk without changing the Telegram authorization flow.
+- `swift build --target NeTelegramApp` passed with the Swift scratch and module caches under `/private/tmp`; `git diff --check` and `Scripts/validate_checkpoint.py` passed. The first sandboxed SwiftPM attempt could not write the user cache; the temporary-cache build succeeded.
+- The canonical `/private/tmp/NeTelegram-Dev.app` was left running and not replaced. The change is uncommitted and has not had a source-matched native visual review at default/compact sizes; AUTH03 remains partial.
+- Corrected the resume action: the API hash exposed in chat is retired. Use an appropriate current app credential entered directly in the protected app UI. No secret values are stored in this log.
+
+
+## 2026-10-14 — Correct API-hash recovery guidance
+
+- Checked Telegram's primary API-id acquisition documentation. It describes obtaining `api_id`/`api_hash` through my.telegram.org and says one `api_id` is associated with a phone number. No supported self-service hash rotation/reissue procedure was found in the reviewed primary docs.
+- Corrected the checkpoint so it no longer assumes a replacement credential can be generated. The owner enters the intended NeTelegram app value only in the protected in-app field; no value is copied into this log.
+- This is documentation/evidence correction only. No credential was read, Keychain item changed, app relaunched, or release published.
+
+
+## 2026-10-14 — Review false positives in changed-file secret scan
+
+- A pattern-only scan of the four changed files found 198 exact 32-hex matches. Redacted prefix classification showed every match was a public Site project/deployment/version identifier (`appgprj_`, `appgdep_`, `appgver_`); no match occurred in the modified Swift source. No matched values were printed. This closes the initial false-positive alert; it is a targeted changed-file scan, not a whole-repository secret audit.
+
+
+## 2026-10-14 — APP29 stale selection guard and scoped Telegram UI review
+
+- Added a monotonically increasing account-selection revision. `authorizationStateClosed` still completes cleanup for the closed account, but post-await status and window presentation changes are now conditional on the same account/revision still being selected.
+- Added `delayedClosedAccountCleanupCannotOverrideNewerSelection`; focused Swift test passed 1/1. SwiftPM compiled both `NeTelegramApp` and `NeTelegramCoreTests` (24.18s build; 0.001s test) on arm64e / Xcode beta / Swift 6.4. The test exercises the selection guard after a modeled suspension; it is not a full native TDLib cleanup integration test. Initial sandbox runs failed before compilation at SwiftPM sandbox setup; the same command succeeded through approved host execution with caches and scratch under `/private/tmp`.
+- Canonical `/private/tmp/NeTelegram-Dev.app` remains open and was not replaced. No account login, full suite, commit, push, GitHub release, or Site deployment occurred.
+- Researched the official `telegramdesktop/tdesktop` source: [`mainwidget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/mainwidget.cpp), [`dialogs_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/dialogs/dialogs_widget.cpp), [`history_view_top_bar_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp), and the project-pinned prior review of `dialogs_row.cpp`, list accessibility, history list and composer. Applicable principles: adaptive two-pane navigation, clear title/preview/selection hierarchy, separate chat header/history/composer, and explicit empty/loading/search states. The existing NeTelegram shell already implements this structural direction; no broad redesign or upstream code/assets were copied. Real-chat row visuals remain pending owner-driven login.
+- Delivery audit: repo and public Site exist, but no application release/download exists. `gh` credentials are invalid and current Git network lookup failed DNS; prior Git push/connector evidence is historical. Release review also observed zero valid local signing identities, conflicting with an earlier checkpoint inventory that was inconsistent; fresh identity/notary checks must precede any candidate. No release is asserted.

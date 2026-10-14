@@ -1830,6 +1830,25 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     ), "A background startup cannot replace an already visible runtime")
 }
 
+@MainActor @Test func delayedClosedAccountCleanupCannotOverrideNewerSelection() {
+    let closedAccount = AccountUUID()
+    let newlySelectedAccount = AccountUUID()
+    let presentation = AccountStartupPresentationCoordinator()
+
+    presentation.select(closedAccount)
+    let cleanupRevision = presentation.selectionRevision
+    #expect(presentation.selectionIsCurrent(account: closedAccount, revision: cleanupRevision))
+
+    // Model the MainActor being suspended in profile/route cleanup while the
+    // user selects another already-open runtime.
+    presentation.select(newlySelectedAccount)
+    #expect(!presentation.selectionIsCurrent(account: closedAccount, revision: cleanupRevision))
+    #expect(presentation.selectionIsCurrent(
+        account: newlySelectedAccount,
+        revision: presentation.selectionRevision
+    ))
+}
+
 @MainActor @Test func profileStartupRegistryIsolatesStallsFailuresAndRetries() async {
     enum StartupFailure: Error { case temporary }
 

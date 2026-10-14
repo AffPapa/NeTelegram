@@ -597,7 +597,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial. Current-source review at 0a7cbe6 confirms the centered default window in light appearance; minimum size, dark appearance, accessibility contrast, later authorization steps, and real login remain unverified. Current canonical Dev.app visual review on exact app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b (window title `NeTelegram · dev 7fd00308`) shows the first-run card centered and all phone-step controls visible at default window size in light appearance. This is a native screenshot observation, not minimum-size or later-step coverage; status remains partial. Current exact source 9e477645: canonical AppKit Dev.app at 760x600; phone, code, 2FA, QR placeholder and registration reviewed in dark appearance, registration also in light. AX lists every registration control. Tab traverses first name → last name → consent; consent is scrolled into visible area. Dark appearance is semantic system color rendering, not a formal contrast measurement. Exact-source macOS suite passed in run 38554499415; pinned TDLib/Dev.app build passed in run 38554499473. Default-size review, VoiceOver/IME/RTL, real login and account-backed coverage remain open."
+      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial. Current-source review at 0a7cbe6 confirms the centered default window in light appearance; minimum size, dark appearance, accessibility contrast, later authorization steps, and real login remain unverified. Current canonical Dev.app visual review on exact app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b (window title `NeTelegram · dev 7fd00308`) shows the first-run card centered and all phone-step controls visible at default window size in light appearance. This is a native screenshot observation, not minimum-size or later-step coverage; status remains partial. Current exact source 9e477645: canonical AppKit Dev.app at 760x600; phone, code, 2FA, QR placeholder and registration reviewed in dark appearance, registration also in light. AX lists every registration control. Tab traverses first name → last name → consent; consent is scrolled into visible area. Dark appearance is semantic system color rendering, not a formal contrast measurement. Exact-source macOS suite passed in run 38554499415; pinned TDLib/Dev.app build passed in run 38554499473. Default-size review, VoiceOver/IME/RTL, real login and account-backed coverage remain open. Local uncommitted follow-up on 2026-10-14 makes the centered card and controls container-relative, preserving preferred widths while allowing narrow-window shrink. `swift build --target NeTelegramApp` passed using a /private/tmp scratch path; checkpoint and diff checks passed. Canonical Dev.app was not replaced, so native visual verification of this follow-up is not yet run; AUTH03 remains partial."
     },
     {
       "id": "AUTH04",
@@ -636,6 +636,16 @@
       "evidence": "RuntimeCoordinator.isCurrent(_:) checks the exact registered route. AppDelegate.receive now rechecks that route and client ownership immediately after await target.consume(object), before its UI/notification/account-state side effects. asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement passed 1/1; full serial suite passed 176/176; exact-source macOS CI 38545776110 succeeded; canonical Dev.app from cea9864 launched once and showed accountless auth UI. Synthetic route replacement only: no deterministic test blocks the AppDelegate identity persistence await while replacing the live runtime, and no real Telegram login or 20-account runtime coverage is available."
     },
     {
+      "id": "APP29",
+      "name": "Отложенное закрытие не перехватывает выбор аккаунта",
+      "expected": "После await очистки закрытого аккаунта его обработчик может завершить account-scoped cleanup, но не меняет интерфейс и глобальный статус после того, как пользователь выбрал другой аккаунт.",
+      "method": "MainActor selection-revision policy regression + exact-source Swift compile",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "Добавлена монотонная selectionRevision в AccountStartupPresentationCoordinator; обработчик authorizationStateClosed передаёт account/revision guard для post-await статуса и UI ветвей. Таргетированный delayedClosedAccountCleanupCannotOverrideNewerSelection passed 1/1 на arm64e / Xcode beta / Swift 6.4; SwiftPM скомпилировал NeTelegramApp и тестовый target. Это проверяет изолированную политику после моделируемого ожидания, а не полный suspended AppDelegate callback/native account cleanup. Canonical Dev.app не заменялся; визуальная проверка и exact-source hosted CI не выполнены.",
+      "source_commit": "016df2a1393bae08697b66ebab5d9c9d230e3cb7 + local uncommitted patch"
+    },
+    {
       "id": "UI01",
       "name": "Иерархия и выбор переписки",
       "expected": "В списке переписок название, последний текст и текущий выбор различимы; строка доступна с клавиатуры/VoiceOver и использует только реальные поля TDLib.",
@@ -655,6 +665,23 @@
     "hosted_ci_status": "success",
     "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38555778654",
     "no_real_account": "No phone, login code, profile, session, or account was used."
+  },
+  "current_local_slice": {
+    "base_commit": "016df2a1393bae08697b66ebab5d9c9d230e3cb7",
+    "dirty_paths": [
+      "Sources/NeTelegramApp/main.swift",
+      "Sources/NeTelegramCore/AccountStartupPresentationCoordinator.swift",
+      "Tests/NeTelegramCoreTests/RuntimeCoordinatorTests.swift",
+      "ACCEPTANCE.json",
+      "PROJECT-STATE.json",
+      "RUN-LOG.md"
+    ],
+    "change": "Prevent stale authorizationStateClosed cleanup from presenting old-account UI/status after account selection changes; keeps cleanup account scoped.",
+    "targeted_test": "delayedClosedAccountCleanupCannotOverrideNewerSelection passed 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests; 24.18s build, 0.001s test.",
+    "environment_note": "Initial restricted SwiftPM attempts were denied before compilation because manifest sandbox setup could not access its cache. Same targeted command succeeded after approved host execution with caches/scratch under /private/tmp.",
+    "canonical_dev_app": "left running and untouched; not replaced",
+    "real_account": "not used; login remains deferred",
+    "recommended_follow_up": "Use the source-backed UI review to keep the existing two-pane shell and validate real-data visual states after login. Recheck signing identity and GitHub transport before planning release; do not publish ad-hoc Dev.app."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -695,7 +722,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "Continue the working-app path without cycling builds: AUTH04 removal logic is already implemented and Core failure tests are historical evidence; its native TDLib close smoke is blocked because the NeTelegram app-specific Keychain API hash is absent. The native app now has the protected API-hash entry dialog open. The owner must enter/save the app hash there (no phone/code login); then verify one unverified local profile close/restore barrier. Real account login remains user-driven. After one real account read/send/close smoke and notarization credentials are available, create a single prerelease candidate; only after public-byte checks add the Site download button. Stable remains gated by compatibility and 20 real accounts.",
+  "next_action": "Keep the single canonical Dev.app running; do not replace it until the owner has completed protected API credential entry. The stale authorizationStateClosed selection race is guarded and its targeted local regression passes. The Telegram Desktop source review confirms the existing two-pane structure, selected conversation row, separate chat header/list/composer, and explicit empty state are the right bounded design direction; validate visual states with real chat data after login rather than repeating a broad redesign. Recheck signing identity and GitHub transport before release; publish only a signed/notarized immutable prerelease with public-byte verification, then update the existing Site once. Stable remains gated by Telegram compatibility and 20 real accounts.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",

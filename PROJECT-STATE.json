@@ -328,7 +328,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue the working-app path without cycling builds: AUTH04 removal logic is already implemented and Core failure tests are historical evidence; its native TDLib close smoke is blocked because the NeTelegram app-specific Keychain API hash is absent. The native app now has the protected API-hash entry dialog open. The owner must enter/save the app hash there (no phone/code login); then verify one unverified local profile close/restore barrier. Real account login remains user-driven. After one real account read/send/close smoke and notarization credentials are available, create a single prerelease candidate; only after public-byte checks add the Site download button. Stable remains gated by compatibility and 20 real accounts.",
+  "next_action": "Keep the single canonical Dev.app running; do not replace it until the owner has completed protected API credential entry. The stale authorizationStateClosed selection race is guarded and its targeted local regression passes. The Telegram Desktop source review confirms the existing two-pane structure, selected conversation row, separate chat header/list/composer, and explicit empty state are the right bounded design direction; validate visual states with real chat data after login rather than repeating a broad redesign. Recheck signing identity and GitHub transport before release; publish only a signed/notarized immutable prerelease with public-byte verification, then update the existing Site once. Stable remains gated by Telegram compatibility and 20 real accounts.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -756,5 +756,23 @@
     "local_targeted_tests": "Tests.release.test_validate_release: 19/19 passed.",
     "design": "Append-only stage-1 asset receipt verifies public GitHub bytes and Gatekeeper/install checks before Sites deployment. Stage-2 delivery receipt verifies the deployed Site and references the exact stage-1 receipt bytes plus manifest hash. The immutable release manifest remains unchanged.",
     "release_state": "Validator workflow only; no real release assets, GitHub release, Site deployment, or public download was created."
+  },
+  "latest_uncommitted_ui_change": {
+    "date": "2026-10-14",
+    "source_commit": "016df2a1393bae08697b66ebab5d9c9d230e3cb7",
+    "dirty_file": "Sources/NeTelegramApp/main.swift",
+    "change": "Authentication card, text fields, country controls, action button, and QR action now use preferred widths with container-relative maximums so the form can shrink with the window.",
+    "validation": "git diff --check and checkpoint validation passed. swift build --target NeTelegramApp passed with scratch/module caches under /private/tmp after the sandbox could not write the user Swift cache.",
+    "canonical_dev_app": "Not replaced or relaunched; CUA showed NeTelegram Dev running before this edit. Current executable remains the prior app-source SHA 92b8ca3f.",
+    "visual_status": "not_run: source change has not been inspected in the native window at default/compact sizes; app remains open.",
+    "publication": "not committed or pushed; no GitHub release or Site deployment was created.",
+    "secret_scan": "Current four-file git diff scanned for exact 32-hex strings. 198 matches were all prefixed public Site resource IDs (appgprj/appgdep/appgver); zero matches in Sources/NeTelegramApp/main.swift. No matched value was printed."
+  },
+  "credential_rotation_research": {
+    "date": "2026-10-14",
+    "primary_source": "https://core.telegram.org/api/obtaining_api_id",
+    "verified": "Official docs describe obtaining api_id/api_hash through my.telegram.org and state one api_id per phone number.",
+    "not_verified": "No official self-service api_hash rotation/reissue procedure found in reviewed docs.",
+    "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   }
 }
