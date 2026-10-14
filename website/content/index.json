@@ -1,7 +1,7 @@
 {
   "route": "/",
   "title": "NeTelegram — альтернативный клиент Telegram для macOS",
-  "description": "NeTelegram — независимый проект неофициального альтернативного клиента Telegram для macOS. Нативный интерфейс на Swift и AppKit, открытая разработка и честные сведения о возможностях и ограничениях. Приложение пока в разработке, загрузки нет.",
+  "description": "NeTelegram — независимый нативный альтернативный клиент Telegram для Mac на Swift и AppKit. Открытый исходный код, честный статус разработки и ограничения; загрузки пока нет. Не связан с Telegram Messenger LLP.",
   "body_class": "home-page",
   "active": "index"
 }
