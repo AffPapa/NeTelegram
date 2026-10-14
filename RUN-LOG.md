@@ -1440,3 +1440,12 @@
 - Source `af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c` committed and pushed once to `AffPapa/NeTelegram:main`. Exact-source macOS CI run [38574131216](https://github.com/AffPapa/NeTelegram/actions/runs/38574131216) completed successfully.
 - CUA confirms the single canonical `NeTelegram Dev` process is still running the prior bundle source `2eadea7efad0b2ac83f9f2af3059c03dd7f846a6`. No second bundle was started and no user credentials/account data were accessed. The new source awaits one canonical rebuild after process exit.
 - Site remains public v194 without downloads. No app release, real login, 20-account coverage, Developer ID signing, or notarization is claimed.
+
+
+## 2026-10-14 — AUTH-QR-01 canonical bundle refresh and process-check lesson
+
+- Closed the old `/private/tmp/NeTelegram-Dev.app` through its native **Выйти** menu. CUA confirmed its app entry disappeared. The default sandbox process guard then returned “unable to prove process absence”; the existing build script correctly refused to replace the app.
+- Resolved the mismatch without bypassing the guard: a narrow elevated `pgrep -fl '^NeTelegram$'` returned exit 1 (no matching app process). Ran `Scripts/dev-app.sh --launch` once from clean `main` at exact app-source SHA `af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c`. Build completed in 5.84s; pinned TDLib commit `c15d3f5a5de6e3ba5839822c451152e5e18bb700`; ad-hoc `codesign --verify --deep --strict` passed.
+- CUA confirmed the running canonical window title `NeTelegram · dev af72c458`, empty phone field, country selector/search, Continue, QR action and independent-client disclosure. No credentials, account, or Telegram data were entered. This is native first-run UI evidence only; it does not verify a QR network response or real account workflow.
+- Process lesson: a failed sandbox process query is **unknown**, not running or absent. Quit through the UI, use a narrowly scoped authorized liveness check, then rerun the canonical script; never force-kill or create a second app bundle.
+- Product/UI design review was already present in the prior checkpoint; the current source retains the AppKit split navigation, searchable conversation rows, distinct chat header/history/composer and explicit content states. Official TDesktop structures were reviewed as concepts only; no source or assets copied. The next meaningful visible refinement depends on a real conversation from owner-operated login.

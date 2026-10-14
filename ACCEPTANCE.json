@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "AUTH-QR-01 accurate QR authorization failure feedback — focused test PASS 1/1; exact-source macOS CI passed for af72c45; canonical Dev.app source 2eadea7 is still running and was not replaced; real account login remains unverified.",
+  "status": "AUTH-QR-01 accurate QR authorization failure feedback — focused test PASS 1/1; exact-source macOS CI passed for af72c45; canonical Dev.app rebuilt once from af72c45 and AX identity verified; real account login remains unverified.",
   "current_evidence": {
     "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
     "local_suite": "PASS 1/1 focused test; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target. Existing unrelated macOS Keychain deprecation warnings only.",
@@ -16,21 +16,20 @@
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "application_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
-      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
+      "source_fingerprint_sha256": "b7cd08bd2a6ca6f780e269b9fd29ae929f544ba27f6a5a01caaeb50f729abe15",
+      "executable_sha256": "8a544d6d477dcc059d71164a86d50af92a98c5e574ca4aa82a12675ddc732ba7",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Canonical bundle still runs source 2eadea7; current source has a pending native rebuild after the process exits. Real auth remains unverified.",
-      "pending_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c"
+      "smoke": "Canonical arm64 Dev.app rebuilt once from exact source af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c after a targeted process-absence check. CUA window title and accessibility tree match af72c458; first-run phone/QR login controls and independent-client disclosure are visible. No account or credentials entered.",
+      "scope": "Accountless native login presentation and exact-source bundle identity only; QR request response, real authentication/chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -627,7 +626,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Canonical Dev.app is running source 2eadea7; do not replace it while running. The new source af72c45 is pushed and CI passed. After the existing app is closed, build this exact source once and verify the QR failure message; then continue owner-operated real login/read/send/close-reopen. Keep Site v194 without download until signed/notarized assets and public-byte verification exist.",
+  "next_action": "Owner-operated login is still pending and no account data has been entered. When the owner chooses to sign in, use the already-running canonical /private/tmp/NeTelegram-Dev.app and verify one real account, chat read/send, close/reopen. Do not rebuild for this step. Continue only after that gate; Site v194 has no download until signed/notarized assets and public-byte verification exist.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
