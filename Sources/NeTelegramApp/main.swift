@@ -6497,9 +6497,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func loadBundledPhoneCountries() {
         phoneCountries = CountryCallingCodeCatalog.entries.map { entry in
             let name = Locale.current.localizedString(forRegionCode: entry.regionCode) ?? entry.regionCode
+            let englishName = Locale(identifier: "en").localizedString(forRegionCode: entry.regionCode)
             return PhoneCountry(
                 code: entry.regionCode,
                 name: name,
+                alternateNames: englishName.map { [$0] } ?? [],
                 flag: PhoneCountry.flagEmoji(for: entry.regionCode),
                 callingCodes: [entry.callingCode]
             )
@@ -6512,11 +6514,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {
         countryPicker.removeAllItems()
         let visibleCountries = CountryPickerSearch.filter(phoneCountries.map {
-            CountryPickerSearchEntry(regionCode: $0.code, name: $0.name, callingCode: $0.callingCodes[0])
+            CountryPickerSearchEntry(regionCode: $0.code, name: $0.name, callingCode: $0.callingCodes[0], alternateNames: $0.alternateNames)
         }, query: countrySearchField.stringValue)
         let visibleRegionCodes = Set(visibleCountries.map(\.regionCode))
-        countryPicker.addItem(withTitle: visibleCountries.isEmpty ? "Страна не найдена" : "Выберите страну…")
+        countryPicker.addItem(withTitle: visibleCountries.isEmpty ? "Подходящих стран нет" : "Выберите страну…")
         countryPickerRegionCodes = [nil]
+        if let preferredRegion,
+           !visibleRegionCodes.contains(preferredRegion),
+           let selectedCountry = phoneCountries.first(where: { $0.code == preferredRegion }) {
+            countryPicker.addItem(withTitle: "Текущая страна: \(selectedCountry.flag)  \(selectedCountry.name)  +\(selectedCountry.callingCodes[0])")
+            countryPickerRegionCodes.append(selectedCountry.code)
+        }
         for country in phoneCountries where visibleRegionCodes.contains(country.code) {
             countryPicker.addItem(withTitle: "\(country.flag)  \(country.name)  +\(country.callingCodes[0])")
             countryPickerRegionCodes.append(country.code)
@@ -6831,13 +6839,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
 private struct PhoneCountry {
     let code: String
     let name: String
+    let alternateNames: [String]
     let flag: String
     let callingCodes: [String]
     let isHidden: Bool
 
-    init(code: String, name: String, flag: String, callingCodes: [String], isHidden: Bool = false) {
+    init(code: String, name: String, alternateNames: [String] = [], flag: String, callingCodes: [String], isHidden: Bool = false) {
         self.code = code
         self.name = name
+        self.alternateNames = alternateNames
         self.flag = flag
         self.callingCodes = callingCodes
         self.isHidden = isHidden
@@ -6847,8 +6857,12 @@ private struct PhoneCountry {
         guard let code = json["country_code"] as? String,
               let name = (json["name"] as? String) ?? (json["english_name"] as? String),
               let callingCodes = json["calling_codes"] as? [String] else { return nil }
+        let alternateNames = [json["name"] as? String, json["english_name"] as? String]
+            .compactMap { $0 }
+            .filter { $0 != name }
         self.code = code
         self.name = name
+        self.alternateNames = alternateNames
         self.flag = Self.flagEmoji(for: code)
         self.callingCodes = callingCodes
         self.isHidden = json["is_hidden"] as? Bool ?? false

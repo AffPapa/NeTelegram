@@ -179,12 +179,13 @@ import Testing
 @Test func countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct() {
     let countries = [
         CountryPickerSearchEntry(regionCode: "US", name: "United States", callingCode: "1"),
-        CountryPickerSearchEntry(regionCode: "CA", name: "Canada", callingCode: "1"),
+        CountryPickerSearchEntry(regionCode: "CA", name: "Канада", callingCode: "1", alternateNames: ["Canada"]),
         CountryPickerSearchEntry(regionCode: "GB", name: "United Kingdom", callingCode: "44"),
         CountryPickerSearchEntry(regionCode: "ES", name: "España", callingCode: "34"),
     ]
 
     #expect(CountryPickerSearch.filter(countries, query: "can").map(\.regionCode) == ["CA"])
+    #expect(CountryPickerSearch.filter(countries, query: "канада").map(\.regionCode) == ["CA"])
     #expect(CountryPickerSearch.filter(countries, query: "GB").map(\.regionCode) == ["GB"])
     #expect(Set(CountryPickerSearch.filter(countries, query: "+1").map(\.regionCode)) == Set(["US", "CA"]))
     #expect(CountryPickerSearch.filter(countries, query: "espana").map(\.regionCode) == ["ES"])

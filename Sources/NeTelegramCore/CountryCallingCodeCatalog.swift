@@ -11,11 +11,13 @@ public struct CountryPickerSearchEntry: Equatable, Sendable {
     public let regionCode: String
     public let name: String
     public let callingCode: String
+    public let alternateNames: [String]
 
-    public init(regionCode: String, name: String, callingCode: String) {
+    public init(regionCode: String, name: String, callingCode: String, alternateNames: [String] = []) {
         self.regionCode = regionCode
         self.name = name
         self.callingCode = callingCode
+        self.alternateNames = alternateNames
     }
 }
 
@@ -26,7 +28,7 @@ public enum CountryPickerSearch {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !needle.isEmpty else { return entries }
         return entries.filter { entry in
-            [entry.name, entry.regionCode, "+\(entry.callingCode)", entry.callingCode].contains {
+            ([entry.name] + entry.alternateNames + [entry.regionCode, "+\(entry.callingCode)", entry.callingCode]).contains {
                 $0.range(of: needle, options: [.caseInsensitive, .diacriticInsensitive], locale: .current) != nil
             }
         }
