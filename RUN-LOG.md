@@ -1431,3 +1431,12 @@
 - Source `2eadea7efad0b2ac83f9f2af3059c03dd7f846a6` pushed to `AffPapa/NeTelegram:main`. Exact-source macOS CI [38572666648](https://github.com/AffPapa/NeTelegram/actions/runs/38572666648) passed 181/181. Canonical Dev.app was built from this clean SHA; BuildInfo and support root match; strict ad-hoc signature passed.
 - Workflow correction: one dirty preview was produced before commit for visual review, then replaced in the same bundle by the clean exact-SHA build. Future slices must review/commit before one canonical build; no parallel app paths.
 - No real auth/read/send, real 20-account lifecycle/performance, Developer ID, notarization, app release, or Site deployment. Site remains v194 with no download. Next action is owner-operated login in the open canonical app; credentials stay out of chat.
+
+
+## 2026-10-14 — AUTH-QR-01 accurate QR authorization failure feedback
+
+- Auth-path review found QR request failures were stored as phone-number failures and announced misleadingly. QR requests now carry `authorizationStateWaitOtherDeviceConfirmation`; static failure copy gives a QR-specific recovery path.
+- Focused Swift test `authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1; covers QR-specific rejection copy.` passed. App and test targets compiled; compiler emitted only existing macOS Keychain deprecation warnings.
+- Source `af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c` committed and pushed once to `AffPapa/NeTelegram:main`. Exact-source macOS CI run [38574131216](https://github.com/AffPapa/NeTelegram/actions/runs/38574131216) completed successfully.
+- CUA confirms the single canonical `NeTelegram Dev` process is still running the prior bundle source `2eadea7efad0b2ac83f9f2af3059c03dd7f846a6`. No second bundle was started and no user credentials/account data were accessed. The new source awaits one canonical rebuild after process exit.
+- Site remains public v194 without downloads. No app release, real login, 20-account coverage, Developer ID signing, or notarization is claimed.

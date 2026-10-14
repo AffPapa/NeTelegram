@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance — focused regression, exact-source CI 181/181, and canonical clean Dev.app smoke passed; real account acceptance remains partial.",
+  "status": "AUTH-QR-01 accurate QR authorization failure feedback — focused test PASS 1/1; exact-source macOS CI passed for af72c45; canonical Dev.app source 2eadea7 is still running and was not replaced; real account login remains unverified.",
   "current_evidence": {
-    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-    "local_suite": "Focused regression passed 1/1; compiled NeTelegramCore, NeTelegramApp, and test target. Full local suite not rerun.",
-    "focused_test": "developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo PASS 1/1; covers args > environment > embedded BuildInfo and rejects a relative path.",
+    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "local_suite": "PASS 1/1 focused test; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target. Existing unrelated macOS Keychain deprecation warnings only.",
+    "focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1; covers QR-specific rejection copy.",
     "hosted_ci": {
-      "run_id": 38572666648,
+      "run_id": 38574131216,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
-      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38574131216",
+      "workflow_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed for af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; no real Telegram account integration."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -29,7 +29,8 @@
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
       "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
+      "scope": "Canonical bundle still runs source 2eadea7; current source has a pending native rebuild after the process exits. Real auth remains unverified.",
+      "pending_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c"
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -55,7 +56,7 @@
       "saved_archive_size_bytes": 491520,
       "saved_archive_file_count": 14
     },
-    "scope": "Clean accountless Dev.app native smoke and exact-source CI; no real auth/read/send, 20 real runtimes, signed release, or Site download."
+    "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -540,55 +541,52 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-    "local_command": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-quickcheck --filter developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo",
-    "local_result": "PASS 1/1; app and test targets compiled.",
-    "hosted_ci_run_id": 38572666648,
+    "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-auth-qr-check --filter authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps",
+    "local_result": "PASS 1/1 focused test; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target. Existing unrelated macOS Keychain deprecation warnings only.",
+    "hosted_ci_run_id": 38574131216,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
-    "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration. Native app screen verified separately through CUA."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38574131216",
+    "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
   "current_local_slice": {
-    "id": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance",
-    "commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-    "parent_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-    "push": "success; GitHub connector fetched exact commit from AffPapa/NeTelegram main",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netetelegram-quickcheck-modules swift test --disable-sandbox --scratch-path /private/tmp/netelegram-quickcheck --filter developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo",
-    "local_result": "PASS 1/1; compiled NeTelegramCore, NeTelegramApp, and focused test target.",
+    "id": "AUTH-QR-01 accurate QR authorization failure feedback",
+    "commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "parent_source_commit": "8fdcb64425f66a0c6c595c0e14db48728bac4b84",
+    "push": "success; pushed once to AffPapa/NeTelegram main",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-auth-qr-check --filter authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps",
+    "local_result": "PASS 1/1 focused test; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target. Existing unrelated macOS Keychain deprecation warnings only.",
     "exact_source_ci": {
-      "run_id": 38572666648,
+      "run_id": 38574131216,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
-      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38574131216",
+      "workflow_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed for af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; no real Telegram account integration."
     },
-    "change": "Reduced initial auth window/card/form dimensions and removed contrasting panel background; shortened disclosure; debug support root now falls back to bundled BuildInfo when launched without args.",
-    "coverage_limit": "One accountless login screen only; no real TDLib login/read/send or 20 authorized runtimes.",
+    "change": "QR authentication request failures now map to the QR step and say the QR request failed, instead of reporting that the phone number was rejected.",
+    "coverage_limit": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified.",
     "canonical_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
-      "version": "0.0.0-dev",
-      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "dirty_source": false,
-      "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "running": true,
+      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
       "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
-      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
+      "pending_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "distribution_ready": false,
+      "smoke": "Existing accountless bundle remains open; no replacement or credentials touched."
     },
-    "real_account": "not tested; owner has deferred login.",
-    "site": "public v194; no app download; unchanged.",
-    "release": "No app release/assets. Latest recorded preflight: 0 Developer ID identities; notary credentials unverified.",
-    "native_smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-    "pending_native_candidate": null
+    "real_account": "not tested; owner previously deferred login.",
+    "site": "public v194; no download; unchanged.",
+    "release": "No app release/assets; signing/notarization remain open.",
+    "native_smoke": "Not run for changed source because the canonical app is running; no competing bundle launched.",
+    "pending_native_candidate": {
+      "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "running_bundle_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "status": "blocked_running_canonical_app",
+      "reason": "CUA confirms the canonical NeTelegram Dev process is still running. Preserve it; rebuild only after it exits."
+    }
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -629,7 +627,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "The canonical Dev.app is open at the empty phone-login screen, source 2eadea7. When ready, the owner completes login in this one app; do not send phone/code/hash in chat or import any sessions. After a real chat appears, verify only open/read/send and close/reopen. Then continue the all-active 20-runtime slice. GitHub app release and Site download remain gated on real-account acceptance, signing/notarization, and Telegram compatibility decisions; Site stays v194 with no download CTA.",
+  "next_action": "Canonical Dev.app is running source 2eadea7; do not replace it while running. The new source af72c45 is pushed and CI passed. After the existing app is closed, build this exact source once and verify the QR failure message; then continue owner-operated real login/read/send/close-reopen. Keep Site v194 without download until signed/notarized assets and public-byte verification exist.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -659,11 +657,11 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
     "branch": "main",
-    "working_tree": "clean app-source tree; exact source commit 2eadea7 is on origin/main.",
-    "local_tests": "Focused support-root regression passed 1/1; no full local suite rerun.",
-    "hosted_validation": "Exact-source macOS suite 38572666648 passed 181/181.",
+    "working_tree": "clean at af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; pushed to origin/main.",
+    "local_tests": "PASS 1/1 focused test; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target. Existing unrelated macOS Keychain deprecation warnings only.",
+    "hosted_validation": "Exact-source macOS CI run 38574131216 passed.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
@@ -680,24 +678,25 @@
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
       "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
+      "scope": "Canonical bundle still runs source 2eadea7; current source has a pending native rebuild after the process exits. Real auth remains unverified.",
+      "pending_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c"
     },
-    "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
+    "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance",
-    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-    "local_focused_test": "developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo PASS 1/1; AppKit and test target compiled.",
+    "id": "AUTH-QR-01 accurate QR authorization failure feedback",
+    "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1; covers QR-specific rejection copy.",
     "hosted_ci": {
-      "run_id": 38572666648,
+      "run_id": 38574131216,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
-      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38574131216",
+      "workflow_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed for af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; no real Telegram account integration."
     },
-    "native_smoke": "PASS: clean canonical Dev.app source 2eadea7, exact path launch without args, CUA AX and screenshot match compact auth UI; BuildInfo support-root fallback; no account data.",
-    "scope": "Design and debug launch provenance only. No real auth/chat/send, 20-account runtime/performance, Developer ID, notarization, release, or Site deployment."
+    "native_smoke": "Not run for changed source: canonical Dev.app remains open on source 2eadea7.",
+    "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -760,13 +759,13 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
-    "case": "APP09",
-    "test_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
-    "app_code_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
-    "test": "acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery",
+    "case": "AUTH-QR-01",
+    "test_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "app_code_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+    "test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps",
     "result": "PASS 1/1",
-    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app09-dirtydraft --filter acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery",
-    "scope": "Synthetic cache/recovery behavior: confirmed text is removed, newer exact-conversation and unrelated dirty drafts remain. Does not prove native disk-full or quit-barrier behavior."
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-auth-qr-check --filter authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps",
+    "scope": "Static auth feedback regression; confirms QR rejection has QR-specific copy and does not report phone rejection."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -780,7 +779,7 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance — focused regression, exact-source CI 181/181, and canonical clean Dev.app smoke passed; real account acceptance remains partial.",
+  "phase": "AUTH-QR-01 accurate QR authorization failure feedback — focused test PASS 1/1; exact-source macOS CI passed for af72c45; canonical Dev.app source 2eadea7 is still running and was not replaced; real account login remains unverified.",
   "latest_local_build": {
     "date": "2026-10-14",
     "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
