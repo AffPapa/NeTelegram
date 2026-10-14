@@ -67,4 +67,8 @@ jobs:
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output
         # makes the handoff from build/link to test-runner startup observable.
+        # The suite has completed in about a minute on hosted macOS; cap this
+        # step separately so a silent runner startup stall fails in two minutes
+        # instead of consuming the whole five-minute job timeout.
+        timeout-minutes: 2
         run: swift test --no-parallel --verbose
