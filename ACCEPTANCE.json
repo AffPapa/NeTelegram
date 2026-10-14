@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "CORE-RUNTIME-04 post-authorization callback ownership — focused race test, exact-source CI, and canonical Dev.app smoke passed; real Telegram authentication remains owner-operated.",
+  "status": "CORE-RUNTIME-05 production startup registration fanout passed its focused synthetic regression and exact-source CI; real account acceptance remains partial.",
   "current_evidence": {
-    "app_source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-    "local_suite": "Focused Swift test passed 1/1; SwiftPM compiled NeTelegramCore and NeTelegramApp. No full local suite run.",
-    "focused_test": "callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime PASS 1/1; exact-source post-authorization continuation protected by coordinator and local runtime revalidation.",
+    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "local_suite": "Focused test passed 1/1; compiled NeTelegramCore, NeTelegramApp and test target. No full local suite run.",
+    "focused_test": "twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges PASS 1/1; production startup and test now use the same registry+scheduler overload.",
     "hosted_ci": {
-      "run_id": 38566830872,
+      "run_id": 38570078255,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38566830872",
-      "workflow_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-      "app_source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-      "scope": "Exact-source macOS CI succeeded; no real-account integration is included."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
+      "workflow_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "scope": "Exact-source GitHub macOS serial suite passed after startup registration was unified; no real Telegram account integration."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -29,28 +29,11 @@
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
       "smoke": "Canonical Dev.app built and launched once from exact source c9516a27. CUA confirms native phone-login state and independence disclosure; no profiles, credentials, phone, or OTP were entered.",
-      "scope": "Does not prove login/read/send, VoiceOver/IME/RTL, real chat rows, 20 real runtimes, performance, Developer ID or notarization."
-    },
-    "app02_stalled_profile_test": {
-      "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "test": "restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers",
-      "test_file": "Tests/NeTelegramCoreTests/RuntimeCoordinatorTests.swift",
-      "local_result": "PASS 1/1; full local serial suite PASS 165/165.",
-      "hosted_ci": "PASS exact-source macOS CI 38508018017; full suite 165/165.",
-      "scenario": "One cleanup remains blocked while cleanup fan-out returns and queues unrelated eligible startup candidates; synthetic fixture only.",
-      "coverage_limit": "Does not exercise actual macOS SecItem stalls, AppDelegate lifecycle, 20 authorized sessions, or physical resource behavior."
-    },
-    "historical_auth_ui_smoke_0a7cbe6": {
-      "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Current-source CUA screenshot and accessibility tree confirm the accountless form and readable secondary disclosure. This does not claim VoiceOver, keyboard traversal, IME/RTL or real-auth coverage."
-    },
-    "historical_auth03_review_0a7cbe6": {
-      "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-      "appearance": "light",
-      "window_state": "centered default window after restoring the previous size",
-      "result": "CUA screenshot and accessibility tree show the complete accountless phone/QR form and readable non-affiliation disclosure at the default size. Minimum supported size, dark appearance, accessibility contrast, and later authorization steps were not verified.",
-      "status": "partial"
+      "scope": "Installed Dev.app is c9516a27, not current source 819071d; no account data or credentials entered.",
+      "running": true,
+      "screen": "accountless phone authorization; country Thailand +66; phone field empty",
+      "rebuilt_for_current_source": false,
+      "pending_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a"
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -76,109 +59,7 @@
       "saved_archive_size_bytes": 491520,
       "saved_archive_file_count": 14
     },
-    "native_ui_smoke": "PASS CUA on canonical Dev.app from cea9864: accountless phone/country/QR authorization window; no credentials or Telegram profile. This is a launch/UI check only.",
-    "tooling_friction": "The default sandbox process guard cannot inspect all macOS processes. CUA confirmed the prior Dev.app was running; after the user-authorized normal quit from its menu, CUA inventory no longer listed it and the elevated process guard returned exit 1 (confirmed absent). The single canonical bundle was then rebuilt once; no alternate app bundle was created.",
-    "profile_picker_origin_test": {
-      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
-      "test": "unfinishedAccountSelectionExplainsItsLocalOriginWithoutShowingUUID",
-      "result": "PASS 1/1",
-      "scope": "Policy test asserts a pending local login is explained and the local UUID is not shown. Native copy is pending safe rebuild."
-    },
-    "keychain_ui_guard_test": {
-      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
-      "test": "secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI",
-      "result": "PASS 1/1",
-      "scope": "Asserts the query carries explicit fail-closed Security UI mode. No real auth-required keychain item was queried."
-    },
-    "appkit_product_compile": {
-      "status": "PASS",
-      "app_source_commit": "7683cc6bace702b3376a08a9a2aaf4aaf881a691",
-      "product": "NeTelegram executable",
-      "elapsed_seconds": 21.31,
-      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app25-search-navigation --filter searchResultNavigationKeepsForumTypeAnchorAndAccountIdentity",
-      "scope": "The test build compiled the changed AppKit executable and Core navigation plan. It did not replace or launch the canonical Dev.app or verify a Telegram account."
-    },
-    "latest_acceptance_slice": {
-      "id": "CORE-RUNTIME-04 post-authorization callback ownership",
-      "source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-      "local_build": "PASS targeted SwiftPM test compiled NeTelegramCore, NeTelegramApp, and product target.",
-      "local_focused_test": "callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime PASS 1/1.",
-      "hosted_ci": {
-        "run_id": 38566830872,
-        "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38566830872",
-        "workflow_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-        "app_source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-        "scope": "Exact-source macOS CI succeeded; no real-account integration is included."
-      },
-      "native_smoke": "PASS one canonical /private/tmp/NeTelegram-Dev.app launched on the same source; accountless phone-auth accessibility state present; no account/phone/OTP entered.",
-      "scope": "Revalidates coordinator generation and AppDelegate runtime ownership after authorization actor hop. Development-only ad-hoc app, not a real login/read/send or 20-account certification."
-    },
-    "historical_native_build": {
-      "status": "PASS_canonical_dev_bundle_build_and_auth_layout_preview",
-      "source_commit": "0ab1fecb60b5beaa40c4bd2655735725927edc8a",
-      "build_duration_seconds": 4.95,
-      "scope": "Canonical arm64 Dev.app built once; strict ad-hoc signature passed; native CUA preview of five auth states at 900x700; app quit and absence confirmed."
-    },
-    "historical_native_lifecycle_smoke": {
-      "app_source_commit": "cb44d07206fdcc9a9a8a2de2dbe33f4fd5559006",
-      "bundle_id": "org.affpapa.netelegram.dev",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "36777f80b6e5b6efc43f6b6d80b2acd9add3e3e24d38974a898a6510e53989fc",
-      "executable_sha256": "7d4af98b61452da7b93030220010ca3798c7a89d80392755acaf27f9e2293e08",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "live_ui": "CUA window title NeTelegram · dev cb44d07; welcome screen with country/phone field, Continue and QR. No login data.",
-      "lifecycle": "PASS: last-window close retained process; LaunchServices reopen restored one window with same PID; normal Cmd+Q exited; post-smoke process guard confirmed absence.",
-      "receipt": "/private/tmp/netelegram-app27-quit-cancel.json",
-      "scope": "Accountless native build/UI/lifecycle only; no real login. Diagnostic screenshot stays local and is not used on public pages."
-    },
-    "historical_site_milestone": {
-      "milestone": "APP26 canonical Dev.app accountless lifecycle verified and documented",
-      "site_version": 187,
-      "source_commit": "b676e0f33ef66fe6a9b5ebd279e6f1ee50666e17",
-      "deployment_id": "appgdep_6acf42e795b4819198da2c7ee7bf0de2",
-      "public_routes": "/devlog/ and /downloads/ 200 text/html; /updates/stable.xml 200 text/xml",
-      "download_available": false
-    },
-    "native_app_ci": {
-      "run_id": 38554499473,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38554499473",
-      "workflow_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
-      "app_source_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
-      "scope": "Exact-source pinned TDLib build and isolated arm64 Dev.app assembly/verification passed; build artifact uploaded for review. This is hosted build evidence, not real-account acceptance or a signed public release."
-    },
-    "latest_native_smoke": "Canonical exact-source Dev.app built and launched from 44c999d. CUA verified empty accountless chat shell and the phone-login screen with country search/picker, Continue, QR login, and disclosure. No credentials or phone entered. Conversation rows remain visually unverified until real chat data.",
-    "native_smoke": {
-      "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
-      "bundle_id": "org.affpapa.netelegram.dev",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "5e3e098cb42f69a6a770cea066f2cb7143dd6aa98e8c36c4d876a52d8f8f4e51",
-      "executable_sha256": "14621340b55e2b7fb66b1072a9cb6962be18c94923647f4179c6c7bb64592d35",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "live_ui": "CUA first verified the explicit accountless empty chat shell, then the currently visible native phone authorization screen on the same canonical bundle/source 44c999d: phone field, country search/picker, Continue, QR login, and independent-client disclosure are present. No credentials, phone, or OTP were entered. Conversation rows remain unobserved until real chat data exists.",
-      "scope": "Native accountless empty-state and phone-login screen smoke only. It does not prove authentication, real chat rows, read/send, real 20 runtimes, performance, Developer ID or notarization.",
-      "process_state": "Running from canonical exact-source Dev.app in accountless preview."
-    },
-    "latest_release_preflight": {
-      "date": "2026-10-14",
-      "status": "blocked_before_signed_candidate",
-      "toolchain": "/Applications/Xcode-beta.app; app build is development-only and ad-hoc signed.",
-      "developer_id": "Fresh `security find-identity -v -p codesigning` returned 0 valid identities. Developer ID distribution signing cannot proceed on this host until a valid identity/private key is configured.",
-      "notary_credentials": "Prior metadata preflight reported absent or inaccessible. No credentials were read, and no submission was attempted in this continuation.",
-      "api_credentials": "The api_hash is absent from source and is read only through the app Keychain item. Its presence/value was not checked. The value previously pasted into chat remains retired and must not be copied or reused; if Keychain reports missing, the owner should enter a fresh/current value directly in the app secure settings UI.",
-      "telegram_compatibility": "Official API Terms §2.3 forbids Telegram in app title unless preceded by Unofficial; the current requested display name NeTelegram conflicts and remains unresolved. §1.3/1.4 basic functionality review remains open. §3.3 requires sponsored channel content. The pinned TDLib documents fullscreen sponsored-video flows; the user previously declined adding a player and deferred channel access or stable release if required. Do not claim channels/stable compatibility.",
-      "github": "Public AffPapa/NeTelegram repository/source exists and latest app source c9516a2 passed exact-source CI. No application release/tag/assets exist.",
-      "site": "Live anonymous GET https://netelegram.iryadom.chatgpt.site/downloads/ verified page title `Загрузки и установка — NeTelegram` and explicit state `Приложение для скачивания отсутствует`; no download CTA points to an asset. Existing Site remains v194; no Site mutation.",
-      "release_status": "No signed/notarized release. One canonical accountless Dev.app is running exact source c9516a2 with ad-hoc development signature; no login/read/send or real 20-runtime evidence.",
-      "api_id": "Source TelegramApplicationIdentity.apiID is 37110989, matching the owner-provided App api_id."
-    }
+    "scope": "Synthetic startup composition only; no real login, message read/send, 20 authorized runtimes, distribution signing or notarization."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -189,7 +70,7 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial. Latest source 4dcddccf fixes a related presentation race: the currently selected account retains the UI when another background profile finishes first. Focused policy regression and exact-source hosted suite passed (run 38509465812, 166/166); this remains synthetic and does not prove live AppKit selection, Telegram login, twenty authorized runtimes, or resource use."
+      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial. Latest source 4dcddccf fixes a related presentation race: the currently selected account retains the UI when another background profile finishes first. Focused policy regression and exact-source hosted suite passed (run 38509465812, 166/166); this remains synthetic and does not prove live AppKit selection, Telegram login, twenty authorized runtimes, or resource use. Current source 819071d exact CI run 38570078255 and focused test now exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production AppDelegate startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial. Current source 819071d exact CI run 38570078255 and focused test exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial."
     },
     {
       "id": "APP02",
@@ -663,14 +544,14 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-    "app_source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-app28 SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-app28 swift test --scratch-path /private/tmp/netelegram-spm-app28 --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime",
-    "local_result": "PASS 1/1; SwiftPM compiled NeTelegramCore and NeTelegramApp.",
-    "hosted_ci_run_id": 38566830872,
+    "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/nettelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/nettelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/nettelegram-startup-integration --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
+    "local_result": "PASS 1/1 focused; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target.",
+    "hosted_ci_run_id": 38570078255,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38566830872",
-    "scope": "Focused callback ownership regression only. Canonical native app launched on exact source; no real account was used."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
+    "scope": "Synthetic 20-profile startup fanout through production registry/scheduler path; does not prove real accounts."
   },
   "current_local_slice": {
     "commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
@@ -723,7 +604,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Keep the single canonical Dev.app at /private/tmp/NeTelegram-Dev.app. Next feature slice should be selected from its observed state and implemented with one targeted acceptance check. For real auth/read/send, the owner enters credentials directly in this exact app. Do not rebuild without source changes. No GitHub app release or Site download CTA until Developer ID, notarization, Telegram compatibility, and candidate validation gates pass.",
+  "next_action": "Highest-value app acceptance is owner-operated first-account smoke in the already-open canonical Dev.app (phone auth → actual chat list → open/read → send one text to intended recipient → close/reopen). Do not request credentials in chat or launch another app. After owner reports completion, verify only the resulting native scenario and fix the first observed defect. Until then, continue only independent source slices. Do not publish an app download or change Site v194 before signed/notarized release gates pass.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -777,20 +658,19 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "CORE-RUNTIME-04 post-authorization callback ownership",
-    "source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-    "local_build": "PASS targeted SwiftPM test compiled NeTelegramCore, NeTelegramApp, and product target.",
-    "local_focused_test": "callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime PASS 1/1.",
+    "id": "CORE-RUNTIME-05 production startup registration fanout",
+    "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "local_focused_test": "twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges PASS 1/1",
     "hosted_ci": {
-      "run_id": 38566830872,
+      "run_id": 38570078255,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38566830872",
-      "workflow_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-      "app_source_commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-      "scope": "Exact-source macOS CI succeeded; no real-account integration is included."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
+      "workflow_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "scope": "Exact-source GitHub macOS serial suite passed after startup registration was unified; no real Telegram account integration."
     },
-    "native_smoke": "PASS one canonical /private/tmp/NeTelegram-Dev.app launched on the same source; accountless phone-auth accessibility state present; no account/phone/OTP entered.",
-    "scope": "Revalidates coordinator generation and AppDelegate runtime ownership after authorization actor hop. Development-only ad-hoc app, not a real login/read/send or 20-account certification."
+    "native_smoke": "Not rebuilt; the single canonical app is open on source c9516a27. No process interruption or second bundle.",
+    "scope": "The 20 synthetic profile test and production schedule path now use the same registry+scheduler API. APP01 remains partial until real authorized account runtime and resource validation."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",

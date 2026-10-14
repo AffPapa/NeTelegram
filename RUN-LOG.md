@@ -1403,3 +1403,13 @@
 
 - Read `Sources/NeTelegramCore/TelegramApplicationIdentity.swift`: the compiled `api_id` is `37110989`, matching the owner-supplied ID. The hash is not in source; runtime loads it from the designated Keychain item. No Keychain item was read or queried in this check. The previously chat-exposed hash remains retired; if absent, enter a current value only through the app's secure settings UI.
 - No code or runtime behavior changed. Checkpoint JSON and diff validators only; no rebuild or app CI required.
+
+
+## 2026-10-14 — CORE-RUNTIME-05 production startup registration fanout
+
+- Source `819071d40371bbc5ae14f372454162dcfdac3f9a` is current on `main` and `origin/main`. `AppDelegate.scheduleProfileStartup()` now calls the registry+scheduler overload, so production uses the same startup-permit composition exercised by `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges`.
+- Focused local test passed 1/1 and compiled `NeTelegramCore`, `NeTelegramApp`, and the test target. Exact-source macOS CI [38570078255](https://github.com/AffPapa/NeTelegram/actions/runs/38570078255) passed for the same SHA. This is synthetic fanout coverage; APP01 remains partial because real 20-account TDLib restore and same-Mac measurements have not run.
+- Refreshed `PROJECT-STATE.json` and `ACCEPTANCE.json` to distinguish current source `819071d` from the one canonical running Dev.app source `c9516a27`. CUA confirms the existing app remains open on accountless phone auth (Thailand +66; empty phone field). No credentials were read or entered; no rebuild or second launch was attempted.
+- Telegram Desktop research already completed at pinned source commit `d77f486228a98e15d6695514d5f2b28ce1c6a872`: retain adaptive pane hierarchy, dialog row scan order, and separate header/history/composer responsibilities in native AppKit; do not copy GPL source/assets or excluded feature surfaces. No new design code was needed for this runtime slice.
+- Site remains public v194 with no app download. No signed app asset or GitHub app release exists. Latest recorded signing inventory has zero Developer ID identities; notary credentials and compatibility gates remain unresolved.
+- Next acceptance action: owner-operated first-account smoke in the already-open canonical app. Do not ask for credentials in chat, rebuild unchanged source, or update Site downloads before release validation.
