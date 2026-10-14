@@ -1284,6 +1284,42 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(!SecretsStore.isValidTelegramAPIHash(" 0123456789abcdef0123456789ABCDEF "))
 }
 
+@Test func telegramAPIHashReadUsesOnlyTheConfiguredItemAndRejectsInvalidStoredValues() throws {
+    let service = TelegramApplicationIdentity.keychainService
+    let account = TelegramApplicationIdentity.keychainAccount
+    let validValue = "0123456789abcdef0123456789ABCDEF"
+    let validBackend = FakeKeychainItemBackend(values: [
+        FakeKeychainCoordinate(account: account, service: service): Data(validValue.utf8),
+        FakeKeychainCoordinate(account: account, service: "unrelated-service"): Data(validValue.utf8),
+    ])
+    #expect(try SecretsStore(backend: validBackend).telegramAPIHash() == validValue)
+    #expect(validBackend.operationCounts.reads == 1)
+
+    let missingBackend = FakeKeychainItemBackend(values: [
+        FakeKeychainCoordinate(account: account, service: "unrelated-service"): Data(validValue.utf8),
+    ])
+    #expect(throws: SecretsStoreError.missing("Telegram API hash")) {
+        try SecretsStore(backend: missingBackend).telegramAPIHash()
+    }
+    #expect(missingBackend.operationCounts.reads == 1)
+
+    let failedBackend = FakeKeychainItemBackend(readFailure: errSecInteractionNotAllowed)
+    #expect(throws: SecretsStoreError.keychain(errSecInteractionNotAllowed)) {
+        try SecretsStore(backend: failedBackend).telegramAPIHash()
+    }
+    #expect(failedBackend.operationCounts.reads == 1)
+
+    for invalidValue in [Data(), Data("not-a-hash".utf8), Data(repeating: 0xff, count: 32)] {
+        let invalidBackend = FakeKeychainItemBackend(values: [
+            FakeKeychainCoordinate(account: account, service: service): invalidValue,
+        ])
+        #expect(throws: SecretsStoreError.invalidTelegramAPIHash) {
+            try SecretsStore(backend: invalidBackend).telegramAPIHash()
+        }
+        #expect(invalidBackend.operationCounts.reads == 1)
+    }
+}
+
 @Test func secretsStoreCreatesKeysOnlyAfterExplicitKeychainNotFound() {
     #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: true) == .create)
     #expect(SecretsStore.keyLookupDecision(status: errSecItemNotFound, data: nil, createIfMissing: false) == .missing)

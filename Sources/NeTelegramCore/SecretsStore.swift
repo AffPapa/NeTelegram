@@ -100,8 +100,9 @@ public struct SecretsStore: Sendable {
         let status = result.status
         guard status != errSecItemNotFound else { throw SecretsStoreError.missing("Telegram API hash") }
         guard status == errSecSuccess else { throw SecretsStoreError.keychain(status) }
-        guard let data = result.data, let value = String(data: data, encoding: .utf8), !value.isEmpty else {
-            throw SecretsStoreError.missing("Telegram API hash")
+        guard let data = result.data, let value = String(data: data, encoding: .utf8),
+              Self.isValidTelegramAPIHash(value) else {
+            throw SecretsStoreError.invalidTelegramAPIHash
         }
         return value
     }
