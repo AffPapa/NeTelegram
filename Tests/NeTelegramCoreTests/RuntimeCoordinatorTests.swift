@@ -6,6 +6,8 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+private final class RuntimeOwnershipProbe {}
+
 @Test func authReturnDoesNotSubmitDuringMarkedIMEComposition() {
     #expect(AuthTextFieldKeyboardPolicy.shouldSubmit(
         isAuthenticationField: true,
@@ -2171,6 +2173,63 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     for route in routes {
         #expect(await coordinator.isCurrent(route), "UI selection and background updates must not replace a runtime route")
     }
+}
+
+@MainActor @Test func runtimeOwnershipRegistryRetainsAllTwentyAndReleasesOnlyExactGeneration() {
+    let registry = RuntimeOwnershipRegistry<RuntimeOwnershipProbe>()
+    let routes = (1...20).map { index in
+        RuntimeRoute(
+            account: AccountUUID(UUID(uuidString: String(format: "72000000-0000-0000-0000-%012d", index))!),
+            generation: RuntimeGeneration(1),
+            client: ClientID(Int32(index))
+        )
+    }
+    weak var firstRuntime: RuntimeOwnershipProbe?
+
+    for (index, route) in routes.enumerated() {
+        let runtime = RuntimeOwnershipProbe()
+        if index == 0 { firstRuntime = runtime }
+        #expect(registry.retain(runtime, for: route))
+    }
+
+    #expect(firstRuntime != nil, "The registry, rather than a local startup variable, must strongly own each open runtime")
+    #expect(registry.accounts.count == 20)
+    #expect(registry.clients.count == 20)
+    var selectedAccount = routes[0].account
+    selectedAccount = routes[19].account
+    #expect(selectedAccount == routes[19].account)
+    for route in routes {
+        #expect(registry[account: route.account] != nil)
+        #expect(registry[client: route.client.value] === registry[account: route.account])
+    }
+
+    let duplicateAccount = RuntimeRoute(
+        account: routes[0].account,
+        generation: RuntimeGeneration(2),
+        client: ClientID(21)
+    )
+    #expect(!registry.retain(RuntimeOwnershipProbe(), for: duplicateAccount))
+    let duplicateClient = RuntimeRoute(
+        account: AccountUUID(),
+        generation: RuntimeGeneration(1),
+        client: routes[0].client
+    )
+    #expect(!registry.retain(RuntimeOwnershipProbe(), for: duplicateClient))
+
+    #expect(registry.release(route: routes[0], ifOwnedBy: registry[account: routes[0].account]!))
+    #expect(firstRuntime == nil, "A confirmed exact-generation release must relinquish the strong runtime owner")
+    let replacementRoute = RuntimeRoute(
+        account: routes[0].account,
+        generation: RuntimeGeneration(2),
+        client: ClientID(21)
+    )
+    let replacement = RuntimeOwnershipProbe()
+    #expect(registry.retain(replacement, for: replacementRoute))
+    #expect(!registry.release(route: routes[0], ifOwnedBy: replacement), "A stale close cannot release a replacement runtime")
+    #expect(registry[account: replacementRoute.account] === replacement)
+    #expect(registry[client: replacementRoute.client.value] === replacement)
+    #expect(registry.accounts.count == 20)
+    #expect(registry.clients.count == 20)
 }
 
 @MainActor @Test func lateBackgroundStartupCannotStealNewerAccountSelection() {

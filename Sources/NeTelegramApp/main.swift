@@ -63,6 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var countrySearchField: NSSearchField!
     private var countrySuggestionLabel: NSTextField!
     private var countryPickerRegionCodes: [String?] = []
+    private var phoneFieldLabel: NSTextField!
     private var phoneField: NSTextField!
     private var emailField: NSTextField!
     private var firstNameField: NSTextField!
@@ -98,8 +99,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private let accountStartupTasks = AccountStartupTaskRegistry()
     private var closedProfileToRetry: AccountUUID?
     private var catalogueRoot: URL?
-    private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
-    private var runtimesByAccount: [AccountUUID: LocalAccountRuntime] = [:]
+    private let runtimeOwnership = RuntimeOwnershipRegistry<LocalAccountRuntime>()
+    private var runtimesByClient: [Int32: LocalAccountRuntime] { runtimeOwnership.clients }
+    private var runtimesByAccount: [AccountUUID: LocalAccountRuntime] { runtimeOwnership.accounts }
     private var pendingAuthorizationType: String?
     private var lastAuthorizationAnnouncementContext: AuthorizationAnnouncementContext?
     private var pendingInitialAuthorizationAction: InitialAuthorizationAction?
@@ -393,7 +395,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildWindow() {
-        let contentWidth: CGFloat = 620
+        // Keep the first-run phone step compact. Longer authorization states
+        // use the same scroll container, while the window remains resizable.
+        let contentWidth: CGFloat = 600
         let contentHeight: CGFloat = 560
         let content = SystemWindowBackgroundView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
@@ -470,6 +474,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySuggestionLabel.maximumNumberOfLines = 2
         countrySuggestionLabel.isHidden = true
         countrySuggestionLabel.setAccessibilityLabel("Можно выбрать страну для местного номера или ввести полный номер с плюсом")
+        phoneFieldLabel = NSTextField(labelWithString: "Номер телефона")
+        phoneFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        phoneFieldLabel.textColor = .labelColor
+        phoneFieldLabel.alignment = .left
+        phoneFieldLabel.setAccessibilityLabel("Номер телефона")
+        phoneFieldLabel.isHidden = true
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -573,7 +583,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneFieldLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -637,6 +647,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            phoneFieldLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            phoneFieldLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             phoneField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -942,7 +954,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             window.maxSize = NSSize(width: 720, height: 640)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
                 ? NSSize(width: 560, height: 520)
-                : NSSize(width: 620, height: 560)
+                : NSSize(width: 600, height: 560)
             if window.contentView?.bounds.size != compactSize {
                 window.setContentSize(compactSize)
                 window.center()
@@ -1915,7 +1927,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         chatPane.isHidden = true
         loginHeading.stringValue = "Профиль временно закрыт"
         loginSubtitle.stringValue = "Связь с Telegram для этого локального профиля закрылась. Профиль и база не удалены; можно повторно открыть именно этот профиль. Остальные аккаунты продолжают работу в фоне."
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = true
         countryPickerStack.isHidden = true
         inputField.isHidden = true
@@ -1944,7 +1956,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginSubtitle.stringValue = "Профиль закрывается. Локальные данные останутся до подтверждения TDLib; при ошибке выберите этот профиль, чтобы повторить close."
         registrationTermsScroll.isHidden = true
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = true
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -1976,7 +1988,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = true
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -2652,8 +2664,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 _ = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
                 return
             }
-            runtimesByClient[route.client.value] = runtime
-            runtimesByAccount[profile.id] = runtime
+            guard runtimeOwnership.retain(runtime, for: route) else {
+                throw RuntimeOwnershipError.duplicateOwner
+            }
             refreshStatusMenu()
             let presentsThisRuntime = accountStartupPresentation.shouldPresentStartupRuntime(
                 account: profile.id,
@@ -2711,12 +2724,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 if !startupRuntime.initializationRequestWasQueued, let route = startupRuntime.route {
                     let removed = await runtimeCoordinator.removeRouteAfterInitializationRequestRejected(route)
                     if removed {
-                        if runtimesByClient[route.client.value] === startupRuntime {
-                            runtimesByClient.removeValue(forKey: route.client.value)
-                        }
-                        if runtimesByAccount[profile.id] === startupRuntime {
-                            runtimesByAccount.removeValue(forKey: profile.id)
-                        }
+                        _ = runtimeOwnership.release(route: route, ifOwnedBy: startupRuntime)
                         networkTypeFanoutCoordinator.forget(account: profile.id)
                         if self.runtime === startupRuntime {
                             self.runtime = runtimesByAccount.values.first
@@ -3228,7 +3236,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 }
                 if confirmedLogout, let client { pendingClosures.insert(client) }
                 target.finishClose()
-                runtimesByAccount.removeValue(forKey: target.account)
+                guard let closedRoute = target.route,
+                      runtimeOwnership.release(route: closedRoute, ifOwnedBy: target) else {
+                    profileStartupFailures.insert(target.account)
+                    setStatus("Закрытие TDLib подтверждено, но ownership runtime не совпал. Локальные данные сохранены; автоматическое повторное открытие заблокировано.")
+                    return
+                }
                 networkTypeFanoutCoordinator.forget(account: target.account)
                 visibleReadReceiptRegistry.remove(account: target.account)
                 if !confirmedLogout {
@@ -3273,7 +3286,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     setStatus("Соединение закрылось до подтверждения выхода Telegram; локальный профиль сохранён.")
                 }
                 if let client {
-                    runtimesByClient.removeValue(forKey: client)
                     if let route = target.route { await runtimeCoordinator.removeRouteAfterClosed(route.client) }
                     pendingClosures.remove(client)
                 }
@@ -3311,7 +3323,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     setAuthCardVisible(true)
                     loginHeading.stringValue = "Очистка профиля не завершена"
                     loginSubtitle.stringValue = "Telegram подтвердил выход. Локальная запись сохранена из-за ошибки очистки; добавьте другой аккаунт через меню «Аккаунт» после устранения ошибки Keychain или диска."
-                    phoneField.isHidden = true
+                    setPhoneFieldVisible(false)
                     inputField.isHidden = true
                     secureInputField.isHidden = true
                     qrImageView.isHidden = true
@@ -3329,7 +3341,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     setAuthCardVisible(true)
                     loginHeading.stringValue = "Удаление ожидает"
                     loginSubtitle.stringValue = "Профиль останется закрытым, пока локальная очистка не завершится. Выберите его в списке аккаунтов, чтобы повторить."
-                    phoneField.isHidden = true
+                    setPhoneFieldVisible(false)
                     inputField.isHidden = true
                     secureInputField.isHidden = true
                     qrImageView.isHidden = true
@@ -3388,7 +3400,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 authPresentationInfoByAccount.removeValue(forKey: target.account)
                 inputField.isHidden = true
                 secureInputField.isHidden = true
-                phoneField.isHidden = true
+                setPhoneFieldVisible(false)
                 emailField.isHidden = true
                 firstNameField.isHidden = true
                 lastNameField.isHidden = true
@@ -7032,7 +7044,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         setStatus(message)
         registrationTermsScroll.isHidden = true
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = true
         firstNameField.isHidden = true
         lastNameField.isHidden = true
@@ -7074,7 +7086,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginSubtitle.stringValue = "Откройте Telegram на телефоне → Настройки → Устройства → Подключить устройство и отсканируйте код."
         registrationTermsScroll.isHidden = true
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         phoneField.stringValue = ""
         emailField.isHidden = true
         emailField.stringValue = ""
@@ -7183,7 +7195,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginHeading.stringValue = title
         loginSubtitle.stringValue = subtitle
         phoneField.stringValue = ""
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         countryPickerStack.isHidden = true
         emailField.stringValue = ""
         emailField.isHidden = true
@@ -7231,7 +7243,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginHeading.stringValue = "Вход по электронной почте"
         loginSubtitle.stringValue = "Введите адрес, привязанный к аккаунту. Мы отправим на него код."
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = false
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -7275,7 +7287,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         registrationTermsScroll.isHidden = false
         countryPickerStack.isHidden = true
-        phoneField.isHidden = true
+        setPhoneFieldVisible(false)
         emailField.isHidden = true
         inputField.isHidden = true
         secureInputField.isHidden = true
@@ -7354,7 +7366,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         firstNameField.isHidden = true
         lastNameField.isHidden = true
         phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
-        phoneField.isHidden = false
+        setPhoneFieldVisible(true)
         inputField.isHidden = true
         secureInputField.isHidden = true
         qrImageView.isHidden = true
@@ -7370,6 +7382,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // Fully qualified numbers do not require choosing a country first.
         // Keep the primary input focused; country search remains available by Tab.
         phoneField.becomeFirstResponder()
+    }
+
+    private func setPhoneFieldVisible(_ visible: Bool) {
+        phoneField.isHidden = !visible
+        phoneFieldLabel.isHidden = !visible
     }
 
     private func showLogoutProgress() {
