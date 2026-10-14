@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "Privacy-lock menu source 752f684 passed exact-SHA Swift CI, pinned-TDLib Dev.app lifecycle smoke and metadata validation. Canonical Dev.app was reused after fingerprint/hash/signature validation and AX confirms accountless first-run UI. Public development Site v167 is live. Full local Swift suite was not duplicated; no-op reuse check took under one second.",
-  "verified_at": "2026-10-14T07:27:00+07:00",
+  "phase": "Privacy-lock menu source 752f684 passed exact-SHA Swift CI, pinned-TDLib Dev.app lifecycle smoke and metadata validation. Canonical Dev.app was reused after fingerprint/hash/signature validation and AX confirms accountless first-run UI. Public development Site v167 is live. Full local Swift suite was not duplicated; no-op reuse check took under one second. Fresh signing preflight found four valid identities (two Developer ID Application for team H6VGU2M6JD); no notarytool Keychain profile is configured.",
+  "verified_at": "2026-10-14T07:34:00+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -94,7 +94,7 @@
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
-    "developer_id_and_notarization": "Not verified; fresh read-only signing identity inventory found 0 valid code-signing identities and 0 Developer ID Application identities. Notary profile/credentials were not inspected. No signed/notarized app.",
+    "developer_id_and_notarization": "Fresh read-only inventory on 2026-10-14: two consecutive security find-identity queries returned 4 valid identities, including 2 Developer ID Application identities for team H6VGU2M6JD. One adjacent query returned 0, so inventory was inconsistent once; repeated enumerations returned 4. Keychain query for Apple notarytool service com.apple.gke.notary.tool returned errSecItemNotFound with attributes only; no APPLE_/ASC_/NOTARY_ environment variable names are configured. No signing, notarization, or secret-value access was performed. Candidate Developer ID identity exists; notary credentials remain unavailable/unverified.",
     "gatekeeper_and_sparkle_update": "not verified",
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
@@ -221,13 +221,13 @@
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Synthetic APP12/APP13 tests cover 20 runtime sinks and per-account network setter recovery; native sleep/wake, real authorized sessions, all-active recovery, notifications, storage faults and performance matrix remain open.",
-    "0 Developer ID signing identities are currently available; notary credentials were not inspected. No signed candidate or release.",
+    "Two Developer ID Application identities are available for team H6VGU2M6JD; notarytool profile is absent from the default Keychain (errSecItemNotFound). No signing or notarization candidate exists yet.",
     "Telegram minimum-functionality compatibility review.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue from the canonical main checkout and current 752f684 source. Choose the next incomplete user-facing acceptance slice; use one full exact-SHA hosted Swift suite, one native Dev.app build/smoke only for changed app source, and a Site update after a coherent milestone. Do not duplicate a passing check. Real login remains deferred; 20-account, signing/notarization and Telegram compatibility gates remain open.",
+  "next_action": "Continue the next incomplete product acceptance slice from this checkpoint. Before distribution, configure/verify a notarytool Keychain profile through Apple’s supported flow; do not request secrets in chat. Real login remains deferred, and all-20 certification plus Telegram compatibility gates remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",

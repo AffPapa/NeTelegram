@@ -685,3 +685,9 @@
 - Публичный in-app browser отобразил `/devlog/` с текущим SHA и ссылками CI. Site остаётся development-страницей; `/downloads/` не содержит фиктивной ссылки на бинарник.
 - Точечная проверка checkpoint: `python3 -m json.tool` для обоих JSON, `python3 -m unittest discover -s Tests/release -t . -p 'test_*.py' -v` (11/11) и `git diff --check` прошли. Swift suite не повторялся, app source не менялся.
 - Остаются открытыми: отложенный пользователем реальный login, 20 реальных авторизованных runtime, Developer ID/notarization, стабильная совместимость с требованиями Telegram и публичный бинарный релиз. Следующий цикл начинается с этого checkpoint, не с пересборки или повторного деплоя сайта.
+
+## 2026-10-14 — Обновлён release preflight Developer ID и notarization
+
+- Свежий `security find-identity -v -p codesigning` read-only inventory дважды возвратил четыре валидные identity: Apple Development, Apple Distribution и две Developer ID Application identity для Team ID `H6VGU2M6JD`. Один соседний вызов вернул ноль; повторные enumeration дали четыре, поэтому нестабильное чтение отмечено явно. Отпечатки и private keys не выводились.
+- Read-only Keychain metadata query к штатной notarytool службе `com.apple.gke.notary.tool` вернул `errSecItemNotFound`; содержимое credential не запрашивалось. Проверка имён environment variables не обнаружила `APPLE_`, `ASC_` или `NOTARY_` credential names. Notarization profile пока не подтверждён.
+- Это снимает только прежнее утверждение «Developer ID identity отсутствует». Никакой app signing, upload в Apple, notarization, release, аккаунтный тест или новый Site deploy не выполнялся. Stable release по-прежнему закрыт реальным login/20-account и Telegram compatibility gates.
