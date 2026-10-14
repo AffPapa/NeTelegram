@@ -1,37 +1,34 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; AUTH05 country search is now bilingual and preserves selected region at exact app source fa80d5a. Local exact-source Swift suite passed 163/163; hosted suite 38497467214 was cancelled after its probe at the five-minute limit; pinned TDLib Dev.app assembly 38497467210 passed. Real auth, 20-account coverage, signed release and compatibility gates remain open.",
+  "status": "implementation_in_progress; AUTH05 disclosure polish at exact app source e43bcd0. Exact-source macOS CI run 38500525870 passed (test count not captured). Canonical Dev.app BuildInfo and live CUA title match e43bcd0; accessibility tree confirms accountless auth screen and concise non-affiliation notice. Real login, 20-account coverage, signed release and compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
-    "local_suite": "163/163 passed in 0.426s; arm64e / Xcode 27.0 / Swift 6.4",
-    "focused_test": "countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct passed 1/1",
+    "app_source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
+    "local_suite": "Not rerun for this presentation-only source change; previous 163/163 at fa80d5a is historical and not claimed for e43bcd0.",
+    "focused_test": "No focused logic regression for the disclosure-only change.",
     "hosted_ci": {
-      "run_id": 38497467214,
-      "status": "cancelled",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214",
-      "scope": "Runner probe passed; full serial suite cancelled at five-minute job limit without a test result."
+      "run_id": 38500525870,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38500525870",
+      "scope": "Exact-source macOS CI workflow passed; test count not captured in returned job output."
     },
     "native_build": {
-      "run_id": 38497467210,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467210",
-      "scope": "Pinned TDLib arm64 Dev.app assembly succeeded."
+      "status": "not_run_for_this_change",
+      "scope": "Pinned-TDLib rebuild omitted by the optimized trigger policy for ordinary Swift UI edits; no TDLib or build/lifecycle script changed."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
-      "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
-      "executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
+      "source_fingerprint_sha256": "f020523821ea483e933cc7bf5712e4df3d06ab62b284bb1e816046fc39ad6229",
+      "executable_sha256": "ed17b1e108223fd97e921cf2691abdee6c4ab927539326471b28a7bdfdb4c461",
       "architecture": "arm64",
-      "signature": "ad-hoc; codesign --verify --deep --strict passed",
-      "smoke": "CUA search Canada found 🇨🇦 Канада +1; selected value updated. No credentials entered."
+      "signature": "ad-hoc development only",
+      "smoke": "CUA confirms e43bcd0 title, welcome content and accessible login controls; no credentials or profile."
     },
     "native_keyboard_smoke": {
-      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "app_source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "On canonical /private/tmp/NeTelegram-Dev.app at exact app source fa80d5a, CUA Tab navigation moved through country search -> country picker -> phone number -> Continue -> QR. AX identified each focused control; no activation, number, code, profile, or Telegram account was used. This is accountless keyboard focus evidence only; VoiceOver announcements, IME, RTL and later auth states remain unverified."
+      "result": "CUA accessibility tree identifies country search, country picker, phone, status, Continue, QR and window controls. No credentials entered; this was a UI presence check, not a keyboard traversal."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -480,16 +477,16 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
-    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
-    "checkpoint_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
-    "local_command": "Focused countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct; full serial Swift suite once because hosted runner stalled.",
-    "local_result": "Focused 1/1 and exact-source serial 163/163 passed in 0.426s under arm64e / Xcode 27.0 / Swift 6.4.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214 cancelled at the five-minute limit after the runner probe; no suite result. Do not repeat unchanged.",
-    "native_dev_app_smoke": "Pinned TDLib arm64 assembly 38497467210 passed. Canonical /private/tmp/NeTelegram-Dev.app BuildInfo and CUA title match exact app source; CUA country search/select passed, no credentials. Keyboard focus smoke also traversed country search → country picker → phone → Continue → QR on the same exact bundle; no controls activated.",
-    "metadata_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919 passed for checkpoint 6883cba; the checkpoint-validator change triggers a fresh metadata run.",
-    "scope": "AUTH05 accountless UI and deterministic country/phone tests only. Real login, 20-account, sleep/wake, Developer ID/notarization, and Telegram compatibility remain unverified.",
-    "site_deployment": "Public Site v170 deployment appgdep_6acee10806988191b7212e17add857a3; anonymous cache-busted /devlog route verified the AUTH05 entry. Downloads page contains no app binary."
+    "source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
+    "app_source_commit": "e43bcd0d5e7304f6731e589ce88bf5438493f520",
+    "checkpoint_commit": "577d0e2c6a6f48785004447c3d1a91098a136cda",
+    "local_command": "No additional test suite run for this disclosure-only change; exact-source macOS CI and canonical Dev.app UI inspection were used.",
+    "local_result": "Canonical Dev.app BuildInfo source SHA/fingerprint and executable hash verified; CUA inspected accountless login UI.",
+    "hosted_ci": "Exact-source CI run 38500525870 succeeded. Test count was not present in command output and is not claimed.",
+    "native_dev_app_smoke": "Canonical /private/tmp/NeTelegram-Dev.app at exact source e43bcd0 is running. CUA confirms accessible login controls and shortened tertiary disclosure. No phone, code or profile was used.",
+    "metadata_ci": "Pending checkpoint-only metadata workflow after push.",
+    "scope": "Auth screen presentation check only. Real login, 20-account coverage, sleep/wake, Developer ID/notarization, and Telegram compatibility remain unverified.",
+    "site_deployment": "Public Site v170 remains live; no Site update or app download was published."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
