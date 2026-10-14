@@ -58,6 +58,16 @@ def validate_records(project: dict, acceptance: dict) -> None:
     )
     acceptance_site = acceptance["latest_site_deployment"]
     nested_acceptance_site = evidence.get("latest_site_deployment")
+    acceptance_site_checkpoints = (
+        acceptance["latest_site_deployment"],
+        acceptance["current_site_checkpoint"],
+        evidence.get("latest_site_deployment", {}),
+    )
+    project_site_checkpoints = (
+        project["site"],
+        project["latest_site_deployment"],
+        project["current_site_checkpoint"],
+    )
     acceptance_slice = acceptance["latest_acceptance_slice"]
     checks = [
         (not any(has_nested_key(value, "next_action") for key, value in project.items() if key != "next_action"),
@@ -75,6 +85,8 @@ def validate_records(project: dict, acceptance: dict) -> None:
          "PROJECT-STATE.verification contains ambiguous current/latest native build pointers; keep only local_development_candidate current and label older receipts historical"),
         (acceptance["status"].startswith(acceptance_slice["id"]),
          "ACCEPTANCE.status is stale; it must identify latest_acceptance_slice"),
+        (project["phase"] == acceptance["status"],
+         "PROJECT-STATE.phase differs from the current ACCEPTANCE status"),
         (acceptance_slice["source_commit"] == app_sha,
          "ACCEPTANCE.latest_acceptance_slice source differs from current_evidence"),
         (project["product"]["app_source_commit"] == app_sha,
@@ -112,6 +124,13 @@ def validate_records(project: dict, acceptance: dict) -> None:
          "ACCEPTANCE Site deployment differs from PROJECT-STATE"),
         (nested_acceptance_site == acceptance_site,
          "ACCEPTANCE.current_evidence.latest_site_deployment is stale"),
+        (acceptance["current_site_checkpoint"] == acceptance_site,
+         "ACCEPTANCE current Site checkpoint differs from latest deployment"),
+        (all(
+            record.get("saved_version_id") == record.get("version_id")
+            for record in (*project_site_checkpoints, *acceptance_site_checkpoints)
+        ),
+         "A saved Site version ID differs from its version ID"),
     ]
     errors = [message for condition, message in checks if not condition]
     pending = project.get("pending_native_candidate")

@@ -147,6 +147,30 @@ class ValidateCheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Site deployment differs"):
             validate_records(project, acceptance)
 
+    def test_saved_site_version_ids_must_match_saved_version_records(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        project["site"]["saved_version_id"] = "truncated-version-id"
+
+        with self.assertRaisesRegex(ValueError, "saved Site version ID"):
+            validate_records(project, acceptance)
+
+    def test_current_site_checkpoint_must_match_latest_deployment(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["current_site_checkpoint"]["version"] -= 1
+
+        with self.assertRaisesRegex(ValueError, "current Site checkpoint"):
+            validate_records(project, acceptance)
+
+    def test_project_phase_must_match_current_acceptance_status(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        project["phase"] = "older milestone"
+
+        with self.assertRaisesRegex(ValueError, "PROJECT-STATE.phase"):
+            validate_records(project, acceptance)
+
 
 if __name__ == "__main__":
     unittest.main()

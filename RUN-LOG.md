@@ -1185,3 +1185,9 @@
 
 - The previous checkpoint reused `AUTH04` and `AUTH05`, which are already identifiers for different acceptance cases. Renamed the AUTH04 VoiceOver error-announcement slice to `A11Y-ANNOUNCE-02` and the next action to `CORE-RUNTIME-01`; the underlying app evidence, Site v190 and release state are unchanged. `ACCEPTANCE.status` now names Site v190 accurately.
 - This is a checkpoint clarity correction only; no app rebuild, Swift suite, or Site deployment was needed. Local checkpoint validator and 10 focused metadata tests are the required checks.
+
+## 2026-10-14 — Repair Site version provenance and prevent checkpoint drift
+
+- Independent read-only audit found four truncated `saved_version_id` copies for Site v190 in PROJECT-STATE and ACCEPTANCE; the exact opaque ID from the Sites save response and RUN-LOG was correct. Corrected all current copies. Also synchronized ACCEPTANCE.current_site_checkpoint and PROJECT-STATE.phase with the verified v190/A11Y-ANNOUNCE-02 state.
+- `Scripts/validate_checkpoint.py` now requires every current saved version ID to equal its version ID, the ACCEPTANCE current Site receipt to equal its latest deployment, and PROJECT-STATE.phase to equal the current ACCEPTANCE status. Added three regressions for truncated Site version ID, stale Site checkpoint, and stale project phase.
+- Checkpoint validation passed; `Tests.release.test_validate_checkpoint` passed 13/13; `git diff --check` passed. Metadata-only correction; no app build, Swift suite, or Site deployment was needed.
