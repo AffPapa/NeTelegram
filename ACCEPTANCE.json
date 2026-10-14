@@ -1,44 +1,44 @@
 {
   "schema_version": 2,
-  "status": "AUTH-FORM-ALIGN-07: country search and selection now form one aligned column; exact-source tests and pinned Dev.app build passed; local GUI review awaits the protected setup dialog.",
+  "status": "AUTH-PHONE-GATE-08: Apple HIG-aligned sign-in form gates Continue on valid input; exact-source CI and local offline UI smoke passed.",
   "current_evidence": {
-    "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-    "local_suite": "git diff --check passed. Exact-source macOS serial Swift CI passed (run 38616087277); pinned TDLib arm64 Dev.app workflow passed (run 38616086721). No local app replacement or GUI smoke: the old canonical app remains open on its protected API-hash setup dialog; the field was not read or changed.",
-    "focused_test": "git diff --check passed. Exact-source macOS serial Swift CI passed (run 38616087277); pinned TDLib arm64 Dev.app workflow passed (run 38616086721). No local app replacement or GUI smoke: the old canonical app remains open on its protected API-hash setup dialog; the field was not read or changed.",
+    "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "local_suite": "Focused local Swift test passed 1/1 for phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal. Exact-source macOS CI passed (38617200776); pinned TDLib/Dev.app workflow passed (38617200741). Local canonical dark offline preview: empty and short international values disabled Continue; selecting Thailand enabled Continue for synthetic 812345678. Continue was not activated. No login/network request or credentials.",
+    "focused_test": "Focused local Swift test passed 1/1 for phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal. Exact-source macOS CI passed (38617200776); pinned TDLib/Dev.app workflow passed (38617200741). Local canonical dark offline preview: empty and short international values disabled Continue; selecting Thailand enabled Continue for synthetic 812345678. Continue was not activated. No login/network request or credentials.",
     "hosted_ci": {
-      "run_id": 38616087277,
+      "run_id": 38617200776,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616087277",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Exact-source serial macOS Swift test suite passed for the aligned AppKit sign-in country controls."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Exact-source macOS serial Swift CI passed; regression covers empty, incomplete, local-without-country, valid-local and valid-full-international phone input."
     },
     "native_workflow_ci": {
-      "run_id": 38616086721,
+      "run_id": 38617200741,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616086721",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Pinned TDLib arm64 Dev.app assembled and strict bundle verification passed. Hosted build is not local GUI evidence."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200741",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted build is separate from local visual evidence."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "application_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
-      "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
+      "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+      "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
-      "pending_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f"
+      "smoke": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls."
     },
+    "scope": "Accountless native auth phone-entry visual/AX smoke only; does not verify Telegram login, authenticated screens, accessibility speech, real chats, or runtime behavior.",
     "latest_site_deployment": {
       "date": "2026-10-15",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -63,8 +63,7 @@
       "saved_archive_size_bytes": 501760,
       "saved_archive_file_count": 14,
       "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
-    },
-    "scope": "Accountless native auth phone-entry visual/AX smoke only; does not verify Telegram login, authenticated screens, accessibility speech, real chats, or runtime behavior."
+    }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -580,55 +579,59 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-    "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-    "local_command": "git diff --check; exact-source GitHub macOS serial Swift CI; pinned TDLib/Dev.app workflow",
-    "local_result": "git diff --check passed. Exact-source macOS serial Swift CI passed (run 38616087277); pinned TDLib arm64 Dev.app workflow passed (run 38616086721). No local app replacement or GUI smoke: the old canonical app remains open on its protected API-hash setup dialog; the field was not read or changed.",
-    "hosted_ci_run_id": 38616087277,
+    "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "local_command": "focused Swift test phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal; exact-source GitHub macOS serial CI; pinned TDLib/Dev.app workflow; canonical Dev.app offline CUA/AX smoke",
+    "local_result": "Focused local Swift test passed 1/1 for phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal. Exact-source macOS CI passed (38617200776); pinned TDLib/Dev.app workflow passed (38617200741). Local canonical dark offline preview: empty and short international values disabled Continue; selecting Thailand enabled Continue for synthetic 812345678. Continue was not activated. No login/network request or credentials.",
+    "hosted_ci_run_id": 38617200776,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616087277",
-    "native_workflow_run_id": 38616086721,
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+    "native_workflow_run_id": 38617200741,
     "native_workflow_status": "success",
-    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616086721",
-    "scope": "Country search and selection alignment passed exact-source test/build gates; local GUI smoke remains pending."
+    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200741",
+    "scope": "Continue is disabled until valid phone input; local input requires an explicitly selected country. CUA used synthetic digits only and did not activate Continue."
   },
   "current_local_slice": {
-    "id": "AUTH-LAYOUT-RHYTHM-06",
-    "source_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-    "change": "Use the NeTelegram N mark and product name consistently in the auth window, account accessibility/status strings and generated Dev.app bundle metadata. Keep the non-affiliation note at 13 pt. Center the sign-in stack as a compact group and grow the scroll document only for long auth steps; native AppKit controls, semantic colors, system window chrome and Auto Layout remain.",
-    "focused_test": "Focused Python native-workflow regression tests passed 3/3; bash -n, git diff --check and checkpoint validation passed. The managed sandbox blocked the local Swift invocation before compilation (`sandbox_apply: Operation not permitted`); exact-source macOS tests passed in GitHub CI. The pinned native workflow assembled and verified the exact Dev.app. No local current-source visual smoke because the old canonical app remains open on the protected API-hash dialog.",
+    "id": "AUTH-PHONE-GATE-08",
+    "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "change": "Apple HIG-guided AppKit sign-in form: keep country search, explicit country selection, phone number and action in one aligned column; disable Continue until PhoneNumberInputPolicy accepts the number. A local number also requires explicit country selection; a sufficiently complete + international number can proceed without the country catalogue. Native controls, system colors, typography and window chrome remain.",
+    "focused_test": "Focused local Swift test passed 1/1 for phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal. Exact-source macOS CI passed (38617200776); pinned TDLib/Dev.app workflow passed (38617200741). Local canonical dark offline preview: empty and short international values disabled Continue; selecting Thailand enabled Continue for synthetic 812345678. Continue was not activated. No login/network request or credentials.",
     "hosted_ci": {
-      "run_id": 38615081039,
+      "run_id": 38617200776,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38615081039",
-      "workflow_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "app_source_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "scope": "Exact-source macOS Apple Silicon Swift tests passed for the AppKit sign-in layout and NeTelegram identity changes."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Exact-source macOS serial Swift CI passed; regression covers empty, incomplete, local-without-country, valid-local and valid-full-international phone input."
     },
     "exact_source_ci": {
-      "run_id": 38615081039,
+      "run_id": 38617200776,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38615081039",
-      "workflow_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "app_source_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "scope": "Exact-source macOS Apple Silicon Swift tests passed for the AppKit sign-in layout and NeTelegram identity changes."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Exact-source macOS serial Swift CI passed; regression covers empty, incomplete, local-without-country, valid-local and valid-full-international phone input."
     },
     "native_workflow": {
-      "run_id": 38615081338,
+      "run_id": 38617200741,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38615081338",
-      "workflow_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "app_source_commit": "78763f3165bef89e98584b6ca6f43c84ebdd3258",
-      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/strict verification passed. Bundle now carries the NeTelegram Dev display name; not a local visual smoke."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200741",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted build is separate from local visual evidence."
     },
     "native_smoke": {
       "date": "2026-10-15",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Not run for source 78763f3: the canonical older Dev.app remains open with its protected API-hash setup dialog. No secret field read or changed; no local app replacement.",
-      "scope": "CI Dev.app assembly is not native GUI evidence; resized-window, light appearance, VoiceOver and login remain unverified."
+      "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+      "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "result": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls.",
+      "scope": "Accountless, dark, offline phone-entry UI smoke. Does not establish successful Telegram auth, authenticated UI, light/resized layouts, VoiceOver speech, or real-account behavior."
     },
-    "coverage_limit": "No local current-source GUI smoke, real account login/chat behavior, VoiceOver speech, light-mode/resizing QA, or 20-runtime evidence."
+    "coverage_limit": "No real login/account, authenticated screens, light appearance/resizing, VoiceOver speech, IME/RTL or all-20 runtime coverage."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -670,7 +673,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "The f56cc73 source is pushed; exact-source macOS tests and pinned TDLib/Dev.app build both passed. Current local Dev.app is still the older app with its protected API-hash setup dialog open. Save the intended value or cancel, then quit that same app normally. After it closes, rebuild only /private/tmp/NeTelegram-Dev.app from f56cc73 and inspect the real login window at default/resized sizes and light/dark appearances. Do not enter login codes or reuse another Telegram app session. Public release and Site downloads remain gated by real account coverage, signing/notarization, and unresolved Telegram compatibility requirements.",
+  "next_action": "Continue the next bounded implementation slice from this exact checkout/source checkpoint. Before any app or metadata work, verify this one source SHA and canonical bundle. Real owner-operated authentication remains unverified; the previously pasted API hash is retired and must not be reused. Do not publish an app release or advertise a download until real account validation, all-20 runtime coverage, Developer ID/notarization and Telegram compatibility gates are resolved.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -702,76 +705,78 @@
   "current_local_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-    "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+    "application_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
-    "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
+    "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+    "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
+    "smoke": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "application_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
-      "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
+      "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+      "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
-      "pending_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f"
-    },
-    "pending_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f"
+      "smoke": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls."
+    }
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-FORM-ALIGN-07",
-    "source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-    "change": "Apple HIG review: keep native AppKit/system colors and typography; align country search and country selection vertically at the same width so the sign-in form reads as one column. No authentication behavior changed.",
-    "focused_test": "git diff --check passed. Exact-source macOS serial Swift CI passed (run 38616087277); pinned TDLib arm64 Dev.app workflow passed (run 38616086721). No local app replacement or GUI smoke: the old canonical app remains open on its protected API-hash setup dialog; the field was not read or changed.",
+    "id": "AUTH-PHONE-GATE-08",
+    "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "change": "Apple HIG-guided AppKit sign-in form: keep country search, explicit country selection, phone number and action in one aligned column; disable Continue until PhoneNumberInputPolicy accepts the number. A local number also requires explicit country selection; a sufficiently complete + international number can proceed without the country catalogue. Native controls, system colors, typography and window chrome remain.",
+    "focused_test": "Focused local Swift test passed 1/1 for phoneNumberContinueRequiresAValidNumberAndExplicitCountryWhenLocal. Exact-source macOS CI passed (38617200776); pinned TDLib/Dev.app workflow passed (38617200741). Local canonical dark offline preview: empty and short international values disabled Continue; selecting Thailand enabled Continue for synthetic 812345678. Continue was not activated. No login/network request or credentials.",
     "hosted_ci": {
-      "run_id": 38616087277,
+      "run_id": 38617200776,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616087277",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Exact-source serial macOS Swift test suite passed for the aligned AppKit sign-in country controls."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Exact-source macOS serial Swift CI passed; regression covers empty, incomplete, local-without-country, valid-local and valid-full-international phone input."
     },
     "exact_source_ci": {
-      "run_id": 38616087277,
+      "run_id": 38617200776,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616087277",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Exact-source serial macOS Swift test suite passed for the aligned AppKit sign-in country controls."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200776",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Exact-source macOS serial Swift CI passed; regression covers empty, incomplete, local-without-country, valid-local and valid-full-international phone input."
     },
     "native_workflow": {
-      "run_id": 38616086721,
+      "run_id": 38617200741,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616086721",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Pinned TDLib arm64 Dev.app assembled and strict bundle verification passed. Hosted build is not local GUI evidence."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38617200741",
+      "workflow_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted build is separate from local visual evidence."
     },
     "native_smoke": {
       "date": "2026-10-15",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+      "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Not run for f56cc73: the canonical older Dev.app remains open with its protected API-hash setup dialog. No secret field read or changed; no local app replacement.",
-      "scope": "Hosted app assembly is not native GUI evidence; resized-window and light-appearance checks remain pending."
+      "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+      "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "result": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls.",
+      "scope": "Accountless, dark, offline phone-entry UI smoke. Does not establish successful Telegram auth, authenticated UI, light/resized layouts, VoiceOver speech, or real-account behavior."
     },
-    "coverage_limit": "No local current-source GUI smoke; dark/light appearance, resized window, VoiceOver, real login, account behavior and 20-runtime coverage remain unverified."
+    "coverage_limit": "No real login/account, authenticated screens, light appearance/resizing, VoiceOver speech, IME/RTL or all-20 runtime coverage."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -857,21 +862,23 @@
   "phase": "AUTH-FORM-ALIGN-07: country search and selection now form one aligned column; exact-source tests and pinned Dev.app build passed; local GUI review awaits the protected setup dialog.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-    "command": "Earlier canonical build; no rebuild for 115716a",
-    "result": "Older app remains running. New source has exact-source CI and isolated native workflow evidence only.",
-    "pending_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4"
+    "source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
+    "command": "bash Scripts/dev-app.sh --launch-auth-layout-preview-dark",
+    "result": "PASS: canonical arm64 Dev.app rebuilt once from exact clean source; BuildInfo matches; strict ad-hoc codesign verification passed.",
+    "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+    "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+    "app_source_commit": "d1e3c73628d8f8e4840cd443aa7ba5c610159a92",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
-    "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
+    "source_fingerprint_sha256": "16f4619a1825ddf30322d439c299a40e38870ed95e7baa0bd933355702f54ff1",
+    "executable_sha256": "2b23ec910deecf5489c5fe1cb8744041d35144db1171bfa31a0959b1197fb6b5",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical arm64 Dev.app was last rebuilt from source 291cd0a and visually checked in an accountless auth preview. It is currently still running with the protected API-hash setup dialog open. No current-source visual smoke.",
-    "scope": "Historical local native smoke, not evidence for pending source 115716a; no real login or account data."
+    "result": "Canonical Dev.app rebuilt once from exact clean source after proving the previous app process absent; strict ad-hoc codesign verification passed. CUA/AX verified Continue disabled for empty/incomplete input, then enabled only after explicit country selection for synthetic local digits. Full international-number behavior was covered by the focused test, not network auth. Button was not activated; no account credentials or network calls.",
+    "scope": "Accountless, dark, offline phone-entry UI smoke. Does not establish successful Telegram auth, authenticated UI, light/resized layouts, VoiceOver speech, or real-account behavior."
   },
   "current_ui_design_slice": {
     "id": "AUTH-UI-DESIGN-03",

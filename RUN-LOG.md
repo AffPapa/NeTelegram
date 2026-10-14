@@ -1705,3 +1705,10 @@
 - Exact-source macOS tests passed: [run 38616087277](https://github.com/AffPapa/NeTelegram/actions/runs/38616087277). Pinned TDLib arm64 Dev.app build and strict verification passed: [run 38616086721](https://github.com/AffPapa/NeTelegram/actions/runs/38616086721).
 - Local GUI review remains pending: the single canonical Dev.app still has its protected API-hash setup dialog open. The field was not read or changed; no local bundle was replaced.
 - Next: owner saves or cancels that protected dialog and normally quits the same app; then rebuild the one canonical Dev.app from this source SHA and inspect default/resized and light/dark presentation. No release or Site download changed.
+
+## 2026-10-15 — AUTH-PHONE-GATE-08
+
+- Apple HIG-guided native sign-in refinement: preserve AppKit/system styling and aligned form layout, and disable Continue until the phone policy accepts input. Local numbers additionally require the user to choose a country; complete international `+` input can proceed without a loaded country catalogue.
+- Focused local Swift regression passed 1/1. Exact-source serial macOS CI `38617200776` and pinned TDLib/Dev.app workflow `38617200741` passed for source `d1e3c73628d8f8e4840cd443aa7ba5c610159a92`.
+- Rebuilt the sole canonical `/private/tmp/NeTelegram-Dev.app` once after the prior process was confirmed closed. BuildInfo matches source, arm64, macOS 14 baseline and pinned TDLib; strict ad-hoc code-signature verification passed. CUA/AX dark offline preview confirmed disabled state for empty/incomplete input and enabled state after choosing Thailand for synthetic local digits. The Continue button was not activated; no account credentials or network requests were used.
+- Coverage remains limited to accountless phone-entry UI. Real auth, authenticated views, resized/light appearance, VoiceOver speech, IME/RTL and all-20 runtime behavior remain unverified. No Site deployment or app release was made.
