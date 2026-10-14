@@ -1,50 +1,51 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; auth disclosure contrast verified at exact app source 0a7cbe6. Exact-source macOS CI 38501111688 passed; the one canonical arm64 Dev.app rebuilt in 5.24s, signature verified, and CUA confirmed the visible change. Real login, 20-account coverage, signed release and compatibility gates remain open.",
+  "status": "implementation_in_progress; APP15 async shutdown drain fix passed 164/164 local and exact-source CI tests; one canonical Dev.app at 67341ba is verified and running. Real login, 20-account coverage, signed release and Telegram compatibility gates remain open.",
   "current_evidence": {
-    "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-    "local_suite": "Not rerun for the one-line presentation change; logic unchanged.",
-    "focused_test": "No logic-focused Swift test applies to the color-only change.",
+    "app_source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+    "local_suite": "PASS 164/164 serial Swift tests on Xcode 27 / Swift 6.4 / arm64; completed in 0.455s after incremental build.",
+    "focused_test": "PASS 1/1 TDLib async shutdown drain regression and PASS 1/1 deterministic scoped photo-cache invalidation regression.",
     "hosted_ci": {
-      "run_id": 38501111688,
+      "run_id": 38504170791,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501111688",
-      "scope": "Exact-source macOS CI passed; test count not captured."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38504170791",
+      "scope": "Exact-source commit 67341ba; runner probe and 164/164 serial Swift tests passed."
     },
     "native_build": {
       "status": "success_local",
-      "scope": "Canonical app built once from exact source 0a7cbe6 in 5.24s with pinned TDLib; codesign verification passed."
+      "scope": "One canonical arm64 Dev.app rebuild from exact source 67341ba in 5.22s with pinned TDLib; ad-hoc signature verification passed."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-      "source_fingerprint_sha256": "f80ce59a1b8fa6497e1abaa2441dc3c1d10b491e5929606e6290162672a3639b",
-      "executable_sha256": "f5b47d8ab41381bbe045ac0d3c7696a4ac78d7284bb5a7ec83b2d94523220b4d",
+      "source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+      "source_fingerprint_sha256": "1ced8b14e526c5b7f17698c1eed977e52aeaaee2a5340e23c6b30caa806f7af8",
+      "executable_sha256": "ad0acae841e326944953a49cebd7ba5629ad068f00d7b5887946042a5594a694",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA title and screenshot confirm exact source 0a7cbe6, readable secondary non-affiliation disclosure and accountless form; no credentials."
+      "smoke": "CUA confirmed exact title NeTelegram · dev 67341bab and accountless login screen; normal Quit completed; process exit verified; no credentials."
     },
-    "native_keyboard_smoke": {
+    "app02_stalled_profile_test": {
+      "app_source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+      "test": "oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen",
+      "test_file": "Tests/NeTelegramCoreTests/RuntimeCoordinatorTests.swift",
+      "local_result": "PASS 1/1 on arm64 / Xcode 27.0 / Swift 6.4; compile 17.99 s, test 0.018 s.",
+      "scenario": "Profile 1 remained blocked in the shared Keychain operation queue while ProfileStoragePreparer completed for the other 19 under RuntimeStartupScheduler(parallelism: 2); the test confirmed Profile 1 was still blocked, then released it and drained all permits.",
+      "hosted_ci": "PASS exact-source macOS CI 38504170791 on commit 67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1; full serial suite 164/164.",
+      "coverage_limit": "Synthetic Keychain operation and 20 generated local account namespaces; does not exercise macOS SecItem stalls, AppDelegate lifecycle, real Telegram sessions, or 20-account native resources."
+    },
+    "historical_auth_ui_smoke_0a7cbe6": {
       "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
       "result": "Current-source CUA screenshot and accessibility tree confirm the accountless form and readable secondary disclosure. This does not claim VoiceOver, keyboard traversal, IME/RTL or real-auth coverage."
     },
-    "auth03_window_review": {
+    "historical_auth03_review_0a7cbe6": {
       "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
       "appearance": "light",
       "window_state": "centered default window after restoring the previous size",
       "result": "CUA screenshot and accessibility tree show the complete accountless phone/QR form and readable non-affiliation disclosure at the default size. Minimum supported size, dark appearance, accessibility contrast, and later authorization steps were not verified.",
       "status": "partial"
-    },
-    "app02_stalled_profile_test": {
-      "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-      "test": "oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen",
-      "test_file": "Tests/NeTelegramCoreTests/RuntimeCoordinatorTests.swift",
-      "local_result": "PASS 1/1 on arm64 / Xcode 27.0 / Swift 6.4; compile 17.99 s, test 0.018 s.",
-      "scenario": "Profile 1 remained blocked in the shared Keychain operation queue while ProfileStoragePreparer completed for the other 19 under RuntimeStartupScheduler(parallelism: 2); the test confirmed Profile 1 was still blocked, then released it and drained all permits.",
-      "hosted_ci": "pending exact-source push",
-      "coverage_limit": "Synthetic Keychain operation and 20 generated local account namespaces; does not exercise macOS SecItem stalls, AppDelegate lifecycle, real Telegram sessions, or 20-account native resources."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -65,7 +66,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At app-source 26abae365b4eec54882ae69cc1274e20ddabb276, AppDelegate calls the production-used ProfileStoragePreparer before TDLib runtime creation. Two targeted local tests passed: one injected errSecInteractionNotAllowed among 20 synthetic scheduled profiles; the failed profile retained its existing DB/draft files and no replacement key was added while the other 19 prepared. Exact-SHA macOS CI 38425731506 and pinned TDLib/Dev.app assembly 38425731851 passed. This does not test actual macOS Keychain lock/ACL behavior, a stalled real SecItem call in AppDelegate orchestration, login, or 20 authorized sessions; APP02 remains partial. Current implementation replaces the global serial Keychain executor with OperationQueue(maxConcurrentOperationCount: 2), keeping blocking SecItem work bounded while allowing another account to prepare its keys if one operation stalls. The corrected focused test stalled operation 1, confirmed operation 2 entered and completed its own work path, confirmed operation 3 waited for a slot, then verified operation 3 advanced after release. Local Xcode 27 / Swift 6.4 focused test passed 1/1; exact-source macOS Swift run 38487262779 and pinned-TDLib Dev.app/lifecycle run 38487262804 passed; metadata run 38487262753 passed. This remains synthetic executor coverage, not an actual macOS SecItem stall, 20 authorized accounts, or an appDelegate restore measurement. New combined 20-profile regression `oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen` uses the same `RuntimeStartupScheduler`, `SecretsStore.performKeychainOperation`, and `ProfileStoragePreparer` as startup. It leaves one profile blocked while the other 19 finish preparation, then releases the blocker and confirms all permits drain. Local focused test passed 1/1 on arm64 / Xcode 27.0 / Swift 6.4 (compile 17.99 s, test 0.018 s). Hosted exact-source CI is pending; this remains synthetic and does not establish OS Keychain, AppDelegate lifecycle, real-account, or 20-runtime coverage."
+      "evidence": "At app-source 26abae365b4eec54882ae69cc1274e20ddabb276, AppDelegate calls the production-used ProfileStoragePreparer before TDLib runtime creation. Two targeted local tests passed: one injected errSecInteractionNotAllowed among 20 synthetic scheduled profiles; the failed profile retained its existing DB/draft files and no replacement key was added while the other 19 prepared. Exact-SHA macOS CI 38425731506 and pinned TDLib/Dev.app assembly 38425731851 passed. This does not test actual macOS Keychain lock/ACL behavior, a stalled real SecItem call in AppDelegate orchestration, login, or 20 authorized sessions; APP02 remains partial. Current implementation replaces the global serial Keychain executor with OperationQueue(maxConcurrentOperationCount: 2), keeping blocking SecItem work bounded while allowing another account to prepare its keys if one operation stalls. The corrected focused test stalled operation 1, confirmed operation 2 entered and completed its own work path, confirmed operation 3 waited for a slot, then verified operation 3 advanced after release. Local Xcode 27 / Swift 6.4 focused test passed 1/1; exact-source macOS Swift run 38487262779 and pinned-TDLib Dev.app/lifecycle run 38487262804 passed; metadata run 38487262753 passed. This remains synthetic executor coverage, not an actual macOS SecItem stall, 20 authorized accounts, or an appDelegate restore measurement. New combined 20-profile regression `oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen` uses the same `RuntimeStartupScheduler`, `SecretsStore.performKeychainOperation`, and `ProfileStoragePreparer` as startup. It leaves one profile blocked while the other 19 finish preparation, then releases the blocker and confirms all permits drain. Local focused test passed 1/1 on arm64 / Xcode 27.0 / Swift 6.4 (compile 17.99 s, test 0.018 s). Hosted exact-source CI is pending; this remains synthetic and does not establish OS Keychain, AppDelegate lifecycle, real-account, or 20-runtime coverage. Follow-up commit 67341ba includes the combined APP02 synthetic stall regression and exact-source CI 38504170791 passed 164/164; this still does not prove SecItem, AppDelegate restore, authorized sessions, or 20-runtime operation."
     },
     {
       "id": "APP03",
@@ -182,7 +183,7 @@
       "method": "native lifecycle",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "RuntimeShutdownCoordinator owns the expected client-ID close set and shared receiver drain. It ignores unknown/duplicate Closed updates and cannot begin drain until all expected clients acknowledge; an immediate rejected close cancels quit while accepted closes remain managed by general lifecycle bookkeeping. Two focused local tests passed. Exact-SHA macOS CI 38437898571 passed 150/150 on 256caf4faea294cddf4dd4e168cc2b64bd18a3d8. Pinned TDLib/arm64 Dev.app workflow 38437335165 passed on product-code commit 15cb93b63c1654f256403b793ff05995a4907a09, including accountless last-window close, same-PID LaunchServices reopen and quit. Real multiple-account close/drain and twenty authorized runtimes remain unverified; APP15 stays partial."
+      "evidence": "RuntimeShutdownCoordinator owns the expected client-ID close set and shared receiver drain. It ignores unknown/duplicate Closed updates and cannot begin drain until all expected clients acknowledge; an immediate rejected close cancels quit while accepted closes remain managed by general lifecycle bookkeeping. Two focused local tests passed. Exact-SHA macOS CI 38437898571 passed 150/150 on 256caf4faea294cddf4dd4e168cc2b64bd18a3d8. Pinned TDLib/arm64 Dev.app workflow 38437335165 passed on product-code commit 15cb93b63c1654f256403b793ff05995a4907a09, including accountless last-window close, same-PID LaunchServices reopen and quit. Real multiple-account close/drain and twenty authorized runtimes remain unverified; APP15 stays partial. At exact source 67341ba, finishInputAndDrain is async and AppDelegate awaits it without blocking a Swift cooperative executor on DispatchGroup.wait. Focused drain regression passed; the exact-source local serial suite passed 164/164 in 0.455s and GitHub CI 38504170791 passed. One canonical arm64 Dev.app was built once (5.22s), CUA verified its exact source and accountless UI, and normal menu Quit exited the process. This remains synthetic/accountless evidence; 20 authorized-runtime shutdown is unverified and APP15 remains partial."
     },
     {
       "id": "APP16",
@@ -227,7 +228,7 @@
       "method": "native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial. Static review found that the current v1.8.68 TDLib schema requires `openMessageContent` when photo content is actually opened, but the AppKit full-size photo viewer did not issue it. The viewer now sends that request only after the full-size image is successfully decoded and presented; the call is bound to the selected account, expected Telegram identity, runtime generation, and privacy epoch through PrivacyDispatchBarrier. Final exact-worktree serial suite passed 151/151 in 0.207 seconds; AppKit/Core build completed in 5.33 seconds on Xcode 27 / Swift 6.4. Exact hosted CI, pinned Dev.app compile/smoke, and real-account photo interaction remain pending; APP20 stays partial."
+      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial. Static review found that the current v1.8.68 TDLib schema requires `openMessageContent` when photo content is actually opened, but the AppKit full-size photo viewer did not issue it. The viewer now sends that request only after the full-size image is successfully decoded and presented; the call is bound to the selected account, expected Telegram identity, runtime generation, and privacy epoch through PrivacyDispatchBarrier. Final exact-worktree serial suite passed 151/151 in 0.207 seconds; AppKit/Core build completed in 5.33 seconds on Xcode 27 / Swift 6.4. Exact hosted CI, pinned Dev.app compile/smoke, and real-account photo interaction remain pending; APP20 stays partial. Test-only deterministic cache injection prevents scoped delete assertions from depending on NSCache retention under system memory pressure; production continues to use NSCache."
     },
     {
       "id": "APP21",
@@ -493,16 +494,15 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-    "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
-    "checkpoint_commit": "db1a69bec5415c5c00d4ad8feae829495f40c930",
-    "local_command": "NETELEGRAM_SUPPORT_ROOT=/private/tmp/netelegram-dev-support-clean Scripts/dev-app.sh --launch; codesign --verify --deep --strict; CUA accessibility/screenshot.",
-    "local_result": "Build complete in 5.24s. BuildInfo source/fingerprint matched 0a7cbe6; canonical bundle signature passed. CUA screenshot confirmed disclosure is readable and secondary.",
-    "hosted_ci": "Exact-source macOS CI 38501111688 success; test count not captured.",
-    "native_dev_app_smoke": "One canonical /private/tmp/NeTelegram-Dev.app at exact source 0a7cbe6 is running; no credentials entered.",
-    "metadata_ci": "PASS: metadata workflow 38501473452 passed for preceding checkpoint db1a69b; this update triggers one new metadata run.",
-    "scope": "Accountless presentation smoke only. Real auth, 20-account coverage, Developer ID/notarization and Telegram compatibility remain unverified.",
-    "site_deployment": "Public Site v170 unchanged, no app download."
+    "source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+    "app_source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+    "checkpoint_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app02-stall-check",
+    "local_result": "PASS: serial Swift suite 164/164 in 0.455s after focused diagnostics; arm64e macOS 27 SDK, Xcode 27 / Swift 6.4.",
+    "hosted_ci": "PASS exact-source GitHub macOS CI 38504170791; full serial suite 164/164.",
+    "native_dev_app_smoke": "One canonical /private/tmp/NeTelegram-Dev.app at exact source 67341ba is running after an accountless UI check and a normal Quit/process-exit smoke; reopened by verified reuse without rebuild. No credentials entered.",
+    "metadata_ci": "Local checkpoint validation and release metadata suite passed 15/15; checkpoint-only hosted metadata workflow pending.",
+    "scope": "No real login, authorized-account data, twenty-account coverage, Developer ID signature, notarization, Gatekeeper, public release or new Site deployment."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -551,7 +551,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Next code slice: strengthen APP02 by exercising production AppDelegate restore orchestration with an injected stalled Keychain preparation and proving unrelated profiles advance. Add one deterministic regression, run the applicable hosted serial suite once, and reuse the current Dev.app because this slice does not change UI or lifecycle. Fold acceptance/checkpoint updates into that same source commit. Real Telegram login stays deferred; do not claim 20-account coverage.",
+  "next_action": "Next: continue the highest-value native acceptance slice in ACCEPTANCE.json using one source SHA and one focused local diagnostic only when needed; run hosted serial CI once for exact source, rebuild the canonical Dev.app only for app/lifecycle changes, and keep Site/release work separate. Real login remains deferred; do not claim 20-account coverage.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
