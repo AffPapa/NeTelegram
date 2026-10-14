@@ -8,6 +8,14 @@ import UniformTypeIdentifiers
 import UserNotifications
 import NeTelegramCore
 
+private struct ChatListRowData {
+    var title: String
+    var lastText: String
+    var lastMessageDate: Int64?
+    var unreadCount: Int
+    var isMuted: Bool
+}
+
 private extension NSLayoutConstraint {
     func withPriority(_ value: NSLayoutConstraint.Priority) -> NSLayoutConstraint {
         priority = value
@@ -183,7 +191,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var networkTypeUpdateTask: Task<Void, Never>?
     private var pendingProfileStorageWarnings = 0
     private var suppressDraftUpdate = false
-    private var chatRowsByAccount: [AccountUUID: [Int64: (title: String, lastText: String)]] = [:]
+    private var chatRowsByAccount: [AccountUUID: [Int64: ChatListRowData]] = [:]
     private var chatOrderByAccount: [AccountUUID: [Int64: UInt64]] = [:]
     private var selectedChatByAccount: [AccountUUID: Int64] = [:]
     private var messagesByConversation: [ConversationKey: [[String: Any]]] = [:]
@@ -3259,12 +3267,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value {
             guard !lockState else { return }
             if let message = object["last_message"] as? [String: Any] {
-                let rows = chatRowsByAccount[target.account] ?? [:]
-                chatRowsByAccount[target.account, default: [:]][chatID] = (rows[chatID]?.title ?? "Чат \(chatID)", messagePreview(message))
+                var row = chatRowsByAccount[target.account]?[chatID]
+                    ?? ChatListRowData(title: "Чат \(chatID)", lastText: "", lastMessageDate: nil, unreadCount: 0, isMuted: false)
+                row.lastText = messagePreview(message)
+                row.lastMessageDate = (message["date"] as? NSNumber)?.int64Value
+                chatRowsByAccount[target.account, default: [:]][chatID] = row
             } else if let existing = chatRowsByAccount[target.account]?[chatID] {
-                chatRowsByAccount[target.account, default: [:]][chatID] = (existing.title, "Нет новых сообщений")
+                var row = existing
+                row.lastText = "Последнее сообщение недоступно"
+                row.lastMessageDate = nil
+                chatRowsByAccount[target.account, default: [:]][chatID] = row
             }
             if target === runtime { refreshChatList() }
+        } else if let type = object["@type"] as? String, type == "updateChatReadInbox",
+                  let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
+                  let unreadCount = (object["unread_count"] as? NSNumber)?.intValue,
+                  var row = chatRowsByAccount[target.account]?[chatID] {
+            row.unreadCount = max(0, unreadCount)
+            chatRowsByAccount[target.account, default: [:]][chatID] = row
+            if target === runtime, !lockState { refreshChatList() }
+        } else if let type = object["@type"] as? String, type == "updateChatNotificationSettings",
+                  let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
+                  let settings = object["notification_settings"] as? [String: Any],
+                  var row = chatRowsByAccount[target.account]?[chatID] {
+            let inheritsMute = (settings["use_default_mute_for"] as? Bool) ?? false
+            let muteFor = (settings["mute_for"] as? NSNumber)?.intValue ?? 0
+            row.isMuted = !inheritsMute && muteFor > 0
+            chatRowsByAccount[target.account, default: [:]][chatID] = row
+            if target === runtime, !lockState { refreshChatList() }
         } else if let type = object["@type"] as? String, type == "updateChatPosition",
                   let chatID = (object["chat_id"] as? NSNumber)?.int64Value,
                   let position = object["position"] as? [String: Any] {
@@ -3291,7 +3321,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 renderMessages(cached)
             }
             if let existing = chatRowsByAccount[target.account]?[chatID] {
-                chatRowsByAccount[target.account, default: [:]][chatID] = (existing.title, messagePreview(message))
+                var row = existing
+                row.lastText = messagePreview(message)
+                row.lastMessageDate = (message["date"] as? NSNumber)?.int64Value
+                chatRowsByAccount[target.account, default: [:]][chatID] = row
                 if target === runtime { refreshChatList() }
             }
         } else if let type = object["@type"] as? String, type == "chat" {
@@ -3823,7 +3856,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         guard let id = (chat["id"] as? NSNumber)?.int64Value else { return }
         let title = (chat["title"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
         let last = chat["last_message"] as? [String: Any]
-        chatRowsByAccount[target.account, default: [:]][id] = (title?.isEmpty == false ? title! : "Чат \(id)", last.map(messagePreview) ?? "")
+        let notificationSettings = chat["notification_settings"] as? [String: Any]
+        let inheritsMute = (notificationSettings?["use_default_mute_for"] as? Bool) ?? false
+        chatRowsByAccount[target.account, default: [:]][id] = ChatListRowData(
+            title: title?.isEmpty == false ? title! : "Чат \(id)",
+            lastText: last.map(messagePreview) ?? "",
+            lastMessageDate: (last?["date"] as? NSNumber)?.int64Value,
+            unreadCount: max(0, (chat["unread_count"] as? NSNumber)?.intValue ?? 0),
+            isMuted: !inheritsMute && ((notificationSettings?["mute_for"] as? NSNumber)?.intValue ?? 0) > 0
+        )
         if let positions = chat["positions"] as? [[String: Any]],
            let main = positions.first(where: { ($0["list"] as? [String: Any])?["@type"] as? String == "chatListMain" }),
            let order = (main["order"] as? NSNumber)?.uint64Value {
@@ -3928,33 +3969,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return leftOrder == rightOrder ? lhs.key > rhs.key : leftOrder > rightOrder
         }) {
             let isSelected = account.flatMap { selectedChatByAccount[$0] } == id
-            let button = NSButton(title: "", target: self, action: #selector(openChatFromButton(_:)))
+            let button = ConversationListRowButton(
+                conversationTitle: value.title,
+                preview: value.lastText,
+                time: formattedChatTime(value.lastMessageDate),
+                unreadCount: value.unreadCount,
+                isMuted: value.isMuted,
+                chatID: id,
+                isSelected: isSelected,
+                target: self,
+                action: #selector(openChatFromButton(_:))
+            )
             button.identifier = NSUserInterfaceItemIdentifier(String(id))
-            button.alignment = .left
-            button.isBordered = false
             button.translatesAutoresizingMaskIntoConstraints = false
             button.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
-            button.lineBreakMode = .byTruncatingTail
-            button.wantsLayer = true
-            button.layer?.cornerRadius = 8
-            button.layer?.backgroundColor = (isSelected ? NSColor.selectedContentBackgroundColor : .clear).cgColor
-            let titleColor = isSelected ? NSColor.selectedControlTextColor : NSColor.labelColor
-            let snippetColor = isSelected ? NSColor.selectedControlTextColor.withAlphaComponent(0.82) : NSColor.secondaryLabelColor
-            let title = NSAttributedString(string: value.title, attributes: [
-                .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
-                .foregroundColor: titleColor,
-            ])
-            let snippet = NSAttributedString(string: "\n\(value.lastText)", attributes: [
-                .font: NSFont.systemFont(ofSize: 12),
-                .foregroundColor: snippetColor,
-            ])
-            let rowTitle = NSMutableAttributedString(attributedString: title)
-            rowTitle.append(snippet)
-            button.attributedTitle = rowTitle
-            button.frame.size.height = 52
-            button.setAccessibilityLabel("\(isSelected ? "Текущая переписка" : "Открыть переписку"): \(value.title). Последнее сообщение: \(value.lastText)")
             chatList.addArrangedSubview(button)
         }
+    }
+
+    private func formattedChatTime(_ timestamp: Int64?) -> String {
+        guard let timestamp, timestamp > 0 else { return "" }
+        let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
+        let formatter = DateFormatter()
+        if Calendar.current.isDateInToday(date) {
+            formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "jmm", options: 0, locale: .current)
+        } else if Calendar.current.isDate(date, equalTo: Date(), toGranularity: .weekOfYear) {
+            formatter.dateFormat = "EEE"
+        } else {
+            formatter.dateStyle = .short
+        }
+        return formatter.string(from: date)
     }
 
     @objc private func searchFieldChanged() {
