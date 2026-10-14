@@ -19,6 +19,12 @@ public enum RuntimeShutdownStartResult: Sendable, Equatable {
     case rejected(RuntimeShutdownRejection)
 }
 
+public enum RuntimeTerminationRequestDisposition: Sendable, Equatable {
+    case beginNewShutdown
+    case rejectWhilePending
+    case terminateAfterFinished
+}
+
 /// Owns the quit-only account-close acknowledgements and shared receiver drain.
 /// Profile logout and identity-recovery closes remain outside this coordinator.
 public struct RuntimeShutdownCoordinator: Sendable, Equatable {
@@ -31,6 +37,14 @@ public struct RuntimeShutdownCoordinator: Sendable, Equatable {
     public var isFinished: Bool { barrier.isFinished }
     public var pendingClientIDs: Set<Int32> { pendingClients }
     public var canDrainReceiver: Bool { barrier.isPending && pendingClients.isEmpty }
+
+    /// Reentrant macOS termination requests must not skip an in-flight receive
+    /// and reducer drain from an earlier `.terminateLater` reply.
+    public var terminationRequestDisposition: RuntimeTerminationRequestDisposition {
+        if barrier.isFinished { return .terminateAfterFinished }
+        if barrier.isPending { return .rejectWhilePending }
+        return .beginNewShutdown
+    }
 
     /// Starts one quit attempt with the exact set of clients the app will close.
     @discardableResult

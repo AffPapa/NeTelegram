@@ -296,7 +296,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
-        if shutdownCoordinator.isFinished { return .terminateNow }
+        switch shutdownCoordinator.terminationRequestDisposition {
+        case .terminateAfterFinished:
+            return .terminateNow
+        case .rejectWhilePending:
+            // Keep the original terminateLater reply until receiver/reducer
+            // work drains; a second Cmd+Q cannot skip that barrier.
+            return .terminateCancel
+        case .beginNewShutdown:
+            break
+        }
         guard flushDirtyDraftsBeforeQuit() else { return .terminateCancel }
         if profileRestoreInProgress {
             _ = profileRestoreGenerationGate.invalidate()

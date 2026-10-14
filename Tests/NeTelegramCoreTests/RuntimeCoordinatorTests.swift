@@ -538,8 +538,10 @@ import Testing
 @Test func runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain() {
     var shutdown = RuntimeShutdownCoordinator()
     let clients = Set((0..<20).map(Int32.init))
+    #expect(shutdown.terminationRequestDisposition == .beginNewShutdown)
     let began = shutdown.begin(clients: clients)
     #expect(began)
+    #expect(shutdown.terminationRequestDisposition == .rejectWhilePending)
     #expect(shutdown.pendingClientIDs == clients)
     let prematureDrain = shutdown.beginReceiverDrain()
     #expect(!prematureDrain)
@@ -555,9 +557,11 @@ import Testing
     #expect(!duplicateAcknowledgement)
     let beganDrain = shutdown.beginReceiverDrain()
     #expect(beganDrain)
+    #expect(shutdown.terminationRequestDisposition == .rejectWhilePending)
     let finishedDrain = shutdown.finishReceiverDrain()
     #expect(finishedDrain)
     #expect(shutdown.isFinished)
+    #expect(shutdown.terminationRequestDisposition == .terminateAfterFinished)
     let duplicateBegin = shutdown.begin(clients: clients)
     #expect(!duplicateBegin)
 }
