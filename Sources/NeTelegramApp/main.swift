@@ -2182,8 +2182,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                             await self?.receive(event)
                         }
                     },
-                    onReceiveFailure: { [weak self] _ in
-                        await self?.handleTDLibReceiveFailure()
+                    onReceiveFailure: { [weak self] failure in
+                        await self?.handleTDLibReceiveFailure(failure)
                     }
                 )
             }
@@ -2375,10 +2375,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         }
     }
 
-    private func handleTDLibReceiveFailure() {
+    private func handleTDLibReceiveFailure(_ failure: TDLibGatewayError) {
         tdlibReceiveFailed = true
         refreshComposerState()
-        setStatus("TDLib остановил приём обновлений после ошибки копирования события. Отправка приостановлена; перезапустите \(ProductIdentity.displayName) после освобождения памяти.")
+        let message: String
+        switch failure {
+        case .routingFailure(let routingError):
+            message = "TDLib остановил общий приём: update нельзя безопасно связать с профилем (\(routingError)). Отправка всех профилей приостановлена; перезапустите \(ProductIdentity.displayName)."
+        case .updateTooLarge(let maximumBytes):
+            message = "TDLib остановил приём: размер update превысил лимит \(maximumBytes) байт. Отправка приостановлена; перезапустите \(ProductIdentity.displayName)."
+        case .receiveCopyFailed:
+            message = "TDLib остановил приём после ошибки копирования события. Отправка приостановлена; перезапустите \(ProductIdentity.displayName) после освобождения памяти."
+        default:
+            message = "TDLib остановил общий приём обновлений (\(failure)). Отправка приостановлена; перезапустите \(ProductIdentity.displayName)."
+        }
+        setStatus(message)
     }
 
     private func clearRevokedIdentityPresentation(for target: LocalAccountRuntime) {

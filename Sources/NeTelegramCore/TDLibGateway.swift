@@ -7,6 +7,7 @@ public enum TDLibGatewayError: Error, Equatable, Sendable {
     case requestRejected
     case receiveCopyFailed
     case updateTooLarge(maximumBytes: Int)
+    case routingFailure(TDLibRoutingError)
 }
 
 enum TDLibReceivePollResult: Sendable {
@@ -135,6 +136,13 @@ public final class TDLibGateway: @unchecked Sendable {
         stopLock.lock()
         stopping = true
         stopLock.unlock()
+    }
+
+    /// Fail-stops user commands when the global receive stream can no longer
+    /// be safely associated with an account. The pipeline owns delivery of the
+    /// terminal callback after all previously admitted updates are drained.
+    func failReceive(_ error: TDLibGatewayError) -> TDLibGatewayError {
+        markReceiveFailed(error: error)
     }
 
     /// True only after the dedicated thread has returned from its final

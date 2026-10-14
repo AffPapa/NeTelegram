@@ -807,6 +807,67 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
 }
 
+@Test func unknownClientUpdateFailsSharedReceiverAfterDrainingAcceptedEvents() async throws {
+    let coordinator = RuntimeCoordinator(startupParallelism: 2)
+    let account = AccountUUID()
+    let route = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(17))
+    try await coordinator.registerBeforeFirstRequest(route)
+
+    let pollCount = LockedTestValue(0)
+    let gateway = TDLibGateway { _ in
+        let current = pollCount.get()
+        pollCount.set(current + 1)
+        switch current {
+        case 0:
+            return .update(Data(#"{"@client_id":17,"@type":"updateConnectionState"}"#.utf8))
+        case 1:
+            return .update(Data(#"{"@client_id":99,"@type":"updateDeleteMessages"}"#.utf8))
+        default:
+            return .timeout
+        }
+    }
+    let pipeline = TDLibUpdatePipeline(gateway: gateway, coordinator: coordinator)
+    let events = LockedTestValue<[String]>([])
+    let failed = LockedTestValue(false)
+    pipeline.start(
+        onEvent: { event in
+            switch event {
+            case .routed(let update):
+                events.mutate { $0.append("routed-\(update.route.client.value)") }
+            case .routingFailure(.unregisteredClientID(let client)):
+                events.mutate { $0.append("unknown-\(client.value)") }
+            case .routingFailure:
+                events.mutate { $0.append("other-routing-failure") }
+            }
+        },
+        onReceiveFailure: { error in
+            if error == .routingFailure(.unregisteredClientID(ClientID(99))) {
+                events.mutate { $0.append("terminal") }
+            }
+            failed.set(true)
+        }
+    )
+
+    #expect(await waitForTrue(failed, timeout: .seconds(2)))
+    let delivered = events.get()
+    #expect(delivered.contains("routed-17"))
+    #expect(delivered.contains("unknown-99"))
+    #expect(delivered.last == "terminal")
+    let workerDeadline = ContinuousClock.now.advanced(by: .seconds(2))
+    while !gateway.receiveWorkerHasExited && ContinuousClock.now < workerDeadline {
+        try await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(gateway.receiveWorkerHasExited)
+    do {
+        try gateway.send("{}", to: route.client)
+        Issue.record("Gateway must reject every account send after an unrouteable update")
+    } catch let error as TDLibGatewayError {
+        #expect(error == .routingFailure(.unregisteredClientID(ClientID(99))))
+    } catch {
+        Issue.record("Unexpected gateway error: \(error)")
+    }
+}
+
 @Test func accountPickerUsesHumanLocalLabelsAndExplicitAuthorizationStatus() {
     #expect(AccountPresentation.pickerStatus(
         telegramUserID: 123,

@@ -264,6 +264,8 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
     private let reducerExited = DispatchGroup()
     private var started = false
     private var drainRequested = false
+    private var receiveFailureNotified = false
+    private var onReceiveFailure: (@Sendable (TDLibGatewayError) async -> Void)?
 
     var isDrainRequested: Bool {
         lock.lock()
@@ -289,10 +291,14 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
         lock.lock()
         precondition(!started, "TDLib update pipeline may only be started once")
         started = true
+        self.onReceiveFailure = onReceiveFailure
         reducerExited.enter()
         lock.unlock()
 
-        let reducer = Thread { [buffer, coordinator, reducerExited, delivery] in
+        let reportFailure: @Sendable (TDLibGatewayError) -> Void = { [weak self] error in
+            self?.notifyReceiveFailure(error)
+        }
+        let reducer = Thread { [buffer, coordinator, reducerExited, delivery, gateway, reportFailure] in
             defer { reducerExited.leave() }
             while let update = buffer.take() {
                 let completed = DispatchSemaphore(value: 0)
@@ -304,6 +310,10 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
                         event = .routingFailure(error)
                     } catch {
                         event = .routingFailure(.malformedUpdate)
+                    }
+                    if case .routingFailure(let routingError) = event {
+                        let terminal = gateway.failReceive(.routingFailure(routingError))
+                        reportFailure(terminal)
                     }
                     delivery.enqueue(event, update: update, buffer: buffer, onEvent: onEvent)
                     completed.signal()
@@ -320,17 +330,31 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
             onUpdate: { [buffer] update in
                 buffer.admit(update)
             },
-            onFailure: { [buffer, reducerExited] failure in
-                // The receive worker has returned from td_receive and cannot
-                // append another item. Close input, drain every accepted update,
-                // then surface the terminal failure to the application.
-                buffer.close()
-                DispatchQueue.global(qos: .userInitiated).async {
-                    reducerExited.wait()
-                    Task { await onReceiveFailure(failure) }
-                }
+            onFailure: { failure in
+                reportFailure(failure)
             }
         )
+    }
+
+    private func notifyReceiveFailure(_ error: TDLibGatewayError) {
+        lock.lock()
+        guard !receiveFailureNotified else {
+            lock.unlock()
+            return
+        }
+        receiveFailureNotified = true
+        let handler = onReceiveFailure
+        lock.unlock()
+
+        // Stop admission but preserve one update already returned by
+        // td_receive. The reducer routes and delivers every accepted event,
+        // then the app is told that the shared receiver is no longer trusted.
+        buffer.close(allowInFlightReceive: true)
+        DispatchQueue.global(qos: .userInitiated).async { [reducerExited] in
+            reducerExited.wait()
+            guard let handler else { return }
+            Task { await handler(error) }
+        }
     }
 
     /// Stops TDLib input and closes admission immediately. Closing the buffer
