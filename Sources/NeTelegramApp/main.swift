@@ -216,6 +216,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private let telegramAPIHashReadiness = TelegramAPIHashReadiness()
 #if DEBUG
     private var windowLifecycleSmokeRecorder: WindowLifecycleSmokeRecorder?
+    private var authLayoutPreviewEnabled = false
+    private var authLayoutPreviewIndex = 0
+    private var authLayoutPreviewEventMonitor: Any?
+    private let authLayoutPreviewStates = ["phone", "code", "password", "qr", "registration"]
 #endif
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -224,12 +228,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         buildMainMenu()
         buildWindow()
         loadBundledPhoneCountries()
-        buildStatusItem()
-        startConnectionObservers()
+#if DEBUG
+        authLayoutPreviewEnabled = configureAuthenticationLayoutPreviewIfRequested()
+#endif
+        if !authLayoutPreviewEnabledForCurrentBuild {
+            buildStatusItem()
+            startConnectionObservers()
+        }
         NSApp.activate(ignoringOtherApps: true)
-        Task { @MainActor in await restoreProfiles() }
+        if !authLayoutPreviewEnabledForCurrentBuild {
+            Task { @MainActor in await restoreProfiles() }
+        }
 #if DEBUG
         configureWindowLifecycleSmokeIfRequested()
+#endif
+    }
+
+    private var authLayoutPreviewEnabledForCurrentBuild: Bool {
+#if DEBUG
+        authLayoutPreviewEnabled
+#else
+        false
 #endif
     }
 
@@ -1074,6 +1093,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func primaryAction() {
+#if DEBUG
+        if authLayoutPreviewEnabled {
+            setStatus("Предпросмотр экранов входа: сетевые запросы отключены.")
+            return
+        }
+#endif
         guard !lockState else { return }
         guard let runtime else {
             guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber" else {
@@ -6707,6 +6732,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     @objc private func beginQRLogin() {
+#if DEBUG
+        if authLayoutPreviewEnabled {
+            setStatus("Предпросмотр экранов входа: вход по QR не запускается.")
+            return
+        }
+#endif
         guard !lockState else { return }
         guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber" else {
             setStatus("Подождите, пока Telegram подготовит экран входа.")
@@ -6774,6 +6805,76 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         if lockState { unlock() }
     }
 #if DEBUG
+    private func configureAuthenticationLayoutPreviewIfRequested() -> Bool {
+        authLayoutPreviewEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+            guard modifiers.contains([.command, .option]), event.charactersIgnoringModifiers == "0" else {
+                return event
+            }
+            Task { @MainActor [weak self] in self?.advanceOrBeginAuthenticationLayoutPreview() }
+            return nil
+        }
+        guard CommandLine.arguments.contains("--ci-auth-layout-preview") else { return false }
+        return beginAuthenticationLayoutPreview()
+    }
+
+    private func advanceOrBeginAuthenticationLayoutPreview() {
+        if authLayoutPreviewEnabled {
+            advanceAuthenticationLayoutPreview()
+        } else {
+            _ = beginAuthenticationLayoutPreview()
+        }
+    }
+
+    @discardableResult
+    private func beginAuthenticationLayoutPreview() -> Bool {
+        guard runtime == nil, runtimesByClient.isEmpty, profileOrder.isEmpty, !profileRestoreInProgress else {
+            setStatus("Предпросмотр доступен только без профилей и активных аккаунтов.")
+            return false
+        }
+        authLayoutPreviewEnabled = true
+        authLayoutPreviewIndex = 0
+        window.setFrame(
+            NSRect(origin: window.frame.origin, size: NSSize(width: 900, height: 700)),
+            display: true
+        )
+        window.center()
+        presentAuthenticationLayoutPreview(at: authLayoutPreviewIndex)
+        return true
+    }
+
+    private func advanceAuthenticationLayoutPreview() {
+        guard authLayoutPreviewEnabled else { return }
+        authLayoutPreviewIndex = (authLayoutPreviewIndex + 1) % authLayoutPreviewStates.count
+        presentAuthenticationLayoutPreview(at: authLayoutPreviewIndex)
+    }
+
+    private func presentAuthenticationLayoutPreview(at index: Int) {
+        let state = authLayoutPreviewStates[index]
+        window.title = "\(ProductIdentity.displayName) · auth preview \(state)"
+        switch state {
+        case "phone":
+            pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+            showPhoneEntry()
+        case "code":
+            pendingAuthorizationType = "authorizationStateWaitCode"
+            showAuthInput("Введите демонстрационный код подтверждения.", placeholder: "Код", button: "Продолжить")
+        case "password":
+            pendingAuthorizationType = "authorizationStateWaitPassword"
+            showAuthInput("Введите демонстрационный пароль двухэтапной проверки.", placeholder: "Пароль двухэтапной проверки", button: "Продолжить")
+        case "qr":
+            pendingAuthorizationType = "authorizationStateWaitOtherDeviceConfirmation"
+            showQRConfirmation(["link": "tg://login?token=LOCAL_PREVIEW_DO_NOT_SCAN"])
+            setStatus("Локальный предпросмотр QR. Ссылка не является приглашением для входа.")
+        case "registration":
+            pendingAuthorizationType = "authorizationStateWaitRegistration"
+            showRegistration(["terms_of_service": ["text": ["text": "Локальный демонстрационный текст условий регистрации. В этом предпросмотре нет реальной регистрации или сетевого соединения."]]])
+        default:
+            return
+        }
+        window.contentView?.layoutSubtreeIfNeeded()
+    }
+
     private var visibleApplicationWindowCount: Int {
         NSApp.windows.filter { $0.isVisible && $0.styleMask.contains(.titled) }.count
     }
