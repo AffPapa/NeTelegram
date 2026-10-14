@@ -1186,6 +1186,42 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(IncomingMessagePresentation.cardText(for: "messagePaidMedia").contains("не выполняет оплату"))
 }
 
+@Test func unsupportedMessageCardsKeepAvailableCaptionMetadataAndTime() {
+    let message: [String: Any] = [
+        "id": 42,
+        "chat_id": 9001,
+        "sender_id": ["@type": "messageSenderUser", "user_id": 17],
+        "date": 1_700_000_000,
+        "content": [
+            "@type": "messageDocument",
+            "caption": ["@type": "formattedText", "text": "  Квитанция за поездку  ", "entities": []],
+            "document": ["file_name": "receipt.pdf", "local": ["path": "/private/account/secret.pdf"]],
+        ],
+    ]
+
+    let details = IncomingMessagePresentation.contextLines(for: message)
+    #expect(details.first == "Квитанция за поездку")
+    #expect(details.contains("receipt.pdf"))
+    #expect(details.contains(where: { $0.hasPrefix("Дата сообщения:") }))
+    #expect(!details.contains(where: { $0.contains("9001") || $0.contains("17") || $0.contains("/private/account") }))
+}
+
+@Test func unsupportedMessageCardsPreserveAudioAndPollContextWithoutConstructorNames() {
+    let audio: [String: Any] = [
+        "content": ["@type": "messageAudio", "audio": ["title": "Трек", "performer": "Исполнитель"]],
+    ]
+    let poll: [String: Any] = [
+        "content": ["@type": "messagePoll", "poll": ["question": "Куда поедем?"]],
+    ]
+    let future: [String: Any] = [
+        "content": ["@type": "messageFutureType", "caption": ["text": "Контекст будущего типа"]],
+    ]
+
+    #expect(IncomingMessagePresentation.contextLines(for: audio) == ["Исполнитель — Трек"])
+    #expect(IncomingMessagePresentation.contextLines(for: poll) == ["Куда поедем?"])
+    #expect(IncomingMessagePresentation.contextLines(for: future) == ["Контекст будущего типа"])
+}
+
 @Test func developmentBundlesGetSeparateAccountCataloguesAndReleasePathStaysStable() {
     let support = URL(fileURLWithPath: "/tmp/example-support", isDirectory: true)
     let first = AccountStorageRoot.resolve(

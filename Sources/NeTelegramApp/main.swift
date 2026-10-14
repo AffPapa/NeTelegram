@@ -8,6 +8,23 @@ import UniformTypeIdentifiers
 import UserNotifications
 import NeTelegramCore
 
+/// Fills window content with a semantic color at draw time so appearance and
+/// accessibility contrast changes are resolved by AppKit instead of being
+/// frozen into a CGColor when the view is created.
+private final class SystemWindowBackgroundView: NSView {
+    override var isOpaque: Bool { true }
+
+    override func draw(_ dirtyRect: NSRect) {
+        NSColor.windowBackgroundColor.setFill()
+        dirtyRect.fill()
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+}
+
 private struct ChatListRowData {
     var title: String
     var lastText: String
@@ -374,13 +391,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildWindow() {
-        let contentWidth: CGFloat = 640
-        let contentHeight: CGFloat = 680
-        let content = NSView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
+        let contentWidth: CGFloat = 620
+        let contentHeight: CGFloat = 600
+        let content = SystemWindowBackgroundView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
-        content.wantsLayer = true
-        content.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
 
         let mark = NSView(frame: .zero)
         mark.wantsLayer = true
@@ -853,10 +868,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         ])
         content.addSubview(chatPane)
 
-        lockedView = NSView(frame: content.bounds)
+        lockedView = SystemWindowBackgroundView(frame: content.bounds)
         lockedView.autoresizingMask = [.width, .height]
-        lockedView.wantsLayer = true
-        lockedView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
         lockedView.isHidden = true
         let lockedTitle = NSTextField(labelWithString: "\(ProductIdentity.displayName) заблокирован")
         lockedTitle.identifier = NSUserInterfaceItemIdentifier("lockedTitle")
@@ -914,8 +927,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countrySuggestionLabel.isHidden = true
             window.minSize = NSSize(width: 560, height: 520)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
-                ? NSSize(width: 620, height: 640)
-                : NSSize(width: 640, height: 680)
+                ? NSSize(width: 560, height: 520)
+                : NSSize(width: 620, height: 600)
             if window.contentView?.bounds.size != compactSize {
                 window.setContentSize(compactSize)
                 window.center()
@@ -5874,6 +5887,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             label.widthAnchor.constraint(lessThanOrEqualToConstant: max(120, maximumWidth - 24)).isActive = true
             label.setAccessibilityLabel("\(isOutgoing ? "Отправленное" : "Входящее") сообщение. \(textValue)")
             bubble.addArrangedSubview(label)
+            for detail in IncomingMessagePresentation.contextLines(for: message) {
+                let contextLabel = NSTextField(wrappingLabelWithString: detail)
+                contextLabel.font = .systemFont(ofSize: 12)
+                contextLabel.textColor = .secondaryLabelColor
+                contextLabel.maximumNumberOfLines = 0
+                contextLabel.widthAnchor.constraint(lessThanOrEqualToConstant: max(120, maximumWidth - 24)).isActive = true
+                bubble.addArrangedSubview(contextLabel)
+            }
         }
         appendReplyAction(message, into: bubble)
         appendMessageActions(message, into: bubble)
