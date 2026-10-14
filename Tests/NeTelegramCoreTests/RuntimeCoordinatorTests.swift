@@ -1520,6 +1520,51 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await coordinator.isCurrent(newRoute))
 }
 
+@MainActor @Test func callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime() async throws {
+    let coordinator = RuntimeCoordinator()
+    let account = AccountUUID()
+    let oldRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(195))
+    try await coordinator.registerBeforeFirstRequest(oldRoute)
+
+    let consumeGate = AsyncTestGate()
+    let coordinatorCheckGate = AsyncTestGate()
+    let callbackStarted = LockedTestValue(false)
+    let coordinatorCheckStarted = LockedTestValue(false)
+    let localRoute = LockedTestValue(oldRoute)
+    let sideEffectsApplied = LockedTestValue(false)
+    let callback = Task { @MainActor in
+        // Represents LocalAccountRuntime.consume suspending while the
+        // verified Telegram identity is persisted.
+        callbackStarted.set(true)
+        await consumeGate.wait()
+        let stillOwnsRoute = await RuntimeUpdateOwnership.isCurrent(
+            oldRoute,
+            coordinatorRouteIsCurrent: {
+                let wasCurrentBeforeSuspension = await coordinator.isCurrent(oldRoute)
+                coordinatorCheckStarted.set(true)
+                await coordinatorCheckGate.wait()
+                return wasCurrentBeforeSuspension
+            },
+            localOwnerIsCurrent: { localRoute.get() == oldRoute }
+        )
+        if stillOwnsRoute { sideEffectsApplied.set(true) }
+        return stillOwnsRoute
+    }
+    #expect(await waitForTrue(callbackStarted, timeout: .seconds(1)))
+    await consumeGate.open()
+    #expect(await waitForTrue(coordinatorCheckStarted, timeout: .seconds(1)))
+
+    #expect(await coordinator.applyAuthorizationState("authorizationStateClosed", telegramUserID: nil, from: oldRoute))
+    let replacement = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(196))
+    try await coordinator.registerBeforeFirstRequest(replacement)
+    localRoute.set(replacement)
+    await coordinatorCheckGate.open()
+
+    #expect(!(await callback.value))
+    #expect(!sideEffectsApplied.get())
+    #expect(await coordinator.isCurrent(replacement))
+}
+
 @Test func rejectedFirstRequestRemovesOnlyItsUninitializedRoute() async throws {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()

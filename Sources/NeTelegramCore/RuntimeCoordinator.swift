@@ -40,6 +40,21 @@ public struct RuntimeRoute: Sendable, Equatable {
     }
 }
 
+/// Revalidates ownership after a runtime callback has suspended. The
+/// coordinator is checked first; local UI/runtime ownership is checked only
+/// after that await, while executing on the main actor.
+@MainActor
+public enum RuntimeUpdateOwnership {
+    public static func isCurrent(
+        _ route: RuntimeRoute,
+        coordinatorRouteIsCurrent: @Sendable () async -> Bool,
+        localOwnerIsCurrent: @MainActor () -> Bool
+    ) async -> Bool {
+        guard await coordinatorRouteIsCurrent() else { return false }
+        return localOwnerIsCurrent()
+    }
+}
+
 public struct RoutedTDLibUpdate: Sendable {
     public let route: RuntimeRoute
     public let json: Data

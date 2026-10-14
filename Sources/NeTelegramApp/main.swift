@@ -2608,10 +2608,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // MainActor may process close/reopen while the actor check is in
             // flight, so local ownership checks placed before this await are
             // stale as soon as control resumes.
-            let coordinatorRouteIsCurrent = await runtimeCoordinator.isCurrent(update.route)
-            guard coordinatorRouteIsCurrent,
-                  target.route == update.route,
-                  runtimesByClient[update.route.client.value] === target else { return }
+            guard await RuntimeUpdateOwnership.isCurrent(
+                update.route,
+                coordinatorRouteIsCurrent: { await runtimeCoordinator.isCurrent(update.route) },
+                localOwnerIsCurrent: {
+                    target.route == update.route
+                        && runtimesByClient[update.route.client.value] === target
+                }
+            ) else { return }
             if previousTelegramUserID != nil,
                target.telegramUserID == nil,
                !target.isLogoutRequested {
