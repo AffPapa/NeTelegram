@@ -2430,9 +2430,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             // replacement can happen during that await, so revalidate both the
             // coordinator route and AppDelegate ownership before applying any
             // UI, notification, or account-state side effects from this event.
-            guard target.route == update.route,
-                  runtimesByClient[update.route.client.value] === target,
-                  await runtimeCoordinator.isCurrent(update.route) else { return }
+            // Await the coordinator before reading AppDelegate-owned state.
+            // MainActor may process close/reopen while the actor check is in
+            // flight, so local ownership checks placed before this await are
+            // stale as soon as control resumes.
+            let coordinatorRouteIsCurrent = await runtimeCoordinator.isCurrent(update.route)
+            guard coordinatorRouteIsCurrent,
+                  target.route == update.route,
+                  runtimesByClient[update.route.client.value] === target else { return }
             if previousTelegramUserID != nil,
                target.telegramUserID == nil,
                !target.isLogoutRequested {
