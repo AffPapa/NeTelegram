@@ -4973,6 +4973,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        if control === phoneField,
+           commandSelector == #selector(NSResponder.insertTab(_:)),
+           !countryPickerStack.isHidden,
+           selectedCountryRegionCode == nil,
+           !phoneField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("+") {
+            return window?.makeFirstResponder(countryPicker) == true
+        }
         let isAuthenticationField = control === phoneField || control === emailField || control === inputField
             || control === secureInputField || control === firstNameField || control === lastNameField
         guard AuthTextFieldKeyboardPolicy.shouldSubmit(
