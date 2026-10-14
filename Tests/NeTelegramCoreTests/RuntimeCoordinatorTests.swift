@@ -673,6 +673,7 @@ private final class FakeKeychainItemBackend: KeychainItemBackend, @unchecked Sen
     private var values: [FakeKeychainCoordinate: Data]
     private var deleted: [FakeKeychainCoordinate] = []
     private var reads = 0
+    private var interactiveReads = 0
     private var adds = 0
     private var updates = 0
     private var readFailure: OSStatus?
@@ -695,9 +696,18 @@ private final class FakeKeychainItemBackend: KeychainItemBackend, @unchecked Sen
     }
 
     func read(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        readValue(account: account, service: service, interactive: false)
+    }
+
+    func readInteractively(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        readValue(account: account, service: service, interactive: true)
+    }
+
+    private func readValue(account: String, service: String, interactive: Bool) -> (status: OSStatus, data: Data?) {
         lock.lock()
         defer { lock.unlock() }
         reads += 1
+        if interactive { interactiveReads += 1 }
         if let readFailure { return (readFailure, nil) }
         guard let data = values[FakeKeychainCoordinate(account: account, service: service)] else {
             return (errSecItemNotFound, nil)
@@ -736,10 +746,10 @@ private final class FakeKeychainItemBackend: KeychainItemBackend, @unchecked Sen
         return values.removeValue(forKey: coordinate) == nil ? errSecItemNotFound : errSecSuccess
     }
 
-    var operationCounts: (reads: Int, adds: Int, updates: Int) {
+    var operationCounts: (reads: Int, interactiveReads: Int, adds: Int, updates: Int) {
         lock.lock()
         defer { lock.unlock() }
-        return (reads, adds, updates)
+        return (reads, interactiveReads, adds, updates)
     }
 
     var deletedCoordinates: [FakeKeychainCoordinate] {
@@ -1276,6 +1286,32 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(context != nil)
     #expect(context?.interactionNotAllowed == true)
     #expect(query[kSecUseAuthenticationUI as String] == nil)
+}
+
+@Test func secretsStoreInteractiveReadIsExplicitAndDoesNotReuseNoninteractiveContext() {
+    let query = SecretsStore.keychainReadQuery(
+        account: "test-account",
+        service: "test-service",
+        allowingInteraction: true
+    )
+    #expect(query[kSecAttrAccount as String] as? String == "test-account")
+    #expect(query[kSecAttrService as String] as? String == "test-service")
+    #expect(query[kSecUseAuthenticationContext as String] == nil)
+    #expect(query[kSecUseAuthenticationUI as String] == nil)
+}
+
+@Test func telegramAPIHashUsesInteractiveKeychainReadOnlyWhenExplicitlyRequested() throws {
+    let value = "0123456789abcdef0123456789ABCDEF"
+    let backend = FakeKeychainItemBackend(values: [
+        FakeKeychainCoordinate(
+            account: TelegramApplicationIdentity.keychainAccount,
+            service: TelegramApplicationIdentity.keychainService
+        ): Data(value.utf8)
+    ])
+
+    #expect(try SecretsStore(backend: backend).telegramAPIHash(allowingUserInteraction: true) == value)
+    #expect(backend.operationCounts.reads == 1)
+    #expect(backend.operationCounts.interactiveReads == 1)
 }
 
 @Test func telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters() {
@@ -3876,6 +3912,31 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         return "replacement-value"
     } == "replacement-value")
     #expect(loadCount.get() == 2)
+}
+
+@Test func userAuthorizedAPIHashSupersedesStalledNoninteractiveLookup() async throws {
+    let readiness = TelegramAPIHashReadiness()
+    let gate = AsyncStringGate()
+    let lookupStarted = LockedTestValue(false)
+    let staleWaiter = Task {
+        try await readiness.value(timeout: 2) {
+            lookupStarted.set(true)
+            return await gate.wait()
+        }
+    }
+
+    #expect(await waitForTrue(lookupStarted, timeout: .seconds(1)))
+    readiness.acceptVerifiedValue("synthetic-authorized-value")
+    do {
+        _ = try await staleWaiter.value
+        Issue.record("The superseded noninteractive waiter should be invalidated")
+    } catch TelegramAPIHashReadinessError.invalidated {
+        #expect(true)
+    }
+    #expect(try await readiness.value { "unexpected replacement read" } == "synthetic-authorized-value")
+
+    await gate.open("late stale value")
+    #expect(try await readiness.value { "unexpected third read" } == "synthetic-authorized-value")
 }
 
 @Test func replacingAPIHashDiscardsOldInFlightLookupBeforeStartingProfiles() async throws {

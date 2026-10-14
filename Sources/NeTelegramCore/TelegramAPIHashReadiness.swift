@@ -64,6 +64,21 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
         finishReplacement()
     }
 
+    /// Accepts a value that the user explicitly authorized the system Keychain
+    /// to return. This supersedes any stalled noninteractive lookup without
+    /// exposing the value to presentation or diagnostics.
+    public func acceptVerifiedValue(_ value: String) {
+        lock.lock()
+        let staleGeneration = generation
+        generation &+= 1
+        cachedValue = (generation, value)
+        pendingLoader = nil
+        replacementInProgress = false
+        let staleWaiters = waiters.removeValue(forKey: staleGeneration).map { Array($0.values) } ?? []
+        lock.unlock()
+        staleWaiters.forEach { $0.resume(throwing: TelegramAPIHashReadinessError.invalidated) }
+    }
+
     /// Call before writing a replacement hash so fresh lookups cannot observe
     /// the old Keychain value while the write is still in progress.
     public func beginReplacement() {

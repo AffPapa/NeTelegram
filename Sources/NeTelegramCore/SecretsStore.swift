@@ -4,14 +4,37 @@ import Security
 
 protocol KeychainItemBackend: Sendable {
     func read(account: String, service: String) -> (status: OSStatus, data: Data?)
+    func readInteractively(account: String, service: String) -> (status: OSStatus, data: Data?)
     func add(data: Data, account: String, service: String) -> OSStatus
     func update(data: Data, account: String, service: String) -> OSStatus
     func delete(account: String, service: String) -> OSStatus
 }
 
+extension KeychainItemBackend {
+    func readInteractively(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        read(account: account, service: service)
+    }
+}
+
 private struct SecurityKeychainItemBackend: KeychainItemBackend {
     func read(account: String, service: String) -> (status: OSStatus, data: Data?) {
-        var query = SecretsStore.keychainReadQuery(account: account, service: service)
+        read(account: account, service: service, allowingInteraction: false)
+    }
+
+    func readInteractively(account: String, service: String) -> (status: OSStatus, data: Data?) {
+        read(account: account, service: service, allowingInteraction: true)
+    }
+
+    private func read(
+        account: String,
+        service: String,
+        allowingInteraction: Bool
+    ) -> (status: OSStatus, data: Data?) {
+        var query = SecretsStore.keychainReadQuery(
+            account: account,
+            service: service,
+            allowingInteraction: allowingInteraction
+        )
         query[kSecReturnData as String] = true
         query[kSecMatchLimit as String] = kSecMatchLimitOne
         var result: CFTypeRef?
@@ -92,11 +115,12 @@ public struct SecretsStore: Sendable {
         OperationQueue.current === keychainOperationQueue
     }
 
-    public func telegramAPIHash() throws -> String {
-        let result = backend.read(
-            account: TelegramApplicationIdentity.keychainAccount,
-            service: TelegramApplicationIdentity.keychainService
-        )
+    public func telegramAPIHash(allowingUserInteraction: Bool = false) throws -> String {
+        let account = TelegramApplicationIdentity.keychainAccount
+        let service = TelegramApplicationIdentity.keychainService
+        let result = allowingUserInteraction
+            ? backend.readInteractively(account: account, service: service)
+            : backend.read(account: account, service: service)
         let status = result.status
         guard status != errSecItemNotFound else { throw SecretsStoreError.missing("Telegram API hash") }
         guard status == errSecSuccess else { throw SecretsStoreError.keychain(status) }
@@ -225,12 +249,15 @@ public struct SecretsStore: Sendable {
 
     static func keychainReadQuery(
         account: String,
-        service: String
+        service: String,
+        allowingInteraction: Bool = false
     ) -> [String: Any] {
-        let context = LAContext()
-        context.interactionNotAllowed = true
         var query = itemQuery(account: account, service: service)
-        query[kSecUseAuthenticationContext as String] = context
+        if !allowingInteraction {
+            let context = LAContext()
+            context.interactionNotAllowed = true
+            query[kSecUseAuthenticationContext as String] = context
+        }
         return query
     }
 }

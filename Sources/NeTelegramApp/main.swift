@@ -250,6 +250,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var notificationUnlockHandoff = NotificationUnlockHandoff()
     private var notificationAuthorizationRequestGate = NotificationAuthorizationRequestGate()
     private let telegramAPIHashReadiness = TelegramAPIHashReadiness()
+    private var apiHashAccessCheckInProgress = false
 #if DEBUG
     private var windowLifecycleSmokeRecorder: WindowLifecycleSmokeRecorder?
     private var authLayoutPreviewEnabled = false
@@ -1290,6 +1291,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         )
         apiHashSettings.target = self
         appMenu.addItem(apiHashSettings)
+        let apiHashAccess = NSMenuItem(
+            title: "Разрешить доступ к сохранённому API hash…",
+            action: #selector(allowSavedTelegramAPIHashAccess),
+            keyEquivalent: ""
+        )
+        apiHashAccess.target = self
+        appMenu.addItem(apiHashAccess)
         appMenu.addItem(.separator())
         appMenu.addItem(withTitle: "Выйти", action: #selector(quit), keyEquivalent: "q")
         appMenu.items.forEach { $0.target = self }
@@ -1435,6 +1443,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 self?.setStatus("API hash сохранён в Связке ключей. Введите номер и нажмите «Продолжить», чтобы начать новый вход.")
             } catch {
                 self?.setStatus("Не удалось сохранить API hash в Связку ключей. Значение не записано в файлы проекта.")
+            }
+        }
+    }
+
+    @objc private func allowSavedTelegramAPIHashAccess() {
+        guard !lockState, !closingForTermination else {
+            setStatus("Разблокируйте приложение, чтобы разрешить доступ к API hash.")
+            return
+        }
+        guard !apiHashAccessCheckInProgress else {
+            setStatus("Ожидаю ответ Связки ключей macOS; повторный запрос не запущен.")
+            return
+        }
+        apiHashAccessCheckInProgress = true
+        setStatus("Запрашиваю разрешение macOS прочитать сохранённый API hash. Само значение не отображается; вход в Telegram не запускается…")
+        Task { @MainActor [weak self] in
+            defer { self?.apiHashAccessCheckInProgress = false }
+            do {
+                let value = try await SecretsStore.performKeychainOperation {
+                    try SecretsStore().telegramAPIHash(allowingUserInteraction: true)
+                }
+                guard let self, !self.lockState, !self.closingForTermination else { return }
+                self.telegramAPIHashReadiness.acceptVerifiedValue(value)
+                self.setStatus("Доступ к сохранённому API hash подтверждён. Значение осталось в Связке ключей; нажмите «Продолжить», чтобы отдельно начать вход.")
+            } catch SecretsStoreError.missing {
+                self?.setStatus("Сохранённый API hash не найден. Запрос разрешения не менял Связку ключей; настройте значение через защищённое меню приложения.")
+            } catch {
+                self?.setStatus("macOS не разрешила прочитать API hash. Запись не изменялась; вход в Telegram не начинался.")
             }
         }
     }
