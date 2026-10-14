@@ -6141,18 +6141,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             photoOriginalLocalURLs.removeAll()
             photoOriginalKeysByFileID.removeAll()
             replyCandidatesByControlID.removeAll()
-            if let account = runtime?.account, let chatID = selectedChatByAccount[account] {
-                pendingPhotoByExtra = pendingPhotoByExtra.filter { $0.value.account == account && $0.value.chatID == chatID }
-            } else {
-                pendingPhotoByExtra.removeAll()
-            }
-            if let account = runtime?.account, let chatID = selectedChatByAccount[account] {
-                pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter { $0.value.account == account && $0.value.chatID == chatID }
-                requestedOriginalPhotos = Set(requestedOriginalPhotos.filter { $0.account == account && $0.chatID == chatID })
-            } else {
-                pendingOriginalPhotoByExtra.removeAll()
-                requestedOriginalPhotos.removeAll()
-            }
+            // Keep transport correlation until TDLib returns a terminal file
+            // update/error. UI intents and views above are cleared immediately.
+            requestedOriginalPhotos = Set(requestedOriginalPhotos.filter {
+                $0.account == runtime?.account && $0.chatID == selectedChatByAccount[$0.account]
+            })
         }
         for view in stack.arrangedSubviews {
             stack.removeArrangedSubview(view)
@@ -6505,18 +6498,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func presentDownloadedPhoto(_ file: [String: Any], from target: LocalAccountRuntime) {
-        guard !lockState,
-              let fileID = (file["id"] as? NSNumber)?.int32Value,
+        guard let fileID = (file["id"] as? NSNumber)?.int32Value,
               let local = file["local"] as? [String: Any],
-              local["is_downloading_completed"] as? Bool == true,
+              local["is_downloading_completed"] as? Bool == true else { return }
+        // Always reconcile transport admission, even while locked or viewing
+        // another conversation. Presentation below remains view/privacy gated.
+        PhotoDownloadSlotPolicy.releaseCompleted(account: target.account, fileID: fileID, from: &photoDownloadsByConversation)
+        let completedSponsored = pendingSponsoredPhotoByExtra.filter {
+            $0.value.account == target.account && $0.value.fileID == fileID
+        }
+        for extra in completedSponsored.keys { pendingSponsoredPhotoByExtra.removeValue(forKey: extra) }
+        pendingPhotoByExtra = pendingPhotoByExtra.filter {
+            $0.value.account != target.account || $0.value.fileID != fileID
+        }
+        pendingOriginalPhotoByExtra = pendingOriginalPhotoByExtra.filter {
+            $0.value.account != target.account || photoOriginalFileIDs[$0.value] != fileID
+        }
+        guard !lockState,
               let path = local["path"] as? String, !path.isEmpty,
               let chatID = selectedChatByAccount[target.account] else { return }
         let url = URL(fileURLWithPath: path)
-        photoDownloadsByConversation[ConversationKey(account: target.account, chatID: chatID)]?.remove(fileID)
         var completedSponsoredPhoto = false
         var sponsoredPresentationKeys: Set<PhotoPresentationKey> = []
-        for (extra, key) in pendingSponsoredPhotoByExtra.filter({ $0.value.account == target.account && $0.value.chatID == chatID && $0.value.fileID == fileID }) {
-            pendingSponsoredPhotoByExtra.removeValue(forKey: extra)
+        for (_, key) in completedSponsored where key.chatID == chatID {
             sponsoredPhotoURLs[key] = url
             sponsoredPresentationKeys.insert(PhotoPresentationKey(account: key.account, chatID: key.chatID, messageID: key.messageID, fileID: key.fileID))
             completedSponsoredPhoto = true
@@ -6527,9 +6531,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let conversation = currentConversationKey(for: target.account, chatID: chatID)
             clearStack(messageList)
             renderMessages(messagesByConversation[conversation] ?? [])
-        }
-        pendingPhotoByExtra = pendingPhotoByExtra.filter {
-            $0.value.account != target.account || $0.value.chatID != chatID || $0.value.fileID != fileID
         }
         for key in photoViews.keys where key.account == target.account && key.chatID == chatID && key.fileID == fileID && !sponsoredPresentationKeys.contains(key) {
             photoLocalURLs[key] = url
