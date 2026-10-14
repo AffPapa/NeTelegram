@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/metadata.yml'
+      - 'LICENSE'
+      - 'NOTICE'
       - 'ACCEPTANCE.json'
       - 'CONTRACTS.json'
       - 'TDLIB.lock.json'
@@ -15,10 +17,14 @@ on:
       - 'devlog-entry.template.json'
       - 'Scripts/validate_release.py'
       - 'Scripts/validate_checkpoint.py'
+      - 'Scripts/generate_sbom.py'
+      - 'Scripts/generate_release_notices.py'
       - 'Tests/release/**'
   pull_request:
     paths:
       - '.github/workflows/metadata.yml'
+      - 'LICENSE'
+      - 'NOTICE'
       - 'ACCEPTANCE.json'
       - 'CONTRACTS.json'
       - 'TDLIB.lock.json'
@@ -29,6 +35,8 @@ on:
       - 'devlog-entry.template.json'
       - 'Scripts/validate_release.py'
       - 'Scripts/validate_checkpoint.py'
+      - 'Scripts/generate_sbom.py'
+      - 'Scripts/generate_release_notices.py'
       - 'Tests/release/**'
   workflow_dispatch:
 
@@ -58,5 +66,14 @@ jobs:
           python3 -m json.tool release-manifest.template.json >/dev/null
           python3 -m json.tool release-index.template.json >/dev/null
           python3 -m json.tool devlog-entry.template.json >/dev/null
+          python3 Scripts/generate_sbom.py \
+            --version 0.0.0-ci \
+            --source-commit "$GITHUB_SHA" \
+            --timestamp 2026-01-01T00:00:00Z \
+            --output "$RUNNER_TEMP/netelegram-source-sbom.json"
+          python3 -m json.tool "$RUNNER_TEMP/netelegram-source-sbom.json" >/dev/null
+          python3 Scripts/generate_release_notices.py \
+            --output "$RUNNER_TEMP/NeTelegram-THIRD-PARTY-NOTICES.txt"
+          test -s "$RUNNER_TEMP/NeTelegram-THIRD-PARTY-NOTICES.txt"
           python3 Scripts/validate_checkpoint.py
           python3 -m unittest discover -s Tests/release -t . -p 'test_*.py' -v

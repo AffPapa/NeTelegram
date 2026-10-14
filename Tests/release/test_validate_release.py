@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import zipfile
 
 from Scripts.validate_release import ValidationError, validate_candidate, validate_receipt
 
@@ -11,23 +12,58 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
     assets = root / "assets"
     assets.mkdir()
     artifacts = []
-    for kind, filename in (("app_zip", "NeTelegram.zip"), ("dmg", "NeTelegram.dmg")):
-        path = assets / filename
-        data = f"fixture:{filename}".encode()
-        path.write_bytes(data)
+    source_commit = "a" * 40
+    executable_bytes = b"fixture:NeTelegram executable"
+    tdlib_bytes = b"fixture:libtdjson"
+    app_archive = assets / "NeTelegram.zip"
+    with zipfile.ZipFile(app_archive, "w") as archive:
+        archive.writestr("NeTelegram.app/Contents/MacOS/NeTelegram", executable_bytes)
+        archive.writestr("NeTelegram.app/Contents/Frameworks/libtdjson.dylib", tdlib_bytes)
+    sbom_path = assets / "NeTelegram.cdx.json"
+    sbom_path.write_text(json.dumps({
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.6",
+        "metadata": {"component": {
+            "name": "NeTelegram",
+            "version": "1.2.3",
+            "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(executable_bytes).hexdigest()}],
+            "properties": [
+                {"name": "neTelegram:source:commit", "value": source_commit},
+                {"name": "neTelegram:sbom:release-binary-audit", "value": "passed"},
+            ],
+        }},
+        "components": [{"name": "TDLib", "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(tdlib_bytes).hexdigest()}]}],
+    }), encoding="utf-8")
+    notice_path = assets / "THIRD-PARTY-NOTICES.txt"
+    notice_path.write_text("MIT License\nTDLib\nOpenSSL\ngperf\n", encoding="utf-8")
+    artifacts.extend([
+        {
+            "kind": "app_zip", "filename": app_archive.name, "path": app_archive.name,
+            "url": f"https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/{app_archive.name}",
+            "bytes": app_archive.stat().st_size, "sha256": hashlib.sha256(app_archive.read_bytes()).hexdigest(),
+            "signing_status": "passed", "notarization_status": "accepted_stapled", "gatekeeper_status": "passed",
+            "verification_evidence": ["notary-log-sha256:123", "gatekeeper-smoke:456"],
+        },
+        {
+            "kind": "dmg", "filename": "NeTelegram.dmg", "path": "NeTelegram.dmg",
+            "url": "https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/NeTelegram.dmg",
+            "bytes": len(b"fixture:NeTelegram.dmg"), "sha256": hashlib.sha256(b"fixture:NeTelegram.dmg").hexdigest(),
+            "signing_status": "passed", "notarization_status": "accepted_stapled", "gatekeeper_status": "passed",
+            "verification_evidence": ["notary-log-sha256:123", "gatekeeper-smoke:456"],
+        },
+    ])
+    (assets / "NeTelegram.dmg").write_bytes(b"fixture:NeTelegram.dmg")
+    for kind, path in (("sbom", sbom_path), ("notice", notice_path)):
+        data = path.read_bytes()
         artifacts.append({
             "kind": kind,
-            "filename": filename,
-            "path": filename,
-            "url": f"https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/{filename}",
+            "filename": path.name,
+            "path": path.name,
+            "url": f"https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/{path.name}",
             "bytes": len(data),
             "sha256": hashlib.sha256(data).hexdigest(),
-            "signing_status": "passed",
-            "notarization_status": "accepted_stapled",
-            "gatekeeper_status": "passed",
-            "verification_evidence": ["notary-log-sha256:123", "gatekeeper-smoke:456"],
+            "verification_evidence": ["fixture-source-and-byte-reconciliation"],
         })
-    source_commit = "a" * 40
     manifest = {
         "schema_version": 1,
         "record_status": "release_candidate",
@@ -76,6 +112,81 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
 
 
 class CandidateValidationTests(unittest.TestCase):
+    def test_duplicate_artifact_kinds_are_rejected_even_with_distinct_filenames(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            duplicate = dict(manifest["artifacts"][0])
+            duplicate["filename"] = "NeTelegram-copy.zip"
+            duplicate["path"] = duplicate["filename"]
+            duplicate["url"] = duplicate["url"].removesuffix("NeTelegram.zip") + duplicate["filename"]
+            duplicate_path = assets / duplicate["path"]
+            duplicate_path.write_bytes((assets / "NeTelegram.zip").read_bytes())
+            duplicate["bytes"] = duplicate_path.stat().st_size
+            duplicate["sha256"] = hashlib.sha256(duplicate_path.read_bytes()).hexdigest()
+            manifest["artifacts"].append(duplicate)
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "kind must appear only once: app_zip"):
+                validate_candidate(manifest_path, assets)
+
+    def test_requires_reconciled_sbom_and_third_party_notices(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "notice"]
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "must include app_zip, dmg, sbom, and notice"):
+                validate_candidate(manifest_path, assets)
+
+    def test_sbom_binary_hashes_must_match_the_app_zip(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            sbom_artifact = next(item for item in manifest["artifacts"] if item["kind"] == "sbom")
+            sbom_path = assets / sbom_artifact["path"]
+            sbom = json.loads(sbom_path.read_text(encoding="utf-8"))
+            sbom["components"][0]["hashes"][0]["content"] = "0" * 64
+            changed = json.dumps(sbom).encode()
+            sbom_path.write_bytes(changed)
+            sbom_artifact["bytes"] = len(changed)
+            sbom_artifact["sha256"] = hashlib.sha256(changed).hexdigest()
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "SBOM TDLib hash does not match app_zip"):
+                validate_candidate(manifest_path, assets)
+
+    def test_source_only_sbom_cannot_be_published_as_a_release_sbom(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            artifact = next(item for item in manifest["artifacts"] if item["kind"] == "sbom")
+            path = assets / artifact["path"]
+            sbom = json.loads(path.read_text(encoding="utf-8"))
+            sbom["metadata"]["component"]["properties"][1]["value"] = "required-before-release"
+            data = json.dumps(sbom).encode()
+            path.write_bytes(data)
+            artifact["bytes"] = len(data)
+            artifact["sha256"] = hashlib.sha256(data).hexdigest()
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "not reconciled with the signed notarized"):
+                validate_candidate(manifest_path, assets)
+
+    def test_release_asset_url_must_match_the_candidate_tag_and_filename(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            manifest["artifacts"][0]["url"] = "https://example.com/NeTelegram.zip"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "matching GitHub release"):
+                validate_candidate(manifest_path, assets)
+
+    def test_app_zip_parent_traversal_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            app = assets / "NeTelegram.zip"
+            with zipfile.ZipFile(app, "w") as archive:
+                archive.writestr("../outside.txt", b"unsafe")
+            artifact = next(item for item in manifest["artifacts"] if item["kind"] == "app_zip")
+            artifact["bytes"] = app.stat().st_size
+            artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "parent-traversal"):
+                validate_candidate(manifest_path, assets)
+
     def test_valid_prerelease_checks_exact_asset_bytes_and_account_evidence(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, _ = valid_candidate(Path(temporary))

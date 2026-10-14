@@ -31,6 +31,12 @@
     "basic_functionality_1_3_1_4": "open"
   },
   "artifact_contract": {
+    "required_kinds": [
+      "app_zip",
+      "dmg",
+      "sbom",
+      "notice"
+    ],
     "all": [
       "kind",
       "filename",
@@ -38,10 +44,17 @@
       "url",
       "bytes",
       "sha256",
+      "verification_evidence"
+    ],
+    "signed_binary_kinds": [
+      "app_zip",
+      "dmg",
+      "sparkle_update_zip"
+    ],
+    "signed_binary_fields": [
       "signing_status",
       "notarization_status",
-      "gatekeeper_status",
-      "verification_evidence"
+      "gatekeeper_status"
     ],
     "update_zip_extra": [
       "sparkle_ed_signature",

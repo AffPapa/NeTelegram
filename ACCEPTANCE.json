@@ -502,7 +502,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial. Current-source review at 0a7cbe6 confirms the centered default window in light appearance; minimum size, dark appearance, accessibility contrast, later authorization steps, and real login remain unverified."
+      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial. Current-source review at 0a7cbe6 confirms the centered default window in light appearance; minimum size, dark appearance, accessibility contrast, later authorization steps, and real login remain unverified. Current canonical Dev.app visual review on exact app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b (window title `NeTelegram · dev 7fd00308`) shows the first-run card centered and all phone-step controls visible at default window size in light appearance. This is a native screenshot observation, not minimum-size or later-step coverage; status remains partial."
     },
     {
       "id": "AUTH04",
@@ -561,23 +561,23 @@
     "result": "CI 162/162 and pinned TDLib assembly passed. Synthetic-only; not a login/release qualification."
   },
   "latest_access_audit": {
-    "date": "2026-10-13",
-    "repository": "AffPapa/NeTelegram",
-    "gh_cli": "Last verified status in current checkpoint: stored CLI credentials invalid; not used for this publication.",
-    "github_transport": "Existing Git transport successfully pushed app commit and docs checkpoint; no token creation or gh login used.",
-    "github_connector": "Public workflow run endpoints were read through the connected GitHub integration.",
-    "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
-    "secrets": "No credential values are stored in checkpoints."
+    "date": "2026-10-14",
+    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "app": "/private/tmp/NeTelegram-Dev.app",
+    "window_title": "NeTelegram · dev 7fd00308",
+    "method": "CUA native accessibility tree and screenshot; no controls activated",
+    "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
+    "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Keep one canonical Dev.app at app source 7fd0030; do not repeat its unchanged Swift suite or build. Next high-value product evidence is user-performed login/read/send when the user chooses to enter credentials. Meanwhile continue independent architecture and release-preparation work. Do not publish a stable binary until notary credentials and the unresolved Telegram title/sponsored-video compatibility gates are resolved.",
+  "next_action": "Commit the validated release-tooling slice and push through the existing Git transport. If that exact push fails, keep the commit and diagnose the failure; after a successful push, record metadata CI and batch the factual devlog update on existing Site v175. Do not rebuild unchanged app source.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
-    "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
-    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-    "result": "11/11 targeted Python unit tests passed; candidate and publication-receipt guards reject incomplete, mismatched, secret-bearing, or non-real evidence.",
-    "checks": "Local 11/11 targeted tests, JSON parse, Python byte-compile, Ruby YAML parse and git diff --check passed. Metadata workflow 38484426400 passed for exact commit.",
-    "scope": "Release automation validation only; no app build, login, signing, notarization, release upload or Site deployment. Unchanged-source macOS CI 38484426522 also passed because Tests/** matched the new Python suite.",
-    "release_readiness": "No app release. Real-account coverage, Developer ID/notarization, compatibility decisions, Gatekeeper install and updater smoke remain open."
+    "base_commit": "4459cd817ffd4499cfc6e429e78ad6fa64bf55c1",
+    "result": "Local release metadata suite passed 36/36. Candidate validation requires app_zip, dmg, binary-reconciled CycloneDX 1.6 SBOM, and third-party notice; duplicate artifact kinds fail closed.",
+    "checks": "Targeted duplicate-kind regression 1/1; full release metadata suite 36/36; checkpoint validation and git diff --check passed. SBOM and deterministic NOTICE generators succeeded. Generated notice SHA-256 7f4fe911172ea38c2f5c1c12f4b3af016e510538c4a7c3c05362de7e2c856325. No real signed/notarized bundle audited.",
+    "hosted_ci": "pending push; no hosted PASS claimed for current dirty source.",
+    "scope": "Release tooling only. No app source change, native rebuild, real account coverage, signing/notarization, release upload, or Site deployment.",
+    "release_readiness": "No app release. Real login/read/send, 20 authorized runtime matrix, actual Developer ID/notarization, Telegram compatibility gates, Gatekeeper downloaded install/reopen, and updater smoke remain open."
   },
   "latest_ci_scope_change": {
     "commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",

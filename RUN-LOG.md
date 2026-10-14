@@ -1,3 +1,31 @@
+## 2026-10-14 — Deterministic third-party release notices
+
+- Added `Scripts/generate_release_notices.py`, which assembles the project MIT license, NOTICE, TDLib BSL, OpenSSL Apache, libphonenumber Apache, and SQLCipher BSD notices. It checks the TDLib, OpenSSL, and country-data license hashes against their source locks before writing. Metadata CI now runs the generator and requires a nonempty result.
+- Generated `/private/tmp/NeTelegram-THIRD-PARTY-NOTICES.txt`: 27,015 bytes, SHA-256 `7f4fe911172ea38c2f5c1c12f4b3af016e510538c4a7c3c05362de7e2c856325`. Release manifest validation requires this notice asset together with the notarized app ZIP/DMG and binary-reconciled SBOM.
+- Local verification: release metadata suite 35/35; checkpoint validation, manifest JSON parse, notice generation, and `git diff --check` passed. The site source already has a shared renderer and stylesheet for all routes; no duplicate page redesign or deployment was needed in this tooling slice.
+- Repo remains `AffPapa/NeTelegram:main`, base and origin SHA `4459cd817ffd4499cfc6e429e78ad6fa64bf55c1`; no app source or Dev.app changes. GitHub auth is unchanged and local modifications remain unpushed, so hosted CI and the existing Site devlog are pending.
+
+## 2026-10-14 — Release artifact manifest and SBOM reconciliation guards
+
+- Expanded the release validator to require `app_zip`, `dmg`, `sbom`, and `notice`. Signing/notarization/Gatekeeper fields apply only to application/update binaries. SBOM metadata must match release version and source commit, state that the release binary audit passed, and carry SHA-256 hashes matching the exact app executable and bundled `libtdjson.dylib` read from the app ZIP. URLs must match the repository, tag, and asset filename. Duplicate and parent-traversal ZIP paths fail closed.
+- Extended `Scripts/generate_sbom.py` with an optional `.app` release audit. It verifies embedded version/source, a non-development bundle ID, Developer ID signature and strict codesign verification, stapled ticket, Gatekeeper assessment, and arm64 slices; it records the main executable and TDLib hashes. Without an actual app bundle, the output remains clearly marked incomplete and the release validator rejects it. Added these requirements to the manifest template and dependency instructions.
+- Local verification: release metadata suite 33/33; checkpoint validation, checked-in JSON parsing, and `git diff --check` passed. The bundle-verifier unit test mocks macOS tools to exercise the decision path; this is not evidence that a real signed/notarized bundle passed. No app source changed and the canonical Dev.app was not rebuilt or replaced.
+- Exact repo state: `AffPapa/NeTelegram`, `main`, base/origin SHA `4459cd817ffd4499cfc6e429e78ad6fa64bf55c1`; changes are local in the release tooling/checkpoint files. `gh auth status` still reports both configured tokens invalid. Prior GitHub connector create-blob and Contents API writes returned 403; no hosted CI or public Site update for this milestone. The public Site remains v175.
+- Next action: restore authorized write access, push one checkpoint commit, verify metadata CI, and then batch a factual devlog update on the existing Site. Product release is still blocked by real-user test coverage, Developer ID/notarization, Telegram compatibility gates, and final install/update smoke.
+
+## 2026-10-14 — Current-source authentication screen visual check
+
+- Inspected the already-open canonical `/private/tmp/NeTelegram-Dev.app` through CUA; title matches app source `7fd003088e2593fc2b808f7903e8f8b96c6a1c9b`. The default-size light-appearance screen is centered and shows country search/picker, phone input, status, Continue and QR controls. AX also exposes names/help for country and phone inputs. No UI controls were activated, no login data was entered, and the app was not rebuilt or replaced.
+- This evidence narrows the earlier “crooked” report: the current candidate is centered at its default size. AUTH03 stays partial because minimum-size, dark/contrast, code/2FA/QR/registration states, VoiceOver, and real login are unverified. The screenshot is a native observation, not a synthetic fixture.
+
+## 2026-10-14 — Release SBOM tooling slice
+
+- Added `Scripts/generate_sbom.py`: CycloneDX 1.6 JSON from TDLib/OpenSSL and country-data locks, including bundled/static/system/build-only scope distinctions. Output explicitly states it is a source-pin inventory and needs reconciliation with the final signed bundle; it does not imply binary completeness.
+- Added two focused generator regressions and wired generation/JSON parsing into the five-minute metadata workflow. Updated `DEPENDENCIES.md` with the command and completeness boundary. No Swift sources changed; no Swift suite or Dev.app build was repeated.
+- Local evidence: focused tests 2/2; CLI generation and Python JSON parsing passed; `git diff --check` passed. Official CycloneDX documentation identifies JSON Schema as the reference implementation and lists CycloneDX 1.6 schemas.
+- Publication checkpoint: app repo `AffPapa/NeTelegram`, branch `main`, base `4459cd817ffd4499cfc6e429e78ad6fa64bf55c1`, initially clean. `gh auth status` reports both configured accounts' tokens invalid. The authenticated connector reads repository metadata and reports push permission, but its Git Data API `create-blob` call returned HTTP 403 `Resource not accessible by integration`; no remote file was written. A follow-up actual generator-file create also returned the same 403 via Contents API, confirming the integration cannot write. No token was exposed, and no new login/token flow was started. Public Site remains v175; no Site update was made.
+- Remaining: authenticate the already intended GitHub route, then commit/push this slice and confirm metadata CI; update the existing Site devlog only after the source commit and CI result exist.
+
 ## 2026-10-14 — APP07 transient push notification and v171 devlog
 
 - App source is exact commit `aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2` on `AffPapa/NeTelegram:main`. `notificationTypeNewPushMessage` is now treated as a temporary state: live updates preserve the existing notification/route; active-snapshot reconciliation retains its prior account/chat/topic route until TDLib supplies the full `NewMessage`. No main-topic route is inferred.
@@ -935,3 +963,10 @@
 - Saved Site version 175 as `appgprj_6acba85192e08191acdf7011928848cf~appgver_7f1f5230cb688191afb604fe43d0be0b`, provider archive hash `sha256:9ad6d7e1e0c1b174701c5e846c099926aaa692c9f32f157d4832a39d4e74f16b`, 14 files. Deployment `appgdep_6acf11bc50e08191a9b7b1cf102155a1` succeeded at `https://netelegram.iryadom.chatgpt.site`.
 - Anonymous in-app browser loaded `/devlog/?verify=v175`; the new RU/EN tooling entry, linked app/tooling commits, metadata CI 38515770379 and native TDLib/Dev.app workflow 38515770287 were present. Site source and app-repository `website/` mirror were synchronized and the static validator passed all 8 routes. Downloads were not changed; no binary is available.
 - The app-repository mirror commit for the v175 Site source is `64b0a5fe603c09b6ebb70648be74cf47c9169999`; the checkpoint now points the Site receipt to that exact synchronized mirror.
+
+## 2026-10-14 — Faster focused release validation and duplicate-asset guard
+
+- Added a fail-closed rule rejecting repeated artifact kinds, even when their filenames and bytes differ. This prevents a manifest from carrying two app ZIPs (or duplicate SBOM/notice/update archives) while reconciliation silently selects only the first. Added a regression reproducing that ambiguity.
+- Tightened metadata CI path filters so edits to `LICENSE` or `NOTICE` run the notice generator and release tests.
+- Verification: duplicate-kind test 1/1; release metadata suite 36/36 in 0.867s; checkpoint validation passed; SBOM/NOTICE generators produced valid outputs; `git diff --check` passed. Exact app-source CI 167/167 remains valid because no Swift source or app inputs changed; no native suite or Dev.app rebuild was repeated.
+- No release binary or user account was touched. Changes remain unpushed; no hosted CI or Site update is claimed for this dirty tree. Existing public Site v175 remains unchanged.

@@ -10,7 +10,9 @@ import json
 import re
 import sys
 from pathlib import Path
+from pathlib import PurePosixPath
 from urllib.parse import urlparse
+import zipfile
 
 
 HEX_40 = re.compile(r"^[0-9a-f]{40}$")
@@ -23,9 +25,11 @@ REQUIRED_MANIFEST_FIELDS = (
     "release_url", "minimum_macos",
 )
 REQUIRED_ARTIFACT_FIELDS = (
-    "kind", "filename", "path", "url", "sha256", "signing_status",
-    "notarization_status", "gatekeeper_status",
+    "kind", "filename", "path", "url", "sha256",
 )
+SIGNED_ARTIFACT_KINDS = {"app_zip", "dmg", "sparkle_update_zip"}
+REQUIRED_ARTIFACT_KINDS = {"app_zip", "dmg", "sbom", "notice"}
+ALLOWED_ARTIFACT_KINDS = REQUIRED_ARTIFACT_KINDS | {"sparkle_update_zip"}
 FORBIDDEN_SECRET_KEYS = {
     "api_hash", "api_secret", "access_token", "bearer_token", "private_key",
     "signing_key", "sparkle_private_key", "notary_password", "password",
@@ -216,6 +220,7 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
         raise ValidationError("artifacts must be a non-empty list")
     filenames: set[str] = set()
     kinds: set[str] = set()
+    expected_asset_prefix = f"https://github.com/{manifest['repository']}/releases/download/{manifest['tag']}/"
     for index, artifact in enumerate(artifacts):
         field = f"artifacts[{index}]"
         if not isinstance(artifact, dict):
@@ -226,15 +231,25 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
         if Path(filename).name != filename or filename in {".", ".."} or filename in filenames:
             raise ValidationError(f"{field}.filename must be a unique basename")
         filenames.add(filename)
-        kinds.add(artifact["kind"])
+        kind = artifact["kind"]
+        if kind not in ALLOWED_ARTIFACT_KINDS:
+            raise ValidationError(f"{field}.kind is unsupported: {kind}")
+        if kind in kinds:
+            raise ValidationError(f"{field}.kind must appear only once: {kind}")
+        kinds.add(kind)
         require_https(artifact["url"], f"{field}.url")
-        if artifact["signing_status"] != "passed":
-            raise ValidationError(f"{field}.signing_status must be passed")
-        if artifact["notarization_status"] != "accepted_stapled":
-            raise ValidationError(f"{field}.notarization_status must be accepted_stapled")
-        if artifact["gatekeeper_status"] != "passed":
-            raise ValidationError(f"{field}.gatekeeper_status must be passed")
+        if artifact["url"] != expected_asset_prefix + filename:
+            raise ValidationError(f"{field}.url must identify this exact asset in the matching GitHub release")
         validate_evidence_list(artifact["verification_evidence"], f"{field}.verification_evidence")
+        if kind in SIGNED_ARTIFACT_KINDS:
+            for name in ("signing_status", "notarization_status", "gatekeeper_status"):
+                require_text(artifact, name)
+            if artifact["signing_status"] != "passed":
+                raise ValidationError(f"{field}.signing_status must be passed")
+            if artifact["notarization_status"] != "accepted_stapled":
+                raise ValidationError(f"{field}.notarization_status must be accepted_stapled")
+            if artifact["gatekeeper_status"] != "passed":
+                raise ValidationError(f"{field}.gatekeeper_status must be passed")
         if not isinstance(artifact["bytes"], int) or isinstance(artifact["bytes"], bool) or artifact["bytes"] <= 0:
             raise ValidationError(f"{field}.bytes must be a positive integer")
         if not HEX_64.fullmatch(artifact["sha256"]):
@@ -254,6 +269,32 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
         data = candidate_path.read_bytes()
         if len(data) != artifact["bytes"] or hashlib.sha256(data).hexdigest() != artifact["sha256"]:
             raise ValidationError(f"{field} bytes or sha256 do not match the frozen local asset")
+        if kind == "sbom":
+            try:
+                sbom = json.loads(data.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError) as error:
+                raise ValidationError(f"{field} must be UTF-8 CycloneDX JSON: {error}") from error
+            if sbom.get("bomFormat") != "CycloneDX" or sbom.get("specVersion") != "1.6":
+                raise ValidationError(f"{field} must be a CycloneDX 1.6 BOM")
+            metadata_component = sbom.get("metadata", {}).get("component", {})
+            if metadata_component.get("name") != "NeTelegram" or metadata_component.get("version") != manifest["version"]:
+                raise ValidationError(f"{field} metadata component identity does not match the release")
+            source_properties = {
+                prop.get("name"): prop.get("value")
+                for prop in metadata_component.get("properties", [])
+                if isinstance(prop, dict)
+            }
+            if source_properties.get("neTelegram:source:commit") != manifest["source_commit"]:
+                raise ValidationError(f"{field} source commit does not match the release")
+            if source_properties.get("neTelegram:sbom:release-binary-audit") != "passed":
+                raise ValidationError(f"{field} is not reconciled with the signed notarized release bundle")
+        elif kind == "notice":
+            try:
+                notice_text = data.decode("utf-8")
+            except UnicodeDecodeError as error:
+                raise ValidationError(f"{field} must be UTF-8 third-party notice text") from error
+            if not all(required in notice_text for required in ("TDLib", "OpenSSL", "gperf", "MIT License")):
+                raise ValidationError(f"{field} omits required project or third-party license notices")
         if artifact["kind"] == "sparkle_update_zip":
             sparkle_fields = (
                 "sparkle_ed_signature", "sparkle_version", "sparkle_short_version",
@@ -267,8 +308,40 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                 raise ValidationError(f"{field}.update_channel must match manifest channel")
             if artifact["minimum_system_version"] != manifest["minimum_macos"]:
                 raise ValidationError(f"{field}.minimum_system_version must match manifest minimum_macos")
-    if not {"app_zip", "dmg"}.issubset(kinds):
-        raise ValidationError("artifacts must include both app_zip and dmg")
+    if not REQUIRED_ARTIFACT_KINDS.issubset(kinds):
+        missing = sorted(REQUIRED_ARTIFACT_KINDS - kinds)
+        raise ValidationError(f"artifacts must include app_zip, dmg, sbom, and notice; missing {', '.join(missing)}")
+
+    sbom_item = next(item for item in artifacts if item["kind"] == "sbom")
+    sbom = read_object(assets_dir / sbom_item["path"])
+    metadata_component = sbom.get("metadata", {}).get("component", {})
+    executable_hashes = metadata_component.get("hashes", [])
+    tdlib = next((item for item in sbom.get("components", []) if item.get("name") == "TDLib"), None)
+    tdlib_hashes = tdlib.get("hashes", []) if isinstance(tdlib, dict) else []
+    executable_digest = next((item.get("content") for item in executable_hashes if item.get("alg") == "SHA-256"), None)
+    tdlib_digest = next((item.get("content") for item in tdlib_hashes if item.get("alg") == "SHA-256"), None)
+    if not executable_digest or not tdlib_digest:
+        raise ValidationError("SBOM must include SHA-256 hashes for the app executable and bundled TDLib")
+    app_zip = next(assets_dir / item["path"] for item in artifacts if item["kind"] == "app_zip")
+    try:
+        with zipfile.ZipFile(app_zip) as archive:
+            names = archive.namelist()
+            if len(names) != len(set(names)):
+                raise ValidationError("app_zip contains duplicate paths")
+            for name in names:
+                path = PurePosixPath(name)
+                if "\\" in name or path.is_absolute() or ".." in path.parts:
+                    raise ValidationError("app_zip contains an absolute or parent-traversal path")
+            executable = next((name for name in names if name.endswith(".app/Contents/MacOS/NeTelegram")), None)
+            tdlib_binary = next((name for name in names if name.endswith(".app/Contents/Frameworks/libtdjson.dylib")), None)
+            if not executable or not tdlib_binary:
+                raise ValidationError("app_zip must contain NeTelegram.app executable and libtdjson.dylib")
+            if hashlib.sha256(archive.read(executable)).hexdigest() != executable_digest:
+                raise ValidationError("SBOM app executable hash does not match app_zip bytes")
+            if hashlib.sha256(archive.read(tdlib_binary)).hexdigest() != tdlib_digest:
+                raise ValidationError("SBOM TDLib hash does not match app_zip bytes")
+    except (OSError, zipfile.BadZipFile, StopIteration) as error:
+        raise ValidationError(f"app_zip could not be reconciled with SBOM binary hashes: {error}") from error
 
     return hashlib.sha256(manifest_path.read_bytes()).hexdigest()
 

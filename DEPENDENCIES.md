@@ -1,8 +1,47 @@
 # Dependency inventory
 
-This inventory describes the current Apple Silicon development build. It is
-not a complete SBOM for a future release artifact. `Package.swift` currently
-declares no third-party Swift package dependencies.
+This inventory describes the current Apple Silicon development build. Generate
+the machine-readable CycloneDX source dependency inventory from the committed
+pins with:
+
+```sh
+python3 Scripts/generate_sbom.py \
+  --version 0.0.0-dev \
+  --source-commit "$(git rev-parse HEAD)" \
+  --output /tmp/netelegram-sbom.json
+```
+
+The generated inventory is explicitly marked as pin-derived and incomplete
+until reconciled with the final signed application bundle. Release candidates
+must pass the binary audit and bind its executable and `libtdjson.dylib`
+SHA-256 values to the final app ZIP:
+
+```sh
+python3 Scripts/generate_sbom.py \
+  --version 1.2.3 \
+  --source-commit "$(git rev-parse HEAD)" \
+  --app-bundle /absolute/path/NeTelegram.app \
+  --output /absolute/path/release-assets/NeTelegram.cdx.json
+```
+
+`--app-bundle` requires matching version/source metadata, an arm64 executable
+and TDLib library, Developer ID signature verification, a stapled notarization
+ticket, and an accepted Gatekeeper assessment. The release validator then
+rechecks the two binary hashes against the final ZIP and requires a separate
+third-party notice asset. It does not replace the post-download install/reopen
+smoke or final manual NOTICE review.
+`Package.swift` currently declares no third-party Swift package dependencies.
+
+Generate the release `THIRD-PARTY-NOTICES.txt` from the project NOTICE and the
+license texts pinned by the dependency locks:
+
+```sh
+python3 Scripts/generate_release_notices.py \
+  --output /absolute/path/release-assets/THIRD-PARTY-NOTICES.txt
+```
+
+The command verifies the TDLib, OpenSSL, and libphonenumber license hashes
+before writing. The metadata CI runs this generator on every relevant change.
 
 | Component | Pin / provider | License | Runtime status |
 |---|---|---|---|

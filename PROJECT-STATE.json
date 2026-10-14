@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP16 tooling native build verified; Sites v175 public devlog deployment verified. App source remains 7fd0030, canonical accountless Dev.app open; no login credentials entered. Stable release and 20-account coverage remain open.",
+  "phase": "APP16 unchanged; release tooling now generates pinned CycloneDX SBOM and THIRD-PARTY-NOTICES, reconciles candidate bytes, and rejects duplicate artifact kinds. Local release metadata suite passed 36/36. Changes are local and unpushed; Site v175 remains current.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -220,7 +220,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Keep one canonical Dev.app at app source 7fd0030; do not repeat its unchanged Swift suite or build. Next high-value product evidence is user-performed login/read/send when the user chooses to enter credentials. Meanwhile continue independent architecture and release-preparation work. Do not publish a stable binary until notary credentials and the unresolved Telegram title/sponsored-video compatibility gates are resolved.",
+  "next_action": "Commit the validated release-tooling slice and push through the existing Git transport. If that exact push fails, keep the commit and diagnose the failure; after a successful push, record metadata CI and batch the factual devlog update on existing Site v175. Do not rebuild unchanged app source.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -306,11 +306,11 @@
       "python3 Scripts/validate_release.py candidate <manifest.json> --assets-dir <frozen-assets-dir>",
       "python3 Scripts/validate_release.py receipt <manifest.json> <receipt.json>"
     ],
-    "local_tests": "11/11 targeted unittest cases passed; JSON parse, Python byte-compile, and git diff --check passed.",
-    "scope": "Release metadata guard only. It does not build, sign, notarize, upload, deploy, or prove real account coverage.",
+    "local_tests": "36/36 release metadata tests passed; duplicate artifact kinds fail closed.",
+    "scope": "Release metadata guard only; no app source change, native rebuild, real signing/notarization, upload, or Site deployment.",
     "app_release_status": "No app release; signing, notarization, real account and 20-account measurement gates remain open.",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
-    "hosted_metadata_ci": "PASS: run 38484426400 for exact checkpoint 7104a87.",
+    "hosted_metadata_ci": "pending push; no hosted PASS claimed for current dirty source.",
     "hosted_macos_ci": "PASS: run 38484426522; unchanged app source 209be94 and full serial suite. Triggered by broad Tests/** path matching the Python release tests."
   },
   "ci_test_scope_change": {
@@ -469,5 +469,71 @@
     "support_root": "/private/tmp/netelegram-dev-support-clean",
     "scope": "Exact-source accountless local build and UI smoke; no real login or authorized account.",
     "superseded_by": "local_development_candidate at app source 4dcddcc"
+  },
+  "latest_sbom_tooling": {
+    "date": "2026-10-14",
+    "status": "local generators, candidate guard, and 35-test metadata suite complete; publication remains blocked",
+    "coverage": "CycloneDX 1.6 generated from TDLIB.lock.json and COUNTRY-DATA.lock.json; clearly marks source-pin inventory as incomplete until final signed bundle reconciliation",
+    "files": [
+      "Scripts/generate_sbom.py",
+      "Tests/release/test_generate_sbom.py",
+      ".github/workflows/metadata.yml",
+      "DEPENDENCIES.md"
+    ],
+    "focused_test": "Full release metadata suite 35/35; notice generator output SHA-256 recorded in latest_release_artifact_guards. Physical signed/notarized bundle audit not performed.",
+    "app_source_changed": false,
+    "native_app_rebuilt": false,
+    "public_site_updated": false,
+    "auth_blocker": "gh auth status reports configured mrdumay-source and AffPapa tokens invalid. GitHub connector reports repository push permission, but Git Data API create-blob and Contents API create-file both returned HTTP 403 Resource not accessible by integration; no remote file was written.",
+    "next_action": "Restore working HTTPS GitHub CLI auth or grant the connected GitHub integration repository contents write access; then push the exact prepared local diff and confirm metadata CI. Do not retry unchanged connector permissions.",
+    "site_updated": false
+  },
+  "latest_native_ui_review": {
+    "date": "2026-10-14",
+    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "window_title": "NeTelegram · dev 7fd00308",
+    "method": "CUA native accessibility tree and screenshot",
+    "result": "First-run auth card is centered at default size in light appearance, and phone entry/country/Continue/QR controls are visible.",
+    "limits": "No resize, no alternate auth state, no dark appearance or VoiceOver interaction. Did not rebuild or replace the already open canonical Dev.app."
+  },
+  "latest_release_artifact_guards": {
+    "date": "2026-10-14",
+    "status": "local implementation and validation passed; not pushed or hosted-CI validated",
+    "changes": [
+      "candidate manifests require app_zip, dmg, sbom, and notice",
+      "only binary assets require signing, stapling, and Gatekeeper status",
+      "release SBOM must match release version and source commit and attest the bundle audit passed",
+      "app executable and bundled libtdjson SHA-256 values in the SBOM must match the exact app ZIP members",
+      "artifact URLs must match this repository/tag/filename",
+      "app ZIP path traversal and duplicate paths are rejected",
+      "duplicate artifact kinds are rejected even when filenames differ"
+    ],
+    "bundle_audit": "Generator checks release version and source metadata, production bundle identity, Developer ID signature, codesign verification, stapled notarization, Gatekeeper acceptance, arm64 architecture, and records executable/libtdjson hashes. Default source inventory remains explicitly incomplete and is rejected as a release SBOM.",
+    "local_validation": "Release metadata suite 36/36, including the duplicate-kind regression; checkpoint validation, checked-in JSON parsing, deterministic SBOM/NOTICE generation, and git diff --check passed. Generated notice: /private/tmp/NeTelegram-THIRD-PARTY-NOTICES.txt, 27015 bytes, SHA-256 7f4fe911172ea38c2f5c1c12f4b3af016e510538c4a7c3c05362de7e2c856325.",
+    "app_source_changed": false,
+    "native_app_rebuilt": false,
+    "dirty_state": [
+      ".github/workflows/metadata.yml",
+      "ACCEPTANCE.json",
+      "DEPENDENCIES.md",
+      "PROJECT-STATE.json",
+      "RUN-LOG.md",
+      "Scripts/generate_release_notices.py",
+      "Scripts/generate_sbom.py",
+      "Scripts/validate_release.py",
+      "Tests/release/test_generate_release_notices.py",
+      "Tests/release/test_generate_sbom.py",
+      "Tests/release/test_validate_release.py",
+      "release-manifest.template.json"
+    ],
+    "base_commit": "4459cd817ffd4499cfc6e429e78ad6fa64bf55c1",
+    "site": "existing public Site v175; not updated for this local-only milestone",
+    "publication_blocker": "gh auth status still reports both configured accounts invalid; GitHub connector Git Data and Contents writes returned 403 in the prior check. No new attempt made without auth change.",
+    "next_action": "Restore authorized GitHub write credentials; then push one checkpoint commit, verify hosted metadata CI, mirror the factual milestone into the existing Site devlog, and deploy the saved Site version.",
+    "generated_notice": {
+      "path": "/private/tmp/NeTelegram-THIRD-PARTY-NOTICES.txt",
+      "bytes": 27015,
+      "sha256": "7f4fe911172ea38c2f5c1c12f4b3af016e510538c4a7c3c05362de7e2c856325"
+    }
   }
 }
