@@ -58,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
     private var countryPickerStack: NSStackView!
+    private var countryControlsStack: NSStackView!
     private var countryFieldLabel: NSTextField!
     private var countrySearchField: NSSearchField!
     private var countrySuggestionLabel: NSTextField!
@@ -393,7 +394,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func buildWindow() {
         let contentWidth: CGFloat = 620
-        let contentHeight: CGFloat = 600
+        let contentHeight: CGFloat = 560
         let content = SystemWindowBackgroundView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
@@ -451,10 +452,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
         countryFieldLabel.textColor = .labelColor
         countryFieldLabel.setAccessibilityLabel("Страна")
-        countryPickerStack = NSStackView(views: [countryFieldLabel, countrySearchField, countryPicker])
-        // Keep search and selection as one aligned form section. A vertical
-        // stack with equal-width native controls scans more clearly than a
-        // narrow search field beside a wider country menu.
+        countryControlsStack = NSStackView(views: [countrySearchField, countryPicker])
+        countryControlsStack.orientation = .horizontal
+        countryControlsStack.alignment = .centerY
+        countryControlsStack.distribution = .fill
+        countryControlsStack.spacing = 8
+        countryPickerStack = NSStackView(views: [countryFieldLabel, countryControlsStack])
         countryPickerStack.orientation = .vertical
         countryPickerStack.alignment = .leading
         countryPickerStack.distribution = .fill
@@ -466,7 +469,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySuggestionLabel.alignment = .left
         countrySuggestionLabel.maximumNumberOfLines = 2
         countrySuggestionLabel.isHidden = true
-        countrySuggestionLabel.setAccessibilityLabel("Регион macOS — только подсказка; телефонный код применяется после явного выбора страны")
+        countrySuggestionLabel.setAccessibilityLabel("Можно выбрать страну для местного номера или ввести полный номер с плюсом")
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -629,8 +632,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
-            countrySearchField.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
-            countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countryControlsStack.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 148), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -934,7 +938,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             window.minSize = NSSize(width: 560, height: 520)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
                 ? NSSize(width: 560, height: 520)
-                : NSSize(width: 620, height: 600)
+                : NSSize(width: 620, height: 560)
             if window.contentView?.bounds.size != compactSize {
                 window.setContentSize(compactSize)
                 window.center()
@@ -1593,12 +1597,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
            let callingCode = country.callingCodes.first {
             return "Страна: \(country.name) (+\(callingCode))."
         }
-        if let region = phoneCountrySelection.suggestedRegionCode,
-           let country = phoneCountries.first(where: { $0.code == region }),
-           let callingCode = country.callingCodes.first {
-            return "Регион Mac: \(country.name) (+\(callingCode)); выберите страну."
-        }
-        return "Выберите страну или введите номер с +."
+        return "Введите полный номер с кодом страны или выберите страну для местного номера."
     }
 
     private func beginFirstAccount() {
@@ -7361,11 +7360,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             ? "Введите полный номер с + и кодом страны. Загружаю список стран…"
             : phoneNumberEntryPrompt())
         updatePhoneEntryActionAvailability()
-        if countryPickerStack.isHidden || selectedCountryRegionCode != nil {
-            phoneField.becomeFirstResponder()
-        } else {
-            countrySearchField.becomeFirstResponder()
-        }
+        // Fully qualified numbers do not require choosing a country first.
+        // Keep the primary input focused; country search remains available by Tab.
+        phoneField.becomeFirstResponder()
     }
 
     private func showLogoutProgress() {
@@ -7427,15 +7424,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func updateCountrySuggestion() {
         guard !countryPickerStack.isHidden,
-              selectedCountryRegionCode == nil,
-              let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
-              let country = phoneCountries.first(where: { $0.code == suggestedRegion }),
-              let callingCode = country.callingCodes.first else {
+              selectedCountryRegionCode == nil else {
             countrySuggestionLabel.isHidden = true
             countrySuggestionLabel.stringValue = ""
             return
         }
-        countrySuggestionLabel.stringValue = "Подсказка macOS: \(country.name) (+\(callingCode))."
+        countrySuggestionLabel.stringValue = "Местный номер — после выбора страны; полный — с +."
         countrySuggestionLabel.isHidden = false
     }
 
