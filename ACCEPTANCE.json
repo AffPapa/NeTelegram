@@ -205,7 +205,7 @@
       "method": "native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At app-source commit 0fe2a13ecd7f227e10a2c1fa6773069c53f83e52, lock() now closes PrivacyDispatchBarrier before UI cleanup or draft storage I/O. This makes command dispatch linearize before the lock or be rejected after it, including while dirty drafts flush. Local Swift suite passed 126/126, including privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent and privacyBarrierRejectsQueuedAuthenticationAfterLockAndUnlock. Exact-source macOS CI 38379269975 and pinned TDLib/isolated Dev.app workflow 38379269906 succeeded. Source review confirms restoreProfiles is independent of lockState and locked authorization updates retain current state without presenting auth UI; LocalAuthentication cancellation keeps the UI locked. Native startup-under-lock, reauth UI on a real profile, and concurrent background-account behavior remain unverified; acceptance stays partial."
+      "evidence": "At app-source commit 0fe2a13ecd7f227e10a2c1fa6773069c53f83e52, lock() now closes PrivacyDispatchBarrier before UI cleanup or draft storage I/O. This makes command dispatch linearize before the lock or be rejected after it, including while dirty drafts flush. Local Swift suite passed 126/126, including privacyLockWaitsForAnAtomicDispatchAndRejectsTheNextIntent and privacyBarrierRejectsQueuedAuthenticationAfterLockAndUnlock. Exact-source macOS CI 38379269975 and pinned TDLib/isolated Dev.app workflow 38379269906 succeeded. Source review confirms restoreProfiles is independent of lockState and locked authorization updates retain current state without presenting auth UI; LocalAuthentication cancellation keeps the UI locked. Native startup-under-lock, reauth UI on a real profile, and concurrent background-account behavior remain unverified; acceptance stays partial. At current app-code commit 477404afd89378affb9cc21eb6c0e32745cb5091, source review confirms profile restoration/start scheduling has no Privacy Lock early exit; routed auth updates continue through each LocalAccountRuntime.consume, while the selected UI handler returns before presenting an interactive auth step when lockState is true. After successful LocalAuthentication, unlock presents the selected runtime's current authorization state. This confirms code structure only; real reauth and multi-account runtime behavior remain unverified."
     },
     {
       "id": "APP07",
@@ -214,7 +214,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At app-source commit dd11b9f38978870bf80509c239070d2570c7d8d4, updateActiveNotifications snapshots now re-enqueue current routeable items as silent reconciliation after replacing per-account route state; the existing privacy barrier and stale-target checks still gate publication. Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Real Notification Center permission, restore, account click routing, and 20 real accounts remain unverified; status stays partial. At app-source aab6a4a, live updateNotification and active snapshot reconciliation both preserve an existing routed notification while TDLib temporarily reports notificationTypeNewPushMessage; the route is not guessed and is replaced when full NewMessage arrives. Focused local regression passed 1/1 and the exact-source local serial suite passed 164/164 on Xcode 27 / Swift 6.4. Previous hosted run 38504170791 passed 164/164 at parent test source 67341bab before two assertions were added. On workflow-only commit 9cf35eb, the runner probe passed and the full test bundle built in 0.38s, but no test output followed before the bounded two-minute timeout in run 38506939379. No current-source hosted full-suite PASS. Real Notification Center, TDLib transition and 20 real accounts remain unverified; APP07 stays partial."
+      "evidence": "At app-source commit dd11b9f38978870bf80509c239070d2570c7d8d4, updateActiveNotifications snapshots now re-enqueue current routeable items as silent reconciliation after replacing per-account route state; the existing privacy barrier and stale-target checks still gate publication. Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Real Notification Center permission, restore, account click routing, and 20 real accounts remain unverified; status stays partial. At app-source aab6a4a, live updateNotification and active snapshot reconciliation both preserve an existing routed notification while TDLib temporarily reports notificationTypeNewPushMessage; the route is not guessed and is replaced when full NewMessage arrives. Focused local regression passed 1/1 and the exact-source local serial suite passed 164/164 on Xcode 27 / Swift 6.4. Previous hosted run 38504170791 passed 164/164 at parent test source 67341bab before two assertions were added. On workflow-only commit 9cf35eb, the runner probe passed and the full test bundle built in 0.38s, but no test output followed before the bounded two-minute timeout in run 38506939379. No current-source hosted full-suite PASS. Real Notification Center, TDLib transition and 20 real accounts remain unverified; APP07 stays partial. At current app-code commit 477404afd89378affb9cc21eb6c0e32745cb5091, source review confirms each verified runtime configures TDLib notification options; macOS permission is requested once per process; notification IDs and click routes include account identity; active snapshots reconcile stale IDs; delivery rechecks runtime ownership and route membership under the privacy barrier. Existing synthetic tests cover ID cleanup, routing, privacy redaction, permission request gating, and barrier serialization. This does not prove system notification delivery for 20 real accounts or native Notification Center behavior."
     },
     {
       "id": "APP08",
@@ -669,7 +669,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "APP06: inspect reauthentication while Privacy Lock is active and confirm one account awaiting user input does not pause other runtimes. Begin read-only; add only a focused fixture if a specific acceptance boundary is missing. Do not rebuild the canonical Dev.app or redeploy the Site for test-only evidence.",
+  "next_action": "APP08: targeted source audit of late notification callbacks during runtime replacement and close. Look for a concrete stale-route or duplicate-delivery interleaving; reuse the existing notification privacy test evidence and add/run one focused regression only if code review finds an untested race. No full suite, Dev.app rebuild, or Site deployment.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -810,5 +810,16 @@
     "result": "PASS 1/1",
     "command": "swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app05-lock --filter privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock",
     "scope": "Synthetic PhotoPipeline boundary: cancellation and cache invalidation during a blocked decode suppress late callback/cache data; a fresh post-unlock preview succeeds. Does not prove AppKit integration, system photo viewers, or real-account behavior."
+  },
+  "latest_read_only_audit": {
+    "date": "2026-10-14",
+    "app_code_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
+    "cases": [
+      "APP06",
+      "APP07"
+    ],
+    "result": "No concrete source defect found in lock-gated reauth handling or notification route/reconcile ownership. Existing route, redaction, cleanup, and barrier checks remain synthetic; physical OS/account-scale validation is absent.",
+    "tests_run": false,
+    "scope": "Read-only trace of restoreProfiles, routed authorization handling, per-runtime notification configuration, update/reconcile, notification delivery callback, lock barrier, and close cleanup."
   }
 }

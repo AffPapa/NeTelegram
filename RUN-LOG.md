@@ -1233,3 +1233,9 @@
 - Focused test `privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock` passed 1/1. It blocks the decoder, invokes the same `PhotoPipeline.cancelAllPreviews` and account-cache purge used by lock, then verifies no late callback/cache entry and a fresh preview after unlock. It does not prove AppKit lock integration, native photo-viewer behavior, or real account behavior.
 - The first compile attempt exposed a test-call error (omitted required `chatID` in `hasCachedPreview`); fixed from the declared API signature and reran only the focused test. No app build, full test suite, or Site deploy was run.
 - APP05 remains partial. Next action is APP06 reauthentication under lock and independent runtime progress.
+
+## 2026-10-14 — APP06 reauth and APP07 notification route audit
+
+- Read current app source `477404afd89378affb9cc21eb6c0e32745cb5091`. APP06: startup restoration and route-bound authorization-state reduction continue under lock; interactive auth presentation is gated until successful LocalAuthentication unlock. Other profile runtimes are not closed by a selected profile waiting for input. Real-profile reauth and multi-account operation remain unverified.
+- APP07: each verified runtime configures the TDLib notification API; macOS permission is requested once per process; account-namespaced IDs/routes, snapshot reconciliation, stale-route checks and delivery serialization under the privacy barrier were traced. Existing synthetic tests cover route, cleanup, privacy redaction and lock serialization. No native Notification Center or 20-account delivery claim is made.
+- No concrete source defect found; no code/tests/build/site deployment changed for this read-only review. APP06 and APP07 remain partial. Resume action advances to APP08 late-notification callback races.
