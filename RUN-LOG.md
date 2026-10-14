@@ -1633,3 +1633,19 @@
 - Read-only Keychain lookup used only the app's fixed service/account attributes (`org.affpapa.netelegram.telegram-api` / `api-hash`); command omitted `-w`, did not return secret data, and reported item not found.
 - This confirms that selecting the Save action in an earlier UI prompt did not result in a stored item. The API hash previously exposed in chat remains retired; do not copy it back into Keychain or ask for it in chat. The protected in-app API-hash field is the only approved entry path once the owner provisions a replacement credential.
 - No authentication request, Telegram account data, app source, build, user preference, or Site state changed. Fresh checkpoint validation follows.
+
+## 2026-10-15 — AUTH-UI-DESIGN-04: first-run auth layout
+
+- Reviewed Apple macOS HIG guidance and official Telegram authorization UI source as layout references. Kept the native AppKit controls and semantic system styling; the form now uses the available scroll viewport, consistent widths, a concise country-search prompt, and one explicit locale suggestion. The macOS region remains unselected until the user chooses it.
+- Refined after the first native screenshot showed a clipped country placeholder and duplicate locale guidance; the second screenshot/AX tree confirms both are fixed.
+- Local targeted tests: 5/5. Exact-source GitHub macOS CI: PASS ({run_url}). Pinned TDLib app workflow: PASS ({native_url}).
+- Canonical Dev.app: 291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b; arm64; macOS 14 baseline; ad-hoc development signature verified; executable SHA-256 `d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8`. No login or account was used.
+- Public app name is AffPapa Chat; NeTelegram is the repository codename. No signed release or download was created.
+- Remaining coverage: light appearance, VoiceOver speech, real auth, authenticated UI, IME/RTL, real chats and all-active account behavior remain unverified.
+
+## 2026-10-15 — AUTH-UI-DESIGN-04 and Site v195 verified
+- App source commit `291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b` improves the AppKit authorization window: one aligned form column, a scrollable layout, window-size adaptation, and clear country-selection guidance. Focused local tests passed 5/5; exact-source CI `38607088774` and pinned TDLib build `38607088681` passed. One canonical arm64 Dev.app was rebuilt once and visually checked without signing in or using an account.
+- Reused the existing public Site. Source helper commit `1adba5a1410ed186c389dc701ce8e9ad9d37b26f` was saved as Site version 195 (`appgprj_6acba85192e08191acdf7011928848cf~appgver_8c62e28f8a788191b04e2cd6e2fbd0e0`) and deployed successfully as `appgdep_6acfbddce1d48191bf095654b4586a4e`. The Site project title was updated to “AffPapa Chat — независимый клиент для macOS”; public URL remains https://netelegram.iryadom.chatgpt.site.
+- Anonymous browser verified fresh `/` and `/downloads/`: homepage names AffPapa Chat, links exact source/CI and records the AUTH UI milestone; downloads explicitly has no release/installer and links to source. A preexisting tab with `?v=195` initially showed cached v194; only the fresh cache-busted navigation was counted as live evidence.
+- Site archive SHA-256 `0b31cc62a46f7abb052dc53ea82fbe48c57e1c2f989bcc9283f379f557a88e4e`, 501760 bytes, 14 files. Checkpoints now distinguish app source, Site source/version/deployment, bundle and live URL. No app release/download was created.
+- Remaining: real owner-operated login/read/send, all-20 authorized runtime/resource coverage, Developer ID/notarization/Gatekeeper/updater, and Telegram compatibility policy gates. These are not implied by the accountless screen smoke or Site publication.
