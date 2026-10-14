@@ -1220,3 +1220,9 @@
 - Existing public Site v193 documents the fix; anonymous `/devlog/`, `/downloads/`, and both empty updater feeds returned the expected status/content. No app release or download was created.
 - Updated all current app/Site/CI pointers in the two resume checkpoints. The first validation caught a truncated saved Site version ID and inconsistent phase labels; corrected both. `Scripts/validate_checkpoint.py` passed and `python3 -m unittest Tests.release.test_validate_checkpoint` passed 13/13. Generated Python cache files were removed.
 - Process lesson: stale duplicated pointers caused repeated work; update them together and validate before resume. Shortened opaque provider IDs are unsafe even when visually similar. Do not repeat route tests, rebuild, or deploy without changed inputs. Full real-account and 20-runtime certification, Developer ID signing, notarization, and public app delivery remain open.
+
+## 2026-10-14 — CORE-RUNTIME-04 privacy-bound send dispatch review
+
+- Read-only review of `SendIntent` and `PrivacyDispatchBarrier`: text/photo dispatch rechecks lock state, captured privacy epoch, account namespace, verified Telegram user ID, and runtime generation while holding the same synchronous lock across TDLib send. Photo staging rechecks runtime registration, auth readiness, permissions, topic state, lock, and epoch after asynchronous ImageIO work and before manifest registration; final dispatch repeats the barrier checks.
+- No concrete new race found in this scoped path. No code changed and no app tests/build/site deployment repeated. This does not prove real-account behavior or external TDLib completion semantics.
+- Resume action moved to APP05 lock behavior across decode and accepted-send callbacks so this exact SendIntent review is not repeated.

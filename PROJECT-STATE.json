@@ -286,7 +286,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "CORE-RUNTIME-04: inspect the lock-protected SendIntent dispatch path for one concrete race between PrivacyEpoch validation and TDLib dispatch. Preserve the running canonical Dev.app at source 477404a; do not rerun the route test, rebuild, or redeploy Site unless relevant inputs change. User Telegram login remains deferred.",
+  "next_action": "CORE-RUNTIME-05: targeted review of APP05 privacy lock across photo decode and in-flight send callbacks. Start read-only; change code or run one focused regression only if a concrete race is found. Keep the canonical Dev.app at 477404a and do not repeat its build, auth-screen smoke, route test, or Site v193 deployment.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",

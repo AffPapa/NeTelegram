@@ -669,7 +669,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "CORE-RUNTIME-04: inspect the lock-protected SendIntent dispatch path for one concrete race between PrivacyEpoch validation and TDLib dispatch. Preserve the running canonical Dev.app at source 477404a; do not rerun the route test, rebuild, or redeploy Site unless relevant inputs change. User Telegram login remains deferred.",
+  "next_action": "CORE-RUNTIME-05: targeted review of APP05 privacy lock across photo decode and in-flight send callbacks. Start read-only; change code or run one focused regression only if a concrete race is found. Keep the canonical Dev.app at 477404a and do not repeat its build, auth-screen smoke, route test, or Site v193 deployment.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
