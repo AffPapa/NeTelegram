@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "AUTH-FORM-APPLE-HIG-17: persistent phone label and distinct placeholder verified in one canonical Dev.app; exact-source CI/native workflow and Site devlog passed. Real login and 20-account coverage remain unverified.",
+  "phase": "APP02-RESTORE-STALL-DEDUP-01: 20-profile synthetic startup restore test passes locally and in exact test-commit CI; real accounts/runtime resources remain unverified.",
   "verified_at": "2026-10-15",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
@@ -129,10 +129,10 @@
       "scope": "Pinned TDLib arm64 Dev.app assembly, signature validation and lifecycle workflow passed for exact source."
     },
     "latest_pushed_commit": {
-      "sha": "47247149939e825c23b5816573e42ff5101c7b94",
+      "sha": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
       "branch": "main",
       "remote": "https://github.com/AffPapa/NeTelegram.git",
-      "result": "pushed using existing configured Git credential helper after one approved network escalation; no new credential was created."
+      "result": "pushed successfully using existing configured Git transport; exact test-only CI passed; no new credential or login."
     }
   },
   "local_development_candidate": {
@@ -318,7 +318,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Next: continue on the single canonical Dev.app and exact main commit. Preserve existing Keychain data; diagnose its access/authorization only with the owner, then perform one owner-operated login/read/send/logout. Keep 20-account certification, Developer ID/notarization, API compatibility, and stable release gates open; no download is available.",
+  "next_action": "Next: continue on the single canonical Dev.app and main checkout. Preserve existing Keychain data; diagnose access only through the owner-operated app flow, then perform one owner-operated login/read/send/logout. Keep real 20-account runtime and resource certification, Developer ID/notarization, Telegram API compatibility gates, and public app release open. Do not rebuild the app for test-only commits.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -327,13 +327,13 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544",
+    "repo_head_before_checkpoint": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
     "app_source_commit_authority": "4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544",
     "app_source_commit": "4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544",
-    "repo_head": "4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544",
-    "origin_main": "4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544",
+    "repo_head": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
+    "origin_main": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
     "upstream": "origin/main",
-    "dirty_state": "Source commit 4ccc4821 is pushed to AffPapa/NeTelegram main and matches the clean canonical arm64 Dev.app at /private/tmp/NeTelegram-Dev.app. Ordinary accountless sign-in is open; compact offline preview was inspected and exited before returning to the ordinary app. No account was created, no Telegram login/request was started, and no secret was read. The separate legacy checkout remains preserved."
+    "dirty_state": "Test-only commit 72fbbf7 is pushed to AffPapa/NeTelegram main and matches origin; worktree clean. Application source remains 4724714 and canonical /private/tmp/NeTelegram-Dev.app remains the separately verified build from that app source. No app rebuild, login, account creation, Telegram request, or secret access occurred. The separate legacy checkout remains preserved."
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -538,46 +538,20 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-FORM-APPLE-HIG-17",
+    "id": "APP02-RESTORE-STALL-DEDUP-01",
     "source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-    "change": "Kept the persistent phone label and replaced the identical empty-field placeholder with 'Введите номер', removing redundant copy while clarifying input state. Confirmed current AppKit layout uses system window controls/colors, Auto Layout, aligned persistent labels, native text/search/popup/button controls, and adapts with scrolling; no custom window chrome was added.",
-    "focused_test": "Swift 6.4 app build via Scripts/dev-app.sh succeeded; strict ad-hoc codesign verification passed; exact-source GitHub macOS CI and pinned TDLib/Dev.app workflow passed. Active-window CUA/AX and screenshot verified the exact label and placeholder; no credentials were entered.",
+    "test_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
+    "change": "Added a composed regression for restore planning, startup registration, bounded startup parallelism, a stalled Keychain preparation, one Keychain failure, retry/dedup behavior, preservation of existing DB/draft markers, and complete task-slot drainage across 20 synthetic profiles.",
+    "focused_test": "Swift 6.4 focused test passed 1/1; full serial macOS CI passed 195 tests on test-only commit 72fbbf7. No app code changed and the canonical Dev.app remains built from app-source SHA 4724714.",
     "hosted_ci": {
-      "run_id": 38637208931,
+      "run_id": 38638917609,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38637208931",
-      "workflow_commit": "47247149939e825c23b5816573e42ff5101c7b94",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38638917609",
+      "workflow_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
       "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "scope": "Exact-source macOS CI passed for the phone-label/placeholder refinement."
+      "scope": "Full serial macOS core suite: 195 tests passed on test-only commit; native app source remained unchanged."
     },
-    "exact_source_ci": {
-      "run_id": 38637208931,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38637208931",
-      "workflow_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "scope": "Exact-source macOS CI passed for the phone-label/placeholder refinement."
-    },
-    "native_workflow": {
-      "run_id": 38637208825,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38637208825",
-      "workflow_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "scope": "Pinned TDLib arm64 Dev.app assembly, signature validation and lifecycle workflow passed for exact source."
-    },
-    "native_smoke": {
-      "date": "2026-10-15",
-      "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "32762deedc7ec39101c87c7773f0cf7cc434bff20237c02a50af2e1ccab187e6",
-      "executable_sha256": "a2f604c1e648d9bc5ea2e7d433c91a7c66b28a45ae40fb798784ffdf58c92a92",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "result": "Canonical /private/tmp/NeTelegram-Dev.app rebuilt from exact source 4724714 with Swift 6.4 and pinned TDLib c15d3f5. Active-window CUA/AX and screenshot confirmed persistent phone label, nonduplicating 'Введите номер' placeholder, focus, disabled Continue, country controls and independent-client disclosure. No credentials, profiles or Telegram requests were used.",
-      "scope": "Accountless dark-appearance authorization window only; real login, VoiceOver speech, light appearance, IME/RTL, chats, and 20-account certification remain unverified."
-    },
-    "coverage_limit": "Accountless dark-appearance authorization window only; real login, VoiceOver speech, light appearance, IME/RTL, chats, and 20-account certification remain unverified."
+    "coverage_limit": "Synthetic regression covers the restore planner/registry/scheduler/preparer composition. It does not prove macOS Keychain behavior, production AppDelegate wiring, 20 live LocalAccountRuntime instances, TDLib connections, real authorized identities, or same-Mac RSS/CPU/wakeups/network."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -719,7 +693,7 @@
     "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
-  "status": "AUTH-FORM-APPLE-HIG-17: persistent phone label and distinct placeholder verified in one canonical Dev.app; exact-source CI/native workflow and Site devlog passed. Real login and 20-account coverage remain unverified.",
+  "status": "APP02-RESTORE-STALL-DEDUP-01: 20-profile synthetic startup restore test passes locally and in exact test-commit CI; real accounts/runtime resources remain unverified.",
   "latest_design_research": {
     "date": "2026-10-15",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
@@ -826,10 +800,10 @@
   },
   "pending_native_candidate": null,
   "latest_pushed_commit": {
-    "sha": "709b7552a0198d04b496c1b983dc980855d04de8",
+    "sha": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
     "branch": "main",
     "remote": "https://github.com/AffPapa/NeTelegram.git",
-    "result": "push succeeded using the existing Git credential helper; no new token or login."
+    "result": "pushed successfully using existing configured Git transport; exact test-only CI passed; no new credential or login."
   },
   "latest_exact_source_ci": {
     "run_id": 38632656079,
@@ -870,20 +844,20 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP01",
-    "receipt_id": "APP01-PIPELINE-20-01",
-    "test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
-    "result": "Local targeted regression and exact test-only full serial macOS CI passed. APP01 remains partial for real runtime/account/resource coverage.",
-    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app01-pipeline-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app01-pipeline-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app01-pipeline-scratch --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
-    "scope": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network.",
-    "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+    "case": "APP02",
+    "receipt_id": "APP02-RESTORE-STALL-DEDUP-01",
+    "test": "PASS 1/1 `restorePlannerAndStartupRegistryDeduplicateWhileOneKeychainPreparationStalls`; composes profile restore planning, startup registry, parallelism=2 and injected Keychain preparation across 20 synthetic profiles. One profile stalls, one fails with errSecInteractionNotAllowed, the other 18 finish; a repeated restore adds no duplicate work; existing DB/draft marker bytes remain unchanged; after releasing the stall, 19 succeed and all slots drain.",
+    "result": "Focused local Swift 6.4 test passed 1/1; exact test-only GitHub macOS serial CI passed (195 tests). APP02 remains partial: synthetic coordination only; no real Keychain, TDLib sessions, Telegram accounts, AppDelegate restore, or resource measurements.",
+    "command": "CLANG_MODULECACHE_PATH=/private/tmp/netelegram-app02-restore-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app02-restore-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app02-restore-scratch --no-parallel --filter restorePlannerAndStartupRegistryDeduplicateWhileOneKeychainPreparationStalls",
+    "scope": "Synthetic regression covers the restore planner/registry/scheduler/preparer composition. It does not prove macOS Keychain behavior, production AppDelegate wiring, 20 live LocalAccountRuntime instances, TDLib connections, real authorized identities, or same-Mac RSS/CPU/wakeups/network.",
+    "test_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
     "hosted_test_ci": {
-      "run_id": 38631444134,
+      "run_id": 38638917609,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
-      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
-      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38638917609",
+      "workflow_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
+      "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
+      "scope": "Full serial macOS core suite: 195 tests passed on test-only commit; native app source remained unchanged."
     }
   },
   "latest_chat_list_pagination_slice": {

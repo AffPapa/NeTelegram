@@ -1827,3 +1827,9 @@
 - Exact-source macOS CI 38637208931 and pinned TDLib/Dev.app workflow 38637208825 passed for app commit `47247149939e825c23b5816573e42ff5101c7b94`. One canonical arm64 Dev.app was rebuilt, strict ad-hoc signature verified, and active-window CUA/AX plus screenshot confirmed the label, placeholder, disabled Continue, country controls, and no profile UUIDs.
 - Site version 196 deployed publicly from Site source `4d2bb028425fba0936e6b01f1536e22d8d71a90a`; anonymous devlog route showed this bilingual entry. Downloads still has no installer. Site archive SHA-256: `3ffc12d8c33ab5447c64a7c6d149bd41dd143749f860cc9b1e7b708301bc1c1c`.
 - Limits: no real login or credentials; light appearance, spoken VoiceOver, IME/RTL, 20 authorized runtimes, Developer ID/notarization, and release readiness remain unverified.
+
+## 2026-10-15 — APP02-RESTORE-STALL-DEDUP-01
+
+- Added and pushed test-only commit `72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0` to `AffPapa/NeTelegram:main`. The regression composes restore planning, startup registry, parallelism=2 and injected Keychain preparation over 20 synthetic profiles; one stalls, one fails, the other 18 finish, duplicate scheduling is suppressed, existing DB/draft marker bytes remain unchanged, then 19 finish after releasing the stall.
+- Verification: focused Swift 6.4 test passed 1/1; [full serial macOS CI](https://github.com/AffPapa/NeTelegram/actions/runs/38638917609) passed 195 tests on the exact test commit. App source remains `47247149939e825c23b5816573e42ff5101c7b94`; canonical Dev.app was not rebuilt.
+- Limits: synthetic coordination only. Does not prove production AppDelegate restore, real Keychain, TDLib sessions, authorized accounts, or resource measurements. No login, Telegram request, or secret access.
