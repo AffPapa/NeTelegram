@@ -131,6 +131,12 @@ def validate_records(project: dict, acceptance: dict) -> None:
         )
         if not pending_matches:
             errors.append("canonical Dev.app is stale without a matching documented pending native candidate")
+    elif (
+        "pending_source_commit" in local_app
+        or "pending_source_commit" in bundle
+        or pending is not None
+    ):
+        errors.append("pending native source differs: remove superseded pending-source pointers after the canonical Dev.app reaches current app source")
     if errors:
         raise ValueError("\n".join(errors))
 

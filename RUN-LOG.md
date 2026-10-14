@@ -1132,3 +1132,21 @@
 - Removed superseded nested `next_action` strings from milestone receipts in PROJECT-STATE and ACCEPTANCE. Each file now has one root action, and `Scripts/validate_checkpoint.py` rejects a nested duplicate so resume instructions cannot quietly diverge.
 - Updated the stored GitHub access diagnosis to the observed state: GitHub connector reads work, its blob write is denied, Git transport DNS fails, and cached `gh` sessions are invalid. No credentials were created and no remote ref was changed.
 - Revalidated the current Site independently: public Site v186 and its pages/feeds remain live and factual for APP26; no Site change is needed for this checkpoint-only cleanup.
+
+
+## 2026-10-14 — APP26 canonical Dev.app and lifecycle smoke
+
+- Resolved the stale resume pointer: the canonical `/private/tmp/NeTelegram-Dev.app` is now built from exact app-source `7683cc6bace702b3376a08a9a2aaf4aaf881a691` (APP26), arm64, macOS 14 baseline, pinned TDLib `c15d3f5a5de6e3ba5839822c451152e5e18bb700`. Build completed in 26.74s. `codesign --verify --deep --strict` passed for ad-hoc development signing. BuildInfo SHA-256 `1c707665774882ec185dc0019e83c0dd0be4bf78c6088500272a73279dbd2292`; executable SHA-256 `339f7dad934f4cd658573dcb26b291b19ad4cc781853a365ef5ffc4cb4735f0e`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1.
+- CUA showed the accountless welcome and phone/QR authorization UI. No phone, OTP, API hash, profile selection, or Telegram session was entered.
+- Accountless lifecycle smoke passed: close-last-window left the process alive; LaunchServices/Dock reopen restored one window with the same PID; Cmd+Q exited; elevated process guard then confirmed absence. Receipt: `/private/tmp/netelegram-app26-lifecycle-0f71d8b.json`. A broad diagnostic screenshot exists locally but contains unrelated desktop content and is not suitable for publication.
+- The exact checkpoint commit `0f71d8bd2bf25b432b2bd2a1ddf81fa711cf5ced` was pushed and metadata CI run `38537039886` passed. This new checkpoint replaces the obsolete claim that the old app/PID was still running.
+- Updated the canonical `local_development_candidate` and APP26 acceptance evidence; removed the stale pending-native-candidate pointer. Real login/search, 20 authorized runtimes/resource measurements, Developer ID release signing, notarization, Gatekeeper, updater and public downloads remain open.
+
+
+## 2026-10-14 — Site v187 publishes APP26 native lifecycle evidence
+
+- Existing public Site project `appgprj_6acba85192e08191acdf7011928848cf` reused; no second Site created. Official Sites source helper opened the returned checkout, committed/pushed source `b676e0f33ef66fe6a9b5ebd279e6f1ee50666e17`, built all 8 static routes, and passed `validate_site.py`.
+- Saved Site version 187 from the pushed source and exact 14-file archive (`sha256:9ba2889113b0283f7e93ceeb5c975bdf04378b6d2d1e85f55c985f8dc01824b`; stored 481280 bytes). Deployment `appgdep_6acf42e795b4819198da2c7ee7bf0de2` succeeded at https://netelegram.iryadom.chatgpt.site.
+- Anonymous macOS system-curl verification: `/devlog/` 200 `text/html`, 256336 bytes with APP26 RU/EN lifecycle entry; `/downloads/` 200 `text/html`, 5722 bytes; `/updates/stable.xml` 200 `text/xml`, 421 bytes and states no stable release. No download button or appcast asset was invented.
+- A Python urllib check failed because its bundled CA store rejected the chain; system curl using macOS trust passed.
+- Site archive local SHA-256 `af5ca21c0b015a58804562b6263c9a8828fe47a2164aa491f3b5feff890e26af`, 197516 bytes. Site source, Site version/deployment, app-source SHA, and app bundle remain separate identities.
