@@ -49,6 +49,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var loginSubtitle: NSTextField!
     private var loginDisclosure: NSTextField!
     private var authCard: AuthenticationCardView!
+    private var authScroll: NSScrollView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
     /// Latest account the user asked to see, including one still starting.
@@ -224,12 +225,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var authLayoutPreviewEventMonitor: Any?
     private let authLayoutPreviewStates = ["phone", "code", "password", "qr", "registration"]
 #endif
+    private var authFocusNavigationEventMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
         NSApp.setActivationPolicy(.regular)
+#if DEBUG
+        if CommandLine.arguments.contains("--ci-appearance-dark") {
+            NSApp.appearance = NSAppearance(named: .darkAqua)
+        }
+#endif
         buildMainMenu()
         buildWindow()
+        installAuthenticationFocusScroller()
         loadBundledPhoneCountries()
 #if DEBUG
         authLayoutPreviewEnabled = configureAuthenticationLayoutPreviewIfRequested()
@@ -259,6 +267,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     func applicationWillTerminate(_ notification: Notification) {
         networkTypeUpdateTask?.cancel()
         networkMonitor.cancel()
+        if let authFocusNavigationEventMonitor {
+            NSEvent.removeMonitor(authFocusNavigationEventMonitor)
+            self.authFocusNavigationEventMonitor = nil
+        }
         NSWorkspace.shared.notificationCenter.removeObserver(self, name: NSWorkspace.didWakeNotification, object: nil)
     }
 
@@ -499,17 +511,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authCard = AuthenticationCardView(frame: .zero)
         authCard.translatesAutoresizingMaskIntoConstraints = false
         content.addSubview(authCard)
-        authCard.addSubview(authStack)
+        authScroll = NSScrollView(frame: .zero)
+        authScroll.translatesAutoresizingMaskIntoConstraints = false
+        authScroll.drawsBackground = false
+        authScroll.borderType = .noBorder
+        authScroll.hasVerticalScroller = true
+        authScroll.autohidesScrollers = true
+        let authScrollContent = NSView(frame: .zero)
+        authScrollContent.translatesAutoresizingMaskIntoConstraints = false
+        authScroll.documentView = authScrollContent
+        authScrollContent.addSubview(authStack)
+        authCard.addSubview(authScroll)
         NSLayoutConstraint.activate([
             authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
             authCard.widthAnchor.constraint(equalToConstant: 568),
             authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
             authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
-            authStack.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 32),
-            authStack.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -32),
-            authStack.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 28),
-            authStack.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -28),
+            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 14),
+            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -14),
+            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 14),
+            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -14),
+            authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
+            authStack.leadingAnchor.constraint(equalTo: authScrollContent.leadingAnchor, constant: 4),
+            authStack.trailingAnchor.constraint(equalTo: authScrollContent.trailingAnchor, constant: -4),
+            authStack.topAnchor.constraint(equalTo: authScrollContent.topAnchor, constant: 12),
+            authStack.bottomAnchor.constraint(equalTo: authScrollContent.bottomAnchor, constant: -12),
             mark.widthAnchor.constraint(equalToConstant: 64), mark.heightAnchor.constraint(equalToConstant: 64),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
@@ -803,6 +830,43 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func setAuthCardVisible(_ visible: Bool) {
         authCard.isHidden = !visible
+        guard visible else { return }
+        Task { @MainActor [weak self] in
+            await Task.yield()
+            self?.scrollAuthenticationCardToTop()
+        }
+    }
+
+    private func scrollAuthenticationCardToTop() {
+        guard let documentView = authScroll?.documentView else { return }
+        window?.contentView?.layoutSubtreeIfNeeded()
+        documentView.layoutSubtreeIfNeeded()
+        let top = max(0, documentView.bounds.height - authScroll.contentView.bounds.height)
+        authScroll.contentView.scroll(to: NSPoint(x: 0, y: top))
+        authScroll.reflectScrolledClipView(authScroll.contentView)
+    }
+
+    private func installAuthenticationFocusScroller() {
+        authFocusNavigationEventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard event.keyCode == 48,
+                  let self,
+                  let authCard = self.authCard,
+                  !authCard.isHidden else { return event }
+            Task { @MainActor [weak self] in
+                await Task.yield()
+                self?.scrollFocusedAuthenticationControlIntoView()
+            }
+            return event
+        }
+    }
+
+    private func scrollFocusedAuthenticationControlIntoView() {
+        guard !authCard.isHidden,
+              let documentView = authScroll.documentView,
+              let focusedView = window.firstResponder as? NSView,
+              focusedView.isDescendant(of: documentView) else { return }
+        let rect = focusedView.convert(focusedView.bounds, to: documentView)
+        documentView.scrollToVisible(rect)
     }
 
     @objc private func messageViewportBoundsDidChange(_ notification: Notification) {
@@ -6998,7 +7062,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authLayoutPreviewEnabled = true
         authLayoutPreviewIndex = 0
         window.setFrame(
-            NSRect(origin: window.frame.origin, size: NSSize(width: 900, height: 700)),
+            NSRect(
+                origin: window.frame.origin,
+                size: CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
+                    ? NSSize(width: 760, height: 600)
+                    : NSSize(width: 900, height: 700)
+            ),
             display: true
         )
         window.center()

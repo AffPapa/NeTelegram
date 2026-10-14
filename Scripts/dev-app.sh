@@ -31,18 +31,30 @@ else
 fi
 DEV_DIRTY="$APP_SOURCE_DIRTY"
 MODE="build"
-LAUNCH_PREVIEW_ARGS=()
+LAUNCH_ARGS=(--app-support-root "$SUPPORT_ROOT")
 
 if [[ "${1:-}" == "--launch" ]]; then
     MODE="launch"
 elif [[ "${1:-}" == "--launch-chat-shell-preview" ]]; then
     MODE="launch"
-    LAUNCH_PREVIEW_ARGS=(--ci-chat-shell-preview)
+    LAUNCH_ARGS+=(--ci-chat-shell-preview)
 elif [[ "${1:-}" == "--launch-chat-shell-preview-compact" ]]; then
     MODE="launch"
-    LAUNCH_PREVIEW_ARGS=(--ci-chat-shell-preview --ci-chat-shell-preview-compact)
+    LAUNCH_ARGS+=(--ci-chat-shell-preview --ci-chat-shell-preview-compact)
+elif [[ "${1:-}" == "--launch-auth-layout-preview" ]]; then
+    MODE="launch"
+    LAUNCH_ARGS+=(--ci-auth-layout-preview)
+elif [[ "${1:-}" == "--launch-auth-layout-preview-compact" ]]; then
+    MODE="launch"
+    LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-auth-layout-preview-compact)
+elif [[ "${1:-}" == "--launch-auth-layout-preview-dark" ]]; then
+    MODE="launch"
+    LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-appearance-dark)
+elif [[ "${1:-}" == "--launch-auth-layout-preview-compact-dark" ]]; then
+    MODE="launch"
+    LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-auth-layout-preview-compact --ci-appearance-dark)
 elif [[ $# -gt 0 ]]; then
-    echo "Usage: $0 [--launch|--launch-chat-shell-preview|--launch-chat-shell-preview-compact]" >&2
+    echo "Usage: $0 [--launch|--launch-chat-shell-preview[-compact]|--launch-auth-layout-preview[-compact][-dark]]" >&2
     exit 2
 fi
 
@@ -115,7 +127,7 @@ PY
         echo "Reusing verified canonical bundle for exact clean source $DEV_COMMIT."
         echo "Build record: $BUILD_RECORD"
         if [[ "$MODE" == "launch" ]]; then
-            open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT" "${LAUNCH_PREVIEW_ARGS[@]}"
+            open "$APP_PATH" --args "${LAUNCH_ARGS[@]}"
         fi
         exit 0
     fi
@@ -242,5 +254,5 @@ echo "Support root: $SUPPORT_ROOT"
 echo "Build record: $APP_PATH/Contents/Resources/BuildInfo.json"
 echo "Signed bytes record: $BUILD_RECORD"
 if [[ "$MODE" == "launch" ]]; then
-    open "$APP_PATH" --args --app-support-root "$SUPPORT_ROOT" "${LAUNCH_PREVIEW_ARGS[@]}"
+    open "$APP_PATH" --args "${LAUNCH_ARGS[@]}"
 fi
