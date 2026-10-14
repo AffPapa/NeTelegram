@@ -51,11 +51,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38501042106,
+      "run_id": 38501377674,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501042106",
-      "workflow_commit": "239e5afaea1c9e712cd4a420b65461956cb233e2",
-      "scope": "Last completed checkpoint metadata validation passed for commit 239e5af; the current validator/checkpoint changes will run after push."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501377674",
+      "workflow_commit": "5aaadc7bb4dbb1635fe8574ef7e00e5f4790b6d5",
+      "scope": "Checkpoint metadata validation passed: JSON validation and Scripts/validate_checkpoint.py."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,
@@ -259,11 +259,11 @@
   "latest_site_source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38498457919,
+    "run_id": 38501377674,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919",
-    "workflow_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
-    "scope": "Last recorded metadata validation passed for checkpoint 6883cba; the new coherence-validator commit will trigger its own metadata run."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501377674",
+    "workflow_commit": "5aaadc7bb4dbb1635fe8574ef7e00e5f4790b6d5",
+    "scope": "Checkpoint metadata validation passed: JSON validation and Scripts/validate_checkpoint.py."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
