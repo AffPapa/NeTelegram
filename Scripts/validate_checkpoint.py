@@ -31,6 +31,11 @@ def validate_records(project: dict, acceptance: dict) -> None:
     local_app = project["local_development_candidate"]
     bundle = evidence["local_dev_app"]
     hosted_ci = evidence["hosted_ci"]
+    project_hosted_ci = project["source"]["latest_exact_commit_ci"]
+    exact_ci_copies_match = all(
+        project_hosted_ci.get(key) == hosted_ci.get(key)
+        for key in ("run_id", "status", "url", "workflow_commit", "app_source_commit")
+    )
     hosted_ci_matches_source = (
         hosted_ci["workflow_commit"] == app_sha
         and hosted_ci["app_source_commit"] == app_sha
@@ -77,6 +82,8 @@ def validate_records(project: dict, acceptance: dict) -> None:
          "ACCEPTANCE.latest_acceptance_slice is stale"),
         (hosted_ci_matches_source and hosted_ci_is_recorded,
          "current hosted CI outcome is missing, stale, or an undiagnosed failure"),
+        (exact_ci_copies_match,
+         "duplicate exact-source CI checkpoint differs from current_evidence.hosted_ci"),
         (acceptance_site["version"] == deployment["version"]
          and acceptance_site["project_id"] == deployment["project_id"]
          and acceptance_site["source_commit"] == deployment["source_commit"]

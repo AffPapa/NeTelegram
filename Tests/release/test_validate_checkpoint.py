@@ -28,6 +28,9 @@ class ValidateCheckpointTests(unittest.TestCase):
         acceptance["current_evidence"]["app_source_commit"] = current
         acceptance["current_evidence"]["hosted_ci"]["workflow_commit"] = current
         acceptance["current_evidence"]["hosted_ci"]["app_source_commit"] = current
+        project["source"]["latest_exact_commit_ci"] = copy.deepcopy(
+            acceptance["current_evidence"]["hosted_ci"]
+        )
         acceptance["latest_acceptance_slice"]["source_commit"] = current
         acceptance["last_verification"]["app_source_commit"] = current
         project["pending_native_candidate"] = {
@@ -67,6 +70,14 @@ class ValidateCheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing, stale, or an undiagnosed failure"):
             validate_records(project, acceptance)
 
+    def test_duplicate_exact_source_ci_must_match_current_evidence(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        project["source"]["latest_exact_commit_ci"]["run_id"] += 1
+
+        with self.assertRaisesRegex(ValueError, "duplicate exact-source CI checkpoint differs"):
+            validate_records(project, acceptance)
+
     def test_exact_source_timeout_can_be_checkpointed_without_calling_it_a_pass(self):
         project = copy.deepcopy(self.project)
         acceptance = copy.deepcopy(self.acceptance)
@@ -90,6 +101,9 @@ class ValidateCheckpointTests(unittest.TestCase):
             "app_source_commit": current,
             "diagnosis": "The exact-source full-suite step timed out; local serial suite passed.",
         }
+        project["source"]["latest_exact_commit_ci"] = copy.deepcopy(
+            acceptance["current_evidence"]["hosted_ci"]
+        )
         acceptance["current_evidence"]["local_suite"] = (
             "PASS 167/167 exact-source local serial Swift suite."
         )
