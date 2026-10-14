@@ -58,6 +58,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
     private var countryPickerStack: NSStackView!
+    private var countryFieldLabel: NSTextField!
     private var countrySearchField: NSSearchField!
     private var countrySuggestionLabel: NSTextField!
     private var countryPickerRegionCodes: [String?] = []
@@ -446,7 +447,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySearchField.target = self
         countrySearchField.action = #selector(searchCountries)
         countrySearchField.delegate = self
-        countryPickerStack = NSStackView(views: [countrySearchField, countryPicker])
+        countryFieldLabel = NSTextField(labelWithString: "Страна")
+        countryFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        countryFieldLabel.textColor = .labelColor
+        countryFieldLabel.setAccessibilityLabel("Страна")
+        countryPickerStack = NSStackView(views: [countryFieldLabel, countrySearchField, countryPicker])
         // Keep search and selection as one aligned form section. A vertical
         // stack with equal-width native controls scans more clearly than a
         // narrow search field beside a wider country menu.
@@ -623,6 +628,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countrySearchField.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
@@ -7355,7 +7361,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             ? "Введите полный номер с + и кодом страны. Загружаю список стран…"
             : phoneNumberEntryPrompt())
         updatePhoneEntryActionAvailability()
-        phoneField.becomeFirstResponder()
+        if countryPickerStack.isHidden || selectedCountryRegionCode != nil {
+            phoneField.becomeFirstResponder()
+        } else {
+            countrySearchField.becomeFirstResponder()
+        }
     }
 
     private func showLogoutProgress() {
@@ -7382,6 +7392,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         updateCountrySuggestion()
         setStatus(phoneNumberEntryPrompt())
         updatePhoneEntryActionAvailability()
+        phoneField.becomeFirstResponder()
     }
 
     @objc private func searchCountries() {
@@ -7424,7 +7435,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countrySuggestionLabel.stringValue = ""
             return
         }
-        countrySuggestionLabel.stringValue = "Регион Mac: \(country.name) (+\(callingCode)). Код применится только после выбора страны."
+        countrySuggestionLabel.stringValue = "Подсказка macOS: \(country.name) (+\(callingCode))."
         countrySuggestionLabel.isHidden = false
     }
 
