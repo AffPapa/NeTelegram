@@ -385,7 +385,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         mark.wantsLayer = true
         mark.layer?.backgroundColor = NSColor.systemBlue.cgColor
         mark.layer?.cornerRadius = 28
-        let markLabel = NSTextField(labelWithString: "A")
+        let markLabel = NSTextField(labelWithString: "N")
         markLabel.font = .systemFont(ofSize: 30, weight: .bold)
         markLabel.textColor = .white
         markLabel.alignment = .center
