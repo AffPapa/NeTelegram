@@ -1752,7 +1752,7 @@
 - Current app source is `4ccc4821cde94eb7b4fe2ccfda26ce8b2d038544`; current normal Dev.app remains open with no account data or credentials entered. Next project action remains the scoped Keychain data-query timeout diagnosis, then user-operated one-account login/read/send/logout. Real 20-account validation, compatibility gates, release signing/notarization, and public download remain open.
 
 
-## 2026-10-15 — AUTH-FORM-APPLE-HIG-13
+## 2026-10-15 — AUTH-FORM-APPLE-HIG-17
 
 - Research: current Apple HIG for macOS windows, layout, text fields, accessibility, and keyboard behavior; current Telegram Desktop `Telegram/SourceFiles/intro/intro_phone.cpp` and `intro.style` reviewed for flow only. Telegram Desktop is GPL-3.0; no code, styles, assets, or branding were copied.
 - Change in `Sources/NeTelegramApp/main.swift`: country selector now has a visible “Страна” field label; the visible macOS-region hint is shorter while its accessible description retains the explicit-selection rule. Initial keyboard focus goes to country search until the user selects a country, then to phone entry. Country is not preselected from macOS locale.
@@ -1819,3 +1819,11 @@
 - Reproduced the configured API-hash `SecItemCopyMatching` data-read stall in a separate, bounded 12-second probe using the app's service/account and noninteractive LAContext. A second variant with explicit UI-fail also timed out. Neither probe printed, copied, compared, or persisted the value; the existing Keychain item was not modified.
 - Control: the same query shape for a deliberately nonexistent service/account returned `errSecItemNotFound` (-25300) in 11 ms. Prior attributes-only lookup of the configured item returned `errSecSuccess` in 3 ms.
 - Interpretation: the delay is specific to retrieving data for the existing item, not a general slow Keychain lookup. Root cause is still unproven; this does not establish whether the canonical app can read the item. Do not delete/reset it or claim the value is missing. Owner-side recovery/authorization in the app is still needed before login.
+
+
+## 2026-10-15 — AUTH-FORM-APPLE-HIG-17
+
+- Replaced the phone field’s duplicate placeholder with `Введите номер`; the separate visible label remains. This was a narrow HIG refinement, not a redesign or release.
+- Exact-source macOS CI 38637208931 and pinned TDLib/Dev.app workflow 38637208825 passed for app commit `47247149939e825c23b5816573e42ff5101c7b94`. One canonical arm64 Dev.app was rebuilt, strict ad-hoc signature verified, and active-window CUA/AX plus screenshot confirmed the label, placeholder, disabled Continue, country controls, and no profile UUIDs.
+- Site version 196 deployed publicly from Site source `4d2bb028425fba0936e6b01f1536e22d8d71a90a`; anonymous devlog route showed this bilingual entry. Downloads still has no installer. Site archive SHA-256: `3ffc12d8c33ab5447c64a7c6d149bd41dd143749f860cc9b1e7b708301bc1c1c`.
+- Limits: no real login or credentials; light appearance, spoken VoiceOver, IME/RTL, 20 authorized runtimes, Developer ID/notarization, and release readiness remain unverified.
