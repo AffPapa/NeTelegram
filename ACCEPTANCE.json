@@ -475,16 +475,16 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "checkpoint_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-    "local_command": "Focused: unknownClientUpdateFailsSharedReceiverAfterDrainingAcceptedEvents; prior focused photoSendRevalidatesLiveTargetAfterAsyncStaging. No full local suite repeated after source a455362.",
-    "local_result": "Route regression passed 1/1; photo guard regression passed 1/1 on parent source. Exact source validated by hosted serial CI 162/162.",
-    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482988 passed exact-source 162/162 on macOS 15 / Xcode 16.4 / Swift 6.1.2 arm64. Earlier source 5b40336 run 38494308524 timed out before test start; superseded, not current result.",
-    "native_dev_app_smoke": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482965 successfully built and assembled pinned TDLib arm64 Dev.app for exact source; no launch, login, or real account smoke.",
-    "metadata_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38496052252 passed metadata validation for checkpoint 31c2468.",
-    "scope": "TDLib unknown/unregistered client route now terminates the shared receive channel after accepted-event drain, avoiding silent loss/fallback. Photo send rechecks the captured runtime and permissions after async staging. Synthetic tests only; real transport/send behavior remains unverified.",
-    "site_deployment": "Public Site v170 deployed from Site source 272e257fbe70e6d7de3fb19faff69f78c9cfcdca as appgdep_6acee10806988191b7212e17add857a3; anonymous cache-busted /devlog route verified the AUTH05 bilingual entry for app source fa80d5a. Downloads remain without an app binary."
+    "source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "checkpoint_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
+    "local_command": "Focused countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct; full serial Swift suite once because hosted runner stalled.",
+    "local_result": "Focused 1/1 and exact-source serial 163/163 passed in 0.426s under arm64e / Xcode 27.0 / Swift 6.4.",
+    "hosted_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467214 cancelled at the five-minute limit after the runner probe; no suite result. Do not repeat unchanged.",
+    "native_dev_app_smoke": "Pinned TDLib arm64 assembly 38497467210 passed. Canonical /private/tmp/NeTelegram-Dev.app BuildInfo and CUA title match exact app source; CUA country search/select passed, no credentials.",
+    "metadata_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919 passed for checkpoint 6883cba; the checkpoint-validator change triggers a fresh metadata run.",
+    "scope": "AUTH05 accountless UI and deterministic country/phone tests only. Real login, 20-account, sleep/wake, Developer ID/notarization, and Telegram compatibility remain unverified.",
+    "site_deployment": "Public Site v170 deployment appgdep_6acee10806988191b7212e17add857a3; anonymous cache-busted /devlog route verified the AUTH05 entry. Downloads page contains no app binary."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",

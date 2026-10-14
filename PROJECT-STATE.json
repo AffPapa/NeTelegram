@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "AUTH05: bilingual country search and stable region selection verified in the canonical Dev.app. App source fa80d5a; local exact-source suite 163/163. Hosted suite 38497467214 cancelled at five minutes after probe; native TDLib/Dev.app workflow 38497467210 passed. Public Site remains v169 pending the batched AUTH05 devlog update. No credentials entered.",
+  "phase": "AUTH05 verified at app source fa80d5a: bilingual country search and region selection in the canonical Dev.app; local suite 163/163. Hosted suite 38497467214 cancelled before test results (probe passed); pinned-TDLib assembly 38497467210 passed. Public Site v170 is live and verified; no app binary. Real-account login remains deferred.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -51,21 +51,21 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38496052252,
+      "run_id": 38498457919,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38496052252",
-      "workflow_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-      "scope": "Metadata validation passed for exact checkpoint 31c2468."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919",
+      "workflow_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
+      "scope": "Last recorded metadata validation passed for checkpoint 6883cba; the new coherence-validator commit will trigger its own metadata run."
     },
     "last_native_bundle_smoke": {
-      "run_id": 38495482965,
+      "run_id": 38497467210,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482965",
-      "workflow_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-      "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38497467210",
+      "workflow_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+      "scope": "Pinned TDLib arm64 Dev.app assembly passed; local canonical Dev.app separately launched and country search/select was checked. No Telegram credentials entered."
     },
-    "last_audited_checkpoint_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "last_audited_checkpoint_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null
   },
@@ -73,21 +73,21 @@
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
     "version": "0.0.0-dev",
-    "build_info_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "application_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "build_info_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "application_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "signing": "ad-hoc development signature; codesign --verify --deep --strict passed",
+    "signing": "ad-hoc; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "The single canonical Dev.app is open at source 2d8a4e5. CUA confirms the accountless welcome, phone field and QR action. No phone, code, or profile entered.",
-    "source_fingerprint_sha256": "cca9c035fa390d3b61e11a7cff303f6bb5b79e8d2bd80b69e4cd8b9b61e37784",
-    "app_executable_sha256": "43f9c34a5c1c0e53d79dea2d97cef0dcae089c9ac2d86d0c84ac46f0477c203a",
+    "process_state": "CUA confirms the single canonical Dev.app is open at this exact source; country search/select smoke passed. No phone, code, or Telegram profile created.",
+    "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
+    "app_executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "reuse_validation": "Scripts/dev-app.sh built/replaced the existing canonical bundle once after confirming the empty prior app was quit; codesign --verify --deep --strict passed.",
-    "pending_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "candidate_state": "built and open; accountless first-run UI confirmed by CUA. Real login and account scenarios not run."
+    "reuse_validation": "Exact-source bundle BuildInfo.json and CUA title both identify the same canonical Dev.app. Reuse it; do not rebuild unless app source changes.",
+    "pending_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "candidate_state": "built and open; exact-source accountless country search/select confirmed; no login or account data entered"
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -251,22 +251,22 @@
     "2026-10-14: A broad Site helper invocation from non-empty /private/tmp failed during reserved checkout prep; retrying in a fresh empty directory reached the exact blocker: DNS cannot resolve git.chatgpt-team.site. Preserve the existing Site and source; do not repeat identical helper attempts until provider DNS/network route changes."
   ],
   "latest_access_audit": {
-    "date": "2026-10-13",
+    "date": "2026-10-14",
     "scope": "Read-only release preflight",
-    "signing_identity_count": 0,
-    "developer_id_application_identity_count": 0,
-    "notary_credentials": "not inspected",
-    "github_releases": "empty list via public GitHub REST API",
-    "result": "No release readiness; supersedes stale claim of four code-signing identities / two Developer ID identities."
+    "signing_identity_count": 4,
+    "developer_id_application_identity_count": 2,
+    "team_id": "H6VGU2M6JD",
+    "notary_credentials": "not found in notarytool Keychain metadata; no configured APPLE_/ASC_/NOTARY_ variable names",
+    "result": "Suitable Developer ID identities were observed in repeated inventories, with one adjacent inconsistent zero-result query. No notarization credential, signing operation, or release was confirmed."
   },
-  "latest_site_source_commit": "8a90bfa27cb219f4c86838b2f027f4d6533f72f6",
+  "latest_site_source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38470536609,
+    "run_id": 38498457919,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38470536609",
-    "workflow_commit": "c028bd3859d76b6abf31634a4bb62f071d5e9f57",
-    "scope": "Metadata validation completed successfully for c028bd3."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38498457919",
+    "workflow_commit": "6883cbae4f6386db8123f5ad798f56c237634e04",
+    "scope": "Last recorded metadata validation passed for checkpoint 6883cba; the new coherence-validator commit will trigger its own metadata run."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -332,22 +332,21 @@
     "public_verification": "Sites get_site confirms active public Site v170 and deployment succeeded. Anonymous HTTPS /devlog/?verify=fa80d5a returned 200 with the bilingual AUTH05 entry and exact app commit fa80d5a; accessibility tree showed the local/hosted CI caveat and native build links. Browser cache-busted route verified. Downloads page was not changed; no app download was added."
   },
   "current_native_smoke": {
-    "repository_head": "7d63518026eb17266cfb816d4af22189be859374",
-    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
     "bundle_id": "org.affpapa.netelegram.dev",
-    "source_fingerprint_sha256": "cca9c035fa390d3b61e11a7cff303f6bb5b79e8d2bd80b69e4cd8b9b61e37784",
-    "executable_sha256": "43f9c34a5c1c0e53d79dea2d97cef0dcae089c9ac2d86d0c84ac46f0477c203a",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "source_fingerprint_sha256": "362cf9998bc23b31dd06b6c6de323bfdd1b51a2e2dd499aec0537655fcecad93",
+    "executable_sha256": "5f031ffeaa03b1405cca29261e632ee6976ed238fddc7c8773cd1be3b73ea9fc",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "live_ui": "CUA observed NeTelegram · dev 2d8a4e59, empty phone-entry/QR welcome and non-affiliation disclosure; no profile or credentials.",
+    "live_ui": "CUA confirmed NeTelegram · dev fa80d5a5; Canada search displayed 🇨🇦 Канада +1 and selected value updated. No number, credentials, or profile.",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "ci_run_id": 38492400249,
-    "native_run_id": 38492400259,
-    "scope": "Exact source 2d8a4e5, local 160/160 serial tests, hosted CI/native workflows, and one accountless local Dev.app. No real account, real Keychain recovery, 20-account or distribution test."
+    "native_run_id": 38497467210,
+    "scope": "Accountless native UI smoke on the exact canonical app source. No authorized account, 20-runtime, sleep/wake, or distribution test."
   },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",
@@ -404,12 +403,12 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "APP16+APP17",
-    "source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "local_focused_tests": "unknownClientUpdateFailsSharedReceiverAfterDrainingAcceptedEvents passed 1/1; photoSendRevalidatesLiveTargetAfterAsyncStaging passed 1/1 on prior source; no local full suite repeated after source a455362",
-    "hosted_serial_suite": "passed 162/162; run 38495482988",
-    "native_bundle_workflow": "passed pinned TDLib arm64 Dev.app assembly; run 38495482965; no app launch or account smoke",
-    "remaining": "partial; real TDLib receive/send, picker timing, account auth, 20 real runtimes and device lifecycle remain unverified"
+    "id": "AUTH05",
+    "source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "local_focused_tests": "countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct passed 1/1; full local serial suite passed 163/163 in 0.426s under arm64e / Xcode 27.0 / Swift 6.4.",
+    "hosted_serial_suite": "run 38497467214 cancelled at five-minute limit after runner probe; no test result, no hosted PASS.",
+    "native_bundle_workflow": "pinned TDLib arm64 Dev.app assembly passed in run 38497467210; local canonical Dev.app CUA country search/select smoke passed.",
+    "remaining": "AUTH05 remains partial pending minimum-window, appearance, accessibility, and account-backed auth checks. Real login, 20 authorized runtimes, Developer ID/notarization, and Telegram compatibility remain open."
   },
   "latest_auth05": {
     "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
