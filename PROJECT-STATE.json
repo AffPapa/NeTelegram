@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP28-PROD-CALLBACK-01: production update reduction and post-await ownership validation now share one tested seam.",
+  "phase": "APP01-PIPELINE-20-01: all twenty synthetic restored routes are now exercised through the shared TDLib receive pipeline.",
   "verified_at": "2026-10-15",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
@@ -54,7 +54,7 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "published_application_releases": [],
     "github_access": {
@@ -116,7 +116,7 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "latest_native_workflow_ci": {
       "run_id": 38630779299,
@@ -124,15 +124,16 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for app source 468ab74; no local GUI smoke."
     },
     "latest_pushed_commit": {
       "branch": "main",
-      "sha": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "sha": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "verified": "Pushed to AffPapa/NeTelegram main; exact-source macOS CI and pinned TDLib/native workflow passed.",
-      "ci_status": "exact_source_and_native_success",
+      "verified": "App source 468ab74 and test-only commit 63fc292 are pushed to AffPapa/NeTelegram main; exact app-source CI, test-only full-suite CI, and pinned native app workflow passed.",
+      "ci_status": "exact_source_and_test_only_success",
       "ci_run_id": 38630779359,
+      "test_only_ci_run_id": 38631444134,
       "native_run_id": 38630779299
     }
   },
@@ -155,7 +156,7 @@
     "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
   },
   "verification": {
-    "current_head_targeted_tests": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "current_head_targeted_tests": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
     "real_telegram_account": "not tested; owner-operated login remains pending.",
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "Fresh direct security find-identity -v -p codesigning on 2026-10-14 returned 0 valid identities. An earlier checkpoint reported 4, but the fresh result supersedes it. Notary credentials remain unverified. No signing or notarization was performed.",
@@ -179,7 +180,7 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "historical_native_build_870b894": {
       "status": "success_local",
@@ -394,11 +395,11 @@
   "latest_site_source_commit": "1adba5a1410ed186c389dc701ce8e9ad9d37b26f",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38602838474,
+    "run_id": 38631177788,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602838474",
-    "workflow_commit": "e0a1c09f81c004c9460e58b20f574221d0168b9f",
-    "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631177788",
+    "workflow_commit": "a07f319458758050d6d5d1ae93fe328104c7802b",
+    "scope": "Metadata validation passed for the APP28 callback ownership checkpoint."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -540,17 +541,18 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "APP28-PROD-CALLBACK-01",
+    "id": "APP01-PIPELINE-20-01",
     "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-    "change": "Added production-used `RuntimeUpdateOwnership.consumeThenCheck`: it awaits account update reduction, rechecks coordinator route, then validates MainActor-local runtime ownership before AppDelegate performs UI, notification, or account-state side effects. AppDelegate.receive uses this exact seam; the deterministic suspended identity-persistence regression also uses it and verifies a replacement generation blocks effects. No authentication, route fallback, identity, or TDLib behavior changed.",
-    "focused_test": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+    "change": "Extended the existing 20-profile restore composition regression to feed its resulting registered routes through one injected TDLibGateway and the production TDLibUpdatePipeline. A delayed callback for client 1 cannot block delivery to clients 2–20; after selection changes to account 2, all routes still receive sequence [1,2] in per-client FIFO order. Source code and runtime behavior were unchanged in the test-only commit.",
+    "focused_test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
     "hosted_ci": {
       "run_id": 38630779359,
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "exact_source_ci": {
       "run_id": 38630779359,
@@ -558,7 +560,15 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
+    },
+    "test_only_ci": {
+      "run_id": 38631444134,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
+      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
     },
     "native_workflow": {
       "run_id": 38630779299,
@@ -566,10 +576,10 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for app source 468ab74; no local GUI smoke."
     },
     "native_smoke": null,
-    "coverage_limit": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
+    "coverage_limit": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -819,7 +829,7 @@
     "status": "blocked_running_canonical_app",
     "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
     "running_bundle_source_commit": "6a0b7bf96d821771df0e7045b8a7ccd635ef5581",
-    "reason": "Read-only process guard observed NeTelegram PID 49828. Do not replace the only canonical Dev.app while it is running; local process check was performed with escalation and confirmed the exact app process. Hosted exact-source native workflow passed, but local current-source bundle smoke remains pending."
+    "reason": "Read-only process guard confirmed NeTelegram PID 49828 is still running the sole canonical Dev.app. Do not replace it while running; current source has passed exact hosted CI and pinned native assembly, but local source-matched GUI smoke awaits normal app quit."
   },
   "latest_pushed_commit": {
     "branch": "main",
@@ -836,7 +846,7 @@
     "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
     "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
     "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-    "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+    "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
   },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
@@ -869,12 +879,21 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP28",
-    "receipt_id": "APP28-PROD-CALLBACK-01",
-    "test": "PASS 1/1 callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime; exact-source CI PASS; hosted pinned native workflow PASS.",
-    "result": "Production AppDelegate callback sequencing now calls the same consume-then-check seam tested under deterministic route replacement. APP28 remains partial pending local current-source app smoke and real runtime evidence.",
-    "command": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
-    "scope": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
+    "case": "APP01",
+    "receipt_id": "APP01-PIPELINE-20-01",
+    "test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
+    "result": "Local targeted regression and exact test-only full serial macOS CI passed. APP01 remains partial for real runtime/account/resource coverage.",
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app01-pipeline-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app01-pipeline-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app01-pipeline-scratch --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
+    "scope": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network.",
+    "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+    "hosted_test_ci": {
+      "run_id": 38631444134,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
+      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
+    }
   },
   "latest_chat_list_pagination_slice": {
     "date": "2026-10-14",
@@ -943,7 +962,7 @@
     "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
     "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
     "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-    "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
+    "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for app source 468ab74; no local GUI smoke."
   },
   "latest_dev_mode_guard": {
     "date": "2026-10-15",

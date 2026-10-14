@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "APP28-PROD-CALLBACK-01: production update reduction and post-await ownership validation now share one tested seam.",
+  "status": "APP01-PIPELINE-20-01: all twenty synthetic restored routes are now exercised through the shared TDLib receive pipeline.",
   "current_evidence": {
     "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-    "local_suite": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
-    "focused_test": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "local_suite": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
+    "focused_test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
     "hosted_ci": {
       "run_id": 38630779359,
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "native_workflow_ci": {
       "run_id": 38630779299,
@@ -19,7 +19,7 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for app source 468ab74; no local GUI smoke."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -39,7 +39,7 @@
       "smoke": "Built and opened the one canonical arm64 Dev.app from clean source 6a0b7bf. CUA screenshot and AX confirmed the aligned one-row country controls, neutral guidance, phone field as initial keyboard focus, disabled Continue for empty input, and visible non-affiliation note. No login, Keychain read, profile creation, or Telegram request. Strict ad-hoc codesign verification passed; not a release signature. Pending source 468ab74 changes only the callback ownership seam; canonical app replacement is deferred while its process is running.",
       "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
     },
-    "scope": "APP28 runtime callback isolation: production consume-then-check seam, deterministic suspended identity-persistence regression, exact-source CI, and hosted pinned Dev.app assembly. Local canonical bundle remains at 6a0b7bf because PID 49828 is still running; no login, Keychain value read, real account, or Telegram request.",
+    "scope": "APP28 production callback ownership seam and APP01 synthetic 20-route restore-to-shared-pipeline regression; exact-source app CI, test-only full suite CI, and pinned native workflow evidence. The single local canonical Dev.app remains open at PID 49828 on 6a0b7bf; no local replacement, login, Keychain value access, or Telegram request.",
     "latest_site_deployment": {
       "date": "2026-10-15",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -72,7 +72,15 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
+    },
+    "test_only_ci": {
+      "run_id": 38631444134,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
+      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -84,7 +92,9 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial. Latest source 4dcddccf fixes a related presentation race: the currently selected account retains the UI when another background profile finishes first. Focused policy regression and exact-source hosted suite passed (run 38509465812, 166/166); this remains synthetic and does not prove live AppKit selection, Telegram login, twenty authorized runtimes, or resource use. Current source 819071d exact CI run 38570078255 and focused test now exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production AppDelegate startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial. Current source 819071d exact CI run 38570078255 and focused test exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial."
+      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial. Latest source 4dcddccf fixes a related presentation race: the currently selected account retains the UI when another background profile finishes first. Focused policy regression and exact-source hosted suite passed (run 38509465812, 166/166); this remains synthetic and does not prove live AppKit selection, Telegram login, twenty authorized runtimes, or resource use. Current source 819071d exact CI run 38570078255 and focused test now exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production AppDelegate startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial. Current source 819071d exact CI run 38570078255 and focused test exercise AccountStartupTaskRegistry.start(account:scheduler:operation:onCompletion:) in both production startup and the 20 synthetic profile test. This still does not start 20 real TDLib sessions; APP01 remains partial. Current app source 468ab74 is unchanged in test-only commit 63fc292. The existing restore composition regression now carries the 20 successful synthetic routes through one injected TDLibGateway and production TDLibUpdatePipeline, sending two ordered updates to every client. Client 1 is deliberately delayed; clients 2–20 each finish both updates before release while selected account changes to 2, then client 1 finishes and every route retains per-client [1,2] FIFO. Local focused test passed 1/1; exact full serial macOS suite passed on test-only commit [38631444134](https://github.com/AffPapa/NeTelegram/actions/runs/38631444134). APP01 remains partial: no AppDelegate runtime-handle retention, actual TDLib sessions, authorized accounts, or same-Mac performance matrix.",
+      "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9"
     },
     {
       "id": "APP02",
@@ -598,9 +608,11 @@
     "native_workflow_run_id": 38630779299,
     "native_workflow_status": "success",
     "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
-    "local_command": "`CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1",
-    "local_result": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
-    "scope": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
+    "local_command": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app01-pipeline-scratch --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
+    "local_result": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
+    "scope": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network.",
+    "test_only_ci_run_id": 38631444134,
+    "test_only_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134"
   },
   "current_local_slice": {
     "id": "AUTH-FORM-APPLE-HIG-12",
@@ -750,17 +762,18 @@
     "pending_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9"
   },
   "latest_acceptance_slice": {
-    "id": "APP28-PROD-CALLBACK-01",
+    "id": "APP01-PIPELINE-20-01",
     "source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-    "change": "Added production-used `RuntimeUpdateOwnership.consumeThenCheck`: it awaits account update reduction, rechecks coordinator route, then validates MainActor-local runtime ownership before AppDelegate performs UI, notification, or account-state side effects. AppDelegate.receive uses this exact seam; the deterministic suspended identity-persistence regression also uses it and verifies a replacement generation blocks effects. No authentication, route fallback, identity, or TDLib behavior changed.",
-    "focused_test": "PASS: `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app28-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app28-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime` passed 1/1; SwiftPM compiled NeTelegramApp. Initial sandboxed invocation failed before compilation with sandbox_apply Operation not permitted, then the repository-compatible `--disable-sandbox` invocation succeeded. `git diff --check` passed.",
+    "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+    "change": "Extended the existing 20-profile restore composition regression to feed its resulting registered routes through one injected TDLibGateway and the production TDLibUpdatePipeline. A delayed callback for client 1 cannot block delivery to clients 2–20; after selection changes to account 2, all routes still receive sequence [1,2] in per-client FIFO order. Source code and runtime behavior were unchanged in the test-only commit.",
+    "focused_test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
     "hosted_ci": {
       "run_id": 38630779359,
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
     },
     "exact_source_ci": {
       "run_id": 38630779359,
@@ -768,7 +781,15 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779359",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Exact-source macOS serial Swift suite passed for the APP28 consume-then-check production seam."
+      "scope": "Exact-source macOS serial Swift suite passed for APP28 production consume-then-check seam."
+    },
+    "test_only_ci": {
+      "run_id": 38631444134,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
+      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
     },
     "native_workflow": {
       "run_id": 38630779299,
@@ -776,10 +797,10 @@
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38630779299",
       "workflow_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
       "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for this exact app source. This is not a local GUI/login smoke."
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and hosted lifecycle verification passed for app source 468ab74; no local GUI smoke."
     },
     "native_smoke": null,
-    "coverage_limit": "APP28 remains partial: focused synthetic interleaving plus exact-source CI and hosted pinned Dev.app assembly passed; no physical AppDelegate/TDLib callback, real account, or 20-session workload was exercised. Canonical local Dev.app is still 6a0b7bf and remains running; local replacement/smoke is pending normal quit."
+    "coverage_limit": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -842,13 +863,22 @@
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
   "latest_targeted_acceptance_check": {
-    "date": "2026-10-14",
-    "case": "AUTH-VOICEOVER-QR-01",
-    "receipt_id": "announce QR login confirmation to accessibility users",
-    "test": "PASS 1/1 authorizationAnnouncementsAreStaticAndDeduplicatedByAccountGenerationAndStep; explicitly verifies TDLib QR-state mapping and static QR announcement.",
-    "result": "PASS focused test; exact-source macOS CI PASS; canonical Dev.app strict-signature/accountless AX and focus smoke PASS for 681b1622. Actual VoiceOver speech is unverified.",
-    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-auth-ime-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-auth-ime-swift-cache swift test --scratch-path /private/tmp/netelegram-auth-ime-scratch --filter authorizationAnnouncementsAreStaticAndDeduplicatedByAccountGenerationAndStep; Scripts/dev-app.sh --launch; codesign --verify --deep --strict; CUA title/AX/focus check",
-    "scope": "Pure QR mapping/announcement test and accountless UI/focus checks; actual VoiceOver speech, QR login, real account, and all-20 runtime remain unverified."
+    "date": "2026-10-15",
+    "case": "APP01",
+    "receipt_id": "APP01-PIPELINE-20-01",
+    "test": "PASS 1/1 `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` on the exact test-only commit; the test exercises 20 restored routes, two ordered updates per client through one TDLibGateway/TDLibUpdatePipeline, one intentionally stalled delivery lane, progress for the other 19 while UI selection changes, and per-client FIFO. No real TDLib or Telegram account is used.",
+    "result": "Local targeted regression and exact test-only full serial macOS CI passed. APP01 remains partial for real runtime/account/resource coverage.",
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-app01-pipeline-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-app01-pipeline-swift-cache swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app01-pipeline-scratch --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
+    "scope": "APP01 remains partial: this closes the synthetic restore-to-shared-pipeline gap only. The test uses 20 fabricated identities and an injected receive poll; it does not call AppDelegate restore, construct/retain 20 LocalAccountRuntime instances, open real TDLib sessions, authorize 20 accounts, or measure same-Mac RSS/CPU/wakeups/network.",
+    "test_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+    "hosted_test_ci": {
+      "run_id": 38631444134,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38631444134",
+      "workflow_commit": "63fc2923d0e3a3ef5c68f8cbb06a9254c6db8fc9",
+      "app_source_commit": "468ab74ec4f9c16d4f22df99aac17c3a4326a5a9",
+      "scope": "Exact full serial macOS suite passed on test-only commit 63fc292; application source remains 468ab74."
+    }
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
