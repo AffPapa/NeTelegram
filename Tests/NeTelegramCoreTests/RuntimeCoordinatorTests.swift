@@ -6,6 +6,15 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func composerKeyboardSendRequiresSafeFocusedCommandReturn() {
+    #expect(ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: true, isLocked: false, hasMarkedText: false, sendIsEnabled: true))
+    #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: false, composerIsFocused: true, isLocked: false, hasMarkedText: false, sendIsEnabled: true))
+    #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: false, isLocked: false, hasMarkedText: false, sendIsEnabled: true))
+    #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: true, isLocked: true, hasMarkedText: false, sendIsEnabled: true))
+    #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: true, isLocked: false, hasMarkedText: true, sendIsEnabled: true))
+    #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: true, isLocked: false, hasMarkedText: false, sendIsEnabled: false))
+}
+
 @Test func loginItemPreferencePolicyOnlyRegistersAfterExplicitOptIn() {
     #expect(LoginItemPreferencePolicy.action(for: .notRegistered, requestedEnabled: false) == .noChange)
     #expect(LoginItemPreferencePolicy.action(for: .notRegistered, requestedEnabled: true) == .register)

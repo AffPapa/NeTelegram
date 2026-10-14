@@ -4237,6 +4237,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         return true
     }
 
+    func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        let isCommandReturn = commandSelector == #selector(NSResponder.insertNewline(_:))
+            && NSApp.currentEvent?.modifierFlags.contains(.command) == true
+        guard ComposerKeyboardCommandPolicy.shouldSend(
+            isCommandReturn: isCommandReturn,
+            composerIsFocused: textView === composer && composer.window?.firstResponder === composer,
+            isLocked: lockState || tdlibReceiveFailed,
+            hasMarkedText: textView.hasMarkedText(),
+            sendIsEnabled: sendButton?.isEnabled == true
+        ) else { return false }
+        sendText()
+        return true
+    }
+
     @objc private func sendText() {
         guard !lockState, !tdlibReceiveFailed, let runtime, let userID = runtime.telegramUserID,
               let chatID = selectedChatByAccount[runtime.account] else { return }
