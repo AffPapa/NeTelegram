@@ -69,6 +69,9 @@ def validate_records(project: dict, acceptance: dict) -> None:
         project["current_site_checkpoint"],
     )
     acceptance_slice = acceptance["latest_acceptance_slice"]
+    acceptance_native_app = acceptance["current_local_candidate"]["native_app"]
+    acceptance_native_smoke = acceptance["latest_native_smoke"]
+    acceptance_local_build = acceptance["latest_local_build"]
     checks = [
         (not any(has_nested_key(value, "next_action") for key, value in project.items() if key != "next_action"),
          "PROJECT-STATE has nested next_action fields; keep one canonical root action"),
@@ -99,6 +102,15 @@ def validate_records(project: dict, acceptance: dict) -> None:
          "canonical Dev.app source differs between checkpoint files"),
         (local_app["source_fingerprint_sha256"] == bundle["source_fingerprint_sha256"],
          "canonical Dev.app fingerprint differs across checkpoint files"),
+        (acceptance_native_app.get("source_commit") == local_app["application_source_commit"]
+         and acceptance_native_app.get("application_source_commit") == local_app["application_source_commit"]
+         and acceptance_native_app.get("source_fingerprint_sha256") == local_app["source_fingerprint_sha256"],
+         "ACCEPTANCE.current_local_candidate.native_app differs from canonical Dev.app"),
+        (acceptance_native_smoke.get("app_source_commit") == local_app["application_source_commit"]
+         and acceptance_native_smoke.get("source_fingerprint_sha256") == local_app["source_fingerprint_sha256"],
+         "ACCEPTANCE.latest_native_smoke differs from canonical Dev.app"),
+        (acceptance_local_build.get("source_commit") == local_app["application_source_commit"],
+         "ACCEPTANCE.latest_local_build differs from canonical Dev.app"),
         (deployment["version"] == site_checkpoint["version"] == site["latest_version"],
          "Site version differs across current checkpoint fields"),
         (deployment["project_id"] == site_checkpoint["project_id"] == site["project_id"],

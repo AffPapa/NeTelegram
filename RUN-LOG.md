@@ -1460,3 +1460,12 @@
 
 - Removed three unused duplicate current/latest native bundle pointers from PROJECT-STATE.json; one pointed at an obsolete source SHA. The checkpoint validator and release workflow use local_development_candidate as the canonical bundle pointer, mirrored only where ACCEPTANCE requires it. Previous build receipts remain in RUN-LOG.md/Git history.
 - No app source, binary, tests, or Site content changed.
+
+## 2026-10-14 — Reconcile canonical app identity and guard duplicate pointers
+
+- Resume audit found stale duplicate Dev.app fields in `ACCEPTANCE.json` claiming source `2eadea7` and a pending rebuild, while the canonical checkpoint and live app claimed `af72c45`.
+- Reconciled against the actual `/private/tmp/NeTelegram-Dev.app`: `Info.plist` BuildInfo is `af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c`; CUA reports the same `NeTelegram · dev af72c458` title and accountless phone/QR screen. No process replacement, rebuild, login, or credential entry was performed.
+- Updated only current acceptance pointers; preserved old evidence in dated RUN-LOG/Git history. `Scripts/validate_checkpoint.py` now checks Acceptance's current local candidate, latest native smoke and latest local build against the one canonical Dev.app record. Added one regression test for a stale duplicate source pointer.
+- Focused checkpoint suite: 14/14 passed; `Scripts/validate_checkpoint.py` passed. No app-source input changed, so the existing exact-source CI/build evidence was reused rather than rerun.
+- UX research: upstream Telegram Desktop's adaptive one/two/three-column mode, independent searchable dialogs, dense identity/preview/unread rows, and persistent header/history/composer were confirmed. NeTelegram already has the right two-pane AppKit base and core row fields. Next visual refinement should tighten the account block and later add real account avatars/header identity; do not invent profile rows or add out-of-scope Telegram features. No upstream code/assets copied.
+- Current blocker remains owner-operated login; real chat/read/send and all-20 authorized runtimes are therefore still unverified. No app release or download exists; Site remains v194 without a download button.

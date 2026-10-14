@@ -664,21 +664,20 @@
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "application_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
+      "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
-      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
+      "source_fingerprint_sha256": "b7cd08bd2a6ca6f780e269b9fd29ae929f544ba27f6a5a01caaeb50f729abe15",
+      "executable_sha256": "8a544d6d477dcc059d71164a86d50af92a98c5e574ca4aa82a12675ddc732ba7",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Canonical bundle still runs source 2eadea7; current source has a pending native rebuild after the process exits. Real auth remains unverified.",
-      "pending_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c"
+      "smoke": "Canonical arm64 Dev.app at /private/tmp/NeTelegram-Dev.app is running source af72c458; bundle BuildInfo, window title and accessibility tree match. First-run phone/QR controls are visible. No credentials entered.",
+      "scope": "Accountless native login presentation and bundle identity only; real auth/chat/read/send, 20-account coverage, Developer ID and notarization remain unverified."
     },
     "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
@@ -694,7 +693,7 @@
       "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
       "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed for af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; no real Telegram account integration."
     },
-    "native_smoke": "Not run for changed source: canonical Dev.app remains open on source 2eadea7.",
+    "native_smoke": "PASS: canonical Dev.app is now running exact app source af72c458; bundle BuildInfo and CUA title/AX match. No credentials entered.",
     "scope": "Static announcement regression and exact-source CI only. Real QR/network response, real auth/read/send, 20-account runtime/performance, and distribution remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
@@ -778,22 +777,22 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH-QR-01 accurate QR authorization failure feedback — focused test PASS 1/1; exact-source macOS CI passed for af72c45; canonical Dev.app source 2eadea7 is still running and was not replaced; real account login remains unverified.",
+  "phase": "AUTH-QR-01 exact-source CI passed; canonical Dev.app identity reconciled to af72c458; owner-operated login remains unverified.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
     "command": "Scripts/dev-app.sh",
-    "result": "PASS: canonical arm64 Dev.app built from clean 2eadea7; source fingerprint, BuildInfo, support root, ad-hoc signature and executable hash recorded; direct-path CUA launch verified."
+    "result": "PASS: canonical arm64 Dev.app built from clean app source af72c458; source fingerprint, BuildInfo, isolated support root and ad-hoc signature recorded; direct-path CUA launch verified."
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
-    "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
+    "source_fingerprint_sha256": "b7cd08bd2a6ca6f780e269b9fd29ae929f544ba27f6a5a01caaeb50f729abe15",
+    "executable_sha256": "8a544d6d477dcc059d71164a86d50af92a98c5e574ca4aa82a12675ddc732ba7",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: clean canonical Dev.app launched directly with the accountless compact phone-login screen.",
+    "result": "PASS: canonical arm64 Dev.app launched directly; CUA title and accessibility tree match af72c458 and show the accountless phone/QR login screen.",
     "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
   }
 }

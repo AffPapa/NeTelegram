@@ -87,6 +87,13 @@ class ValidateCheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "ambiguous current/latest native build pointers"):
             validate_records(project, self.acceptance)
 
+    def test_acceptance_native_pointers_must_match_canonical_bundle(self):
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["current_local_candidate"]["native_app"]["source_commit"] = "stale-source"
+
+        with self.assertRaisesRegex(ValueError, "current_local_candidate.native_app differs"):
+            validate_records(self.project, acceptance)
+
     def test_project_checkpoint_has_one_canonical_next_action(self):
         project = copy.deepcopy(self.project)
         project["latest_release_preflight"]["next_action"] = "Stale action"
