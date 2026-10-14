@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP26 reentrant quit during runtime close/drain — focused test PASS 1/1; exact-source CI PASS; canonical Dev.app 8689c0f1 rebuilt and verified; real multi-account quit remains unverified.",
+  "phase": "UI02 message surfaces and design adaptation — exact-source CI PASS; canonical Dev.app 1408ab50 rebuilt and accountless login confirmed; real chat rendering and authenticated runtime remain unverified.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -29,7 +29,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c"
+    "app_source_commit": "1408ab50343325c7cf6949d8f030771761f49189"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -37,12 +37,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38581958699,
+      "run_id": 38584832394,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38581958699",
-      "workflow_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-      "scope": "Exact-source macOS serial Swift test suite passed for APP26 reentrant-quit barrier change; no real account lifecycle run."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38584832394",
+      "workflow_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "app_source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "scope": "Exact-source macOS serial Swift CI succeeded for the AppKit message-bubble layout and pinned Telegram Desktop design research; no authenticated chat or 20-account runtime proof."
     },
     "published_application_releases": [],
     "github_access": {
@@ -99,12 +99,12 @@
       "scope": "Checkpoint metadata validation passed after APP29 source push."
     },
     "latest_exact_source_ci": {
-      "run_id": 38577631851,
+      "run_id": 38584832394,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38577631851",
-      "workflow_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-      "app_source_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
-      "scope": "Exact-source macOS arm64 serial Swift suite passed for ae21665fae9e3d72b3bd1a22ca437e8cd59b0137; no real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38584832394",
+      "workflow_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "app_source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "scope": "Exact-source macOS serial Swift CI succeeded for the AppKit message-bubble layout and pinned Telegram Desktop design research; no authenticated chat or 20-account runtime proof."
     },
     "latest_native_workflow_ci": {
       "run_id": 38554499473,
@@ -124,20 +124,20 @@
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-    "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
+    "application_source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+    "source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "3540f8ff34fa99dd351f8c783c14ade001b588ac28f1e268cdbc4961a660e9a1",
-    "executable_sha256": "155d3f7cc0f9866c8e9086ff7b2841c6dd50e9b363072edc99ddcc30dcff3f1c",
+    "source_fingerprint_sha256": "432310f7fb19d20d7abb40f1d5741f534a5e5f75adf60f5410b0db1148aeb8e9",
+    "executable_sha256": "e4262599cef8fa98566c7d138f2b0d083bc1ca9a33b0197914f96a658da5592a",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical Dev.app rebuilt once from clean source 8689c0f1 in 5.63s. BuildInfo/build record, CUA title and AX agree. Accountless login remains visible; country stays unselected, macOS Thailand +66 is only a suggestion, phone field blank, QR available.",
-    "scope": "Accountless startup UI and exact bundle identity only. APP26 repeated-quit/drain race has deterministic Core test coverage, not real multi-account/TDLib close coverage."
+    "smoke": "Canonical arm64 /private/tmp/NeTelegram-Dev.app rebuilt once from clean source 1408ab50343325c7cf6949d8f030771761f49189 (5.16s); strict ad-hoc codesign verification passed. CUA title is NeTelegram · dev 1408ab50 and AX confirms the clean accountless phone/QR login form. No login data entered. The real-message bubble rendering has not been visually verified because no owner-authenticated chat is available.",
+    "scope": "AppKit text-message surfaces now follow the researched conversation layout: incoming/outgoing direction, compact rounded text surface, semantic colors, width measurement, accessibility label and message actions. Research adapts upstream Telegram Desktop structure without copying its UI/code/assets. Accountless login smoke plus source/CI only; chat rendering, real account and 20 authorized runtimes remain unverified."
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -338,7 +338,7 @@
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Next: continue the next P0 runtime lifecycle gap from ACCEPTANCE, independently of owner-operated login. Real first-account login/chat-read-send and 20-account coverage remain pending by owner choice; do not request or enter credentials in chat. Keep Site v194 without a download until signed/notarized assets and public-byte verification exist.",
+  "next_action": "Continue the next highest-priority app slice from ACCEPTANCE using source-owned deterministic evidence first. Keep one exact source SHA and one canonical Dev.app; rebuild only when app code changes. Owner-operated login/read/send and 20-account validation remain pending. Publish an immutable GitHub release only after the signed/notarized candidate and other release gates pass; update the existing Site only after public bytes verify.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -551,19 +551,19 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "APP26 reentrant quit during runtime close/drain",
-    "source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-    "local_focused_test": "PASS 1/1 runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain; AppKit/Core sources compiled.",
+    "id": "UI02 message surfaces and design adaptation",
+    "source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+    "local_focused_test": "The parent UI source commit 15002cac passed focused incomingTextEntityRejectsUnsafeTextUrlSchemes and incomingTextEntitiesPreserveUTF16RangesAndResolveOnlySafeLinks tests (1/1 each); final 1408ab5 exact-source full suite is covered by hosted CI.",
     "hosted_ci": {
-      "run_id": 38581958699,
+      "run_id": 38584832394,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38581958699",
-      "workflow_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-      "app_source_commit": "8689c0f1c152a4401b66a1b1b58577103ce19e6c",
-      "scope": "Exact-source macOS serial Swift test suite passed for APP26 reentrant-quit barrier change; no real account lifecycle run."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38584832394",
+      "workflow_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "app_source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+      "scope": "Exact-source macOS serial Swift CI succeeded for the AppKit message-bubble layout and pinned Telegram Desktop design research; no authenticated chat or 20-account runtime proof."
     },
-    "native_smoke": "PASS: exact source 8689c0f1 launched in the canonical Dev.app; Info.plist, BuildInfo, record and CUA title match. Country remains unselected and phone empty. Native multi-account quit was not exercised.",
-    "scope": "Repeated macOS termination requests are rejected while the accepted quit barrier is pending, including during receiver/reducer drain; only a finished barrier permits immediate termination. Synthetic coordinator test and accountless native app smoke do not prove 20 real TDLib runtimes."
+    "native_smoke": "Canonical arm64 /private/tmp/NeTelegram-Dev.app rebuilt once from clean source 1408ab50343325c7cf6949d8f030771761f49189 (5.16s); strict ad-hoc codesign verification passed. CUA title is NeTelegram · dev 1408ab50 and AX confirms the clean accountless phone/QR login form. No login data entered. The real-message bubble rendering has not been visually verified because no owner-authenticated chat is available.",
+    "scope": "AppKit text-message surfaces now follow the researched conversation layout: incoming/outgoing direction, compact rounded text surface, semantic colors, width measurement, accessibility label and message actions. Research adapts upstream Telegram Desktop structure without copying its UI/code/assets. Accountless login smoke plus source/CI only; chat rendering, real account and 20 authorized runtimes remain unverified."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -838,5 +838,22 @@
     "resolution": "Used a narrowly scoped elevated pgrep for only NeTelegram; exit 1 confirmed absence. Then the existing canonical Scripts/dev-app.sh --launch workflow built exactly once and launched the pinned current-source bundle. No guard was bypassed.",
     "future_rule": "If process enumeration is restricted, first quit through the app UI; then use a narrow authorized process check. Never infer absence from LaunchServices alone, never force-kill, and never create a second Dev.app."
   },
-  "checkpoint_pointer_policy": "Canonical current Dev.app identity lives only at local_development_candidate and is mirrored as required at ACCEPTANCE.current_evidence.local_dev_app. Older build/smoke evidence stays in append-only RUN-LOG.md; no competing latest/current native bundle pointers."
+  "checkpoint_pointer_policy": "Canonical current Dev.app identity lives only at local_development_candidate and is mirrored as required at ACCEPTANCE.current_evidence.local_dev_app. Older build/smoke evidence stays in append-only RUN-LOG.md; no competing latest/current native bundle pointers.",
+  "latest_local_build": {
+    "date": "2026-10-14",
+    "source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+    "command": "Scripts/dev-app.sh --launch",
+    "result": "PASS: one canonical arm64 Dev.app build from clean 1408ab50343325c7cf6949d8f030771761f49189; 5.16s; source fingerprint 432310f7fb19d20d7abb40f1d5741f534a5e5f75adf60f5410b0db1148aeb8e9; executable SHA-256 e4262599cef8fa98566c7d138f2b0d083bc1ca9a33b0197914f96a658da5592a; strict ad-hoc codesign verification passed."
+  },
+  "latest_native_smoke": {
+    "date": "2026-10-14",
+    "app_source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "source_fingerprint_sha256": "432310f7fb19d20d7abb40f1d5741f534a5e5f75adf60f5410b0db1148aeb8e9",
+    "executable_sha256": "e4262599cef8fa98566c7d138f2b0d083bc1ca9a33b0197914f96a658da5592a",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "architecture": "arm64",
+    "result": "PASS: CUA AX title `NeTelegram · dev 1408ab50` and blank accountless phone/QR entry screen observed. No credentials entered. Chat message surfaces not visually exercised.",
+    "scope": "AppKit text-message surfaces now follow the researched conversation layout: incoming/outgoing direction, compact rounded text surface, semantic colors, width measurement, accessibility label and message actions. Research adapts upstream Telegram Desktop structure without copying its UI/code/assets. Accountless login smoke plus source/CI only; chat rendering, real account and 20 authorized runtimes remain unverified."
+  }
 }
