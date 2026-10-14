@@ -196,7 +196,7 @@
       "method": "native+fault fixtures",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At app-source be4707d2876c183fa5760f7264ee0fd51c740461, Privacy Lock now redacts cached notification preview text while retaining exact account/chat/topic/message route, clears a queued unlock handoff, and routes locked incoming notifications without copying preview text. Focused local tests passed 2/2; exact-source GitHub macOS CI 38473154528 passed 155/155. This is synthetic route/cache evidence only: native Notification Center previews, secure RAM erasure, image/picker callback behavior and real-account send races remain untested; status stays partial."
+      "evidence": "At app-source be4707d2876c183fa5760f7264ee0fd51c740461, Privacy Lock now redacts cached notification preview text while retaining exact account/chat/topic/message route, clears a queued unlock handoff, and routes locked incoming notifications without copying preview text. Focused local tests passed 2/2; exact-source GitHub macOS CI 38473154528 passed 155/155. This is synthetic route/cache evidence only: native Notification Center previews, secure RAM erasure, image/picker callback behavior and real-account send races remain untested; status stays partial. Focused lock-during-photo-decode regression added at test commit b834969cd35c6c7591e92dfd75f51b706541095b: the decoder was blocked, lock-equivalent cancellation/cache purge ran, late callback and cache insertion were rejected, and a fresh request succeeded after unlock; test passed 1/1. This exercises the PhotoPipeline boundary, not AppKit Lock integration or a real account."
     },
     {
       "id": "APP06",
@@ -669,7 +669,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "CORE-RUNTIME-05: targeted review of APP05 privacy lock across photo decode and in-flight send callbacks. Start read-only; change code or run one focused regression only if a concrete race is found. Keep the canonical Dev.app at 477404a and do not repeat its build, auth-screen smoke, route test, or Site v193 deployment.",
+  "next_action": "APP06: inspect reauthentication while Privacy Lock is active and confirm one account awaiting user input does not pause other runtimes. Begin read-only; add only a focused fixture if a specific acceptance boundary is missing. Do not rebuild the canonical Dev.app or redeploy the Site for test-only evidence.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -800,5 +800,15 @@
     "developer_id": "security find-identity -v -p codesigning reported 4 valid identities, including 2 Developer ID Application entries for team H6VGU2M6JD. This proves local signing identities are available; no release binary was signed.",
     "notary_credentials": "Keychain lookup for service com.apple.gke.notary.tool returned absent or inaccessible. No profile name or credential value was read; no submission was attempted.",
     "release_status": "No signed/notarized app release. The canonical Dev.app remains running as PID 79726 on source 87c0c06560ac0986f7e004d6578b1e3b034c9244; current source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 awaits normal exit before in-place rebuild."
+  },
+  "latest_targeted_acceptance_check": {
+    "date": "2026-10-14",
+    "case": "APP05",
+    "test_commit": "b834969cd35c6c7591e92dfd75f51b706541095b",
+    "app_code_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
+    "test": "privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock",
+    "result": "PASS 1/1",
+    "command": "swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app05-lock --filter privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock",
+    "scope": "Synthetic PhotoPipeline boundary: cancellation and cache invalidation during a blocked decode suppress late callback/cache data; a fresh post-unlock preview succeeds. Does not prove AppKit integration, system photo viewers, or real-account behavior."
   }
 }

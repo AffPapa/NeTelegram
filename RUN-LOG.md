@@ -1226,3 +1226,10 @@
 - Read-only review of `SendIntent` and `PrivacyDispatchBarrier`: text/photo dispatch rechecks lock state, captured privacy epoch, account namespace, verified Telegram user ID, and runtime generation while holding the same synchronous lock across TDLib send. Photo staging rechecks runtime registration, auth readiness, permissions, topic state, lock, and epoch after asynchronous ImageIO work and before manifest registration; final dispatch repeats the barrier checks.
 - No concrete new race found in this scoped path. No code changed and no app tests/build/site deployment repeated. This does not prove real-account behavior or external TDLib completion semantics.
 - Resume action moved to APP05 lock behavior across decode and accepted-send callbacks so this exact SendIntent review is not repeated.
+
+## 2026-10-14 — APP05 locks out an in-flight photo decode
+
+- Added test-only commit `b834969cd35c6c7591e92dfd75f51b706541095b`; app implementation and Dev.app binary are unchanged from app-source `477404afd89378affb9cc21eb6c0e32745cb5091`.
+- Focused test `privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock` passed 1/1. It blocks the decoder, invokes the same `PhotoPipeline.cancelAllPreviews` and account-cache purge used by lock, then verifies no late callback/cache entry and a fresh preview after unlock. It does not prove AppKit lock integration, native photo-viewer behavior, or real account behavior.
+- The first compile attempt exposed a test-call error (omitted required `chatID` in `hasCachedPreview`); fixed from the declared API signature and reran only the focused test. No app build, full test suite, or Site deploy was run.
+- APP05 remains partial. Next action is APP06 reauthentication under lock and independent runtime progress.
