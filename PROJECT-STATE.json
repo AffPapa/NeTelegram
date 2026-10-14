@@ -1,15 +1,18 @@
 {
   "schema_version": 1,
-  "phase": "AUTH-PHONE-RECOVERY-09: WaitCode has a tested same-profile path back to phone entry; exact-source CI, pinned TDLib build, and canonical accountless Dev.app smoke passed.",
+  "phase": "AUTH-API-HASH-PROMPT-10: missing-item setup flow is implemented and exact-source gates passed; current app returned a Keychain value-read timeout, so the missing-item dialog path was not confirmed.",
   "verified_at": "2026-10-15",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
-    "method": "security find-generic-password with fixed service/account and no -w option",
+    "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
     "service": "org.affpapa.netelegram.telegram-api",
     "account": "api-hash",
-    "result": "not_found",
-    "secret_value_read": false,
-    "meaning": "No current API hash is stored under the application key. Existing preview process remains running; preserve it until the owner confirms save or cancel."
+    "result": "Attributes-only Security API query returned errSecSuccess (0) in 3 ms and returned attributes. The legacy `security` CLI lookup did not find the item. Canonical app query requesting the stored data exceeded its 10-second readiness timeout.",
+    "meaning": "The attributes-only diagnostic found an item without requesting its value. The app separately requested the data and timed out; do not classify the item as missing or claim the app never read it. No value was observed or printed in diagnostics.",
+    "diagnostic_requested_data": false,
+    "diagnostic_value_observed_or_printed": false,
+    "application_data_lookup_attempted": true,
+    "application_lookup_cancellation": "The readiness caller timed out after 10 seconds; synchronous Security lookup is not canceled and may still complete or cache the result."
   },
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -38,7 +41,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc"
+    "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -46,12 +49,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38620021813,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "published_application_releases": [],
     "github_access": {
@@ -108,53 +111,53 @@
       "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
     },
     "latest_exact_source_ci": {
-      "run_id": 38616087277,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616087277",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Exact-source serial macOS Swift test suite passed for the aligned AppKit sign-in country controls."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "latest_native_workflow_ci": {
-      "run_id": 38616086721,
+      "run_id": 38621219596,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38616086721",
-      "workflow_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "scope": "Pinned TDLib arm64 Dev.app assembled and strict bundle verification passed. Hosted build is not local GUI evidence."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219596",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted bundle is separate from local UI evidence."
     },
     "latest_pushed_commit": {
       "branch": "main",
-      "sha": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "app_source_commit": "f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f",
-      "verified": "AppKit country search and selection alignment pushed to AffPapa/NeTelegram main.",
+      "sha": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "verified": "Added protected API-hash setup prompt on explicit first-login attempt; pushed to AffPapa/NeTelegram main.",
       "ci_status": "exact_source_and_native_success",
-      "ci_run_id": 38616087277,
-      "native_run_id": 38616086721
+      "ci_run_id": 38621219679,
+      "native_run_id": 38621219596
     }
   },
   "local_development_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
+    "application_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "7140e892905ed0aebf930443932c7a135e85e8607c9e2aa401e83507fe419802",
-    "executable_sha256": "dc32f336c17d48d20842518ceb4085baf2e42bc9d8cf34718a10eaca24adbad0",
+    "source_fingerprint_sha256": "5de1afb4b2d664247015239d323b4ce911e355727277990ae102eb849682b431",
+    "executable_sha256": "f3d0cdd33a924c24e31eeb94a9c3696865fcfd66b0d46a05053580e25ff1ee46",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "One canonical bundle was rebuilt from exact clean source after confirming the prior process exited. CUA/AX verified normal login screen title dev 6c16eb1b; accountless auth preview showed the WaitCode recovery action and returned to phone entry with network disabled. No real credentials, network login, or user profile data."
+    "signing": "ad-hoc; codesign --verify --deep --strict passed",
+    "smoke": "Built one canonical Dev.app from clean source and verified its exact title/AX tree. With a synthetic phone number, explicit Continue reached a 10-second Keychain-read timeout; the UI remained on phone entry and showed no account profile. The new missing-item prompt branch was not exercised because the observed failure was timeout, not errSecItemNotFound. Synthetic number cleared afterward."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "PASS focused Swift authorization recovery policy test 1/1; exact-source CI and pinned TDLib app build passed.",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "hosted_run_id": 38620021813
+      "result": "PASS 1/1 telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters; SwiftPM compiled NeTelegramApp. Hosted full serial suite passed.",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "hosted_run_id": 38621219679
     },
     "real_telegram_account": "not tested; owner-operated login remains pending.",
     "real_twenty_runtime_coverage": "not tested",
@@ -310,7 +313,7 @@
     "archive_local_status": "Previous export path was overwritten; current file SHA-256 52f729f5b71ebbf0de7f793694e6e0d601f48fc2d9d3d12776c93ae62f44c16d, 202367 bytes, does not match saved version. Server-side saved archive is independently confirmed by Sites get_site_version; no local-export byte claim."
   },
   "open_gates": [
-    "A non-value Keychain presence check on 2026-10-15 returned not_found. Owner must enter a fresh/current app API hash directly in the secure in-app field; do not reuse the value pasted into chat.",
+    "API hash retrieval unresolved: attributes-only SecItemCopyMatching succeeded (status 0, 3 ms) without requesting data; legacy `security` CLI did not find the item; canonical app value-read timed out after 10 seconds. Diagnose the query/keychain-context mismatch without reading the secret.",
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Fresh 2026-10-14 security find-identity returned 0 valid identities; Developer ID signing unavailable. Notarization credentials remain unverified.",
     "Telegram Terms §1.3/1.4: review basic functionality and behavior; the official page gives no exhaustive checklist, so compatibility remains unproven.",
@@ -320,7 +323,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Continue in /private/tmp/netelegram-cli-work at app source 6c16eb1. Choose one bounded native vertical slice after validating this checkpoint; real owner-operated authentication, authenticated chat behavior, 20-runtime coverage, signing/notarization and compatibility gates remain open. Do not advertise a download or change the Site downloads page before a release candidate passes its gates.",
+  "next_action": "Diagnose why the canonical app’s Keychain query that requests data times out while an attributes-only SecItemCopyMatching query succeeds. Preserve the existing item and never print/read it for diagnosis. Then, when the owner is ready, complete user-operated single-account login/read/send/logout. Continue independent app work; all-20, signing/notarization, compatibility, GitHub release, and Site download gates remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -540,46 +543,46 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-PHONE-RECOVERY-09",
-    "source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "change": "Added a same-profile “Изменить номер телефона” action on TDLib WaitCode only. It returns to phone entry without resetting the profile or sending a request; the regular Continue action dispatches the next TDLib request. QR, password, email, registration and unknown states fail closed. Refreshed design research to correct stale screenshot/build pointers and record Apple HIG plus official Telegram macOS source/license boundaries.",
-    "focused_test": "Local focused Swift test authorizationRecoveryAllowsChangingPhoneOnlyFromCodeStep passed 1/1. Exact-source macOS CI and pinned TDLib app workflow both passed for 6c16eb1. Native preview confirmed the “Изменить номер телефона” action is visible only at WaitCode and returns to phone entry without a network request. The normal accountless login screen now runs from the same canonical bundle. No real auth.",
+    "id": "AUTH-API-HASH-PROMPT-10",
+    "source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "change": "When the user explicitly starts first login and the NeTelegram API hash is confirmed missing, show the protected API-hash entry dialog directly; do not create a profile or start TDLib. After saving, the user must explicitly press Continue again. The live attempt encountered a Keychain lookup timeout, so the missing-item UI branch was not reached.",
+    "focused_test": "Focused local test telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters passed 1/1; SwiftPM compiled NeTelegramApp. Exact-source macOS CI and pinned TDLib app workflow passed for 533c358.",
     "hosted_ci": {
-      "run_id": 38620021813,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "exact_source_ci": {
-      "run_id": 38620021813,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "native_workflow": {
-      "run_id": 38620021706,
+      "run_id": 38621219596,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021706",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; this is hosted build evidence, separate from local GUI smoke."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219596",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted bundle is separate from local UI evidence."
     },
     "native_smoke": {
       "date": "2026-10-15",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "7140e892905ed0aebf930443932c7a135e85e8607c9e2aa401e83507fe419802",
-      "executable_sha256": "dc32f336c17d48d20842518ceb4085baf2e42bc9d8cf34718a10eaca24adbad0",
+      "source_fingerprint_sha256": "5de1afb4b2d664247015239d323b4ce911e355727277990ae102eb849682b431",
+      "executable_sha256": "f3d0cdd33a924c24e31eeb94a9c3696865fcfd66b0d46a05053580e25ff1ee46",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "One canonical bundle was rebuilt from exact clean source after confirming the prior process exited. CUA/AX verified normal login screen title dev 6c16eb1b; accountless auth preview showed the WaitCode recovery action and returned to phone entry with network disabled. No real credentials, network login, or user profile data.",
-      "scope": "Accountless native auth visual/AX preview and ordinary login screen only. Does not establish successful Telegram authentication, authenticated conversation UX, light/increased-contrast appearance, VoiceOver speech, real accounts, or 20-runtime behavior."
+      "result": "Built one canonical Dev.app from clean source and verified its exact title/AX tree. With a synthetic phone number, explicit Continue reached a 10-second Keychain-read timeout; the UI remained on phone entry and showed no account profile. The new missing-item prompt branch was not exercised because the observed failure was timeout, not errSecItemNotFound. Synthetic number cleared afterward.",
+      "scope": "Accountless normal-mode native smoke only. No Telegram request/account was initiated. The app requested the API hash from Keychain, but its caller timed out after 10 seconds; the non-cancelable Security operation may still complete or populate the in-memory readiness cache later. Does not verify real login, authenticated screens, VoiceOver speech, or 20-runtime behavior."
     },
-    "coverage_limit": "No real login or authenticated screens, light/resized/increased-contrast review, VoiceOver speech, IME/RTL, real chats, or all-20 runtime coverage."
+    "coverage_limit": "The Keychain read timed out during local UI smoke, so only the timeout state was exercised; the automatic setup prompt on an explicit item-not-found response is compiled and covered by exact-source CI but not confirmed in the native UI. No real login or network request."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -720,7 +723,7 @@
     "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
-  "status": "AUTH-PHONE-RECOVERY-09: WaitCode has a tested same-profile path back to phone entry; exact-source CI, pinned TDLib build, and canonical accountless Dev.app smoke passed.",
+  "status": "AUTH-API-HASH-PROMPT-10: missing-item setup flow is implemented and exact-source gates passed; current app returned a Keychain value-read timeout, so the missing-item dialog path was not confirmed.",
   "latest_design_research": {
     "date": "2026-10-15",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
@@ -763,46 +766,46 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "AUTH-PHONE-RECOVERY-09",
-    "source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "change": "Added a same-profile “Изменить номер телефона” action on TDLib WaitCode only. It returns to phone entry without resetting the profile or sending a request; the regular Continue action dispatches the next TDLib request. QR, password, email, registration and unknown states fail closed. Refreshed design research to correct stale screenshot/build pointers and record Apple HIG plus official Telegram macOS source/license boundaries.",
-    "focused_test": "Local focused Swift test authorizationRecoveryAllowsChangingPhoneOnlyFromCodeStep passed 1/1. Exact-source macOS CI and pinned TDLib app workflow both passed for 6c16eb1. Native preview confirmed the “Изменить номер телефона” action is visible only at WaitCode and returns to phone entry without a network request. The normal accountless login screen now runs from the same canonical bundle. No real auth.",
+    "id": "AUTH-API-HASH-PROMPT-10",
+    "source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "change": "When the user explicitly starts first login and the NeTelegram API hash is confirmed missing, show the protected API-hash entry dialog directly; do not create a profile or start TDLib. After saving, the user must explicitly press Continue again. The live attempt encountered a Keychain lookup timeout, so the missing-item UI branch was not reached.",
+    "focused_test": "Focused local test telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters passed 1/1; SwiftPM compiled NeTelegramApp. Exact-source macOS CI and pinned TDLib app workflow passed for 533c358.",
     "hosted_ci": {
-      "run_id": 38620021813,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "exact_source_ci": {
-      "run_id": 38620021813,
+      "run_id": 38621219679,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
     },
     "native_workflow": {
-      "run_id": 38620021706,
+      "run_id": 38621219596,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021706",
-      "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; this is hosted build evidence, separate from local GUI smoke."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219596",
+      "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+      "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted bundle is separate from local UI evidence."
     },
     "native_smoke": {
       "date": "2026-10-15",
-      "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
+      "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "7140e892905ed0aebf930443932c7a135e85e8607c9e2aa401e83507fe419802",
-      "executable_sha256": "dc32f336c17d48d20842518ceb4085baf2e42bc9d8cf34718a10eaca24adbad0",
+      "source_fingerprint_sha256": "5de1afb4b2d664247015239d323b4ce911e355727277990ae102eb849682b431",
+      "executable_sha256": "f3d0cdd33a924c24e31eeb94a9c3696865fcfd66b0d46a05053580e25ff1ee46",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
-      "result": "One canonical bundle was rebuilt from exact clean source after confirming the prior process exited. CUA/AX verified normal login screen title dev 6c16eb1b; accountless auth preview showed the WaitCode recovery action and returned to phone entry with network disabled. No real credentials, network login, or user profile data.",
-      "scope": "Accountless native auth visual/AX preview and ordinary login screen only. Does not establish successful Telegram authentication, authenticated conversation UX, light/increased-contrast appearance, VoiceOver speech, real accounts, or 20-runtime behavior."
+      "result": "Built one canonical Dev.app from clean source and verified its exact title/AX tree. With a synthetic phone number, explicit Continue reached a 10-second Keychain-read timeout; the UI remained on phone entry and showed no account profile. The new missing-item prompt branch was not exercised because the observed failure was timeout, not errSecItemNotFound. Synthetic number cleared afterward.",
+      "scope": "Accountless normal-mode native smoke only. No Telegram request/account was initiated. The app requested the API hash from Keychain, but its caller timed out after 10 seconds; the non-cancelable Security operation may still complete or populate the in-memory readiness cache later. Does not verify real login, authenticated screens, VoiceOver speech, or 20-runtime behavior."
     },
-    "coverage_limit": "No real login or authenticated screens, light/resized/increased-contrast review, VoiceOver speech, IME/RTL, real chats, or all-20 runtime coverage."
+    "coverage_limit": "The Keychain read timed out during local UI smoke, so only the timeout state was exercised; the automatic setup prompt on an explicit item-not-found response is compiled and covered by exact-source CI but not confirmed in the native UI. No real login or network request."
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
@@ -837,12 +840,12 @@
     "native_run_id": 38620021706
   },
   "latest_exact_source_ci": {
-    "run_id": 38620021813,
+    "run_id": 38621219679,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021813",
-    "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "scope": "Exact-source macOS serial Swift CI passed; authorization recovery policy regression covers WaitCode and fail-closed states."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219679",
+    "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "scope": "Exact-source macOS serial Swift test suite passed for the first-run API hash setup fallback."
   },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
@@ -853,23 +856,25 @@
   "checkpoint_pointer_policy": "Canonical current Dev.app identity lives at local_development_candidate and mirrors ACCEPTANCE.current_evidence.local_dev_app. App-source SHA, repository checkpoint commit, and public Site v194 are separate. Historical evidence stays in RUN-LOG.md.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "command": "bash Scripts/dev-app.sh --launch-auth-layout-preview, then bash Scripts/dev-app.sh --launch (verified bundle reused)",
-    "result": "PASS: one canonical arm64 bundle rebuilt from exact clean source; BuildInfo matched; strict ad-hoc codesign verification passed; normal login mode reused without a second build.",
-    "source_fingerprint_sha256": "7140e892905ed0aebf930443932c7a135e85e8607c9e2aa401e83507fe419802",
-    "executable_sha256": "dc32f336c17d48d20842518ceb4085baf2e42bc9d8cf34718a10eaca24adbad0",
-    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
+    "source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "command": "bash Scripts/dev-app.sh --launch",
+    "result": "PASS: one canonical arm64 Dev.app rebuilt from exact clean source; embedded BuildInfo matches; strict ad-hoc codesign verification passed.",
+    "source_fingerprint_sha256": "5de1afb4b2d664247015239d323b4ce911e355727277990ae102eb849682b431",
+    "executable_sha256": "f3d0cdd33a924c24e31eeb94a9c3696865fcfd66b0d46a05053580e25ff1ee46",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
+    "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700"
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
+    "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "7140e892905ed0aebf930443932c7a135e85e8607c9e2aa401e83507fe419802",
-    "executable_sha256": "dc32f336c17d48d20842518ceb4085baf2e42bc9d8cf34718a10eaca24adbad0",
+    "source_fingerprint_sha256": "5de1afb4b2d664247015239d323b4ce911e355727277990ae102eb849682b431",
+    "executable_sha256": "f3d0cdd33a924c24e31eeb94a9c3696865fcfd66b0d46a05053580e25ff1ee46",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "One canonical bundle was rebuilt from exact clean source after confirming the prior process exited. CUA/AX verified normal login screen title dev 6c16eb1b; accountless auth preview showed the WaitCode recovery action and returned to phone entry with network disabled. No real credentials, network login, or user profile data.",
-    "scope": "Accountless native auth visual/AX preview and ordinary login screen only. Does not establish successful Telegram authentication, authenticated conversation UX, light/increased-contrast appearance, VoiceOver speech, real accounts, or 20-runtime behavior."
+    "result": "Built one canonical Dev.app from clean source and verified its exact title/AX tree. With a synthetic phone number, explicit Continue reached a 10-second Keychain-read timeout; the UI remained on phone entry and showed no account profile. The new missing-item prompt branch was not exercised because the observed failure was timeout, not errSecItemNotFound. Synthetic number cleared afterward.",
+    "scope": "Accountless normal-mode native smoke only. No Telegram request/account was initiated. The app requested the API hash from Keychain, but its caller timed out after 10 seconds; the non-cancelable Security operation may still complete or populate the in-memory readiness cache later. Does not verify real login, authenticated screens, VoiceOver speech, or 20-runtime behavior."
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
@@ -943,12 +948,12 @@
     "status": "partial"
   },
   "latest_native_workflow_ci": {
-    "run_id": 38620021706,
+    "run_id": 38621219596,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38620021706",
-    "workflow_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "app_source_commit": "6c16eb1b02603a627d168baa6a83d909641814fc",
-    "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; this is hosted build evidence, separate from local GUI smoke."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38621219596",
+    "workflow_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "app_source_commit": "533c358dc6a7958275dd9a39d2b1d13d38a99b66",
+    "scope": "Pinned TDLib arm64 Dev.app assembly and strict verification passed; hosted bundle is separate from local UI evidence."
   },
   "latest_dev_mode_guard": {
     "date": "2026-10-15",
