@@ -49,11 +49,11 @@
         "action": "No login, new token, logout, or credential reset."
       },
       "latest_checkpoint_metadata_ci": {
-        "run_id": 38521890229,
+        "run_id": 38525055679,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521890229",
-        "workflow_commit": "4a21ab708fcc0115550cdef73597e23ba9d1d7ef",
-        "scope": "Metadata validation and checkpoint validator passed for the v179 evidence checkpoint."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38525055679",
+        "workflow_commit": "6bc7bdb4661c585b3661abcf784688b6a6ad1ac3",
+        "scope": "Metadata validation passed for checkpoint containing the public Site v182 receipt and exact APP22 native/test evidence."
       }
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
