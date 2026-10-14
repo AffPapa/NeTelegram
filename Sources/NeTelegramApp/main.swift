@@ -109,7 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var conversationPane: NSView!
     private var chatWorkspaceSplit: NSSplitView!
     private var chatListScroll: NSScrollView!
-    private var chatListPaginationTriggeredAtEnd = false
+    private var chatListPaginationPolicy = ChatListPaginationPolicy()
     private var conversationTitleLabel: NSTextField!
     private var sidebarTitleLabel: NSTextField!
     private var chatList: NSStackView!
@@ -921,24 +921,39 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     @objc private func chatListViewportBoundsDidChange(_ notification: Notification) {
         guard let clipView = notification.object as? NSClipView,
               clipView === chatListScroll?.contentView else { return }
-        guard activeSearchQuery.isEmpty,
-              !lockState,
-              let selected = runtime,
-              AccountPresentation.restoresAuthenticatedChat(
-                telegramUserID: selected.telegramUserID,
-                authorizationState: selected.authorizationState
-              ) else {
-            chatListPaginationTriggeredAtEnd = false
+        evaluateChatListPagination()
+    }
+
+    private func evaluateChatListPagination() {
+        guard activeSearchQuery.isEmpty, !lockState,
+              let selected = runtime else {
+            if let selected = runtime {
+                _ = chatListPaginationPolicy.shouldRequestPage(
+                    account: selected.account,
+                    isNearEnd: false,
+                    loadState: selected.mainChatListLoadState
+                )
+            }
+            return
+        }
+        guard AccountPresentation.restoresAuthenticatedChat(
+            telegramUserID: selected.telegramUserID,
+            authorizationState: selected.authorizationState
+        ) else {
+            _ = chatListPaginationPolicy.shouldRequestPage(
+                account: selected.account,
+                isNearEnd: false,
+                loadState: selected.mainChatListLoadState
+            )
             return
         }
         guard let scroller = chatListScroll.verticalScroller else { return }
         let isNearEnd = CGFloat(scroller.floatValue) + scroller.knobProportion >= 0.88
-        guard isNearEnd else {
-            chatListPaginationTriggeredAtEnd = false
-            return
-        }
-        guard !chatListPaginationTriggeredAtEnd else { return }
-        chatListPaginationTriggeredAtEnd = true
+        guard chatListPaginationPolicy.shouldRequestPage(
+            account: selected.account,
+            isNearEnd: isNearEnd,
+            loadState: selected.mainChatListLoadState
+        ) else { return }
         selected.loadMainChats(nextPage: true)
         refreshChatList()
     }
@@ -2702,7 +2717,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             if target === runtime,
                !lockState,
                target.mainChatLoadRevision != previousMainChatLoadRevision {
+                chatListPaginationPolicy.pageDidComplete(for: target.account)
                 refreshChatList()
+                if target.mainChatListLoadState == .loaded {
+                    DispatchQueue.main.async { [weak self] in self?.evaluateChatListPagination() }
+                }
             }
             if previousTelegramUserID != nil,
                target.telegramUserID == nil,
@@ -4099,7 +4118,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 time: formattedChatTime(value.lastMessageDate),
                 unreadCount: value.unreadCount,
                 isMuted: value.isMuted,
-                chatID: id,
                 isSelected: isSelected,
                 target: self,
                 action: #selector(openChatFromButton(_:))

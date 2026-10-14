@@ -1369,6 +1369,31 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(state.state == .loaded)
 }
 
+@Test func chatListPaginationWaitsForLoadedPageAndDoesNotLeakAcrossAccounts() {
+    var policy = ChatListPaginationPolicy()
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+
+    let loadingPageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loading)
+    #expect(!loadingPageRequested)
+    let firstPageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
+    #expect(firstPageRequested)
+    let duplicatePageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
+    #expect(!duplicatePageRequested)
+
+    // Selecting another account at the bottom can request its own page; A's
+    // in-flight/recent trigger must not suppress it.
+    let accountBPageRequested = policy.shouldRequestPage(account: accountB, isNearEnd: true, loadState: .loaded)
+    #expect(accountBPageRequested)
+    policy.pageDidComplete(for: accountA)
+    let accountAContinuationRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
+    #expect(accountAContinuationRequested)
+
+    _ = policy.shouldRequestPage(account: accountA, isNearEnd: false, loadState: .loaded)
+    let retryAfterLeavingEndRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
+    #expect(retryAfterLeavingEndRequested)
+}
+
 @Test func restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains() async {
     let profiles = (1...20).map { n in
         AccountProfile(

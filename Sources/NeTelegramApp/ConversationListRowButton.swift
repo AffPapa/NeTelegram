@@ -8,7 +8,6 @@ final class ConversationListRowButton: NSButton {
     private let time: String
     private let unreadCount: Int
     private let isMuted: Bool
-    private let chatID: Int64
     private let isSelected: Bool
     private var isHovered = false
 
@@ -18,7 +17,6 @@ final class ConversationListRowButton: NSButton {
         time: String,
         unreadCount: Int,
         isMuted: Bool,
-        chatID: Int64,
         isSelected: Bool,
         target: AnyObject?,
         action: Selector?
@@ -28,7 +26,6 @@ final class ConversationListRowButton: NSButton {
         self.time = time
         self.unreadCount = max(0, unreadCount)
         self.isMuted = isMuted
-        self.chatID = chatID
         self.isSelected = isSelected
         super.init(frame: .zero)
         self.target = target
@@ -92,13 +89,16 @@ final class ConversationListRowButton: NSButton {
         let secondary = selected ? NSColor.selectedControlTextColor.withAlphaComponent(0.78) : NSColor.secondaryLabelColor
         let avatarDiameter: CGFloat = 40
         let avatarRect = NSRect(x: row.minX + 10, y: row.midY - avatarDiameter / 2, width: avatarDiameter, height: avatarDiameter)
-        let hue = CGFloat(UInt64(bitPattern: chatID) % 360) / 360
-        let avatarColor = NSColor(calibratedHue: hue, saturation: 0.58, brightness: selected ? 0.88 : 0.82, alpha: 1)
-        avatarColor.setFill()
+        NSColor.quaternaryLabelColor.setFill()
         NSBezierPath(ovalIn: avatarRect).fill()
-
-        let monogram = conversationTitle.first.map(String.init) ?? "•"
-        draw(monogram, in: avatarRect, font: .systemFont(ofSize: 17, weight: .semibold), color: .white, alignment: .center)
+        let avatarSymbol = NSImage(systemSymbolName: "person.fill", accessibilityDescription: "Аватар не загружен")?
+            .withSymbolConfiguration(NSImage.SymbolConfiguration(pointSize: 17, weight: .regular))
+        avatarSymbol?.draw(
+            in: avatarRect.insetBy(dx: 11, dy: 11),
+            from: .zero,
+            operation: .sourceOver,
+            fraction: selected ? 0.88 : 0.68
+        )
 
         let contentX = avatarRect.maxX + 10
         let trailingInset: CGFloat = 10
