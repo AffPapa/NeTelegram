@@ -907,8 +907,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         window.setContentSize(NSSize(width: contentWidth, height: contentHeight))
         window.center()
         // Longer authorization steps remain reachable through the enclosing
-        // scroll view while the first-run window stays compact.
+        // scroll view while the first-run window stays compact. The login
+        // form has a fixed readable measure; an unbounded Zoom made the
+        // resizable window mostly empty while leaving the form unchanged.
         window.minSize = NSSize(width: 560, height: 520)
+        window.maxSize = NSSize(width: 720, height: 640)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
@@ -936,6 +939,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             changePhoneButton.isEnabled = false
             countrySuggestionLabel.isHidden = true
             window.minSize = NSSize(width: 560, height: 520)
+            window.maxSize = NSSize(width: 720, height: 640)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
                 ? NSSize(width: 560, height: 520)
                 : NSSize(width: 620, height: 560)
@@ -945,6 +949,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             }
         } else {
             window.minSize = NSSize(width: 760, height: 600)
+            // Chat is the primary workspace and should use the space the
+            // person chooses; only the narrow sign-in task has a maximum.
+            window.maxSize = NSSize(width: 4096, height: 4096)
             if let size = window.contentView?.bounds.size, size.width < 760 || size.height < 600 {
                 window.setContentSize(NSSize(width: 1060, height: 720))
                 window.center()
