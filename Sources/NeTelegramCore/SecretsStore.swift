@@ -230,10 +230,6 @@ public struct SecretsStore: Sendable {
         context.interactionNotAllowed = true
         var query = itemQuery(account: account, service: service)
         query[kSecUseAuthenticationContext as String] = context
-        // Keep a fail-closed Security query flag as a compatibility guard for
-        // macOS releases where LAContext.interactionNotAllowed is not reflected
-        // by its getter on legacy login-keychain items.
-        query[kSecUseAuthenticationUI as String] = kSecUseAuthenticationUIFail
         return query
     }
 }

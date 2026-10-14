@@ -1236,7 +1236,8 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(query[kSecAttrAccount as String] as? String == "test-account")
     #expect(query[kSecAttrService as String] as? String == "test-service")
     #expect(context != nil)
-    #expect(query[kSecUseAuthenticationUI as String] as? String == kSecUseAuthenticationUIFail as String)
+    #expect(context?.interactionNotAllowed == true)
+    #expect(query[kSecUseAuthenticationUI as String] == nil)
 }
 
 @Test func telegramAPIHashAcceptsOnlyThirtyTwoAsciiHexCharacters() {
