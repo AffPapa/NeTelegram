@@ -327,9 +327,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
-        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент для macOS на Telegram API и TDLib. Проект не связан напрямую с Telegram Messenger LLP; сессии других приложений не импортируются.")
-        loginDisclosure.font = .systemFont(ofSize: 13, weight: .medium)
-        loginDisclosure.textColor = .secondaryLabelColor
+        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент на Telegram API и TDLib; не связан с Telegram Messenger LLP и не переносит сессии других приложений.")
+        loginDisclosure.font = .systemFont(ofSize: 11)
+        loginDisclosure.textColor = .tertiaryLabelColor
+        loginDisclosure.maximumNumberOfLines = 2
         loginDisclosure.alignment = .center
         loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
 
