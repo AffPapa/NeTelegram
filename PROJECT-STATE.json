@@ -384,7 +384,8 @@
     "Batch checks by their real input SHA and reuse passing evidence. Distinguish app-source SHA, docs/checkpoint commit, Site-source SHA, saved version, deployment, and built bundle hashes; never rebuild or retest an unchanged app source.",
     "Do not treat a process-guard exit of unable-to-prove as proof that a GUI app is running or stopped. Cross-check with fresh CUA app inventory/LaunchServices; report the exact evidence source and keep process status unverified when sources disagree.",
     "Keep milestone receipt IDs in a separate namespace from acceptance requirement IDs; before naming a slice or next action, check existing case IDs to avoid reusing AUTHxx identifiers and making the checkpoint ambiguous.",
-    "Do not reuse milestone IDs from the APPxx/AUTHxx acceptance catalogue; use a separate CORE-RUNTIME-xx milestone namespace and add a requirement receipt only when the invariant is independently scoped."
+    "Do not reuse milestone IDs from the APPxx/AUTHxx acceptance catalogue; use a separate CORE-RUNTIME-xx milestone namespace and add a requirement receipt only when the invariant is independently scoped.",
+    "2026-10-14 APP29b: a startup runtime auto-presented into an unselected window must be adopted as the selection intent; otherwise later logout cleanup can skip add-account presentation. Test both initial adoption and a newer selection. Before every rebuild, check the canonical app process; never create a competing Dev.app while it is running."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
@@ -767,7 +768,7 @@
     "push": "success; GitHub connector verified exact commit",
     "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests",
     "exact_source_ci": "PASS 179/179; run 38560168478",
-    "canonical_dev_app": "PID 67677 running prior source 92b8ca3; no rebuild or interaction while open",
+    "canonical_dev_app": "Fresh Scripts/check-app-process.sh confirms PID 67677 still running prior source 92b8ca3; rebuild intentionally deferred to avoid replacing or duplicating the open app.",
     "real_account": "not used"
   },
   "pending_native_candidate": {
