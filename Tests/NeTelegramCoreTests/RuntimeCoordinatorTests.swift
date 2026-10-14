@@ -1565,6 +1565,43 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await coordinator.isCurrent(replacement))
 }
 
+@MainActor @Test func terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime() async throws {
+    let coordinator = RuntimeCoordinator()
+    let account = AccountUUID()
+    let closedRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(197))
+    try await coordinator.registerBeforeFirstRequest(closedRoute)
+    #expect(await coordinator.applyAuthorizationState("authorizationStateClosed", telegramUserID: nil, from: closedRoute))
+
+    let localRoute = LockedTestValue<RuntimeRoute?>(closedRoute)
+    let cleanupCanRun = await RuntimeUpdateOwnership.isCurrentOrTerminalClose(
+        closedRoute,
+        isTerminalClose: true,
+        coordinatorRouteIsCurrent: { await coordinator.isCurrent(closedRoute) },
+        localOwnerIsCurrent: { localRoute.get() == closedRoute }
+    )
+    #expect(cleanupCanRun)
+
+    let replacement = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(198))
+    try await coordinator.registerBeforeFirstRequest(replacement)
+    localRoute.set(replacement)
+    let staleCloseCanRun = await RuntimeUpdateOwnership.isCurrentOrTerminalClose(
+        closedRoute,
+        isTerminalClose: true,
+        coordinatorRouteIsCurrent: { await coordinator.isCurrent(closedRoute) },
+        localOwnerIsCurrent: { localRoute.get() == closedRoute }
+    )
+    #expect(!staleCloseCanRun)
+
+    let staleOrdinaryEventCanRun = await RuntimeUpdateOwnership.isCurrentOrTerminalClose(
+        closedRoute,
+        isTerminalClose: false,
+        coordinatorRouteIsCurrent: { await coordinator.isCurrent(closedRoute) },
+        localOwnerIsCurrent: { localRoute.get() == closedRoute }
+    )
+    #expect(!staleOrdinaryEventCanRun)
+    #expect(await coordinator.isCurrent(replacement))
+}
+
 @Test func rejectedFirstRequestRemovesOnlyItsUninitializedRoute() async throws {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()

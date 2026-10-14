@@ -53,6 +53,21 @@ public enum RuntimeUpdateOwnership {
         guard await coordinatorRouteIsCurrent() else { return false }
         return localOwnerIsCurrent()
     }
+
+    /// A terminal Closed update removes its coordinator route before the
+    /// caller performs local cleanup. Let only that exact local runtime finish
+    /// handling the event; a replacement generation still fails the local
+    /// ownership check.
+    public static func isCurrentOrTerminalClose(
+        _ route: RuntimeRoute,
+        isTerminalClose: Bool,
+        coordinatorRouteIsCurrent: @Sendable () async -> Bool,
+        localOwnerIsCurrent: @MainActor () -> Bool
+    ) async -> Bool {
+        let coordinatorOwnsRoute = await coordinatorRouteIsCurrent()
+        guard localOwnerIsCurrent() else { return false }
+        return coordinatorOwnsRoute || isTerminalClose
+    }
 }
 
 public struct RoutedTDLibUpdate: Sendable {

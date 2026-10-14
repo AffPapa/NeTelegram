@@ -2647,8 +2647,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 // applyAuthorizationState is an actor hop. The route may have
                 // been replaced after that actor accepted the update but
                 // before this MainActor continuation resumes.
-                guard await RuntimeUpdateOwnership.isCurrent(
+                guard await RuntimeUpdateOwnership.isCurrentOrTerminalClose(
                     route,
+                    isTerminalClose: target.authorizationState == "authorizationStateClosed",
                     coordinatorRouteIsCurrent: { await runtimeCoordinator.isCurrent(route) },
                     localOwnerIsCurrent: {
                         target.route == route
