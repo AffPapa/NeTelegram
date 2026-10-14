@@ -865,5 +865,5 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH03 adaptive native authorization layout — compact native visual/AX review and exact-source CI passed; VoiceOver, IME/RTL, default-size review, and real login remain open."
+  "phase": "UI-CHATLIST-01 conversation selection hierarchy — AppKit build, accountless native shell smoke, and exact-source macOS CI passed; row selection awaits real chat data for visual confirmation."
 }
