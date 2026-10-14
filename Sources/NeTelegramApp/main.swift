@@ -2938,7 +2938,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             case "chats":
                 let chatIDs = (object["chat_ids"] as? [NSNumber] ?? []).map(\.int64Value)
                 for chatID in chatIDs.prefix(10) {
-                    let title = chatRowsByAccount[pending.account]?[chatID]?.title ?? "Чат \(chatID)"
+                    let title = ChatDisplayTitlePolicy.resolve(chatRowsByAccount[pending.account]?[chatID]?.title)
                     searchResults.append(AccountSearchResult(
                         account: pending.account,
                         conversation: ConversationKey(account: pending.account, chatID: chatID),
@@ -2953,7 +2953,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     guard let chatID = (message["chat_id"] as? NSNumber)?.int64Value,
                           let messageID = (message["id"] as? NSNumber)?.int64Value else { continue }
                     let conversation = conversationKey(for: message, account: pending.account, chatID: chatID)
-                    let title = chatRowsByAccount[pending.account]?[chatID]?.title ?? "Чат \(chatID)"
+                    let title = ChatDisplayTitlePolicy.resolve(chatRowsByAccount[pending.account]?[chatID]?.title)
                     searchResults.append(AccountSearchResult(
                         account: pending.account,
                         conversation: conversation,
@@ -3333,7 +3333,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard !lockState else { return }
             if let message = object["last_message"] as? [String: Any] {
                 var row = chatRowsByAccount[target.account]?[chatID]
-                    ?? ChatListRowData(title: "Чат \(chatID)", lastText: "", lastMessageDate: nil, unreadCount: 0, isMuted: false)
+                    ?? ChatListRowData(title: ChatDisplayTitlePolicy.unavailableTitle, lastText: "", lastMessageDate: nil, unreadCount: 0, isMuted: false)
                 row.lastText = messagePreview(message)
                 row.lastMessageDate = (message["date"] as? NSNumber)?.int64Value
                 chatRowsByAccount[target.account, default: [:]][chatID] = row
@@ -3924,7 +3924,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let notificationSettings = chat["notification_settings"] as? [String: Any]
         let inheritsMute = (notificationSettings?["use_default_mute_for"] as? Bool) ?? false
         chatRowsByAccount[target.account, default: [:]][id] = ChatListRowData(
-            title: title?.isEmpty == false ? title! : "Чат \(id)",
+            title: ChatDisplayTitlePolicy.resolve(title),
             lastText: last.map(messagePreview) ?? "",
             lastMessageDate: (last?["date"] as? NSNumber)?.int64Value,
             unreadCount: max(0, (chat["unread_count"] as? NSNumber)?.intValue ?? 0),
