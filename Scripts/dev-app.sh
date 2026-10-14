@@ -13,7 +13,7 @@ DEV_COMMIT="$(git -C "$ROOT_DIR" log -1 --format=%H -- Package.swift Sources TDL
 ORIGIN_URL="$(git -C "$ROOT_DIR" remote get-url origin)"
 ORIGIN_URL_LOWER="$(printf '%s' "$ORIGIN_URL" | tr '[:upper:]' '[:lower:]')"
 case "$ORIGIN_URL_LOWER" in
-    https://github.com/affpapa/netelegram.git|git@github.com:affpapa/netelegram.git|ssh://git@github.com/affpapa/netelegram.git) ;;
+    https://github.com/affpapa/netelegram|https://github.com/affpapa/netelegram.git|git@github.com:affpapa/netelegram|git@github.com:affpapa/netelegram.git|ssh://git@github.com/affpapa/netelegram|ssh://git@github.com/affpapa/netelegram.git) ;;
     *)
         echo "Refusing to replace the canonical Dev.app from unexpected origin: $ORIGIN_URL" >&2
         exit 1
