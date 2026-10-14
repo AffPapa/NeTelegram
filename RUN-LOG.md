@@ -664,3 +664,15 @@
 - Native CI now compares the bundle identity against the app-source commit, not the docs/workflow commit. Checkout fetches full history so a script/docs-only trigger can still identify the exact last source commit. This avoids false version changes while retaining exact source traceability.
 - Targeted local checks passed: `bash -n Scripts/dev-app.sh`, native workflow YAML parse, `python3 -m json.tool PROJECT-STATE.json`, `git diff --check`, and release metadata tests 11/11. Running `bash Scripts/dev-app.sh` against the already-open canonical app returned “Reusing verified canonical bundle” for source `4f7cb6f` in under one second; no build, bundle replacement, or relaunch occurred. CI validation for the changed script/workflow is pending publication.
 - Canonical app remains `/private/tmp/NeTelegram-Dev.app`, source `4f7cb6f`, arm64, macOS 14 baseline, ad-hoc development signature. This does not test login, real accounts, 20-runtime behavior, Developer ID or notarization. Site v166 is unchanged because this was build-pipeline work, not a user-visible product milestone.
+
+## 2026-10-14 — Exact-source validation for the Dev.app reuse guard
+
+- The first native workflow attempt, [38488971908](https://github.com/AffPapa/NeTelegram/actions/runs/38488971908), correctly stopped before bundle assembly: GitHub Actions supplies `https://github.com/AffPapa/NeTelegram` without `.git`, while the local remote includes it. Accepted both forms without weakening the repository owner/name check.
+- Follow-up commit `2fd84223a420a3aa7ac602085a34c0a3fc39bf3e` passed pinned TDLib, Dev.app bundle verification and lifecycle smoke in [38489107253](https://github.com/AffPapa/NeTelegram/actions/runs/38489107253). Metadata validation for the implementation/checkpoint commit passed in [38488971873](https://github.com/AffPapa/NeTelegram/actions/runs/38488971873).
+- Local no-op validation continues to reuse the one canonical `4f7cb6f` Dev.app without replacing it. Current checkout is clean at tooling commit `2fd8422`; app-source SHA remains `4f7cb6f` until Swift changes.
+
+## 2026-10-14 — Reflect privacy-lock state in the menu-bar status
+
+- `Sources/NeTelegramApp/main.swift` now changes the menu-bar status to `Заблокировано · синхронизация продолжается` while privacy-locked and disables the already-satisfied `Заблокировать` command. Both lock and successful unlock refresh the menu immediately; background runtimes remain untouched.
+- Local `swift build` passed for the changed source under Xcode 27 / Swift 6.4 in 8.92 s. The default sandbox attempt was rejected before compilation by macOS `sandbox_apply`; the same bounded build passed on the host. No unrelated or full local test suite was repeated; exact-source serial Swift and native Dev.app workflows will validate after push.
+- The currently open canonical Dev.app remains the old, accountless source `4f7cb6f`; it has not been replaced. Rebuild/AX verification occurs once only after exact hosted checks.

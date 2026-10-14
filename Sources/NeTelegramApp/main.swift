@@ -20,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private var statusMenuItem: NSMenuItem!
+    private var lockMenuItem: NSMenuItem?
     private var logoutAccountMenuItem: NSMenuItem?
     private var statusLabel: NSTextField!
     private var inputField: NSTextField!
@@ -744,7 +745,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         menu.addItem(statusMenuItem)
         menu.addItem(.separator())
         menu.addItem(withTitle: "Открыть", action: #selector(openWindow), keyEquivalent: "")
-        menu.addItem(withTitle: "Заблокировать", action: #selector(lock), keyEquivalent: "")
+        let lockItem = NSMenuItem(title: "Заблокировать", action: #selector(lock), keyEquivalent: "")
+        lockMenuItem = lockItem
+        menu.addItem(lockItem)
         menu.addItem(withTitle: "Выйти", action: #selector(quit), keyEquivalent: "")
         menu.items.forEach { $0.target = self }
         statusItem.menu = menu
@@ -844,11 +847,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let storageWarning = pendingProfileStorageWarnings > 0
             ? " · \(pendingProfileStorageWarnings) локальных профилей не проверены"
             : ""
-        if accounts.isEmpty, knownProfilesByAccount.isEmpty {
+        if lockState {
+            statusMenuItem.title = "Заблокировано · синхронизация продолжается"
+        } else if accounts.isEmpty, knownProfilesByAccount.isEmpty {
             statusMenuItem.title = "Аккаунтов пока нет\(storageWarning)\(networkWarning)"
         } else {
             statusMenuItem.title = "Аккаунты: \(summary.authorizedCount) авторизованы · \(summary.awaitingInputCount) требуют входа · \(summary.failedCount) с ошибкой\(storageWarning)\(networkWarning)"
         }
+        lockMenuItem?.isEnabled = !lockState && !closingForTermination
         logoutAccountMenuItem?.isEnabled = !lockState
             && runtime?.telegramUserID != nil
             && runtime?.isLogoutRequested == false
@@ -6549,6 +6555,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         // rejected after it; it cannot slip through while drafts are flushed.
         privacyDispatchBarrier.setLocked(true)
         lockState = true
+        refreshStatusMenu()
         lastAuthorizationAnnouncementContext = nil
         stopTypingAction()
         visibleReadReceiptTask?.cancel()
@@ -6683,6 +6690,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     return
                 }
                 self.lockState = false
+                self.refreshStatusMenu()
                 for accountRuntime in self.runtimesByAccount.values {
                     self.hydratePrivateAppState(for: accountRuntime)
                 }
