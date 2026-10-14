@@ -431,8 +431,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySearchField.action = #selector(searchCountries)
         countrySearchField.delegate = self
         countryPickerStack = NSStackView(views: [countrySearchField, countryPicker])
-        countryPickerStack.orientation = .horizontal
-        countryPickerStack.alignment = .centerY
+        // Keep search and selection as one aligned form section. A vertical
+        // stack with equal-width native controls scans more clearly than a
+        // narrow search field beside a wider country menu.
+        countryPickerStack.orientation = .vertical
+        countryPickerStack.alignment = .leading
         countryPickerStack.distribution = .fill
         countryPickerStack.spacing = 8
         countryPickerStack.isHidden = true
@@ -597,8 +600,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 156), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
-            countryPicker.widthAnchor.constraint(equalToConstant: 236), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countrySearchField.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             phoneField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
