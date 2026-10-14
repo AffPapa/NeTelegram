@@ -10,6 +10,7 @@ on:
       - 'Scripts/window-lifecycle-smoke.sh'
       - 'Scripts/tdlib-smoke.c'
       - 'TDLIB.lock.json'
+      - 'Sources/**'
   pull_request:
     paths:
       - 'Package.swift'
@@ -18,6 +19,7 @@ on:
       - 'Scripts/window-lifecycle-smoke.sh'
       - 'Scripts/tdlib-smoke.c'
       - 'TDLIB.lock.json'
+      - 'Sources/**'
   workflow_dispatch:
 
 permissions:
