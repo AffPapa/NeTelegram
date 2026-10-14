@@ -4746,9 +4746,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        guard commandSelector == #selector(NSResponder.insertNewline(_:)),
-              control === phoneField || control === emailField || control === inputField || control === secureInputField
-                || control === firstNameField || control === lastNameField else { return false }
+        let isAuthenticationField = control === phoneField || control === emailField || control === inputField
+            || control === secureInputField || control === firstNameField || control === lastNameField
+        guard AuthTextFieldKeyboardPolicy.shouldSubmit(
+            isAuthenticationField: isAuthenticationField,
+            isReturnCommand: commandSelector == #selector(NSResponder.insertNewline(_:)),
+            hasMarkedText: textView.hasMarkedText()
+        ) else { return false }
         primaryAction()
         return true
     }

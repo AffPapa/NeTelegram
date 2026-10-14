@@ -6,6 +6,29 @@ import Security
 import Testing
 @testable import NeTelegramCore
 
+@Test func authReturnDoesNotSubmitDuringMarkedIMEComposition() {
+    #expect(AuthTextFieldKeyboardPolicy.shouldSubmit(
+        isAuthenticationField: true,
+        isReturnCommand: true,
+        hasMarkedText: false
+    ))
+    #expect(!AuthTextFieldKeyboardPolicy.shouldSubmit(
+        isAuthenticationField: true,
+        isReturnCommand: true,
+        hasMarkedText: true
+    ))
+    #expect(!AuthTextFieldKeyboardPolicy.shouldSubmit(
+        isAuthenticationField: true,
+        isReturnCommand: false,
+        hasMarkedText: false
+    ))
+    #expect(!AuthTextFieldKeyboardPolicy.shouldSubmit(
+        isAuthenticationField: false,
+        isReturnCommand: true,
+        hasMarkedText: false
+    ))
+}
+
 @Test func composerKeyboardSendRequiresSafeFocusedCommandReturn() {
     #expect(ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: true, composerIsFocused: true, isLocked: false, hasMarkedText: false, sendIsEnabled: true))
     #expect(!ComposerKeyboardCommandPolicy.shouldSend(isCommandReturn: false, composerIsFocused: true, isLocked: false, hasMarkedText: false, sendIsEnabled: true))

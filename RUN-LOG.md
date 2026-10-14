@@ -1588,3 +1588,10 @@
 - Change: reduce the initial native window to 760×600 pt; use a single 360 pt control column with shared alignment, adjust spacing by hierarchy, align the phone field and status to the form edge, shorten the country-entry instruction, and use secondary semantic text color for the independence disclosure. Auth states and TDLib commands are unchanged.
 - Local verification: focused country-picker and phone-input tests passed 2/2. Focused country-picker and phone-input tests passed 2/2; exact-source macOS CI run 38597901537 passed for `ae169ecf0e619eb27e7e8767266baacb6dbe2091`. One canonical arm64 Dev.app was rebuilt once and passed strict ad-hoc codesign verification. CUA confirmed the exact title/SHA and visibly aligned compact auth screen with updated AX text. No credentials or account were used; the Site was unchanged.
 - Sources: Apple HIG https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/ and https://developer.apple.com/design/human-interface-guidelines/layout ; Apple accessibility https://developer.apple.com/design/human-interface-guidelines/accessibility ; official Telegram Desktop https://github.com/telegramdesktop/tdesktop and Telegram iOS https://github.com/TelegramMessenger/Telegram-iOS.
+
+## 2026-10-14 — AUTH-IME-01 prevents premature login submission
+
+- Finding: the first-run auth text-field delegate submitted on Return without checking AppKit marked text, so Return could submit an unfinished IME candidate. The message composer already had this guard.
+- Change: added `AuthTextFieldKeyboardPolicy` and applied it to auth-field Return handling; non-Return commands and marked-text composition are left to AppKit. TDLib requests and the rest of the auth flow are unchanged.
+- Local verification: focused `authReturnDoesNotSubmitDuringMarkedIMEComposition` passed 1/1 using an isolated `/private/tmp` SwiftPM scratch/cache after the sandbox's default module cache was denied. Exact-source macOS CI and the canonical app smoke are pending.
+- Coverage: pure policy regression only; actual CJK IME interaction is not yet verified. No phone number, code, API hash, or account was used.
