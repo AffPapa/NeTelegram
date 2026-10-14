@@ -704,11 +704,12 @@
     "public_site": "PASS: public Site v178 deployment appgdep_6acf1c9813788191b4e17f6f6ae951d6; anonymous Playwright confirmed devlog and no-download gate."
   },
   "latest_checkpoint_metadata": {
-    "run_id": 38602838474,
+    "run_id": 38633083575,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602838474",
-    "workflow_commit": "e0a1c09f81c004c9460e58b20f574221d0168b9f",
-    "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38633083575",
+    "workflow_commit": "988d20784475a3acfd2a320d85589e5627b823df",
+    "app_source_commit": "709b7552a0198d04b496c1b983dc980855d04de8",
+    "scope": "Checkpoint metadata validator passed after recording AUTH-FORM-APPLE-HIG-15; the canonical Dev.app source/fingerprint and Site pointers agree."
   },
   "latest_release_preflight": {
     "date": "2026-10-15",
