@@ -74,13 +74,16 @@ checks passed; exact-source macOS CI
 passed for final source `1408ab5`. This is implementation evidence, not live
 visual parity.
 
-At current app source `97228153bf8c77bca42efbde9b54fe0f0d452c96`, the AppKit
+At current app source `4e54ce8d7c03ac92905de498b45f0bfc9b57cc52`, the AppKit
 shell still has the researched two-pane hierarchy, separate header/history/
 composer, search, selected chat and visible unsupported content. The prior
 chat-list pagination trigger could become stuck when the viewport reached the
 end before the first TDLib page completed; it now gates per account, waits for
-`.loaded`, and rechecks the same viewport after completion. Deterministic
-regressions pass 3/3, and exact-source macOS CI passes 185/185. Synthetic
+`.loaded`, and rechecks the same viewport after completion. A response also
+clears the originating account's gate even if that account is now backgrounded
+or the privacy lock is active; only the selected, unlocked account refreshes
+visible UI. Deterministic regressions pass 3/3, and exact-source macOS CI passes
+185/185. Synthetic
 chat-ID-colored initials were removed in favor of a neutral system placeholder,
 so the UI does not imply a discovered avatar or identity. The canonical Dev.app
 is open on its accountless first-run screen. Real chat rows/avatar rendering,
