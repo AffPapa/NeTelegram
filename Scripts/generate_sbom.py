@@ -33,6 +33,38 @@ class SBOMError(ValueError):
     pass
 
 
+def validate_release_archive(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
+    """Validate the archive namespace before reading or extracting any member."""
+    entries = archive.infolist()
+    if not entries or len(entries) > 100_000:
+        raise SBOMError("app ZIP has an invalid entry count")
+    names = [item.filename for item in entries]
+    if len(names) != len(set(names)):
+        raise SBOMError("app ZIP contains duplicate paths")
+    total_size = 0
+    for item in entries:
+        name = item.filename
+        path = Path(name)
+        path_parts = name.rstrip("/").split("/")
+        mode = (item.external_attr >> 16) & 0xFFFF
+        kind = mode & 0o170000
+        if ".." in path_parts or path.is_absolute() or "\\" in name:
+            raise SBOMError("app ZIP contains an unsafe absolute or parent-traversal path")
+        if (not name or any(part in ("", ".") for part in path_parts)
+                or (name.endswith("/") and not item.is_dir())
+                or item.flag_bits & 0x1 or (kind and kind not in (0o100000, 0o040000))):
+            raise SBOMError("app ZIP contains an unsafe, encrypted, or special entry")
+        total_size += item.file_size
+        if total_size > 8 * 1024 * 1024 * 1024:
+            raise SBOMError("app ZIP uncompressed size exceeds the 8 GiB audit limit")
+        if item.file_size > 0 and item.compress_size == 0:
+            raise SBOMError("app ZIP contains an invalid compressed entry")
+    roots = {PurePosixPath(name).parts[0] for name in names if PurePosixPath(name).parts}
+    if roots != {"NeTelegram.app"}:
+        raise SBOMError("app ZIP must contain exactly one NeTelegram.app root")
+    return entries
+
+
 def component(name: str, version: str, license_id: str, *, scope: str,
               bom_ref: str, purl: str | None = None, properties: dict[str, str] | None = None) -> dict:
     result = {
@@ -125,40 +157,26 @@ def audit_release_zip(app_zip: Path, version: str, source_commit: str,
     """Safely materialize and audit the exact final ZIP on macOS."""
     if sys.platform != "darwin":
         raise SBOMError("--app-zip final signature audit requires macOS")
-    if not app_zip.is_file():
+    if app_zip.is_symlink() or not app_zip.is_file():
         raise SBOMError("--app-zip must be an existing finalized ZIP")
     if not expected_team_id:
         raise SBOMError("--expected-team-id is required for final app ZIP auditing")
     try:
-        with zipfile.ZipFile(app_zip) as archive:
-            entries = archive.infolist()
-            if not entries or len(entries) > 100_000:
-                raise SBOMError("app ZIP has an invalid entry count")
-            names = [item.filename for item in entries]
-            if len(names) != len(set(names)):
-                raise SBOMError("app ZIP contains duplicate paths")
-            total_size = 0
-            for item in entries:
-                name = item.filename
-                path = Path(name)
-                path_parts = name.rstrip("/").split("/")
-                mode = (item.external_attr >> 16) & 0xFFFF
-                kind = mode & 0o170000
-                if (not name or "\\" in name or path.is_absolute()
-                        or any(part in ("", ".", "..") for part in path_parts)
-                        or (name.endswith("/") and not item.is_dir())
-                        or item.flag_bits & 0x1 or (kind and kind not in (0o100000, 0o040000))):
-                    raise SBOMError("app ZIP contains an unsafe, encrypted, or special entry")
-                total_size += item.file_size
-                if total_size > 8 * 1024 * 1024 * 1024:
-                    raise SBOMError("app ZIP uncompressed size exceeds the 8 GiB audit limit")
-                if item.file_size > 0 and item.compress_size == 0:
-                    raise SBOMError("app ZIP contains an invalid compressed entry")
-            roots = {PurePosixPath(name).parts[0] for name in names if PurePosixPath(name).parts}
-            if roots != {"NeTelegram.app"}:
-                raise SBOMError("app ZIP must contain exactly one NeTelegram.app root")
-            with tempfile.TemporaryDirectory(prefix="netelegram-final-zip-audit-") as directory:
-                root = Path(directory)
+        with app_zip.open("rb") as source, tempfile.TemporaryDirectory(prefix="netelegram-final-zip-audit-") as directory:
+            snapshot_path = Path(directory) / "candidate.zip"
+            initial_stat = os.fstat(source.fileno())
+            digest = hashlib.sha256()
+            with snapshot_path.open("xb") as snapshot:
+                for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                    digest.update(chunk)
+                    snapshot.write(chunk)
+            final_stat = os.fstat(source.fileno())
+            stable_fields = ("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns")
+            if any(getattr(initial_stat, key) != getattr(final_stat, key) for key in stable_fields):
+                raise SBOMError("app ZIP changed while the audit snapshot was being created")
+            with zipfile.ZipFile(snapshot_path) as archive:
+                entries = validate_release_archive(archive)
+                root = Path(directory) / "extracted"
                 for item in entries:
                     relative = PurePosixPath(item.filename)
                     target = root.joinpath(*relative.parts)
@@ -166,17 +184,16 @@ def audit_release_zip(app_zip: Path, version: str, source_commit: str,
                         target.mkdir(parents=True, exist_ok=True)
                     else:
                         target.parent.mkdir(parents=True, exist_ok=True)
-                        with archive.open(item) as source, target.open("xb") as destination:
-                            shutil.copyfileobj(source, destination, 1024 * 1024)
+                        with archive.open(item) as member, target.open("xb") as destination:
+                            shutil.copyfileobj(member, destination, 1024 * 1024)
                         os.chmod(target, ((item.external_attr >> 16) & 0o777) or 0o644)
                 audit = audit_release_bundle(root / "NeTelegram.app", version, source_commit, expected_team_id)
+                # Candidate validation later requires the public asset bytes to equal this snapshot.
+                audit["app_zip_sha256"] = digest.hexdigest()
+    except SBOMError:
+        raise
     except (OSError, zipfile.BadZipFile, RuntimeError) as error:
         raise SBOMError(f"final app ZIP could not be safely audited: {error}") from error
-    digest = hashlib.sha256()
-    with app_zip.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    audit["app_zip_sha256"] = digest.hexdigest()
     return audit
 
 

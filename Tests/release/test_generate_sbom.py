@@ -4,6 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import plistlib
+import stat
 from unittest.mock import patch
 import subprocess
 import zipfile
@@ -105,6 +106,24 @@ class GenerateSBOMTests(unittest.TestCase):
             with patch("Scripts.generate_sbom.sys.platform", "darwin"):
                 with self.assertRaisesRegex(SBOMError, "unsafe"):
                     audit_release_zip(archive_path, "1.2.3", COMMIT, "ABCDEFGHIJ")
+
+    def test_final_zip_hash_and_audit_use_the_same_snapshot_if_source_changes(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            archive_path = Path(temporary) / "NeTelegram.zip"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("NeTelegram.app/Contents/Info.plist", b"audited snapshot")
+            expected_digest = hashlib.sha256(archive_path.read_bytes()).hexdigest()
+            def audit_then_replace(bundle, _version, _commit, _team):
+                self.assertEqual((bundle / "Contents/Info.plist").read_bytes(), b"audited snapshot")
+                with zipfile.ZipFile(archive_path, "w") as changed:
+                    changed.writestr("NeTelegram.app/Contents/Info.plist", b"different final bytes")
+                    changed.writestr("NeTelegram.app/Contents/Resources/extra", b"changed")
+                return {"team_id": "ABCDEFGHIJ"}
+            with patch("Scripts.generate_sbom.sys.platform", "darwin"), \
+                 patch("Scripts.generate_sbom.audit_release_bundle", side_effect=audit_then_replace):
+                result = audit_release_zip(archive_path, "1.2.3", COMMIT, "ABCDEFGHIJ")
+            self.assertEqual(result["app_zip_sha256"], expected_digest)
+            self.assertNotEqual(result["app_zip_sha256"], hashlib.sha256(archive_path.read_bytes()).hexdigest())
 
     def test_requires_full_source_commit_and_timestamp_zone(self):
         with self.assertRaisesRegex(SBOMError, "full lowercase"):

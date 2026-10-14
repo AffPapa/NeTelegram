@@ -4,6 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 import zipfile
+import stat
 
 from Scripts.validate_release import ValidationError, validate_candidate, validate_receipt
 
@@ -204,6 +205,23 @@ class CandidateValidationTests(unittest.TestCase):
             artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "parent-traversal"):
+                validate_candidate(manifest_path, assets)
+
+    def test_candidate_validator_reuses_single_app_root_and_special_file_guards(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            app = assets / "NeTelegram.zip"
+            symlink = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/unsafe")
+            symlink.external_attr = (stat.S_IFLNK | 0o777) << 16
+            with zipfile.ZipFile(app, "w") as archive:
+                archive.writestr("other/NeTelegram.app/Contents/MacOS/NeTelegram", b"x")
+                archive.writestr("other/NeTelegram.app/Contents/Frameworks/libtdjson.dylib", b"y")
+                archive.writestr(symlink, "../../outside")
+            artifact = next(item for item in manifest["artifacts"] if item["kind"] == "app_zip")
+            artifact["bytes"] = app.stat().st_size
+            artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "archive structure is invalid: app ZIP contains an unsafe"):
                 validate_candidate(manifest_path, assets)
 
     def test_valid_prerelease_checks_exact_asset_bytes_and_account_evidence(self):

@@ -14,6 +14,11 @@ from pathlib import PurePosixPath
 from urllib.parse import urlparse
 import zipfile
 
+if __package__:
+    from .generate_sbom import SBOMError, validate_release_archive
+else:
+    from generate_sbom import SBOMError, validate_release_archive
+
 
 HEX_40 = re.compile(r"^[0-9a-f]{40}$")
 HEX_64 = re.compile(r"^[0-9a-f]{64}$")
@@ -334,9 +339,11 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
         raise ValidationError("release SBOM must record the exact audited Developer Team ID")
     try:
         with zipfile.ZipFile(app_zip) as archive:
-            names = archive.namelist()
-            if len(names) != len(set(names)):
-                raise ValidationError("app_zip contains duplicate paths")
+            try:
+                entries = validate_release_archive(archive)
+            except SBOMError as error:
+                raise ValidationError(f"app_zip archive structure is invalid: {error}") from error
+            names = [item.filename for item in entries]
             for name in names:
                 path = PurePosixPath(name)
                 if "\\" in name or path.is_absolute() or ".." in path.parts:
@@ -351,7 +358,7 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                 raise ValidationError("SBOM TDLib hash does not match app_zip bytes")
             if sbom_properties.get("neTelegram:sbom:audited-app-zip-sha256") != hashlib.sha256(app_zip.read_bytes()).hexdigest():
                 raise ValidationError("SBOM final app ZIP hash does not match the candidate app_zip bytes")
-    except (OSError, zipfile.BadZipFile, StopIteration) as error:
+    except (OSError, zipfile.BadZipFile, StopIteration, RuntimeError) as error:
         raise ValidationError(f"app_zip could not be reconciled with SBOM binary hashes: {error}") from error
 
     return hashlib.sha256(manifest_path.read_bytes()).hexdigest()

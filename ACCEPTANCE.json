@@ -569,15 +569,15 @@
     "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
     "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Continue from app-source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b and the canonical open /private/tmp/NeTelegram-Dev.app without rebuilding unchanged source. Next runtime evidence is user-entered single-account login/read/send; 20-account certification is a separate later gate. Release tooling CI and public Site devlog are current; real signed ZIP/notarization, compatibility gates, updater and download readiness remain unverified/open.",
+  "next_action": "Push one metadata-only commit, verify exact metadata CI, update existing Site v177 to v178 with factual devlog proof; then continue only at the next concrete app/runtime gate. Do not rebuild unchanged Swift source or Dev.app.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
-    "base_commit": "dd92a67f1a7fbb9ce3feaafedba1d44372486307",
-    "result": "Local final-ZIP audit release suite 39/39 in 0.836s; exact release-tooling commit 428f49d passed GitHub metadata CI run 38519326151.",
-    "checks": "Final ZIP verifier validates safe archive structure and one app root, exact source/version, Developer ID signature, stapled ticket, Gatekeeper, arm64 and exact Team ID; binds ZIP SHA-256 into SBOM and release validator. Tests use fixtures only; no actual signed archive was available.",
-    "hosted_ci": "PASS: https://github.com/AffPapa/NeTelegram/actions/runs/38519326151 for exact commit 428f49d8963a799c71fcf05ec4eb8fdfa31808ad.",
-    "scope": "Release tooling only. No Swift source/app input changes, native rebuild, real login, signing/notarization operation, or binary release.",
-    "release_readiness": "No app release. Real login/read/send, 20 authorized runtimes, actual Developer ID/notarization, Telegram compatibility gates, downloaded Gatekeeper install/reopen and updater smoke remain open."
+    "base_commit": "5512333a12306984f3283c363c0adedf016f0f44",
+    "result": "Local release suite 41/41 in 1.803s; focused SBOM and candidate tests 26/26.",
+    "checks": "Final ZIP auditor copies and hashes through one open descriptor into a private snapshot, confirms source metadata stayed stable while copying, then validates/extracts/audits that snapshot. Candidate validation shares the fail-closed archive structure checks. Fixture regressions cover source-path replacement, invalid roots, and special entries.",
+    "hosted_ci": "pending push",
+    "scope": "Metadata/release tooling only; app source, Dev.app and user data untouched. Tests use synthetic ZIP fixtures; no real signing/notarization or ZIP release evidence.",
+    "release_readiness": "No app release. User login, 20 authorized runtimes, real notarized archive, compatibility gates, downloaded Gatekeeper and updater smoke remain open."
   },
   "latest_ci_scope_change": {
     "commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",

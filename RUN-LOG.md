@@ -993,3 +993,12 @@
 - Anonymous Playwright confirmed the bilingual entry and exact commit/CI on `/devlog/`. `/downloads/` remains explicitly no-release/no-download with the compatibility gates visible. The static validator passed all eight routes.
 - Site source helper initially hit sandbox DNS; one retry accidentally used an incorrect project ID and was rejected before any action. The next attempt supplied the correct project ID but stale base commit and was rejected; inspection showed the helper had already created local source commit `91b55f7` before network failure. Re-running the supported helper with the exact current HEAD and same existing Site credential pushed and packaged the source successfully. No new Site or remote was created.
 - App repo `website/` mirror and checkpoints now record v177 and CI. This checkpoint-only follow-up does not change app source; real signed archive, notarization, account login/20 runtime coverage and stable compatibility remain open.
+
+
+## 2026-10-14 — close final-ZIP audit snapshot gap
+
+- Independent read-only review found that the auditor extracted a ZIP and then reopened the source path to compute its SBOM digest. A concurrent replacement could therefore make the digest describe bytes different from those actually audited. It also found that candidate validation applied weaker structure checks than the signing audit.
+- The final ZIP auditor now rejects symlink inputs, copies and hashes through one open file descriptor into a private snapshot, checks the descriptor metadata did not change during copying, and extracts/audits only that snapshot. The same digest is recorded in the SBOM.
+- SBOM generation and candidate validation share one fail-closed archive validator for traversal, duplicates, encrypted and special entries, exact `NeTelegram.app` root, entry count, and expanded size. Added regression coverage for path replacement during audit and invalid root/symlink members.
+- A first focused run found only a test-message wording mismatch; the rejection behavior was already correct. The message was clarified and rerun. Targeted release tests passed 26/26; full release suite passed 41/41 in 1.803s; checkpoint validation, Python compile, CLI help, and `git diff --check` passed.
+- No Swift/app source changed; the current exact-source Swift PASS and canonical Dev.app remain reusable. No native build, real archive signing, login, or actual ZIP audit was performed; the archive tests use fixtures.

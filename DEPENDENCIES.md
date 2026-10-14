@@ -27,11 +27,12 @@ python3 Scripts/generate_sbom.py \
 
 `--app-zip` safely extracts the exact candidate archive on macOS and reruns
 matching version/source metadata, arm64, Developer ID signature, stapled ticket,
-and Gatekeeper checks. `--expected-team-id` is mandatory for this final archive
-audit. The resulting SBOM records the archive SHA-256 and exact Team ID; the
-release validator binds those values to the frozen candidate ZIP and rechecks
-the executable and TDLib hashes. A pre-ZIP `--app-bundle` audit may be useful
-for diagnosis but cannot qualify a release SBOM. This does not replace the
+and Gatekeeper checks on a private snapshot of the archive. `--expected-team-id`
+is mandatory for this final archive audit. The SBOM records the snapshot's
+archive SHA-256 and exact Team ID; the release validator applies the same
+fail-closed ZIP structure checks, binds those values to the frozen candidate
+ZIP, and rechecks the executable and TDLib hashes. A pre-ZIP `--app-bundle` audit may
+be useful for diagnosis but cannot qualify a release SBOM. This does not replace the
 post-download install/reopen smoke or final manual NOTICE review.
 `Package.swift` currently declares no third-party Swift package dependencies.
 
