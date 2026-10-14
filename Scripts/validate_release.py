@@ -364,12 +364,24 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
     return hashlib.sha256(manifest_path.read_bytes()).hexdigest()
 
 
-def validate_receipt(manifest_path: Path, receipt_path: Path) -> str:
+def validate_receipt(
+    manifest_path: Path,
+    receipt_path: Path,
+    *,
+    stage: str,
+    asset_receipt_path: Path | None = None,
+) -> str:
     manifest = read_object(manifest_path)
     receipt = read_object(receipt_path)
     reject_secrets(receipt, "receipt")
-    if receipt.get("record_status") != "publication_verified":
-        raise ValidationError("receipt record_status must be publication_verified")
+    expected_status = {
+        "assets": "asset_publication_verified",
+        "delivery": "publication_verified",
+    }.get(stage)
+    if expected_status is None:
+        raise ValidationError("receipt stage must be assets or delivery")
+    if receipt.get("record_status") != expected_status:
+        raise ValidationError(f"receipt record_status must be {expected_status} for stage {stage}")
     manifest_sha = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
     if receipt.get("manifest_sha256") != manifest_sha:
         raise ValidationError("receipt manifest_sha256 does not match the immutable candidate manifest")
@@ -400,10 +412,32 @@ def validate_receipt(manifest_path: Path, receipt_path: Path) -> str:
         if asset.get("public_http_status") != 200 or asset.get("download_sha256") != artifact.get("sha256"):
             raise ValidationError(f"receipt asset {name} was not publicly downloaded and hash-verified")
     checks = receipt.get("checks")
-    if not isinstance(checks, dict) or any(checks.get(name) != "passed" for name in (
-        "gatekeeper_quarantine_smoke", "native_install_reopen", "site_download_links", "update_feed",
-    )):
-        raise ValidationError("receipt must confirm Gatekeeper, native install/reopen, Site links, and update-feed checks")
+    if not isinstance(checks, dict):
+        raise ValidationError("receipt checks must be an object")
+    asset_checks = ("gatekeeper_quarantine_smoke", "native_install_reopen")
+    if any(checks.get(name) != "passed" for name in asset_checks):
+        raise ValidationError("receipt must confirm Gatekeeper and native install/reopen checks")
+    if stage == "assets":
+        if asset_receipt_path is not None:
+            raise ValidationError("asset-stage receipt must not reference a prior asset receipt")
+        if any(name in checks for name in ("site_download_links", "update_feed")):
+            raise ValidationError("asset-stage receipt cannot claim Site checks before deployment")
+    else:
+        if asset_receipt_path is None:
+            raise ValidationError("delivery receipt requires the pre-Site asset receipt")
+        asset_receipt_sha = validate_receipt(
+            manifest_path, asset_receipt_path, stage="assets"
+        )
+        if receipt.get("asset_receipt_sha256") != hashlib.sha256(asset_receipt_path.read_bytes()).hexdigest():
+            raise ValidationError("delivery receipt does not reference the supplied asset receipt bytes")
+        if any(checks.get(name) != "passed" for name in ("site_download_links", "update_feed")):
+            raise ValidationError("delivery receipt must confirm public Site links and update-feed checks")
+        require_https(require_text(receipt, "site_url"), "receipt site_url")
+        require_text(receipt, "site_deployment_id")
+        require_text(receipt, "site_version_id")
+        validate_evidence_list(receipt.get("site_evidence"), "receipt.site_evidence")
+        if receipt.get("asset_manifest_sha256") != asset_receipt_sha:
+            raise ValidationError("delivery receipt asset manifest hash does not match the asset receipt")
     return manifest_sha
 
 
@@ -413,17 +447,24 @@ def main() -> int:
     candidate = sub.add_parser("candidate", help="validate frozen candidate metadata and local asset bytes")
     candidate.add_argument("manifest", type=Path)
     candidate.add_argument("--assets-dir", required=True, type=Path)
-    receipt = sub.add_parser("receipt", help="validate post-publication byte receipt against the frozen manifest")
+    receipt = sub.add_parser("receipt", help="validate staged GitHub asset or post-Site delivery evidence")
     receipt.add_argument("manifest", type=Path)
     receipt.add_argument("receipt", type=Path)
+    receipt.add_argument("--stage", choices=("assets", "delivery"), required=True)
+    receipt.add_argument("--asset-receipt", type=Path)
     args = parser.parse_args()
     try:
         if args.command == "candidate":
             digest = validate_candidate(args.manifest, args.assets_dir)
             print(f"PASS candidate manifest_sha256={digest}")
         else:
-            digest = validate_receipt(args.manifest, args.receipt)
-            print(f"PASS publication receipt manifest_sha256={digest}")
+            digest = validate_receipt(
+                args.manifest,
+                args.receipt,
+                stage=args.stage,
+                asset_receipt_path=args.asset_receipt,
+            )
+            print(f"PASS {args.stage} receipt manifest_sha256={digest}")
         return 0
     except ValidationError as error:
         print(f"FAIL: {error}", file=sys.stderr)

@@ -337,13 +337,13 @@ class CandidateValidationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValidationError, "must stay inside"):
                 validate_candidate(manifest_path, assets)
 
-    def test_receipt_must_match_frozen_manifest_hash_and_public_bytes(self):
+    def test_staged_receipts_verify_assets_before_site_and_delivery_after(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             manifest_path, assets, manifest = valid_candidate(root)
             digest = validate_candidate(manifest_path, assets)
-            receipt = {
-                "record_status": "publication_verified",
+            assets_receipt = {
+                "record_status": "asset_publication_verified",
                 "manifest_sha256": digest,
                 "source_commit": manifest["source_commit"],
                 "published_at": "2026-10-14T02:00:00Z",
@@ -362,17 +362,61 @@ class CandidateValidationTests(unittest.TestCase):
                 "checks": {
                     "gatekeeper_quarantine_smoke": "passed",
                     "native_install_reopen": "passed",
+                },
+            }
+            assets_receipt_path = root / "assets-receipt.json"
+            assets_receipt_path.write_text(json.dumps(assets_receipt), encoding="utf-8")
+            self.assertEqual(validate_receipt(manifest_path, assets_receipt_path, stage="assets"), digest)
+
+            receipt = {
+                **assets_receipt,
+                "record_status": "publication_verified",
+                "asset_receipt_sha256": hashlib.sha256(assets_receipt_path.read_bytes()).hexdigest(),
+                "asset_manifest_sha256": digest,
+                "site_url": "https://netelegram.example.test",
+                "site_deployment_id": "site-deploy-42",
+                "site_version_id": "site-version-42",
+                "site_evidence": ["https://netelegram.example.test/downloads/", "https://netelegram.example.test/appcast.xml"],
+                "checks": {
+                    **assets_receipt["checks"],
                     "site_download_links": "passed",
                     "update_feed": "passed",
                 },
             }
-            receipt_path = root / "receipt.json"
+            receipt_path = root / "delivery-receipt.json"
             receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
-            self.assertEqual(validate_receipt(manifest_path, receipt_path), digest)
+            with self.assertRaisesRegex(ValidationError, "requires the pre-Site asset receipt"):
+                validate_receipt(manifest_path, receipt_path, stage="delivery")
+            self.assertEqual(
+                validate_receipt(
+                    manifest_path,
+                    receipt_path,
+                    stage="delivery",
+                    asset_receipt_path=assets_receipt_path,
+                ),
+                digest,
+            )
+
+            receipt["asset_receipt_sha256"] = "0" * 64
+            receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "does not reference the supplied asset receipt"):
+                validate_receipt(
+                    manifest_path,
+                    receipt_path,
+                    stage="delivery",
+                    asset_receipt_path=assets_receipt_path,
+                )
+
+            receipt["asset_receipt_sha256"] = hashlib.sha256(assets_receipt_path.read_bytes()).hexdigest()
             receipt["manifest_sha256"] = "0" * 64
             receipt_path.write_text(json.dumps(receipt), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "does not match"):
-                validate_receipt(manifest_path, receipt_path)
+                validate_receipt(
+                    manifest_path,
+                    receipt_path,
+                    stage="delivery",
+                    asset_receipt_path=assets_receipt_path,
+                )
 
 
 if __name__ == "__main__":
