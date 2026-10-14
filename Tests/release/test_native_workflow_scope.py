@@ -6,7 +6,7 @@ WORKFLOW = Path(__file__).resolve().parents[2] / ".github/workflows/native-app.y
 
 
 class NativeWorkflowScopeTests(unittest.TestCase):
-    def test_expensive_native_build_has_narrow_automatic_triggers(self):
+    def test_native_build_runs_for_app_sources_and_dependency_inputs(self):
         lines = WORKFLOW.read_text(encoding="utf-8").splitlines()
 
         def block(name):
@@ -33,10 +33,10 @@ class NativeWorkflowScopeTests(unittest.TestCase):
             "Scripts/window-lifecycle-smoke.sh",
             "Scripts/tdlib-smoke.c",
             "TDLIB.lock.json",
+            "Sources/**",
         ]
         self.assertEqual(paths("push"), expected)
         self.assertEqual(paths("pull_request"), expected)
-        self.assertNotIn("Sources/**", expected)
         self.assertNotIn(".github/workflows/native-app.yml", expected)
 
     def test_manual_native_bundle_gate_remains_available(self):

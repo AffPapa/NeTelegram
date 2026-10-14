@@ -1619,3 +1619,4 @@
 - Added `Sources/**` trigger to the pinned TDLib/Dev.app workflow so AppKit source edits get a native bundle build.
 - Source `45a5451cb614202989ccc3a3981f539eadf0d7fb` pushed to `main`; exact macOS CI 38602110387 passed 187/187; pinned native build 38602110256 passed. One canonical arm64 Dev.app rebuilt (5.48s), strict ad-hoc signature verification passed; CUA inspected phone/code/2FA/QR/registration with no credentials or account.
 - Local `swift test` could not enter compilation because the sandbox rejected `sandbox_apply`; exact hosted suite is the test evidence. Real auth, authenticated UI, VoiceOver speech, RTL/IME and all-20 runtime remain unverified. Site/release unchanged.
+- Metadata validation run 38602612320 initially failed because `test_native_workflow_scope.py` encoded the former exclusion of `Sources/**`; updated the test to match the new trigger and focused scope tests pass 2/2. Re-run metadata CI after this correction.
