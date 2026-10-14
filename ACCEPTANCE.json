@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source GitHub CI passed; native visual smoke waits for the protected API-hash dialog to be safely resolved.",
+  "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state verified, row appearance still awaits real chat data.",
   "current_evidence": {
     "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
     "local_suite": "No local behavioral suite run for presentation-only slice. SwiftPM AppKit target build passed; exact-source GitHub macOS CI run 38563635904 passed.",
@@ -16,24 +16,20 @@
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
+      "application_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "source_fingerprint_sha256": "3f98eeb08df406a0711fb76b2bfa791c9ea7942919429b9c53715e6d3d1b8ff2",
-      "executable_sha256": "86b31cc13ed52ff13e2b72719ebacce24e6437f453e8bb47157d15f8acde1e0d",
+      "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "source_fingerprint_sha256": "5e3e098cb42f69a6a770cea066f2cb7143dd6aa98e8c36c4d876a52d8f8f4e51",
+      "executable_sha256": "14621340b55e2b7fb66b1072a9cb6962be18c94923647f4179c6c7bb64592d35",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "1e16b78a419b7dd8c95b12e6012c5ba5d69a70894387b44f8c8ad5ccf151a2e7",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "build_record_sha256": "ef05513128e7eb85aa5a4f5660cd55bd7f6c7348947178a37f07e4648d7cee2b",
-      "smoke": "Built once from clean source 92b8ca3 and launched the canonical Dev.app in the explicit compact chat-shell preview. CUA verified the first-run workspace and honest empty state; no accounts, profiles, TDLib auth, or synthetic identities were loaded. Selected-row appearance could not be visually exercised without chat data.",
-      "scope": "Installed canonical bundle is prior source 92b8ca3 and is currently running on the protected API hash setup dialog. Source 41b3378 is pending one in-place rebuild after owner resolves the dialog and closes the app. No real account login.",
-      "pending_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
-      "current_running_pid": null
+      "smoke": "Canonical Dev.app rebuilt once from clean source 44c999d and launched with --ci-chat-shell-preview. CUA verified the empty accountless workspace; no profiles, Telegram accounts or credentials were loaded. Conversation rows are not visible in this empty-state smoke, so row styling still awaits real chat data.",
+      "scope": "Native launch/empty-state smoke only. This does not prove Telegram login, send/read, real 20 runtimes, performance, signing or release."
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -174,6 +170,21 @@
       "workflow_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
       "app_source_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
       "scope": "Exact-source pinned TDLib build and isolated arm64 Dev.app assembly/verification passed; build artifact uploaded for review. This is hosted build evidence, not real-account acceptance or a signed public release."
+    },
+    "latest_native_smoke": "Canonical exact-source Dev.app built and launched from 44c999d. CUA verified empty accountless chat shell and the phone-login screen with country search/picker, Continue, QR login, and disclosure. No credentials or phone entered. Conversation rows remain visually unverified until real chat data.",
+    "native_smoke": {
+      "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+      "source_fingerprint_sha256": "5e3e098cb42f69a6a770cea066f2cb7143dd6aa98e8c36c4d876a52d8f8f4e51",
+      "executable_sha256": "14621340b55e2b7fb66b1072a9cb6962be18c94923647f4179c6c7bb64592d35",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "live_ui": "CUA first verified the explicit accountless empty chat shell, then the currently visible native phone authorization screen on the same canonical bundle/source 44c999d: phone field, country search/picker, Continue, QR login, and independent-client disclosure are present. No credentials, phone, or OTP were entered. Conversation rows remain unobserved until real chat data exists.",
+      "scope": "Native accountless empty-state and phone-login screen smoke only. It does not prove authentication, real chat rows, read/send, real 20 runtimes, performance, Developer ID or notarization.",
+      "process_state": "Running from canonical exact-source Dev.app in accountless preview."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -675,7 +686,9 @@
     "local_build": "PASS AppKit SwiftPM target compile; git diff --check PASS",
     "exact_source_ci": "not reported yet; old run 38561302832 is for prior source 41b3378 and does not apply",
     "canonical_dev_app": "CUA confirms prior source 92b8ca3 remains running on protected API-hash dialog. Cmd+Q did not close it. No secret field contents observed or changed.",
-    "real_account": "not used"
+    "real_account": "not used",
+    "native_smoke": "PASS one canonical build and native UI check for empty state plus login form. No real auth and no chat rows rendered.",
+    "pending_native_candidate": null
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -716,7 +729,7 @@
     "verified": "Canonical app is running and its installed bundle source is 92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f. The secure API hash field and Save/Cancel controls are present.",
     "not_verified": "Secure field contents or whether it matches the intended app credential; app API credential saved state; real Telegram login or account behavior; current process PID."
   },
-  "next_action": "The exact-source CI for 44c999dee5c866f03272404e7d14965509fdefa6 passed (run 38563635904); do not rerun it. The owner should finish or discard the protected API-hash setup dialog and close NeTelegram Dev. Then build /private/tmp/NeTelegram-Dev.app once from 44c999d, verify BuildInfo and perform one named native visual smoke. Real account login is still user-operated. Developer ID identity count is 0 and notarization credentials are unverified, so no public app release/download. Keep Site v194 unchanged.",
+  "next_action": "Use the canonical Dev.app at /private/tmp/NeTelegram-Dev.app for user-operated API credential setup and one authorized real test account; do not place secrets in chat. Verify login, read/send, close-window/reopen and render real conversation rows. Then continue remaining required vertical slices and real-runtime coverage. Developer ID inventory is 0 and notarization credentials are unverified; no app release/download. Keep Site v194 without a download button until signed public assets exist.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -750,14 +763,24 @@
     "branch": "main",
     "working_tree": "source clean and exact origin/main verified",
     "local_tests": "No behavioral suite run for presentation-only slice; AppKit executable target compiled. git diff --check passed.",
-    "hosted_validation": "Exact-source GitHub macOS CI passed; run 38563635904 for source 44c999d. Native Dev.app visual smoke pending.",
+    "hosted_validation": "Exact-source GitHub macOS CI passed run 38563635904; canonical Dev.app was then built from 44c999d and empty accountless preview verified.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
+      "application_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "dirty_source": false,
+      "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
-      "status": "Running prior bundle source 92b8ca3 on protected API-hash setup dialog; no save/cancel action taken; candidate 44c999d not bundled or visually checked.",
-      "pending_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6"
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+      "source_fingerprint_sha256": "5e3e098cb42f69a6a770cea066f2cb7143dd6aa98e8c36c4d876a52d8f8f4e51",
+      "executable_sha256": "14621340b55e2b7fb66b1072a9cb6962be18c94923647f4179c6c7bb64592d35",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Canonical Dev.app source 44c999d was built once and launched. CUA verified the empty accountless workspace and, after closing that preview, the phone-login screen with country search/picker, Continue, QR login and independence disclosure. No profiles, credentials, phone or OTP were entered. Conversation row rendering is still unobserved until real chat data exists.",
+      "scope": "Native accountless empty-state and phone-login screen smoke only. It does not prove authentication, real chat rows, read/send, real 20 runtimes, performance, Developer ID or notarization."
     }
   },
   "latest_acceptance_slice": {
@@ -850,11 +873,20 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source GitHub CI passed; native visual smoke waits for the protected API-hash dialog to be safely resolved.",
+  "phase": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state verified, row appearance still awaits real chat data.",
   "latest_local_build": {
     "date": "2026-10-14",
     "source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
     "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-design SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-design swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-design-5239471",
     "result": "PASS; 4.80s incremental after cache warming. Initial attempt was blocked by sandboxed cache path; rerun with Xcode build permission and cache redirected to /private/tmp passed. No Dev.app bundle was replaced or launched."
+  },
+  "latest_native_smoke": {
+    "date": "2026-10-14",
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "source_fingerprint_sha256": "5e3e098cb42f69a6a770cea066f2cb7143dd6aa98e8c36c4d876a52d8f8f4e51",
+    "executable_sha256": "14621340b55e2b7fb66b1072a9cb6962be18c94923647f4179c6c7bb64592d35",
+    "architecture": "arm64",
+    "result": "PASS accountless empty state and native phone-login screen; no profiles, credentials, phone, or OTP. Conversation row visual still not observed without real chats."
   }
 }
