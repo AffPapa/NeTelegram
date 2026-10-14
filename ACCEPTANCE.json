@@ -1,22 +1,22 @@
 {
   "schema_version": 2,
-  "status": "implementation_in_progress; source 2d8a4e5 passed local serial Swift 160/160 and exact hosted macOS CI 38492400249; pinned-TDLib native app workflow 38492400259 and metadata validation 38492400278 passed on checkpoint 7d63518. The single canonical Dev.app was rebuilt and its accountless first-run UI verified at title 2d8a4e5. Public Site v168 is deployed from Site source 8a90bfa as deployment appgdep_6aced33c6180819180ed76df0094ad26; public route verification is pending. No app release/download exists. Real login remains deferred; 20 real-account coverage, signing/notarization, and Telegram compatibility remain open.",
+  "status": "implementation_in_progress; source 2d8a4e5 passed local serial Swift 160/160 and exact hosted macOS CI 38492400249; pinned-TDLib native app workflow 38492400259 and metadata validation 38492400278 passed on checkpoint 7d63518. The single canonical Dev.app was rebuilt and its accountless first-run UI verified at title 2d8a4e5. Public Site v168 is deployed from Site source 8a90bfa as deployment appgdep_6aced33c6180819180ed76df0094ad26; public /devlog/ and /downloads/ routes were verified anonymously. No app release/download exists. Real login remains deferred; 20 real-account coverage, signing/notarization, and Telegram compatibility remain open.",
   "current_evidence": {
     "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "app_tests": "Local serial suite 160/160 on app source 2d8a4e5; exact-source hosted macOS CI run 38492400249 passed. A test-only APP01 refinement passed focused local test 1/1 on the current worktree; its exact-source hosted suite is pending.",
+    "app_tests": "Exact-source hosted macOS serial suite passed 160/160 on test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app source remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Local focused APP01 test passed 1/1.",
     "github_workflows": {
       "current_app_source_ci": {
-        "run_id": 38492400249,
-        "workflow_commit": "7d63518026eb17266cfb816d4af22189be859374",
+        "run_id": 38493619014,
+        "workflow_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
         "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
         "result": "success",
-        "scope": "Exact-source serial Swift suite for app source 2d8a4e5."
+        "scope": "Exact-source macOS serial Swift suite passed 160/160; test-only APP01 fan-out refinement, no Swift app source changed."
       },
       "current_checkpoint_metadata": {
-        "run_id": 38492400278,
-        "workflow_commit": "7d63518026eb17266cfb816d4af22189be859374",
+        "run_id": 38493619106,
+        "workflow_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
         "result": "success",
-        "scope": "Metadata validation for checkpoint commit 7d63518."
+        "scope": "Metadata validation passed on test/checkpoint commit bb9b38f."
       },
       "latest_native_bundle": {
         "run_id": 38492400259,
@@ -51,7 +51,7 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted CI is pending."
+      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937."
     },
     {
       "id": "APP02",
@@ -488,26 +488,16 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "source_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
     "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "checkpoint_commit": "7d63518026eb17266cfb816d4af22189be859374",
-    "local_command": "swift test --package-path . --scratch-path .build/canonical-dev-build/swift --no-parallel; bash Scripts/dev-app.sh --launch; codesign --verify --deep --strict.",
-    "local_result": "Serial Swift suite 160/160 and focused replacement race test 1/1 passed. Existing canonical Dev.app was replaced once after its accountless old instance was quit; build record and CUA title match source 2d8a4e5. No credentials entered.",
-    "hosted_ci": "Run 38492400249 passed exact-source macOS serial Swift suite for app source 2d8a4e5964211c9fbd40136f5470da7d47266937.",
-    "native_dev_app_smoke": "Pinned TDLib/native Dev.app workflow 38492400259 passed for app source 2d8a4e5964211c9fbd40136f5470da7d47266937; local app rebuilt once and accountless entry UI verified.",
-    "metadata_ci": "Run 38492400278 passed metadata validation for checkpoint 7d63518026eb17266cfb816d4af22189be859374.",
-    "scope": "API-hash readiness replacement race; one exact-source Swift suite; one native bundle workflow; one local Dev.app accountless check. No real auth, 20 accounts, notarization or release.",
-    "site_deployment": {
-      "version": 168,
-      "source_commit": "8a90bfa27cb219f4c86838b2f027f4d6533f72f6",
-      "deployment_id": "appgdep_6aced33c6180819180ed76df0094ad26",
-      "url": "https://netelegram.iryadom.chatgpt.site",
-      "audience": "public",
-      "site_archive_sha256": "fcbde11c88acc4645df7d2448a58ad815e97d7ad34d37d33aa1df92af50502e2",
-      "site_archive_size_bytes": 187992,
-      "saved_archive_content_hash": "sha256:d7af3b2d8b75b2c1c140fe747d098f02d6bacec10ec81a4754ba5043f27e8a1e",
-      "public_routes": "Anonymous browser verification: /devlog/ shows source 2d8a4e5 and its CI links; /downloads/ says no public GitHub Release or installer and links to source. No login required."
-    }
+    "checkpoint_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
+    "local_command": "swift test --package-path . --scratch-path .build/canonical-dev-build/swift --no-parallel --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
+    "local_result": "Focused APP01 test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no duplicate full local suite.",
+    "hosted_ci": "Run 38493619014 passed the exact-source serial macOS suite 160/160 on test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744.",
+    "native_dev_app_smoke": "No native rebuild was needed: only Tests/** and checkpoint files changed. Existing pinned native workflow 38492400259 still validates unchanged app source 2d8a4e5964211c9fbd40136f5470da7d47266937; no new Dev.app launch occurred.",
+    "metadata_ci": "Run 38493619106 passed metadata validation for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744.",
+    "scope": "APP01 synthetic integration now invokes the production AccountRestorePlanner.enqueueStartupProfiles fan-out helper. It asserts all 20 are queued, one startup stalls, one first request fails and retries under a fresh generation, routes register before requests, and account selection does not replace routing. Does not exercise AppDelegate restoreProfiles end-to-end, real TDLib or 20 authorized accounts.",
+    "site_deployment": "No user-visible app behavior changed; Site devlog not updated for test-only coverage work."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -542,12 +532,12 @@
   },
   "latest_source_audit": {
     "date": "2026-10-14",
-    "source_commit": "d8055a1967e029b27e2db427939d5220f48dc0d8",
-    "app_source_commit": "209be94fde904d0b666ab5c28f588d78610b05bf",
-    "change": "Added a toolchain/pin-scoped SwiftPM cache and a bounded deterministic runner probe; recorded accurate app-source and hosted-CI status.",
-    "local_checks": "Ruby YAML parse, checkpoint JSON parses, and git diff --check passed. Local filtered test passed 1/1. No app-source change or Dev.app rebuild.",
-    "hosted_checks": "macOS CI 38481987804 passed filtered 1/1 and full 157/157; metadata validation 38481987832 passed.",
-    "site_check": "Public Site v163 source 73bdefa deployed successfully; anonymous /devlog HTTP 200 text/html; archive/static checks pass; Downloads contains no installer URL."
+    "source_commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
+    "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+    "change": "Strengthened APP01 integration to exercise production profile fan-out before the bounded all-active startup scheduler.",
+    "local_checks": "Focused APP01 test 1/1 passed under arm64 / Xcode 27 / Swift 6.4; JSON parsing and git diff --check passed. No app-source change or Dev.app rebuild.",
+    "hosted_checks": "Exact-source macOS CI 38493619014 passed filtered probe and full suite 160/160; metadata validation 38493619106 passed.",
+    "site_check": "Not applicable: test-only change; public Site remains v168."
   },
   "latest_access_audit": {
     "date": "2026-10-13",
@@ -558,7 +548,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Push the APP01 test refinement once, inspect its exact-source serial macOS CI and metadata workflow, then update the checkpoint. No native bundle rebuild is needed because app source and native build inputs did not change. Keep APP01 partial until authorized real sessions are measured.",
+  "next_action": "Continue the next incomplete product acceptance slice without repeating APP01 checks. All-active real-account certification remains open until authorized Telegram profiles are available; do not substitute synthetic fixtures.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -577,11 +567,11 @@
   },
   "current_local_candidate": {
     "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
-    "parent": "247aec67ec3eb240e3b87ce0de40f8f64f7aa6e1",
+    "parent": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
     "branch": "main",
-    "working_tree": "Test-only APP01 coverage refinement plus acceptance/run-log checkpoint; no app source changed.",
-    "local_tests": "Focused twenty-profile restore fan-out integration test 1/1 passed; full suite not rerun locally.",
-    "hosted_validation": "Pending exact-source serial macOS CI and metadata workflow.",
-    "dev_app": "Existing canonical Dev.app remains source 2d8a4e5; no rebuild or relaunch because app inputs did not change."
+    "working_tree": "Checkpoint-only update after test commit bb9b38f; test commit is on origin/main.",
+    "local_tests": "Focused APP01 integration 1/1 passed; exact hosted serial suite passed 160/160.",
+    "hosted_validation": "macOS CI 38493619014 and metadata 38493619106 passed on test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744.",
+    "dev_app": "Canonical Dev.app remains app source 2d8a4e5; no rebuild required."
   }
 }
