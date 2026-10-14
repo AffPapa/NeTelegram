@@ -31,10 +31,10 @@ jobs:
     # This suite contains cancellation/continuation scheduling tests. Keep
     # test execution serialized so runner scheduling cannot strand a test.
     runs-on: macos-15
-    # The serial suite normally completes in under a minute. Bound silent
-    # Swift Testing startup stalls so a wedged runner fails fast enough to
-    # diagnose rather than consuming ten minutes without test output.
-    timeout-minutes: 5
+    # One test process avoids repeated SwiftPM/test-runner startup. A hosted
+    # macOS capacity delay previously consumed the 2-minute step cap before
+    # the full suite could report; allow one bounded run without probe churn.
+    timeout-minutes: 10
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -58,29 +58,10 @@ jobs:
           restore-keys: |
             macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-
 
-      - name: Probe account startup task registry
-        # Exercise the production task registry and selection handoff first.
-        # This also verifies Swift Testing runner startup on the hosted toolchain.
-        timeout-minutes: 1
-        run: swift test --no-parallel --verbose --filter profileStartupRegistryIsolatesStallsFailuresAndRetries
-
-      - name: Probe API hash timeout and retry handoff
-        # This test uses a timed waiter and a deliberately stalled lookup. Run
-        # alone so a failure is attributable before the full suite starts.
-        timeout-minutes: 1
-        run: swift test --no-parallel --verbose --filter apiHashReadTimeoutRetriesJoinOneLookupAndCacheItsLateResult
-
-      - name: Probe twenty-client receive drain
-        # This test exercises the async reducer-exit barrier after accepted
-        # updates drain; keep it isolated from suite-level scheduling effects.
-        timeout-minutes: 1
-        run: swift test --no-parallel --verbose --filter twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates
-
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output
-        # makes the handoff from build/link to test-runner startup observable.
-        # The suite has completed in about a minute on hosted macOS; cap this
-        # step separately so a silent runner startup stall fails in two minutes
-        # instead of consuming the whole five-minute job timeout.
-        timeout-minutes: 2
+        # makes build/link and test progress observable. Local full-suite and
+        # focused regressions remain the fast iteration loop; CI is one exact-
+        # SHA full-suite gate, not a sequence of redundant test processes.
+        timeout-minutes: 8
         run: swift test --no-parallel --verbose
