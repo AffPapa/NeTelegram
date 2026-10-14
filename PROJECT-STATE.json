@@ -51,11 +51,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38501473452,
+      "run_id": 38504598500,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501473452",
-      "workflow_commit": "db1a69bec5415c5c00d4ad8feae829495f40c930",
-      "scope": "Checkpoint metadata validation passed for the prior state commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38504598500",
+      "workflow_commit": "6b9fc7b716de62044bcb6b56e088d885dbe7a37c",
+      "scope": "Checkpoint JSON, resume pointers, and the complete 15-test release metadata suite passed."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,

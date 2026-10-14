@@ -496,12 +496,12 @@
     "date": "2026-10-14",
     "source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
     "app_source_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
-    "checkpoint_commit": "67341bab5399fcf3323f0a9fd5b486b0dd8bf6d1",
+    "checkpoint_commit": "6b9fc7b716de62044bcb6b56e088d885dbe7a37c",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-app02-stall-check",
     "local_result": "PASS: serial Swift suite 164/164 in 0.455s after focused diagnostics; arm64e macOS 27 SDK, Xcode 27 / Swift 6.4.",
     "hosted_ci": "PASS exact-source GitHub macOS CI 38504170791; full serial suite 164/164.",
     "native_dev_app_smoke": "One canonical /private/tmp/NeTelegram-Dev.app at exact source 67341ba is running after an accountless UI check and a normal Quit/process-exit smoke; reopened by verified reuse without rebuild. No credentials entered.",
-    "metadata_ci": "Local checkpoint validation and release metadata suite passed 15/15; checkpoint-only hosted metadata workflow pending.",
+    "metadata_ci": "PASS: metadata workflow 38504598500 validated exact checkpoint commit 6b9fc7b; JSON, checkpoint consistency and 15 release metadata tests passed. This checkpoint records that run.",
     "scope": "No real login, authorized-account data, twenty-account coverage, Developer ID signature, notarization, Gatekeeper, public release or new Site deployment."
   },
   "latest_site_deployment": {
