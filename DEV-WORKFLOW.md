@@ -37,3 +37,8 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 - The only development bundle is `/private/tmp/NeTelegram-Dev.app`. Before rebuilding it, inspect its embedded `Contents/Resources/BuildInfo.json` and confirm the process has exited. Rebuild this same path once; never launch a second development identity for routine smoke.
 - The prior no-account first-run smoke reached phone entry and QR login without entering credentials. That does not prove a real Telegram login/read/send/logout flow or multi-account behavior.
 - Developer ID signing, notarization, real-account scenarios, and twenty-runtime measurements remain open release gates.
+
+
+## LaunchServices recovery
+
+If `Scripts/dev-app.sh --launch` returns `kLSNoExecutableErr`, first verify BuildInfo, executable presence, source fingerprint, and strict ad-hoc signature. Do not start the executable directly or create another bundle. Bind and launch the single canonical `/private/tmp/NeTelegram-Dev.app` by exact path through CUA once, then verify its window title/AX state match the embedded source commit. Record both the LaunchServices failure and successful exact-path smoke; do not call the failure a product crash without evidence.

@@ -1413,3 +1413,11 @@
 - Telegram Desktop research already completed at pinned source commit `d77f486228a98e15d6695514d5f2b28ce1c6a872`: retain adaptive pane hierarchy, dialog row scan order, and separate header/history/composer responsibilities in native AppKit; do not copy GPL source/assets or excluded feature surfaces. No new design code was needed for this runtime slice.
 - Site remains public v194 with no app download. No signed app asset or GitHub app release exists. Latest recorded signing inventory has zero Developer ID identities; notary credentials and compatibility gates remain unresolved.
 - Next acceptance action: owner-operated first-account smoke in the already-open canonical app. Do not ask for credentials in chat, rebuild unchanged source, or update Site downloads before release validation.
+
+
+## 2026-10-14 — CORE-RUNTIME-05 exact-source Dev.app candidate
+
+- The owner-authorized quit was performed with the NeTelegram menu command. CUA inventory confirmed the app exited; the normal sandbox process guard still could not prove absence, so the standard build script ran with the system process-check permission. It built the single canonical `/private/tmp/NeTelegram-Dev.app` from clean source `819071d40371bbc5ae14f372454162dcfdac3f9a` once in 5.71s. No alternate bundle was created.
+- `BuildInfo.json` and the build record agree on source SHA, fingerprint `a047da8b…62bd52c`, arm64, macOS 14.0, and TDLib pin `c15d3f5a5de6e3ba5839822c451152e5e18bb700`. Strict ad-hoc `codesign --verify --deep --strict` passed. Executable SHA-256 `321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183`; TDJSON SHA-256 `9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1`.
+- The script's `open` returned LaunchServices `kLSNoExecutableErr`; no repeated `open`, direct executable launch, or alternate app copy was attempted. One CUA launch by the exact canonical bundle path succeeded. CUA title `NeTelegram · dev 819071d4`, accessibility state, and screenshot match the expected accountless phone-login screen. No phone, code, API hash, account, or profile was entered.
+- Updated current app/bundle evidence in `PROJECT-STATE.json` and `ACCEPTANCE.json`; source, app build and Site identifiers remain separate. The real authenticated chat/read/send scenario is still pending owner-operated login. Site v194 remains unchanged and has no download.
