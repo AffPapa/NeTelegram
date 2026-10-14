@@ -59,10 +59,11 @@ jobs:
             macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-
 
       - name: Probe Swift Testing runner
-        # A known-fast deterministic test distinguishes runner startup hangs
-        # from a stall later in the full suite without parallelizing tests.
+        # Probe the exact restore-cleanup isolation regression before the full
+        # serial suite. This distinguishes a runner startup stall from a later
+        # suite stall and validates the changed contract on the hosted toolchain.
         timeout-minutes: 2
-        run: swift test --no-parallel --verbose --filter publicDisplayNameMatchesRepositoryName
+        run: swift test --no-parallel --verbose --filter restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers
 
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output

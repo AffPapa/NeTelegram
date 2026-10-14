@@ -1349,6 +1349,52 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         retryOpeningProfile(account)
     }
 
+    /// Restore-time cleanup is profile-local. Enqueue it on MainActor and return
+    /// immediately so a slow Keychain or filesystem operation cannot prevent
+    /// unrelated authorized profiles from entering the bounded startup queue.
+    private func scheduleRestoreCleanup(_ profile: AccountProfile) -> Bool {
+        let account = profile.id
+        guard !closingForTermination,
+              !profileOpenRequests.contains(account),
+              runtimesByAccount[account] == nil,
+              profileStartupTasks[account] == nil else { return false }
+        if profile.logoutCleanupPending == true, profile.telegramUserID == nil {
+            profileStartupFailures.insert(account)
+            return false
+        }
+        profileOpenRequests.insert(account)
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            defer {
+                self.profileOpenRequests.remove(account)
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+            }
+            do {
+                if profile.logoutCleanupPending == true {
+                    guard let expectedTelegramUserID = profile.telegramUserID else {
+                        throw AccountCatalogueError.identityMismatch
+                    }
+                    try await self.completePendingLogoutCleanup(
+                        account,
+                        expectedTelegramUserID: expectedTelegramUserID
+                    )
+                } else if profile.unverifiedRemovalPending == true {
+                    try await self.completePendingUnverifiedProfileCleanup(account)
+                }
+                self.profileStartupFailures.remove(account)
+                if self.knownProfilesByAccount.isEmpty, self.runtimesByAccount.isEmpty {
+                    self.pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+                    self.showPhoneEntry()
+                    self.setStatus("Очистка локальных профилей завершена. Введите номер телефона, чтобы добавить аккаунт.")
+                }
+            } catch {
+                self.profileStartupFailures.insert(account)
+            }
+        }
+        return true
+    }
+
     private func retryPendingLogoutCleanup(_ profile: AccountProfile) {
         guard !profileRestoreInProgress, !closingForTermination,
               !profileOpenRequests.contains(profile.id),
@@ -1879,32 +1925,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let catalogue = try accountCatalogue()
             var profiles = await catalogue.allProfiles()
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
-            let cleanupProfiles = profiles.filter { $0.logoutCleanupPending == true }
-            for profile in cleanupProfiles {
-                guard let expectedTelegramUserID = profile.telegramUserID else {
-                    profileStartupFailures.insert(profile.id)
-                    continue
-                }
-                do {
-                    try await completePendingLogoutCleanup(
-                        profile.id,
-                        expectedTelegramUserID: expectedTelegramUserID
-                    )
-                } catch {
-                    profileStartupFailures.insert(profile.id)
-                }
-                guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            let cleanupCandidates = profiles.filter {
+                ($0.logoutCleanupPending == true || $0.unverifiedRemovalPending == true)
+                    && runtimesByAccount[$0.id] == nil
+                    && profileStartupTasks[$0.id] == nil
+                    && !profileOpenRequests.contains($0.id)
             }
-            let unfinishedRemovalProfiles = profiles.filter { $0.unverifiedRemovalPending == true }
-            for profile in unfinishedRemovalProfiles where runtimesByAccount[profile.id] == nil
-                && profileStartupTasks[profile.id] == nil {
-                do {
-                    try await completePendingUnverifiedProfileCleanup(profile.id)
-                } catch {
-                    profileStartupFailures.insert(profile.id)
-                }
-                guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
+            let pendingCleanups = AccountRestorePlanner.enqueuePendingCleanups(cleanupCandidates) { profile in
+                scheduleRestoreCleanup(profile)
             }
+            for rejected in pendingCleanups.rejected {
+                profileStartupFailures.insert(rejected)
+            }
+            guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             profiles = await catalogue.allProfiles()
             guard profileRestoreGenerationGate.isCurrent(restoreGeneration) else { return }
             rememberProfiles(profiles)
@@ -1967,9 +2000,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             profileStartupFailures.formUnion(enqueueResult.rejected)
             if enqueueResult.queued.isEmpty {
                 if profiles.contains(where: { $0.logoutCleanupPending == true }) {
-                    setStatus("Очистка после подтверждённого выхода ожидает. Выберите этот профиль, чтобы безопасно продолжить.")
+                    setStatus("Очистка после подтверждённого выхода выполняется отдельно. Профиль останется недоступен до завершения.")
                 } else if profiles.contains(where: { $0.unverifiedRemovalPending == true }) {
-                    setStatus("Удаление незавершённого входа ожидает. Выберите этот профиль, чтобы безопасно повторить.")
+                    setStatus("Удаление незавершённого входа выполняется отдельно. Данные удалятся только после безопасного закрытия.")
                 } else if !enqueueResult.rejected.isEmpty {
                     setStatus("Не удалось поставить в очередь запуск \(enqueueResult.rejected.count) профилей. Выберите профиль, чтобы повторить запуск.")
                 }

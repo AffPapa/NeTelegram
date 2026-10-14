@@ -47,6 +47,26 @@ public enum AccountRestorePlanner {
         return EnqueueResult(queued: queued, rejected: rejected)
     }
 
+    /// Hands independent pending cleanup operations to their owners without
+    /// waiting for any one account's Keychain or filesystem work to finish.
+    /// The callback must enqueue and return; it must not await cleanup.
+    @discardableResult
+    public static func enqueuePendingCleanups(
+        _ profiles: [AccountProfile],
+        enqueue: (AccountProfile) -> Bool
+    ) -> EnqueueResult {
+        var queued: [AccountUUID] = []
+        var rejected: [AccountUUID] = []
+        for profile in profiles where profile.logoutCleanupPending == true || profile.unverifiedRemovalPending == true {
+            if enqueue(profile) {
+                queued.append(profile.id)
+            } else {
+                rejected.append(profile.id)
+            }
+        }
+        return EnqueueResult(queued: queued, rejected: rejected)
+    }
+
     /// Restores every verified identity plus any unverified profile whose
     /// existing TDLib database may contain a session that needs identity
     /// recovery. A single empty login profile is opened only when nothing else

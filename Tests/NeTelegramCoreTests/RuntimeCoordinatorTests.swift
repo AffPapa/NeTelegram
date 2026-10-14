@@ -2436,6 +2436,41 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     ).isEmpty)
 }
 
+@Test func restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers() async {
+    let logoutProfile = AccountProfile(id: AccountUUID(), telegramUserID: 901, logoutCleanupPending: true)
+    let unverifiedProfile = AccountProfile(id: AccountUUID(), unverifiedRemovalPending: true)
+    let cleanupGate = AsyncTestGate()
+    let blockedCleanupEntered = LockedTestValue(false)
+    var cleanupTasks: [Task<Void, Never>] = []
+
+    let cleanupResult = AccountRestorePlanner.enqueuePendingCleanups([logoutProfile, unverifiedProfile]) { profile in
+        let task = Task {
+            if profile.id == logoutProfile.id {
+                blockedCleanupEntered.set(true)
+                await cleanupGate.wait()
+            }
+        }
+        cleanupTasks.append(task)
+        return true
+    }
+
+    let authorizedProfiles = (1...19).map { _ in AccountProfile(telegramUserID: 90_000) }
+    let startupResult = AccountRestorePlanner.enqueueStartupProfiles(
+        candidates: authorizedProfiles,
+        running: [],
+        starting: []
+    ) { _ in true }
+
+    #expect(cleanupResult.queued == [logoutProfile.id, unverifiedProfile.id])
+    #expect(cleanupResult.rejected.isEmpty)
+    #expect(startupResult.queued == authorizedProfiles.map(\.id))
+    #expect(startupResult.rejected.isEmpty)
+    #expect(await waitForTrue(blockedCleanupEntered, timeout: .seconds(2)))
+
+    await cleanupGate.open()
+    for task in cleanupTasks { await task.value }
+}
+
 @Test func pendingUnverifiedProfileRemovalCannotBeRestoredAndCanResumeAfterFailure() async throws {
     enum InjectedFailure: Error { case fileRemoval }
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
