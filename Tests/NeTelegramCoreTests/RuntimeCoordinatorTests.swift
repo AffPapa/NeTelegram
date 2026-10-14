@@ -4013,6 +4013,49 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     #expect(decoderCalls.get() == 2)
 }
 
+@Test func privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock() async {
+    let account = AccountUUID()
+    let decoderCalls = LockedTestValue(0)
+    let firstDecodeStarted = LockedTestValue(false)
+    let successfulCallbacks = LockedTestValue(0)
+    let releaseFirstDecode = DispatchSemaphore(value: 0)
+    defer { releaseFirstDecode.signal() }
+    let pipeline = PhotoPipeline(maxConcurrentDecodes: 1, maxQueuedDecodes: 1, decoder: { _, _ in
+        let call = decoderCalls.get() + 1
+        decoderCalls.set(call)
+        if call == 1 {
+            firstDecodeStarted.set(true)
+            releaseFirstDecode.wait()
+        }
+        return Data([UInt8(call)])
+    })
+    let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
+    let completion: @Sendable (PhotoPreviewToken, Data?) -> Void = { _, data in
+        if data != nil { successfulCallbacks.set(successfulCallbacks.get() + 1) }
+    }
+
+    _ = pipeline.requestPreview(account: account, messageID: 77, fileID: 9, fileURL: url, maxPixelSize: 320, completion: completion)
+    #expect(await waitForTrue(firstDecodeStarted, timeout: .seconds(2)))
+
+    // This mirrors Privacy Lock's cache invalidation while ImageIO is still working.
+    pipeline.cancelAllPreviews()
+    pipeline.removeCachedPreviews(for: account)
+    releaseFirstDecode.signal()
+
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while pipeline.outstandingDecodeCount(for: account) != 0, clock.now < deadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(pipeline.outstandingDecodeCount(for: account) == 0)
+    #expect(successfulCallbacks.get() == 0)
+    #expect(!pipeline.hasCachedPreview(account: account, chatID: 0, messageID: 77, fileID: 9, fileURL: url, maxPixelSize: 320))
+
+    _ = pipeline.requestPreview(account: account, messageID: 77, fileID: 9, fileURL: url, maxPixelSize: 320, completion: completion)
+    #expect(await waitForCount(successfulCallbacks, atLeast: 1, timeout: .seconds(2)))
+    #expect(decoderCalls.get() == 2, "A fresh post-unlock request must decode and populate the preview again")
+}
+
 @Test func outgoingPhotoManifestSurvivesRestartAndReleasesOnlyOwnedFiles() throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
     defer { try? FileManager.default.removeItem(at: root) }
