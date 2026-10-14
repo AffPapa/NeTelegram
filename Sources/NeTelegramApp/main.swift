@@ -457,8 +457,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryFieldLabel.textColor = .labelColor
         countryFieldLabel.setAccessibilityLabel("Страна")
         countryControlsStack = NSStackView(views: [countrySearchField, countryPicker])
-        countryControlsStack.orientation = .horizontal
-        countryControlsStack.alignment = .centerY
+        countryControlsStack.orientation = .vertical
+        countryControlsStack.alignment = .leading
         countryControlsStack.distribution = .fill
         countryControlsStack.spacing = 8
         countryPickerStack = NSStackView(views: [countryFieldLabel, countryControlsStack])
@@ -643,7 +643,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryControlsStack.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 148), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
+            countrySearchField.widthAnchor.constraint(equalTo: countryControlsStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.widthAnchor.constraint(equalTo: countryControlsStack.widthAnchor),
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
