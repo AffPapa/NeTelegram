@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import re
 import sys
 
 
@@ -37,7 +38,10 @@ def validate_records(project: dict, acceptance: dict) -> None:
     hosted_ci_is_recorded = hosted_ci["status"] == "success" or (
         hosted_ci["status"] == "failure"
         and bool(hosted_ci.get("diagnosis"))
-        and "PASS 166/166" in evidence["local_suite"]
+        and re.search(
+            r"\bPASS \d+/\d+ exact-source local serial Swift suite\b",
+            evidence["local_suite"],
+        ) is not None
     )
     acceptance_site = acceptance["latest_site_deployment"]
     acceptance_slice = acceptance["latest_acceptance_slice"]

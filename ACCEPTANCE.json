@@ -2,17 +2,17 @@
   "schema_version": 2,
   "status": "APP01 startup-presentation coordinator implemented on exact app source 3f11a0e. Focused and full local serial suite pass 166/166. Hosted exact-source run 38510759384 failed because the full-suite step timed out after 2 minutes; no hosted PASS claimed. Canonical Dev.app remains on 4dcddcc and has not been rebuilt or smoked for this source. Real login, 20 authorized runtime measurements, Developer ID/notarization, and Telegram compatibility remain open.",
   "current_evidence": {
-    "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-    "local_suite": "PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
-    "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1 through the production AccountStartupPresentationCoordinator used by AppDelegate. This tests selection policy, not live AppKit switching.",
+    "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+    "local_suite": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
+    "focused_test": "profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1 through the production AccountStartupTaskRegistry used by AppDelegate. Local tests also confirmed API-hash timeout/retry and twenty-client receive-drain probes each pass 1/1.",
     "hosted_ci": {
-      "run_id": 38510759384,
+      "run_id": 38512034207,
       "status": "failure",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38510759384",
-      "workflow_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-      "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-      "scope": "Runner probe passed; full serial suite step timed out after its 2-minute limit. GitHub annotation included a macOS arm64 capacity notice. This is not a test assertion failure; exact-source local full suite passed 166/166. Raw Actions logs were unavailable through the authenticated CLI route.",
-      "diagnosis": "The hosted full-suite step exceeded its workflow timeout; do not retry unchanged. Diagnose the runner/test-runner stall before another hosted run."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38512034207",
+      "workflow_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+      "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+      "scope": "All three isolated probes passed. The full serial suite step timed out at 2 minutes; GitHub annotated macOS arm64 runner capacity. This is a hosted timeout, not an assertion failure. Exact-source local full suite passed 167/167.",
+      "diagnosis": "The full hosted suite exceeded its 2-minute step timeout after isolated probes passed. No unchanged retry. Workflow is changed to one serial full-suite process with an 8-minute step cap; this new workflow commit is pending push because github.com DNS did not resolve."
     },
     "native_build": {
       "status": "success_local",
@@ -516,13 +516,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-    "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-    "local_command": "swift test --filter lateBackgroundStartupCannotStealNewerAccountSelection; swift test --no-parallel",
-    "local_result": "PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
-    "hosted_ci": "Runner probe passed; full serial suite step timed out after its 2-minute limit. GitHub annotation included a macOS arm64 capacity notice. This is not a test assertion failure; exact-source local full suite passed 166/166. Raw Actions logs were unavailable through the authenticated CLI route. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38510759384",
-    "native_dev_app_smoke": "Not run for this source. Canonical bundle remains at 4dcddcc; desktop inventory reported it running, so no second bundle was built or launched.",
-    "scope": "Core policy regression and full local synthetic suite only. No fresh Dev.app launch, live account switch, real login, 20 authorized sessions, Developer ID signing, notarization, or resource matrix."
+    "source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+    "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+    "local_command": "swift test --filter profileStartupRegistryIsolatesStallsFailuresAndRetries; swift test --no-parallel",
+    "local_result": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
+    "hosted_ci": "All three isolated probes passed. The full serial suite step timed out at 2 minutes; GitHub annotated macOS arm64 runner capacity. This is a hosted timeout, not an assertion failure. Exact-source local full suite passed 167/167. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38512034207",
+    "native_dev_app_smoke": "Not run for this source. Canonical bundle remains at 4dcddcc; it was reported running, so no second bundle was built or launched.",
+    "scope": "Production startup task registry regression and full local synthetic suite. No fresh Dev.app launch, real login, 20 authorized sessions, signing, notarization or resource matrix."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -571,7 +571,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "APP01 remains partial. Source 3f11a0e centralizes account startup presentation intent; local focused test and full serial suite pass, but exact-source macOS CI 38510759384 timed out in the full-suite step. Do not retry unchanged. Diagnose the hosted runner/test-runner timeout first. The canonical Dev.app is still at 4dcddcc and was reported running; rebuild only that same bundle path after it exits, then perform one named account-selection smoke. No real Telegram login, 20 authorized runtimes, Developer ID/notarization, or compatibility gates are complete.",
+  "next_action": "After network DNS recovers, push commit 306f2c8 once and inspect its single exact-SHA macOS suite run. Do not repeat isolated probes or retry unchanged source. Then, once the canonical Dev.app process has exited, rebuild only /private/tmp/NeTelegram-Dev.app from source 9f4d3ca and perform one named account-startup UI smoke. Real login, 20 authorized runtimes, Developer ID/notarization and compatibility gates remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -629,12 +629,20 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP01 startup presentation coordinator",
-    "source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
-    "local_focused_tests": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1 through the production AccountStartupPresentationCoordinator used by AppDelegate. This tests selection policy, not live AppKit switching. PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
-    "hosted_serial_suite": "GitHub Actions run 38510759384 for exact source 3f11a0e992b40ac4e905a177605008940f15cf95: filtered runner probe passed; full suite step timed out at 2 minutes. This is recorded as failure/timeout, not PASS. GitHub annotation noted macOS arm64 runner capacity constraints.",
-    "native_bundle_workflow": "Not run. The canonical /private/tmp/NeTelegram-Dev.app remains at source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d; desktop inventory reported NeTelegram Dev running, so no replacement bundle or second app identity was launched.",
-    "implementation": "Extracted account selection intent and startup presentation decision into one MainActor Core coordinator used by AppDelegate and the focused regression. Removed the duplicate pure policy so there is one production source of truth.",
-    "remaining": "No new Dev.app smoke, live account switch, real login, 20 authorized runtimes, or resource measurements. Hosted full-suite timeout remains unresolved. APP01 is partial."
+    "id": "APP01 account startup task registry",
+    "source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
+    "local_focused_tests": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
+    "hosted_serial_suite": "GitHub Actions run 38512034207 for exact source 9f4d3cabf6c4ca84489613fbc350fa65baa2130a: all three isolated probes passed; full suite timed out at 2 minutes. Recorded as failure/timeout, not PASS.",
+    "native_bundle_workflow": "Not run. The canonical /private/tmp/NeTelegram-Dev.app remains at source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d and was reported running; no replacement bundle or second app identity was launched.",
+    "implementation": "Moved per-account startup task deduplication, generation-safe completion, cancellation and starting-account tracking into AccountStartupTaskRegistry, used by AppDelegate. Added a regression where one profile stalls, another fails and retries, and the stalled completion cannot clear the newer registration.",
+    "remaining": "Synthetic orchestration only. No fresh Dev.app smoke, real login, 20 authorized runtimes or resource measurements. Hosted full-suite timeout remains unresolved pending the simplified workflow run."
+  },
+  "latest_hosted_ci_efficiency_change": {
+    "date": "2026-10-14",
+    "workflow_commit": "306f2c8",
+    "change": "Removed three separate preflight swift test processes. CI now runs one serial full suite, with an 8-minute step / 10-minute job bound.",
+    "reason": "On exact source 9f4d3ca all three probes passed, then the full run still hit its 2-minute timeout. Repeated runner startup did not diagnose or prevent the failure.",
+    "local_validation": "Ruby YAML parse, single-test-process assertion, and git diff --check passed. Metadata validation pending after checkpoint update.",
+    "publication": "Local commit created; git push failed because github.com DNS could not resolve. No credential change or retry."
   }
 }

@@ -889,3 +889,11 @@
 - The single canonical `/private/tmp/NeTelegram-Dev.app` remains at source `4dcddcc`. Desktop inventory reported NeTelegram Dev running; no rebuild or second bundle was made. One named AppKit account-selection smoke remains pending after the canonical process exits.
 - No Sites deployment, app release, login credentials, or Telegram profiles were used. Real account coverage and all-20 resource certification remain unverified.
 - Next: diagnose the full-suite runner/test-runner timeout before any retry; preserve the single canonical Dev.app identity, then rebuild that path once and run one named selection smoke. Current full implementation/release gates remain open.
+
+### 2026-10-14 — reduce hosted Swift CI to one test process
+
+- Current app-source commit `9f4d3cabf6c4ca84489613fbc350fa65baa2130a`: focused production registry, API-hash timeout/retry, and twenty-client receive-drain probes each passed 1/1; exact-source local serial Swift suite passed 167/167 in 0.442s on arm64e / Xcode 27 / Swift 6.4.
+- Exact-source hosted run [38512034207](https://github.com/AffPapa/NeTelegram/actions/runs/38512034207) passed all three isolated probes, then the full suite timed out at its 2-minute step cap; GitHub annotated macOS arm64 runner capacity. This is not a hosted suite pass. Repeating the same probes before the full suite added process startups without preventing the timeout.
+- Workflow commit `306f2c8` removes the three extra SwiftPM test processes and runs one serial full suite with an 8-minute step cap / 10-minute job cap. Ruby YAML parse, single-test-process assertion, and `git diff --check` passed. `DEV-WORKFLOW.md` now records this as the default and prohibits restoring redundant preflight runs without evidence.
+- Checkpoint validation now accepts a diagnosed timeout with any exact-source `PASS N/N` local serial Swift suite record instead of hard-coding the obsolete 166-test count.
+- Push of `306f2c8` failed before authentication because the network could not resolve `github.com`. No credential was printed, changed, or retried. Workflow run is pending push/network recovery. Canonical Dev.app remains at source `4dcddcc`; no rebuild, duplicate app, login, Site deploy, or app release occurred.

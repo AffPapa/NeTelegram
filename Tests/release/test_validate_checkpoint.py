@@ -78,7 +78,9 @@ class ValidateCheckpointTests(unittest.TestCase):
             "app_source_commit": current,
             "diagnosis": "The exact-source full-suite step timed out; local serial suite passed.",
         }
-        acceptance["current_evidence"]["local_suite"] = "PASS 166/166 exact-source local serial suite."
+        acceptance["current_evidence"]["local_suite"] = (
+            "PASS 167/167 exact-source local serial Swift suite."
+        )
         acceptance["latest_acceptance_slice"]["source_commit"] = current
         acceptance["last_verification"]["app_source_commit"] = current
 
