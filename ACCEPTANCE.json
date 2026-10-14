@@ -2,17 +2,17 @@
   "schema_version": 2,
   "status": "APP01 startup-presentation coordinator implemented on exact app source 3f11a0e. Focused and full local serial suite pass 166/166. Hosted exact-source run 38510759384 failed because the full-suite step timed out after 2 minutes; no hosted PASS claimed. Canonical Dev.app remains on 4dcddcc and has not been rebuilt or smoked for this source. Real login, 20 authorized runtime measurements, Developer ID/notarization, and Telegram compatibility remain open.",
   "current_evidence": {
-    "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-    "local_suite": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
-    "focused_test": "profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1 through the production AccountStartupTaskRegistry used by AppDelegate. Local tests also confirmed API-hash timeout/retry and twenty-client receive-drain probes each pass 1/1.",
+    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "local_suite": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
+    "focused_test": "The final TDLib receive update now remains readable until the receive worker exits. Local repeated run passed 20/20 for `twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates` and 20/20 for `updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput`.",
     "hosted_ci": {
-      "run_id": 38512034207,
-      "status": "failure",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38512034207",
-      "workflow_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-      "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-      "scope": "All three isolated probes passed. The full serial suite step timed out at 2 minutes; GitHub annotated macOS arm64 runner capacity. This is a hosted timeout, not an assertion failure. Exact-source local full suite passed 167/167.",
-      "diagnosis": "The full hosted suite exceeded its 2-minute step timeout after isolated probes passed. No unchanged retry. Workflow is changed to one serial full-suite process with an 8-minute step cap; this new workflow commit is pending push because github.com DNS did not resolve."
+      "run_id": 38514102824,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38514102824",
+      "workflow_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+      "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+      "scope": "Exact-source macOS Actions job passed all 167 Swift tests in 0.860s; the formerly hanging twenty-client shutdown regression passed in 0.012s. The workflow ran one full serial test process.",
+      "diagnosis": "The previous timeout was a confirmed queue EOF race: close(allowInFlightReceive:true) woke a blocked final append, while the reducer could observe closed+empty and exit first. The final event then remained queued and the drain barrier waited forever."
     },
     "native_build": {
       "status": "success_local",
@@ -516,13 +516,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-    "app_source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-    "local_command": "swift test --filter profileStartupRegistryIsolatesStallsFailuresAndRetries; swift test --no-parallel",
-    "local_result": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
-    "hosted_ci": "All three isolated probes passed. The full serial suite step timed out at 2 minutes; GitHub annotated macOS arm64 runner capacity. This is a hosted timeout, not an assertion failure. Exact-source local full suite passed 167/167. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38512034207",
-    "native_dev_app_smoke": "Not run for this source. Canonical bundle remains at 4dcddcc; it was reported running, so no second bundle was built or launched.",
-    "scope": "Production startup task registry regression and full local synthetic suite. No fresh Dev.app launch, real login, 20 authorized sessions, signing, notarization or resource matrix."
+    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "local_command": "swift test --no-parallel --filter 'twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates|updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput' --maximum-repetitions 20 --repeat-until fail",
+    "local_result": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
+    "hosted_ci": "Exact-source macOS Actions job passed all 167 Swift tests in 0.860s; the formerly hanging twenty-client shutdown regression passed in 0.012s. The workflow ran one full serial test process. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38514102824",
+    "native_dev_app_smoke": "Not run for this source. The single canonical Dev.app remains at 4dcddcc and is currently running; no second bundle was built.",
+    "scope": "Core shutdown producer/EOF barrier, 40 focused test repetitions, and the 167-test synthetic hosted suite. No Dev.app rebuild, real login, 20 authorized accounts, signing or notarization."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -543,18 +543,6 @@
     "archive_file_count": 14,
     "public_verification": "Public deployment v173 is reported succeeded by the Sites deployment record. Anonymous browser loaded /devlog/ and showed the 4dcddcc milestone and CI 38509465812. /downloads and updater-feed MIME were not checked in this turn. No app binary/download exists."
   },
-  "latest_local_candidate": {
-    "date": "2026-10-14",
-    "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "checkpoint_commit": "7d63518026eb17266cfb816d4af22189be859374",
-    "source_fingerprint_sha256": "30dd7f4aba6c4f453a7b697c699199ccff1ed8ec55d4dc3d086c885ee8aba7f8",
-    "hosted_ci": "Run 38492400249 passed exact-source serial suite; local suite 160/160. Native run 38492400259 and metadata run 38492400278 passed for checkpoint 7d63518.",
-    "native_app": "Single canonical app at /private/tmp/NeTelegram-Dev.app; app source 2d8a4e5; arm64; ad-hoc signature valid; CUA accountless entry screen confirmed; no credentials.",
-    "app_executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
-    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "release_status": "development only; unsigned for distribution and no release assets"
-  },
   "latest_source_audit": {
     "date": "2026-10-14",
     "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
@@ -571,7 +559,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "After network DNS recovers, push commit 306f2c8 once and inspect its single exact-SHA macOS suite run. Do not repeat isolated probes or retry unchanged source. Then, once the canonical Dev.app process has exited, rebuild only /private/tmp/NeTelegram-Dev.app from source 9f4d3ca and perform one named account-startup UI smoke. Real login, 20 authorized runtimes, Developer ID/notarization and compatibility gates remain open.",
+  "next_action": "After NeTelegram Dev exits through its normal Quit action, rebuild only /private/tmp/NeTelegram-Dev.app from source 7fd0030 and run one native launch/reopen smoke. Do not create another app bundle. Real login and authorized 20-account testing remain pending; Developer ID/notarization and compatibility gates remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -609,13 +597,13 @@
     "dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "source_fingerprint_sha256": "30dd7f4aba6c4f453a7b697c699199ccff1ed8ec55d4dc3d086c885ee8aba7f8",
-      "executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
+      "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "source_fingerprint_sha256": "6fcd6855fc47f2d7f34b9ae8e8a03af539f3ac6a6f0f85ee95f434c36a6713bb",
+      "executable_sha256": "bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA confirmed exact title NeTelegram · dev e7cc4b3 and accountless login. No credentials or profiles."
+      "smoke": "CUA confirmed NeTelegram · dev 4dcddcc accountless login; no credentials entered. This is the currently running canonical bundle, not the latest app source."
     },
     "date": "2026-10-14",
     "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
@@ -629,20 +617,34 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP01 account startup task registry",
-    "source_commit": "9f4d3cabf6c4ca84489613fbc350fa65baa2130a",
-    "local_focused_tests": "PASS 167/167 exact-source local serial Swift suite in 0.442s on arm64e / Xcode 27 / Swift 6.4; focused profileStartupRegistryIsolatesStallsFailuresAndRetries passed 1/1.",
-    "hosted_serial_suite": "GitHub Actions run 38512034207 for exact source 9f4d3cabf6c4ca84489613fbc350fa65baa2130a: all three isolated probes passed; full suite timed out at 2 minutes. Recorded as failure/timeout, not PASS.",
-    "native_bundle_workflow": "Not run. The canonical /private/tmp/NeTelegram-Dev.app remains at source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d and was reported running; no replacement bundle or second app identity was launched.",
-    "implementation": "Moved per-account startup task deduplication, generation-safe completion, cancellation and starting-account tracking into AccountStartupTaskRegistry, used by AppDelegate. Added a regression where one profile stalls, another fails and retries, and the stalled completion cannot clear the newer registration.",
-    "remaining": "Synthetic orchestration only. No fresh Dev.app smoke, real login, 20 authorized runtimes or resource measurements. Hosted full-suite timeout remains unresolved pending the simplified workflow run."
+    "id": "APP16 final TDLib update shutdown drain",
+    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "local_focused_tests": "The final TDLib receive update now remains readable until the receive worker exits. Local repeated run passed 20/20 for `twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates` and 20/20 for `updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput`.",
+    "hosted_serial_suite": "GitHub Actions run 38514102824 passed 167/167 on exact source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b; the former hang regression passed. The preceding 8-minute timeout at commit 5ea93a0 is explained by the reproduced final-append/EOF race and is not reused as current evidence.",
+    "native_bundle_workflow": "Not run. The single canonical /private/tmp/NeTelegram-Dev.app remains at source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d and CUA still reports NeTelegram Dev running. No replacement bundle or second app identity was created.",
+    "implementation": "Separated queue admission closure from producer EOF. TDLibGateway now marks producer completion on receive-worker exit; the reducer waits for that signal before treating an empty closed queue as end-of-stream, so an already-returned TDLib event cannot strand the shutdown drain.",
+    "remaining": "Synthetic shutdown regression and full synthetic suite pass. No new Dev.app smoke, real login, 20 authorized accounts, resource measurements, Developer ID/notarization or release compatibility gates."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
-    "workflow_commit": "306f2c8",
-    "change": "Removed three separate preflight swift test processes. CI now runs one serial full suite, with an 8-minute step / 10-minute job bound.",
-    "reason": "On exact source 9f4d3ca all three probes passed, then the full run still hit its 2-minute timeout. Repeated runner startup did not diagnose or prevent the failure.",
-    "local_validation": "Ruby YAML parse, single-test-process assertion, and git diff --check passed. Metadata validation pending after checkpoint update.",
-    "publication": "Local commit created; git push failed because github.com DNS could not resolve. No credential change or retry."
+    "workflow_commit": "306f2c86cf35db3bbf1fa27f99cc4c5923e34db2",
+    "change": "CI runs one bounded full serial Swift test process; three redundant preflight invocations were removed.",
+    "reason": "On commit 5ea93a0 the single run isolated a deterministic hang at the final receive update. Job logs showed the full suite passed all earlier tests; focused stress then reproduced a close-vs-final-append EOF race.",
+    "local_validation": "Exact-source targeted stress passed both relevant tests 20/20; workflow YAML and checkpoint validation passed.",
+    "hosted_validation": "PASS: run 38514102824 for source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b, 167/167 tests. Full serial execution completed in 0.860s after the warm cache.",
+    "status": "The simplified single-run harness is green after the concrete shutdown race fix."
+  },
+  "historical_local_candidate_e7cc": {
+    "date": "2026-10-14",
+    "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "checkpoint_commit": "7d63518026eb17266cfb816d4af22189be859374",
+    "source_fingerprint_sha256": "30dd7f4aba6c4f453a7b697c699199ccff1ed8ec55d4dc3d086c885ee8aba7f8",
+    "hosted_ci": "Run 38492400249 passed exact-source serial suite; local suite 160/160. Native run 38492400259 and metadata run 38492400278 passed for checkpoint 7d63518.",
+    "native_app": "Single canonical app at /private/tmp/NeTelegram-Dev.app; app source 2d8a4e5; arm64; ad-hoc signature valid; CUA accountless entry screen confirmed; no credentials.",
+    "app_executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "release_status": "development only; unsigned for distribution and no release assets",
+    "superseded_by": "current_local_candidate app source 4dcddcc"
   }
 }
