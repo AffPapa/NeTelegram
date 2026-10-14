@@ -1,15 +1,15 @@
 {
   "schema_version": 2,
-  "status": "Implementation continues; APP07 transient push state fix passed local 164/164 and 1 focused test; exact-source hosted suite cancelled before test-run startup. Site v171 public with factual milestone. Real login, 20 runtime and signed distribution remain open.",
+  "status": "Implementation continues; APP07 transient push state fix passed local 164/164 and 1 focused test. Latest hosted run passed the runner probe and built tests, then timed out after 2 minutes without test output; no current-source hosted suite PASS. Prior hosted 164/164 was before two added assertions. Site v171 public with factual milestone. Real login, 20 runtime and signed distribution remain open.",
   "current_evidence": {
     "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
     "local_suite": "PASS 164/164 exact-source serial Swift tests on Xcode 27 / Swift 6.4 / arm64e in 0.459s; focused transient-push regression PASS 1/1.",
     "focused_test": "tdlibNotificationUpdateDoesNotInventRouteForPartialPushOrWrongUpdateKind passed 1/1.",
     "hosted_ci": {
       "run_id": 38505482508,
-      "status": "cancelled_no_test_run_started",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38505482508",
-      "scope": "Exact-source app commit aab6a4a; fast runner probe passed, full test invocation emitted no Test run started and was cancelled after 4m24. No hosted full-suite PASS."
+      "status": "timed_out_after_build_without_test_output",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38506939379",
+      "scope": "Workflow-only commit 9cf35eb for exact app source aab6a4a: filtered runner probe passed; full suite built in 0.38s, then emitted no test output and hit the new 2-minute step timeout. No current-source hosted full-suite PASS. The previous hosted run 38504170791 passed 164/164 at parent test source 67341bab, before two added assertions; current app source passes locally 164/164."
     },
     "native_build": {
       "status": "success_local",
@@ -119,7 +119,7 @@
       "method": "native notifications",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "At app-source commit dd11b9f38978870bf80509c239070d2570c7d8d4, updateActiveNotifications snapshots now re-enqueue current routeable items as silent reconciliation after replacing per-account route state; the existing privacy barrier and stale-target checks still gate publication. Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Real Notification Center permission, restore, account click routing, and 20 real accounts remain unverified; status stays partial. At app-source aab6a4a, live updateNotification and active snapshot reconciliation both preserve an existing routed notification while TDLib temporarily reports notificationTypeNewPushMessage; the route is not guessed and is replaced when full NewMessage arrives. Focused local regression passed 1/1 and the exact-source local serial suite passed 164/164 on Xcode 27 / Swift 6.4. Hosted run 38505482508 passed its probe but was cancelled after 4m24 with no Test run started event; no hosted PASS. Real Notification Center, TDLib transition and 20 real accounts remain unverified; APP07 stays partial."
+      "evidence": "At app-source commit dd11b9f38978870bf80509c239070d2570c7d8d4, updateActiveNotifications snapshots now re-enqueue current routeable items as silent reconciliation after replacing per-account route state; the existing privacy barrier and stale-target checks still gate publication. Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Real Notification Center permission, restore, account click routing, and 20 real accounts remain unverified; status stays partial. At app-source aab6a4a, live updateNotification and active snapshot reconciliation both preserve an existing routed notification while TDLib temporarily reports notificationTypeNewPushMessage; the route is not guessed and is replaced when full NewMessage arrives. Focused local regression passed 1/1 and the exact-source local serial suite passed 164/164 on Xcode 27 / Swift 6.4. Previous hosted run 38504170791 passed 164/164 at parent test source 67341bab before two assertions were added. On workflow-only commit 9cf35eb, the runner probe passed and the full test bundle built in 0.38s, but no test output followed before the bounded two-minute timeout in run 38506939379. No current-source hosted full-suite PASS. Real Notification Center, TDLib transition and 20 real accounts remain unverified; APP07 stays partial."
     },
     {
       "id": "APP08",
@@ -506,7 +506,7 @@
     "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
     "local_command": "swift test --no-parallel",
     "local_result": "PASS: focused transient notification regression 1/1; full serial suite 164/164 in 0.459s; arm64e, Xcode 27 / Swift 6.4.",
-    "hosted_ci": "Run 38505482508 passed the filtered runner probe and compiled, but full test invocation had no Test run started event and was cancelled after 4m24; no hosted full-suite result.",
+    "hosted_ci": "Run 38506939379 on workflow commit 9cf35eb passed the filtered runner probe, built in 0.38s, then hit the 2-minute step timeout without test output. No current-source hosted full-suite result. Parent-source run 38504170791 passed 164/164 before two notification assertions were added; exact current source passes locally 164/164.",
     "native_dev_app_smoke": "One canonical app at exact source aab6a4a built in 5.24s, ad-hoc signature verified, CUA confirmed matching title and accountless sign-in screen. No credentials.",
     "metadata_ci": "Pending: metadata validation will run for the checkpoint commit after push.",
     "scope": "No real login, authorized account, 20-runtime coverage, Developer ID/notarization, Gatekeeper, public app release or binary download."
@@ -558,7 +558,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Diagnose the hosted Xcode 16.4 / Swift 6.1.2 full-suite startup stall from the cancelled run log before another hosted attempt; do not retry unchanged. Then continue production-path startup orchestration coverage with one exact-source CI and one canonical Dev.app rebuild only if Swift/app inputs change. Keep real login deferred; no 20-account or release claims.",
+  "next_action": "Do not rerun the unchanged full suite: run 38506939379 established that Xcode 16.4 / Swift 6.1.2 builds the test bundle in 0.38s, passes the probe, then produces no test output before the two-minute cap; parent source 67341bab passed 164/164 and current aab6a4a passes locally 164/164. Continue one production-path startup slice. On its next Swift source commit, run one focused local regression plus one local serial suite; make the hosted probe target that changed regression, then allow one bounded full hosted run. Rebuild the single canonical Dev.app only when app inputs change. Keep real login deferred; no 20-account or release claims.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",

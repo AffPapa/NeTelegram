@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "phase": "Notification transition fix verified locally and in one canonical Dev.app; Site v171 published. Exact-source hosted suite runner probe passed but full-suite runner produced no start event and was cancelled; hosted PASS is unavailable. Real accounts, 20-runtime coverage and distribution gates remain open.",
+  "phase": "Notification transition fix verified locally and in one canonical Dev.app; Site v171 published. CI now bounds the full-suite step at two minutes; latest runner probe passed and test bundle built, but test execution emitted no output before timeout. Current-source hosted PASS is unavailable. Real accounts, 20-runtime coverage and distribution gates remain open.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
-    "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
-    "local_validation": "Ruby YAML parse, JSON parse, and git diff --check passed. No Swift source changed, so no local Swift suite or Dev.app rebuild was run.",
-    "hosted_validation": "PASS: cold-cache run 38481765351 passed filtered probe 1/1 and full suite 157/157, compiled in 48.43s, and saved a 51 MB cache. Warm-cache run 38481987804 restored that cache, passed probe 1/1 and suite 157/157, compiled in 17.50s, completed in 42s overall, and saved the next checkpoint key. In these comparable runs the compile step fell about 64%; future cache hits are not guaranteed.",
+    "change": "Use a SwiftPM cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json. Keep the filtered runner probe, and cap the serial full-suite step at two minutes so a silent test-runner hang fails without waiting for the five-minute job timeout.",
+    "local_validation": "Ruby YAML parse, checkpoint validation, JSON parse, and git diff --check passed. Workflow-only change; no local Swift suite or Dev.app rebuild was run.",
+    "hosted_validation": "Run 38506939379 on workflow commit 9cf35eb: runner probe passed; full test bundle built in 0.38s; no test output followed before the two-minute step timeout. The cap bounds the stall but does not fix it. Prior exact-hosted suite run 38504170791 passed 164/164 on parent test source 67341bab; current aab6a4a source passes locally 164/164. No hosted PASS is claimed for current source.",
     "prior_baseline": "Hosted run 38478591456: test binary build 31.65s, then no test output for 272s before cancellation; no test-level root cause or hosted PASS."
   },
   "product": {
@@ -51,10 +51,10 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38504598500,
+      "run_id": 38506808954,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38504598500",
-      "workflow_commit": "6b9fc7b716de62044bcb6b56e088d885dbe7a37c",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38506808954",
+      "workflow_commit": "d089ecd22e282d48357463a44a97bcd4998eeb07",
       "scope": "Checkpoint JSON, resume pointers, and the complete 15-test release metadata suite passed."
     },
     "last_native_bundle_smoke": {
@@ -212,7 +212,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Diagnose the hosted Xcode 16.4 / Swift 6.1.2 full-suite startup stall from the cancelled run log before another hosted attempt; do not retry unchanged. Then continue production-path startup orchestration coverage with one exact-source CI and one canonical Dev.app rebuild only if Swift/app inputs change. Keep real login deferred; no 20-account or release claims.",
+  "next_action": "Do not rerun the unchanged full suite: run 38506939379 established that Xcode 16.4 / Swift 6.1.2 builds the test bundle in 0.38s, passes the probe, then produces no test output before the two-minute cap; parent source 67341bab passed 164/164 and current aab6a4a passes locally 164/164. Continue one production-path startup slice. On its next Swift source commit, run one focused local regression plus one local serial suite; make the hosted probe target that changed regression, then allow one bounded full hosted run. Rebuild the single canonical Dev.app only when app inputs change. Keep real login deferred; no 20-account or release claims.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
