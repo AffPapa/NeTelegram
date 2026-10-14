@@ -407,11 +407,11 @@
   "latest_site_source_commit": "664f3efdb8cd49952341fb0bdca03aaffdb1ba71",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38545074877,
+    "run_id": 38586812417,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38545074877",
-    "workflow_commit": "836daa3b9f413ed1253339f3a796b293cf027173",
-    "scope": "Latest completed metadata validation for checkpoint 836daa3 before the current CORE-RUNTIME-02 metadata update; current app source is independently validated by exact-source CI."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38586812417",
+    "workflow_commit": "8b61d62c7c4b32d876b98e2ecef5dc6fcb2d461f",
+    "scope": "Metadata validation passed for the AUTH03 checkpoint: source/Dev.app/Site pointers agreed and checkpoint JSON validated. App code unchanged; exact-source app CI is run 38586251707."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -685,11 +685,11 @@
     "public_site": "PASS: public Site v178 deployment appgdep_6acf1c9813788191b4e17f6f6ae951d6; anonymous Playwright confirmed devlog and no-download gate."
   },
   "latest_checkpoint_metadata": {
-    "run_id": 38545074877,
+    "run_id": 38586812417,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38545074877",
-    "workflow_commit": "836daa3b9f413ed1253339f3a796b293cf027173",
-    "scope": "Latest completed metadata validation for checkpoint 836daa3 before the current CORE-RUNTIME-02 metadata update; current app source is independently validated by exact-source CI."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38586812417",
+    "workflow_commit": "8b61d62c7c4b32d876b98e2ecef5dc6fcb2d461f",
+    "scope": "Metadata validation passed for the AUTH03 checkpoint: source/Dev.app/Site pointers agreed and checkpoint JSON validated. App code unchanged; exact-source app CI is run 38586251707."
   },
   "latest_release_preflight": {
     "date": "2026-10-14",

@@ -1516,3 +1516,5 @@
 - CUA reviewed compact dark phone and registration preview. Terms wrap inside the available width; name, optional surname, consent and Continue remain reachable through the form/keyboard. This is a local preview, not an authenticated Telegram session. No phone, code, QR scan, password or account was used.
 - Exact-source GitHub macOS Swift test job passed: [run 38586251707](https://github.com/AffPapa/NeTelegram/actions/runs/38586251707). No duplicate local full-suite rerun. AUTH03 remains partial pending actual auth steps, accessibility/IME/RTL and real user validation.
 - Reconciled `PROJECT-STATE.json` and `ACCEPTANCE.json` to source `3f98f85`; checkpoint validator, JSON parsing and `git diff --check` passed. Site remains the same public v194 with no download. Next code/design work must use one pinned source and this single Dev.app; do not rebuild until app source changes.
+
+- Metadata validation for checkpoint commit `8b61d62c7c4b32d876b98e2ecef5dc6fcb2d461f` passed in GitHub run [38586812417](https://github.com/AffPapa/NeTelegram/actions/runs/38586812417); app source and Dev.app were not rebuilt.
