@@ -7418,8 +7418,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func controlTextDidChange(_ notification: Notification) {
-        if let editor = notification.object as? NSText,
-           editor === countryPicker.currentEditor() {
+        // AppKit can post the text-change notification for either the control
+        // or its field editor. Handle both identities: the combo box's own
+        // editor is transient, so relying only on currentEditor() can miss a
+        // keystroke while its popup is being rebuilt.
+        if let changedObject = notification.object as AnyObject?,
+           changedObject === countryPicker || changedObject === countryPicker.currentEditor() {
             searchCountries()
             return
         }
