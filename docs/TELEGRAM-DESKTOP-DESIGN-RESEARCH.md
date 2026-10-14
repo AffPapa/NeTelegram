@@ -1,65 +1,84 @@
 # Telegram Desktop UI research for NeTelegram
 
 Research snapshot: 2026-10-14. The upstream `dev` branch resolved to commit
-`fad667c6d71c5e965a9da71e48dc1ab82ba0568d`. The links below pin that commit.
-This is a source-structure review, not a pixel comparison or a claim of visual
-parity. Telegram Desktop is a large Qt application; NeTelegram remains a
-native AppKit client and does not copy its implementation or feature surface.
+`d77f486228a98e15d6695514d5f2b28ce1c6a872`. This matches the project
+checkpoint. Source files were fetched through the GitHub connector at this
+exact commit; links below are pinned and do not follow a moving branch. This is
+a source-structure review, not pixel parity. NeTelegram remains a native
+AppKit client and does not copy Telegram Desktop's implementation or feature
+surface.
 
 ## Useful interaction structure
 
-- **Conversation list:** Each row communicates identity and recency through a
-  compact avatar, title, one-line preview, timestamp, and unread state. Keep
-  selection distinct, keyboard reachable, and accessible without relying on
-  color alone. See [`dialogs_row.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/dialogs/dialogs_row.cpp)
-  and [`dialogs_inner_widget_accessibility.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/dialogs/dialogs_inner_widget_accessibility.cpp).
-- **Conversation header:** Keep chat identity, useful presence/context, and
-  supported actions together. NeTelegram needs the chat name, status and typed
-  forum topic; it does not need Telegram Desktop's many product-specific
-  controls. See [`history_view_top_bar_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp).
-- **Message history:** Present a chronological stream where message bodies,
-  dates/service events, replies and unsupported media read as different kinds
-  of content. Keep unsupported content visible with a clear explanation. See
-  [`history_view_element.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/history/view/history_view_element.cpp)
-  and [`history.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/history/history.cpp).
-- **Composer:** Keep the text field anchored at the bottom, with reply/draft
-  context attached and photo attachment separate. Exclude voice, sticker,
-  animation and emoji-picker controls per NeTelegram's product scope. See
-  [`history_view_compose_controls.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/history/view/controls/history_view_compose_controls.cpp)
-  and [`message_field.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/chat_helpers/message_field.cpp).
-- **Accessibility and shortcuts:** Give the chat list, message entries,
-  composer and primary actions names and predictable keyboard focus. Adopt a
-  small macOS Command-key shortcut set rather than copying desktop shortcuts
-  verbatim. See the accessibility file above and
-  [`shortcuts.cpp`](https://github.com/telegramdesktop/tdesktop/blob/fad667c6d71c5e965a9da71e48dc1ab82ba0568d/Telegram/SourceFiles/core/shortcuts.cpp).
+- **Workspace:** Telegram Desktop separates main navigation, dialogs and the
+  active history, adapting composition to available width. For NeTelegram on
+  macOS, retain the simpler two-pane split: one searchable dialog list and one
+  active conversation. Do not imitate its full three-column/power-user shell.
+  See [`mainwidget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/mainwidget.cpp)
+  and [`dialogs_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/dialogs/dialogs_widget.cpp).
+- **Conversation list:** Treat a row as a compact scan unit: identity, latest
+  message, recency, unread/mute state. Selection should remain visually,
+  keyboard and VoiceOver distinct. Transfer only states backed by NeTelegram's
+  own data model. See [`dialogs_row.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/dialogs/dialogs_row.cpp)
+  and [`dialogs_inner_widget_accessibility.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/dialogs/dialogs_inner_widget_accessibility.cpp).
+- **Conversation header:** Keep chat identity, relevant status/context and the
+  typed forum topic together. Include only actions that NeTelegram actually
+  implements. See [`history_view_top_bar_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/history/view/history_view_top_bar_widget.cpp).
+- **Message history:** Keep chronological order and distinguish message
+  bodies, service events, replies and unsupported content. Telegram Desktop's
+  history tracks the visible range and unloads off-screen user pictures; this
+  supports NeTelegram's bounded image work and visible-chat policy. See
+  [`history_view_list_widget.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/history/view/history_view_list_widget.cpp)
+  and [`history_view_element.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/history/view/history_view_element.cpp).
+- **Composer:** Keep text entry anchored beneath history. Attach reply/edit
+  context to the field in a separate, dismissible header; keep photo selection
+  separate. NeTelegram excludes voice, sticker, animation and emoji-picker
+  controls. See [`history_view_compose_controls.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/history/view/controls/history_view_compose_controls.cpp)
+  and [`message_field.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/chat_helpers/message_field.cpp).
+- **Accessibility:** Give list rows, messages, composer and primary actions
+  names and predictable focus. Use a small macOS Command-key shortcut set
+  rather than copying desktop shortcuts verbatim. See the accessibility file
+  above and [`shortcuts.cpp`](https://github.com/telegramdesktop/tdesktop/blob/d77f486228a98e15d6695514d5f2b28ce1c6a872/Telegram/SourceFiles/core/shortcuts.cpp).
 
 ## NeTelegram design direction
 
-Use a restrained two-pane macOS workspace: a dense, readable conversation
-list; a flexible history pane; a compact header; and a persistent composer.
-Retain AppKit typography, focus rings, menus, system appearance and window
-behavior. Use semantic colors and selection shapes that remain distinct in
-light/dark mode and at accessibility contrast settings. Favor actual TDLib
-identity/avatar metadata when available; never fabricate profile identities
-from chat IDs. Message alignment and emphasis derive from TDLib's
-`is_outgoing` flag, while account, chat and topic routing remains untouched.
+Use a restrained AppKit workspace: a readable conversation list, flexible
+history, compact chat/topic header and persistent composer. Keep macOS
+typography, focus rings, menus, system appearance and window behavior. Rows
+should answer “which chat, what happened last, when, and is anything unread?”
+Use actual TDLib identity/avatar data where available; a fallback must read as
+a placeholder, never as a discovered profile. Use semantic selection that
+works in light/dark appearance and accessibility contrast settings. Message
+direction derives from TDLib `is_outgoing`; account/chat/topic routing remains
+independent of the selected interface.
 
-Keep the interface small and direct. Do not add calls, voice chats, recording,
-general video playback, animated GIFs, stickers, emoji/reaction composers,
-Stories, Mini Apps, AI, payments or controls whose actions are not implemented.
+Distinguish initial loading, an actually empty list, empty search results and
+errors. Do not fill any state with sample profiles or invented conversations.
+Only add empty/loading/error states alongside the real account data and request
+state needed to make their wording truthful.
+
+Telegram Desktop is GPL-3.0-or-later. This review transfers information
+hierarchy and state ownership only. Do not copy its source, artwork, icons,
+branding or licensed implementation into NeTelegram's MIT codebase. Do not
+bring in calls, voice chats, recording, general video playback, animated GIFs,
+stickers, emoji/reaction composers, Stories, Mini Apps, AI, payments or
+controls whose actions are not implemented.
 
 ## Current implementation evidence and limits
 
-At app source `15002caccc16953cd3fd093ab9fb7ddca205ca1e`, ordinary text messages
-are being changed from generic sender-prefixed transcript lines to aligned,
-rounded incoming/outgoing message surfaces. A targeted build and text-entity
-tests passed locally; exact-source macOS CI run
-[`38583887319`](https://github.com/AffPapa/NeTelegram/actions/runs/38583887319)
-passed for this source commit. Native real-account rendering, VoiceOver, RTL, IME,
-photo-bearing bubbles and visual review with real chat data remain unverified.
+At app source `15002caccc16953cd3fd093ab9fb7ddca205ca1e`, ordinary text
+messages changed from generic sender-prefixed transcript lines to aligned,
+rounded incoming/outgoing surfaces. The focused unsafe-link and UTF-16 entity
+checks passed; exact-source macOS CI
+[`38584832394`](https://github.com/AffPapa/NeTelegram/actions/runs/38584832394)
+passed for final source `1408ab5`. This is implementation evidence, not live
+visual parity.
 
-The accountless chat-shell preview currently renders an empty shell. It is not
-used as proof of message appearance, and no synthetic account or profile is
-created to fill it. The next visual acceptance requires user-operated login
-and review of actual authorized chat data, or a separate explicit fixture
-renderer that is visibly labeled as demonstration data.
+At current app source `352a293ccb93d7f74799d1852ca98065e32193ab`, the AppKit
+shell still has the researched two-pane hierarchy, separate header/history/
+composer, search, selected chat and visible unsupported content. The canonical
+Dev.app is open on its accountless first-run screen. There are no fabricated
+profile rows. Conversation rows, message surfaces and avatar behavior have not
+been visually accepted with real account data; VoiceOver, IME, RTL and
+photo-bearing conversations also remain unverified. The next visual acceptance
+is owner-operated login followed by review of that same account's actual chats.

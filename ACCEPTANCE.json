@@ -557,7 +557,7 @@
       "required_for": "all releases",
       "status": "partial",
       "source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
-      "evidence": "Telegram Desktop source pinned at fad667c6d71c5e965a9da71e48dc1ab82ba0568d and adapted in docs/TELEGRAM-DESKTOP-DESIGN-RESEARCH.md. Parent source 15002cac passed two focused text/entity tests; final 1408ab5 exact-source macOS CI run 38584832394 succeeded. Canonical Dev.app 1408ab50 built and accountless login AX confirmed. No authenticated conversation was available; incoming/outgoing bubble appearance remains visually unverified against real TDLib messages."
+      "evidence": "Telegram Desktop source pinned at d77f486228a98e15d6695514d5f2b28ce1c6a872 and adapted in docs/TELEGRAM-DESKTOP-DESIGN-RESEARCH.md. Parent source 15002cac passed two focused text/entity tests; final 1408ab5 exact-source macOS CI run 38584832394 succeeded. Current canonical Dev.app source 352a293c is accountless; no authenticated conversation is available, so incoming/outgoing bubble appearance remains visually unverified against real TDLib messages."
     },
     {
       "id": "UX01",
