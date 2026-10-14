@@ -140,7 +140,7 @@
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
-    "current_head_native_smoke": "Exact app source 4dcddcc: canonical arm64 Dev.app built once in 5.29s; ad-hoc codesign verification passed. CUA confirmed exact source title and accountless login UI. No credentials or profiles.",
+    "historical_native_smoke_4dcddcc": "Exact app source 4dcddcc: canonical arm64 Dev.app built once in 5.29s; ad-hoc codesign verification passed. CUA confirmed exact source title and accountless login UI. No credentials or profiles.",
     "publication": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
@@ -158,13 +158,13 @@
       "app_source_commit": "7683cc6bace702b3376a08a9a2aaf4aaf881a691",
       "scope": "Exact-source macOS CI passed the complete serial Swift suite."
     },
-    "current_head_native_build": {
+    "historical_native_build_870b894": {
       "status": "success_local",
       "workflow_commit": "870b8946eb6441955e035084f099dcacef04a99b",
       "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
       "scope": "Canonical arm64 Dev.app rebuilt in place in 26.58s; BuildInfo/source fingerprint match; codesign strict verification passed; same-PID last-window close, LaunchServices reopen, and normal quit smoke passed."
     },
-    "latest_local_appkit_build": {
+    "historical_local_appkit_build_e7cc4b3": {
       "result": "Built exact source e7cc4b3 in 5.29s; codesign --verify --deep --strict passed.",
       "toolchain": "Apple Swift 6.4; arm64; macOS 14 baseline",
       "bundle_id": "org.affpapa.netelegram.dev",
@@ -176,7 +176,7 @@
       "native_gui_smoke": "CUA confirmed exact source title and accountless sign-in; no credentials."
     },
     "telegram_api_compatibility": "Official Telegram API Terms rechecked 2026-10-14: §1.3 requires all basic features of the main Telegram apps to work correctly but supplies no exhaustive checklist here; §1.4 prohibits interference with basic behavior. This broad requirement remains an open compatibility review, not a PASS. §2.3 says the app title must not include “Telegram” unless preceded by “Unofficial”; user instructions require the product name NeTelegram, so public naming remains an explicit conflict and must not be silently changed. §3.3 requires sponsored messages for channel access; the official sponsored-messages API also requires a fullscreen video playback path with timed sponsored overlays when viewing channel videos. User declined a player, so channel access and stable release remain deferred. Primary sources: https://core.telegram.org/api/terms and https://core.telegram.org/api/sponsored-messages.",
-    "last_native_bundle_smoke": {
+    "historical_native_bundle_smoke_870b894": {
       "status": "success_local",
       "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
@@ -208,7 +208,7 @@
       "workflow_commit": "2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b",
       "scope": "Metadata validation passed for exact checkpoint commit 2ff390a, including checkpoint consistency and release metadata tests."
     },
-    "latest_native_bundle": {
+    "historical_hosted_native_bundle_1de5720": {
       "result": "PASS",
       "run_id": 38477106487,
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38477106487",
@@ -217,7 +217,7 @@
       "scope": "Pinned TDLib arm64 Dev.app build and automated accountless window close/reopen/quit smoke."
     },
     "site_public_v167": "Anonymous in-app browser rendered the public /devlog/ route. Accessibility tree shows the 752f684 entry, three exact-SHA CI links, and remaining limits. Deployment metadata confirms public audience; /downloads/ remains no-release.",
-    "latest_native_build": {
+    "historical_hosted_native_build_7fd0030": {
       "run_id": 38515770287,
       "status": "success",
       "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38515770287",
@@ -279,7 +279,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "The canonical NeTelegram Dev.app remains running on app-source 87c0c06560ac0986f7e004d6578b1e3b034c9244 (last elevated process check PID 79726). Wait for the user to exit its secure API-hash dialog and quit normally; prove absence, then rebuild that same bundle from app-source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 and run the current-source accountless lifecycle smoke. Do not open another bundle, inspect secrets, or claim real search/login until the user completes the auth flow.",
+  "next_action": "First publish the one local checkpoint/tooling commit after GitHub Git transport or an authorized write route is available, then read its exact metadata CI result; do not repeat the local checks. Independently, after the user exits the auth dialog and quits the single canonical NeTelegram Dev.app normally, prove process absence, rebuild that same bundle once from app-source 7683cc6bace702b3376a08a9a2aaf4aaf881a691, and run one current-source accountless lifecycle smoke. Do not open another bundle or inspect auth secrets; real account login/search remains unverified until the user completes the standard auth flow.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -553,8 +553,7 @@
     "app_source_changed": false,
     "native_app_rebuilt": false,
     "public_site_updated": false,
-    "auth_blocker": "gh auth status reports configured mrdumay-source and AffPapa tokens invalid. GitHub connector reports repository push permission, but Git Data API create-blob and Contents API create-file both returned HTTP 403 Resource not accessible by integration; no remote file was written.",
-    "next_action": "Restore working HTTPS GitHub CLI auth or grant the connected GitHub integration repository contents write access; then push the exact prepared local diff and confirm metadata CI. Do not retry unchanged connector permissions.",
+    "auth_blocker": "Fresh checks: cached gh sessions are invalid; Git transport cannot resolve github.com; the connected GitHub API can read the repository but Git blob creation returned 403 Resource not accessible by integration. No remote ref changed.",
     "site_updated": false
   },
   "latest_native_ui_review": {
@@ -598,7 +597,6 @@
     "base_commit": "4459cd817ffd4499cfc6e429e78ad6fa64bf55c1",
     "site": "existing public Site v175; not updated for this local-only milestone",
     "publication_blocker": "gh auth status still reports both configured accounts invalid; GitHub connector Git Data and Contents writes returned 403 in the prior check. No new attempt made without auth change.",
-    "next_action": "Restore authorized GitHub write credentials; then push one checkpoint commit, verify hosted metadata CI, mirror the factual milestone into the existing Site devlog, and deploy the saved Site version.",
     "generated_notice": {
       "path": "/private/tmp/NeTelegram-THIRD-PARTY-NOTICES.txt",
       "bytes": 27015,
@@ -637,7 +635,6 @@
     "toolchain": "/Applications/Xcode-beta.app/Contents/Developer; notarytool 1.1.3 (42); Gatekeeper assessments enabled.",
     "developer_id": "security find-identity -v -p codesigning reported 4 valid identities, including 2 Developer ID Application entries for team H6VGU2M6JD. This proves local signing identities are available; no release binary was signed.",
     "notary_credentials": "Keychain lookup for service com.apple.gke.notary.tool returned absent or inaccessible. No profile name or credential value was read; no submission was attempted.",
-    "release_status": "No signed/notarized app release. The canonical Dev.app remains running as PID 79726 on source 87c0c06560ac0986f7e004d6578b1e3b034c9244; current source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 awaits normal exit before in-place rebuild.",
-    "next_action": "After normal quit and positive process absence, rebuild only the canonical Dev.app. Separately configure a supported notarytool Keychain profile before any Developer ID distribution candidate is submitted."
+    "release_status": "No signed/notarized app release. The canonical Dev.app remains running as PID 79726 on source 87c0c06560ac0986f7e004d6578b1e3b034c9244; current source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 awaits normal exit before in-place rebuild."
   }
 }

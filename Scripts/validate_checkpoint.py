@@ -22,6 +22,14 @@ def require(condition: bool, message: str) -> None:
         raise ValueError(message)
 
 
+def has_nested_key(value: object, key: str) -> bool:
+    if isinstance(value, dict):
+        return key in value or any(has_nested_key(child, key) for child in value.values())
+    if isinstance(value, list):
+        return any(has_nested_key(child, key) for child in value)
+    return False
+
+
 def validate_records(project: dict, acceptance: dict) -> None:
     evidence = acceptance["current_evidence"]
     app_sha = evidence["app_source_commit"]
@@ -52,6 +60,19 @@ def validate_records(project: dict, acceptance: dict) -> None:
     nested_acceptance_site = evidence.get("latest_site_deployment")
     acceptance_slice = acceptance["latest_acceptance_slice"]
     checks = [
+        (not any(has_nested_key(value, "next_action") for key, value in project.items() if key != "next_action"),
+         "PROJECT-STATE has nested next_action fields; keep one canonical root action"),
+        (not any(has_nested_key(value, "next_action") for key, value in acceptance.items() if key != "next_action"),
+         "ACCEPTANCE has nested next_action fields; keep one canonical root action"),
+        (not ({
+            "current_head_native_smoke",
+            "current_head_native_build",
+            "latest_local_appkit_build",
+            "last_native_bundle_smoke",
+            "latest_native_bundle",
+            "latest_native_build",
+        } & set(project.get("verification", {}))),
+         "PROJECT-STATE.verification contains ambiguous current/latest native build pointers; keep only local_development_candidate current and label older receipts historical"),
         (acceptance["status"].startswith(acceptance_slice["id"]),
          "ACCEPTANCE.status is stale; it must identify latest_acceptance_slice"),
         (acceptance_slice["source_commit"] == app_sha,

@@ -78,6 +78,29 @@ class ValidateCheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate exact-source CI checkpoint differs"):
             validate_records(project, acceptance)
 
+    def test_ambiguous_old_native_build_pointers_are_rejected(self):
+        project = copy.deepcopy(self.project)
+        project["verification"]["latest_native_build"] = {
+            "app_source_commit": "old-source"
+        }
+
+        with self.assertRaisesRegex(ValueError, "ambiguous current/latest native build pointers"):
+            validate_records(project, self.acceptance)
+
+    def test_project_checkpoint_has_one_canonical_next_action(self):
+        project = copy.deepcopy(self.project)
+        project["latest_release_preflight"]["next_action"] = "Stale action"
+
+        with self.assertRaisesRegex(ValueError, "PROJECT-STATE has nested next_action"):
+            validate_records(project, self.acceptance)
+
+    def test_acceptance_checkpoint_has_one_canonical_next_action(self):
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["latest_acceptance_slice"]["next_action"] = "Stale action"
+
+        with self.assertRaisesRegex(ValueError, "ACCEPTANCE has nested next_action"):
+            validate_records(self.project, acceptance)
+
     def test_exact_source_timeout_can_be_checkpointed_without_calling_it_a_pass(self):
         project = copy.deepcopy(self.project)
         acceptance = copy.deepcopy(self.acceptance)

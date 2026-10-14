@@ -1118,3 +1118,17 @@
 - Reconciled the duplicated `source.latest_exact_commit_ci` pointer with current APP26 exact-source evidence, Site receipts across both checkpoint files with v186, and added a validator guard plus regression test so the stale duplicate fails validation instead of misleading the next resume.
 - Targeted checkpoint tests passed 7/7; `Scripts/validate_checkpoint.py` and `git diff --check` passed. No Swift suite, TDLib build, Dev.app rebuild, or app CI rerun was needed because app-source inputs did not change.
 - Next: after the one running stale Dev.app exits normally and absence is positively checked, rebuild that same bundle from `7683cc6` and run the narrowly scoped native lifecycle/search smoke. Real login remains deferred; no credentials were entered. Site v186 and current source checkpoints are separate identities.
+
+
+## 2026-10-14 — Remove ambiguous native build pointers from resume checkpoint
+
+- The single current Dev.app pointer remains `local_development_candidate`; six duplicated `verification` entries referred to older builds while their keys implied `current`, `latest`, or `last`. Renamed those receipts with explicit `historical_*` keys. Their detailed evidence remains in this append-only run log.
+- `Scripts/validate_checkpoint.py` now rejects those ambiguous key names, with a focused regression test, so an old bundle cannot silently look current during resume. No source, app bundle, release asset, or Site was changed.
+- Targeted checkpoint validation and the Python metadata test are the only required checks for this metadata/tooling slice; no Swift suite, app rebuild, app launch, or Site deployment is needed.
+- Publication attempt: the Git transport failed before authentication because `github.com` DNS resolution failed. The connected GitHub integration could read the repository but returned 403 `Resource not accessible by integration` for Git blob creation. No remote ref changed; local commit remains pending. `gh auth status` reported the cached `mrdumay-source` and `AffPapa` sessions invalid. No new token was created and no browser flow was opened.
+
+## 2026-10-14 — Keep one actionable resume pointer
+
+- Removed superseded nested `next_action` strings from milestone receipts in PROJECT-STATE and ACCEPTANCE. Each file now has one root action, and `Scripts/validate_checkpoint.py` rejects a nested duplicate so resume instructions cannot quietly diverge.
+- Updated the stored GitHub access diagnosis to the observed state: GitHub connector reads work, its blob write is denied, Git transport DNS fails, and cached `gh` sessions are invalid. No credentials were created and no remote ref was changed.
+- Revalidated the current Site independently: public Site v186 and its pages/feeds remain live and factual for APP26; no Site change is needed for this checkpoint-only cleanup.
