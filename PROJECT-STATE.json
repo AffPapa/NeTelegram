@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "Notification transition fix verified locally and in one canonical Dev.app; Site v171 published. CI now bounds the full-suite step at two minutes; latest runner probe passed and test bundle built, but test execution emitted no output before timeout. Current-source hosted PASS is unavailable. Real accounts, 20-runtime coverage and distribution gates remain open.",
+  "phase": "APP02 restore cleanup no longer blocks unrelated profiles: focused synthetic regression and exact-source hosted macOS CI 38508018017 passed 165/165; one canonical Dev.app smoke matches app source e7cc4b3. Existing public Site v172 deployed. Real login, real 20-account coverage, signed/notarized distribution and Telegram compatibility gates remain open.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -13,7 +13,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2"
+    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -21,12 +21,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38505482508,
-      "status": "cancelled_no_test_run_started",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38505482508",
-      "workflow_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-      "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-      "scope": "Exact-source workflow passed filtered runner probe 1/1 and compiled the test bundle, but the full invocation emitted no Test run started event. It was cancelled after 4m24 in the core-suite step. No hosted full-suite PASS."
+      "run_id": 38508018017,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508018017",
+      "workflow_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+      "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+      "scope": "Exact-source macOS CI passed filtered probe 1/1 and complete serial Swift suite 165/165."
     },
     "published_application_releases": [],
     "github_access": {
@@ -51,11 +51,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38506808954,
+      "run_id": 38508018017,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38506808954",
-      "workflow_commit": "d089ecd22e282d48357463a44a97bcd4998eeb07",
-      "scope": "Checkpoint JSON, resume pointers, and the complete 15-test release metadata suite passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508018017",
+      "workflow_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+      "scope": "This run validates app source e7cc4b3 and the complete serial Swift suite 165/165; checkpoint-only metadata validation for this documentation update is pending."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,
@@ -65,7 +65,7 @@
       "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
       "scope": "Pinned TDLib arm64 Dev.app assembly passed; local canonical Dev.app separately launched and country search/select was checked. No Telegram credentials entered."
     },
-    "last_audited_checkpoint_commit": "577d0e2c6a6f48785004447c3d1a91098a136cda",
+    "last_audited_checkpoint_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null
   },
@@ -73,28 +73,28 @@
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
     "version": "0.0.0-dev",
-    "build_info_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "application_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
+    "build_info_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "application_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
     "dirty_source": false,
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "Exact source aab6a4a Dev.app is currently running, opened with the guarded canonical build path; CUA confirms accountless login screen and matching source title. No credentials entered.",
-    "source_fingerprint_sha256": "9821890e9d292e9526fbb3490b21dcbb8bc8044680d1219ce87c68146bd2e559",
-    "app_executable_sha256": "d218bf00ca886ee9fc32b4621221d6fea963dbb0c4bd7576756565deceaf6360",
+    "process_state": "Canonical Dev.app built from exact app source e7cc4b3 and launched; CUA confirmed matching title and accountless login. No credentials entered.",
+    "source_fingerprint_sha256": "30dd7f4aba6c4f453a7b697c699199ccff1ed8ec55d4dc3d086c885ee8aba7f8",
+    "app_executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
     "reuse_validation": "BuildInfo and build record source SHA/fingerprint match; executable and TDJSON hashes recorded; ad-hoc signature verified.",
-    "pending_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "candidate_state": "Built once from exact source aab6a4a in 5.24s; signature verified; CUA confirms the exact source title and clean login view. No login or account data."
+    "pending_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "candidate_state": "Built once from exact source e7cc4b3 in 5.29s; app executable and TDJSON hashes recorded; ad-hoc signature verified; accountless UI smoke passed."
   },
   "verification": {
     "current_head_targeted_tests": {
-      "result": "Focused TDLib transient-push regression passed 1/1. Full local serial Swift suite passed 164/164 in 0.459s on Xcode 27 / Swift 6.4 / arm64e. Hosted exact-source run 38505482508 passed the filtered runner probe but the full runner never emitted Test run started and was cancelled after 4m24; no hosted full-suite result.",
-      "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-      "hosted_run_id": 38505482508,
-      "suite": "Local 164/164 and focused 1/1; hosted full run cancelled before test-run startup. Synthetic only; no real account or 20-account coverage."
+      "result": "Focused synthetic production-path restore cleanup fan-out regression passed 1/1. Full local serial Swift suite passed 165/165; exact-source hosted run 38508018017 passed 165/165. No real Keychain stall or real account was used.",
+      "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+      "hosted_run_id": 38508018017,
+      "suite": "Local 165/165 plus focused regression 1/1; hosted exact-source 165/165; synthetic only."
     },
     "real_telegram_account": "not tested; user deferred login",
     "real_twenty_runtime_coverage": "not tested",
@@ -103,7 +103,7 @@
     "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
-    "current_head_native_smoke": "Exact source aab6a4a: canonical Dev.app built in 5.24s; executable/TDJSON hashes recorded; ad-hoc signature verification passed. CUA title matched source and showed accountless login. No phone, code or account data entered.",
+    "current_head_native_smoke": "Exact source e7cc4b3: one canonical arm64 Dev.app built in 5.29s; codesign --verify --deep --strict passed. CUA title matched e7cc4b3 and showed accountless login. No credentials entered.",
     "publication": "App-source source is pushed to public AffPapa/NeTelegram main. Exact-source hosted macOS CI 38505482508 has no full-suite result; local 164/164 passed. Public NeTelegram Site v171 was saved and deployed; anonymous /devlog and /downloads routes were verified in the in-app browser. No application release/download.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
@@ -128,16 +128,15 @@
       "scope": "Canonical arm64 Dev.app built in 5.24s using pinned TDLib; codesign --verify --deep --strict passed; exact app visible in CUA."
     },
     "latest_local_appkit_build": {
-      "result": "Built exact source 0a7cbe627d253c5cb9751573b014145ee9f630d3 in 5.24s; BuildInfo fingerprint and executable SHA verified; codesign --verify --deep --strict passed.",
+      "result": "Built exact source e7cc4b3 in 5.29s; codesign --verify --deep --strict passed.",
       "toolchain": "Apple Swift 6.4; arm64; macOS 14 baseline",
       "bundle_id": "org.affpapa.netelegram.dev",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "f80ce59a1b8fa6497e1abaa2441dc3c1d10b491e5929606e6290162672a3639b",
-      "executable_sha256": "f5b47d8ab41381bbe045ac0d3c7696a4ac78d7284bb5a7ec83b2d94523220b4d",
+      "app_executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "signing": "ad-hoc development only",
-      "native_gui_smoke": "CUA screenshot verified exact-source accountless sign-in and readable secondary disclosure; no credentials entered."
+      "native_gui_smoke": "CUA confirmed exact source title and accountless sign-in; no credentials."
     },
     "telegram_api_compatibility": "Primary Terms page rechecked 2026-10-14. Sign-in intro now explicitly states Telegram API/TDLib use and ecosystem membership with a no-affiliation statement. Terms §2.3 still conflicts with requested public title NeTelegram; §3.3 requires sponsored channel messages/video behavior, which user declined to add; channel access/stable release remain deferred. §§1.3/1.4 basic functionality review remains open. Pinned schema c15d3f5a5de6e3ba5839822c451152e5e18bb700 exposes sponsored video and timed video ad APIs.",
     "last_native_bundle_smoke": {
@@ -148,7 +147,7 @@
       "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
       "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
     },
-    "current_head_site_release_note": "Public Site v170 verified anonymously at /devlog/?verify=fa80d5a; bilingual AUTH05 entry links exact app source fa80d5a, hosted CI 38497467214 (cancelled after five-minute limit), and native workflow 38497467210. No release download was added.",
+    "current_head_site_release_note": "Site v172 is a development milestone only; no release or download was created.",
     "privacy_lock_notification_cache": {
       "result": "PASS synthetic core tests; acceptance remains partial for native/real-account cases.",
       "commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
@@ -181,21 +180,21 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 171,
-    "source_commit": "07256341ff02f240fddf21d758a3a2d1b9250dc0",
-    "deployment_id": "appgdep_6acef6eb8bb88191b69865e8e9dc1e2b",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_62ec1356376c8191a0bb3ffac596b98c",
+    "latest_version": 172,
+    "source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
+    "deployment_id": "appgdep_6acefc4c79888191afe5b199682996a2",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d5d86670f6c8191a6ca277f156d8669",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Sites v171 deployment succeeded for source 0725634. Anonymous in-app browser verified /devlog/?verify=aab6a4a shows bilingual entry and /downloads/?verify=aab6a4a still has no build or download link. XML browser navigation was blocked by client and shell DNS lookup failed; the saved archive includes the unchanged empty feed files, but this turn did not re-verify their public MIME.",
-    "archive_local_path": "/private/tmp/netelegram-site-active-20261014.tar.gz",
-    "archive_local_sha256": "fe85119b2c702de70ee8788ace4ca662f5c43e3b5c44fa2ec6feccd61a1917d5",
-    "archive_local_size_bytes": 190399,
-    "saved_archive_content_hash": "sha256:efd2f98d46090cacde5b75379765a63e0c8279c11c5bd6c9a46c8fa190e225f5",
-    "saved_archive_size_bytes": 440320,
+    "public_route_verified": "Existing public Site deployment succeeded. Anonymous in-app browser loaded /devlog/ with title “Журнал разработки — NeTelegram”. No app binary/download is available; full page text and public feed MIME were not freshly verified in this check.",
+    "archive_local_path": "/private/tmp/netelegram-site-app02-20261014.tar.gz",
+    "archive_local_sha256": "92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "archive_local_size_bytes": 450560,
+    "saved_archive_content_hash": "sha256:92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "saved_archive_size_bytes": 450560,
     "saved_archive_file_count": 14,
-    "app_repository_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
+    "app_repository_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
     "asset_cleanup": "No public app binary because no verified Developer ID signed/notarized release exists.",
     "app_ci_run_id": 38492400249,
     "native_app_run_id": 38492400259,
@@ -212,7 +211,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Do not rerun the unchanged full suite: run 38506939379 established that Xcode 16.4 / Swift 6.1.2 builds the test bundle in 0.38s, passes the probe, then produces no test output before the two-minute cap; parent source 67341bab passed 164/164 and current aab6a4a passes locally 164/164. Continue one production-path startup slice. On its next Swift source commit, run one focused local regression plus one local serial suite; make the hosted probe target that changed regression, then allow one bounded full hosted run. Rebuild the single canonical Dev.app only when app inputs change. Keep real login deferred; no 20-account or release claims.",
+  "next_action": "APP02 production restore cleanup fan-out is implemented and exact-source hosted CI 38508018017 passed 165/165. Do not repeat unchanged APP02 or notification suites. Next implement one APP01 production-path slice: verify all eligible accounts are queued and retain independent runtimes while the selected UI account changes; add one focused regression, run one serial suite on the changed source, then one hosted exact-source CI run. Rebuild the canonical Dev.app only if Swift/build inputs change. Real login remains deferred by the user; do not claim real-account or 20-account coverage.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -261,7 +260,7 @@
     "notary_credentials": "not found in notarytool Keychain metadata; no configured APPLE_/ASC_/NOTARY_ variable names",
     "result": "Suitable Developer ID identities were observed in repeated inventories, with one adjacent inconsistent zero-result query. No notarization credential, signing operation, or release was confirmed."
   },
-  "latest_site_source_commit": "07256341ff02f240fddf21d758a3a2d1b9250dc0",
+  "latest_site_source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
   "pending_publication": null,
   "latest_checkpoint_ci": {
     "run_id": 38501473452,
@@ -273,21 +272,21 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 171,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_62ec1356376c8191a0bb3ffac596b98c",
-    "source_commit": "07256341ff02f240fddf21d758a3a2d1b9250dc0",
-    "app_repository_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "deployment_id": "appgdep_6acef6eb8bb88191b69865e8e9dc1e2b",
+    "version": 172,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d5d86670f6c8191a6ca277f156d8669",
+    "source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
+    "app_repository_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "deployment_id": "appgdep_6acefc4c79888191afe5b199682996a2",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-active-20261014.tar.gz",
-    "archive_local_sha256": "fe85119b2c702de70ee8788ace4ca662f5c43e3b5c44fa2ec6feccd61a1917d5",
-    "archive_local_size_bytes": 190399,
-    "saved_archive_content_hash": "sha256:efd2f98d46090cacde5b75379765a63e0c8279c11c5bd6c9a46c8fa190e225f5",
-    "saved_archive_size_bytes": 440320,
-    "archive_file_count": 14,
-    "public_verification": "Anonymous in-app browser confirmed bilingual /devlog/ milestone and /downloads/ no-release state. Direct XML feed navigation was blocked by the browser client; no fresh public MIME check."
+    "archive_local_path": "/private/tmp/netelegram-site-app02-20261014.tar.gz",
+    "archive_local_sha256": "92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "archive_local_size_bytes": 450560,
+    "saved_archive_content_hash": "sha256:92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "saved_archive_size_bytes": 450560,
+    "archive_file_count": null,
+    "public_verification": "Existing public Site deployment succeeded. Anonymous in-app browser loaded /devlog/ with title “Журнал разработки — NeTelegram”. No app binary/download is available; full page text and public feed MIME were not freshly verified in this check."
   },
   "release_candidate_validation": {
     "status": "implemented_not_used_for_release",
@@ -317,21 +316,21 @@
   "current_site_checkpoint": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 171,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_62ec1356376c8191a0bb3ffac596b98c",
-    "source_commit": "07256341ff02f240fddf21d758a3a2d1b9250dc0",
-    "app_repository_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "deployment_id": "appgdep_6acef6eb8bb88191b69865e8e9dc1e2b",
+    "version": 172,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d5d86670f6c8191a6ca277f156d8669",
+    "source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
+    "app_repository_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "deployment_id": "appgdep_6acefc4c79888191afe5b199682996a2",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-active-20261014.tar.gz",
-    "archive_local_sha256": "fe85119b2c702de70ee8788ace4ca662f5c43e3b5c44fa2ec6feccd61a1917d5",
-    "archive_local_size_bytes": 190399,
-    "saved_archive_content_hash": "sha256:efd2f98d46090cacde5b75379765a63e0c8279c11c5bd6c9a46c8fa190e225f5",
-    "saved_archive_size_bytes": 440320,
-    "archive_file_count": 14,
-    "public_verification": "Deployment succeeded; anonymous in-app browser confirmed bilingual /devlog/ milestone and /downloads/ no-release state. Direct XML route was blocked by browser client; no fresh public MIME assertion for feeds."
+    "archive_local_path": "/private/tmp/netelegram-site-app02-20261014.tar.gz",
+    "archive_local_sha256": "92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "archive_local_size_bytes": 450560,
+    "saved_archive_content_hash": "sha256:92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "saved_archive_size_bytes": 450560,
+    "archive_file_count": null,
+    "public_verification": "Existing public Site deployment succeeded. Anonymous in-app browser loaded /devlog/ with title “Журнал разработки — NeTelegram”. No app binary/download is available; full page text and public feed MIME were not freshly verified in this check."
   },
   "current_native_smoke": {
     "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
@@ -413,13 +412,13 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "APP07",
-    "source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "local_focused_tests": "tdlibNotificationUpdateDoesNotInventRouteForPartialPushOrWrongUpdateKind passed 1/1; full local serial suite passed 164/164.",
-    "hosted_serial_suite": "Exact-source run 38505482508 passed the probe and compiled, then was cancelled after 4m24 with no Test run started event; no hosted full-suite PASS.",
-    "native_bundle_workflow": "Canonical local arm64 Dev.app built from exact source in 5.24s; ad-hoc signature verified; CUA title and accountless login confirmed.",
-    "implementation": "Live notification updates and active snapshot reconciliation preserve the existing route/presentation through transient notificationTypeNewPushMessage and wait for full NewMessage; no topic inference.",
-    "remaining": "Real Notification Center delivery/tap, push-to-message transition under real TDLib, and 20 real accounts remain unverified; APP07 remains partial."
+    "id": "APP02",
+    "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "local_focused_tests": "restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers passed 1/1; local serial suite 165/165.",
+    "hosted_serial_suite": "Exact-source macOS CI 38508018017 passed all 165 tests.",
+    "native_bundle_workflow": "Canonical local arm64 Dev.app built from exact source in 5.29s; ad-hoc signature passed; CUA title/accountless login match.",
+    "implementation": "Pending per-profile cleanup is scheduled independently; a blocked cleanup no longer prevents unrelated eligible profiles from being queued.",
+    "remaining": "Synthetic cleanup fixture only. Real SecItem behavior, real auth, all 20 active runtimes, and resource measurements remain unverified; APP02 partial."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
