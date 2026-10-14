@@ -176,6 +176,21 @@ import Testing
     #expect(PhoneNumberInputPolicy.validate("0812345678", selectedCallingCode: "") == .invalidCountryCode)
 }
 
+@Test func countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct() {
+    let countries = [
+        CountryPickerSearchEntry(regionCode: "US", name: "United States", callingCode: "1"),
+        CountryPickerSearchEntry(regionCode: "CA", name: "Canada", callingCode: "1"),
+        CountryPickerSearchEntry(regionCode: "GB", name: "United Kingdom", callingCode: "44"),
+        CountryPickerSearchEntry(regionCode: "ES", name: "España", callingCode: "34"),
+    ]
+
+    #expect(CountryPickerSearch.filter(countries, query: "can").map(\.regionCode) == ["CA"])
+    #expect(CountryPickerSearch.filter(countries, query: "GB").map(\.regionCode) == ["GB"])
+    #expect(Set(CountryPickerSearch.filter(countries, query: "+1").map(\.regionCode)) == Set(["US", "CA"]))
+    #expect(CountryPickerSearch.filter(countries, query: "espana").map(\.regionCode) == ["ES"])
+    #expect(CountryPickerSearch.filter(countries, query: "  ") == countries)
+}
+
 @Test func bundledCountryCallingCodeCatalogIsCompleteAndWellFormed() {
     let entries = CountryCallingCodeCatalog.entries
     #expect(entries.count >= 240)

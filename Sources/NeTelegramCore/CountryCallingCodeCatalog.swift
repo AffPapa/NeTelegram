@@ -7,6 +7,32 @@ public struct CountryCallingCodeEntry: Equatable, Hashable, Sendable {
     public let callingCode: String
 }
 
+public struct CountryPickerSearchEntry: Equatable, Sendable {
+    public let regionCode: String
+    public let name: String
+    public let callingCode: String
+
+    public init(regionCode: String, name: String, callingCode: String) {
+        self.regionCode = regionCode
+        self.name = name
+        self.callingCode = callingCode
+    }
+}
+
+public enum CountryPickerSearch {
+    /// Filters the display list while keeping each region distinct, even when
+    /// several countries share a calling code such as +1.
+    public static func filter(_ entries: [CountryPickerSearchEntry], query: String) -> [CountryPickerSearchEntry] {
+        let needle = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !needle.isEmpty else { return entries }
+        return entries.filter { entry in
+            [entry.name, entry.regionCode, "+\(entry.callingCode)", entry.callingCode].contains {
+                $0.range(of: needle, options: [.caseInsensitive, .diacriticInsensitive], locale: .current) != nil
+            }
+        }
+    }
+}
+
 public enum CountryCallingCodeCatalog {
     public static let entries: [CountryCallingCodeEntry] = [
         .init(regionCode: "AC", callingCode: "247"),

@@ -16,7 +16,7 @@ private extension NSLayoutConstraint {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSSearchFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private var statusMenuItem: NSMenuItem!
@@ -32,6 +32,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var accountPickerAccounts: [AccountUUID] = []
     private var topicPicker: NSPopUpButton!
     private var countryPicker: NSPopUpButton!
+    private var countryPickerStack: NSStackView!
+    private var countrySearchField: NSSearchField!
     private var countryPickerRegionCodes: [String?] = []
     private var phoneField: NSTextField!
     private var emailField: NSTextField!
@@ -345,11 +347,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         accountProfileHint.setAccessibilityLabel("О профилях NeTelegram")
 
         countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
-        countryPicker.isHidden = true
         countryPicker.target = self
         countryPicker.action = #selector(selectCountry)
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
         countryPicker.setAccessibilityHelp("Регион macOS предлагается автоматически, когда он известен. Выбранную страну можно изменить; полный номер с + принимается отдельно.")
+        countrySearchField = NSSearchField(frame: .zero)
+        countrySearchField.placeholderString = "Поиск страны или кода"
+        countrySearchField.setAccessibilityLabel("Поиск страны или телефонного кода")
+        countrySearchField.target = self
+        countrySearchField.action = #selector(searchCountries)
+        countrySearchField.delegate = self
+        countryPickerStack = NSStackView(views: [countrySearchField, countryPicker])
+        countryPickerStack.orientation = .vertical
+        countryPickerStack.alignment = .centerX
+        countryPickerStack.spacing = 6
+        countryPickerStack.isHidden = true
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
@@ -439,7 +451,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPicker, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -471,6 +483,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -64),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
+            countryPickerStack.widthAnchor.constraint(equalToConstant: 300),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 300), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
             countryPicker.widthAnchor.constraint(equalToConstant: 300), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             phoneField.widthAnchor.constraint(equalToConstant: 360), phoneField.heightAnchor.constraint(equalToConstant: 38),
             emailField.widthAnchor.constraint(equalToConstant: 360), emailField.heightAnchor.constraint(equalToConstant: 38),
@@ -1401,7 +1415,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginSubtitle.stringValue = "Связь с Telegram для этого локального профиля закрылась. Профиль и база не удалены; можно повторно открыть именно этот профиль. Остальные аккаунты продолжают работу в фоне."
         phoneField.isHidden = true
         emailField.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         inputField.isHidden = true
         secureInputField.isHidden = true
         firstNameField.isHidden = true
@@ -1427,7 +1441,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading.stringValue = "Удаление незавершённого входа"
         loginSubtitle.stringValue = "Профиль закрывается. Локальные данные останутся до подтверждения TDLib; при ошибке выберите этот профиль, чтобы повторить close."
         registrationTermsScroll.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         emailField.isHidden = true
         inputField.isHidden = true
@@ -1459,7 +1473,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         chatPane.isHidden = true
         setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         emailField.isHidden = true
         inputField.isHidden = true
@@ -2834,7 +2848,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 secureInputField.stringValue = ""
                 firstNameField.stringValue = ""
                 lastNameField.stringValue = ""
-                countryPicker.isHidden = true
+                countryPickerStack.isHidden = true
                 qrButton.isHidden = true
                 actionButton.isEnabled = false
                 setStatus("Проверяю серверную identity профиля…")
@@ -2856,7 +2870,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             }
             phoneField.placeholderString = phoneCountries.isEmpty ? "+код страны и номер" : "Номер телефона"
             populateCountryPicker(preferredRegion: selectedRegion ?? Locale.current.region?.identifier)
-            countryPicker.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
+            countryPickerStack.isHidden = phoneCountries.isEmpty || pendingAuthorizationType != "authorizationStateWaitPhoneNumber"
             if target === runtime && pendingAuthorizationType == "authorizationStateWaitPhoneNumber" {
                 statusLabel.stringValue = phoneCountries.isEmpty
                     ? "Введите полный номер с + и кодом страны. Список стран пока недоступен."
@@ -6133,7 +6147,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading.stringValue = pendingAuthorizationType == "authorizationStateWaitCode" ? "Введите код" : "Подтверждение входа"
         loginSubtitle.stringValue = message
         registrationTermsScroll.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         emailField.isHidden = true
         firstNameField.isHidden = true
@@ -6162,7 +6176,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginHeading.stringValue = "Вход по QR-коду"
         loginSubtitle.stringValue = "Откройте Telegram на телефоне → Настройки → Устройства → Подключить устройство и отсканируйте код."
         registrationTermsScroll.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         phoneField.stringValue = ""
         emailField.isHidden = true
@@ -6269,7 +6283,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         loginSubtitle.stringValue = subtitle
         phoneField.stringValue = ""
         phoneField.isHidden = true
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         emailField.stringValue = ""
         emailField.isHidden = true
         inputField.stringValue = ""
@@ -6314,7 +6328,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         lastNameField.stringValue = ""
         loginHeading.stringValue = "Вход по электронной почте"
         loginSubtitle.stringValue = "Введите адрес, привязанный к аккаунту. Мы отправим на него код."
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         emailField.isHidden = false
         inputField.isHidden = true
@@ -6358,7 +6372,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             registrationTermsAvailable = false
         }
         registrationTermsScroll.isHidden = false
-        countryPicker.isHidden = true
+        countryPickerStack.isHidden = true
         phoneField.isHidden = true
         emailField.isHidden = true
         inputField.isHidden = true
@@ -6429,7 +6443,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         secureInputField.stringValue = ""
         loginHeading.stringValue = "Добро пожаловать"
         loginSubtitle.stringValue = "Введите номер телефона, чтобы войти в свой аккаунт."
-        countryPicker.isHidden = phoneCountries.isEmpty
+        countryPickerStack.isHidden = phoneCountries.isEmpty
         emailField.isHidden = true
         firstNameField.isHidden = true
         lastNameField.isHidden = true
@@ -6471,6 +6485,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         selectedCountryRegionCode = country.code
     }
 
+    @objc private func searchCountries() {
+        populateCountryPicker(preferredRegion: selectedCountryRegionCode, preserveSelectionWhenFiltered: true)
+    }
+
+    func controlTextDidChange(_ notification: Notification) {
+        guard (notification.object as? NSTextField) === countrySearchField else { return }
+        searchCountries()
+    }
+
     private func loadBundledPhoneCountries() {
         phoneCountries = CountryCallingCodeCatalog.entries.map { entry in
             let name = Locale.current.localizedString(forRegionCode: entry.regionCode) ?? entry.regionCode
@@ -6486,23 +6509,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         populateCountryPicker(preferredRegion: selectedCountryRegionCode)
     }
 
-    private func populateCountryPicker(preferredRegion: String?) {
+    private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {
         countryPicker.removeAllItems()
-        countryPicker.addItem(withTitle: "Выберите страну…")
+        let visibleCountries = CountryPickerSearch.filter(phoneCountries.map {
+            CountryPickerSearchEntry(regionCode: $0.code, name: $0.name, callingCode: $0.callingCodes[0])
+        }, query: countrySearchField.stringValue)
+        let visibleRegionCodes = Set(visibleCountries.map(\.regionCode))
+        countryPicker.addItem(withTitle: visibleCountries.isEmpty ? "Страна не найдена" : "Выберите страну…")
         countryPickerRegionCodes = [nil]
-        for country in phoneCountries {
+        for country in phoneCountries where visibleRegionCodes.contains(country.code) {
             countryPicker.addItem(withTitle: "\(country.flag)  \(country.name)  +\(country.callingCodes[0])")
             countryPickerRegionCodes.append(country.code)
         }
         if let preferredRegion,
-           let index = phoneCountries.firstIndex(where: { $0.code == preferredRegion }) {
-            countryPicker.selectItem(at: index + 1)
-            selectedCountryRegionCode = preferredRegion
-            selectedCallingCode = phoneCountries[index].callingCodes[0]
+           let visibleIndex = countryPickerRegionCodes.firstIndex(where: { $0 == preferredRegion }),
+           let country = phoneCountries.first(where: { $0.code == preferredRegion }) {
+            countryPicker.selectItem(at: visibleIndex)
+            if !preserveSelectionWhenFiltered {
+                selectedCountryRegionCode = preferredRegion
+                selectedCallingCode = country.callingCodes[0]
+            }
         } else {
             countryPicker.selectItem(at: 0)
-            selectedCountryRegionCode = nil
-            selectedCallingCode = ""
+            if !preserveSelectionWhenFiltered {
+                selectedCountryRegionCode = nil
+                selectedCallingCode = ""
+            }
         }
     }
 
