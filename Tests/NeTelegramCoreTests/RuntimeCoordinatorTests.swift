@@ -4694,6 +4694,35 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     #expect(AuthorizationStep(tdlibType: "authorizationStateReady").uiAvailability == .nonInteractive)
 }
 
+@Test func authorizationRecoveryAllowsChangingPhoneOnlyFromCodeStep() {
+    #expect(AuthorizationRecoveryPolicy.canChangePhoneNumber(
+        from: "authorizationStateWaitCode", hasRuntime: true, isLocked: false, requestInFlight: false
+    ))
+    for state in [
+        "authorizationStateWaitPhoneNumber",
+        "authorizationStateWaitPassword",
+        "authorizationStateWaitEmailAddress",
+        "authorizationStateWaitEmailCode",
+        "authorizationStateWaitRegistration",
+        "authorizationStateWaitOtherDeviceConfirmation",
+        "authorizationStateReady",
+        "unknown",
+    ] {
+        #expect(!AuthorizationRecoveryPolicy.canChangePhoneNumber(
+            from: state, hasRuntime: true, isLocked: false, requestInFlight: false
+        ))
+    }
+    #expect(!AuthorizationRecoveryPolicy.canChangePhoneNumber(
+        from: "authorizationStateWaitCode", hasRuntime: false, isLocked: false, requestInFlight: false
+    ))
+    #expect(!AuthorizationRecoveryPolicy.canChangePhoneNumber(
+        from: "authorizationStateWaitCode", hasRuntime: true, isLocked: true, requestInFlight: false
+    ))
+    #expect(!AuthorizationRecoveryPolicy.canChangePhoneNumber(
+        from: "authorizationStateWaitCode", hasRuntime: true, isLocked: false, requestInFlight: true
+    ))
+}
+
 @Test func authorizationAnnouncementsAreStaticAndDeduplicatedByAccountGenerationAndStep() {
     #expect(AuthorizationStep(tdlibType: "authorizationStateWaitOtherDeviceConfirmation") == .qrConfirmation)
     #expect(AuthorizationAnnouncement.message(for: .qrConfirmation) == "Вход по QR: отсканируйте код в Telegram на телефоне для подтверждения.")

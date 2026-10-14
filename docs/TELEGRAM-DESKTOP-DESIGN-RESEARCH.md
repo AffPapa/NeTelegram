@@ -50,6 +50,15 @@ as a structural reference only: explicit country selection, number entry,
 validation and a deliberate continue action. Its UIKit implementation, assets,
 and styling are not copied into this native AppKit client.
 
+### Native macOS source review
+
+The [TelegramSwift macOS repository](https://github.com/overtake/TelegramSwift)
+identifies itself as Telegram's macOS source and is licensed under
+[GPL-2.0](https://github.com/overtake/TelegramSwift/blob/master/LICENSE).
+It is useful for studying conversation hierarchy and state, but its code,
+assets, icons, and visual styling are not copied into this MIT project.
+NeTelegram keeps its own AppKit implementation and independent mark.
+
 The exact-source macOS test workflow and pinned TDLib/Dev.app assembly passed
 for source `78763f3`. The generated development bundle now uses `NeTelegram Dev`
 for both `CFBundleName` and `CFBundleDisplayName`, and the sign-in mark is N. A native visual PASS is
@@ -61,13 +70,13 @@ was disabled. The active source keeps AppKit's native control state and
 semantic system colors. Keep the native
 smoke pending until that same canonical process is safely closed and rebuilt.
 
-Review of the current accountless screen found that country search and the
-country menu each consumed a full row, and the code/2FA preview repeated the
-subtitle's instruction as a second status line. The login form now places the
-searchable country field and native country menu side by side on the same 360 pt
-grid, with the phone field below; the status identifies the selected/suggested
-region briefly. Authorization status is hidden only when it exactly repeats
-the visible subtitle; distinct progress and error messages remain visible. The
+Review of the accountless screen found that country search and the country
+menu needed consistent alignment and that code/2FA previews could repeat the
+subtitle as a second status line. The form keeps country search and native
+country selection in a vertical, equal-width column, followed by the phone
+field; the system locale remains a suggestion and never silently supplies a
+calling code. Authorization status is hidden only when it exactly repeats the
+visible subtitle; distinct progress and error messages remain visible. The
 phone value, TDLib request, and country-selection policy are unchanged. This is
 a focused layout correction, not a claim that authenticated conversation
 screens have passed visual review.
@@ -152,10 +161,13 @@ passed, and pinned TDLib/Dev.app workflow
 passed. These checks prove compile/test and bundle assembly, not a measured
 large-list performance improvement or local visual behavior.
 
-The canonical local Dev.app remains a separate artifact at source
-`291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b`. The old screenshot title
-`5f414650` identifies an even earlier build. The current process is still open,
-and the app-specific API-hash Keychain lookup returned `not_found`; no app
-replacement or local smoke was attempted. Real chat rows/avatar rendering,
-VoiceOver, IME, RTL and photo-bearing conversations still require visual review;
-authenticated behavior requires an owner-operated login.
+The screenshot titled `NeTelegram · dev 5f414650` is historical. During the
+2026-10-15 review, the canonical app at `/private/tmp/NeTelegram-Dev.app`
+(`org.affpapa.netelegram.dev`) identified app source `d1e3c736`. An accountless
+authorization preview verified the code-step “Изменить номер телефона” action
+returns to phone entry without a network request; the action stays hidden on
+unsupported authorization states. This is a focused native auth visual/AX
+check, not a real-login or authenticated-view result. Conversation rows/avatar
+rendering, light/increased-contrast appearance, VoiceOver speech, IME/RTL and
+photo-bearing conversations still need their own review; real account behavior
+requires owner-operated login.

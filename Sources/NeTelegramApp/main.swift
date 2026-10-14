@@ -53,6 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var registrationTermsTextView: NSTextView!
     private var registrationTermsAvailable = false
     private var qrButton: NSButton!
+    private var changePhoneButton: NSButton!
     private var qrImageView: NSImageView!
     private var loginHeading: NSTextField!
     private var loginSubtitle: NSTextField!
@@ -536,13 +537,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         qrButton.contentTintColor = .systemBlue
         qrButton.frame = .zero
         qrButton.setAccessibilityLabel("Войти по QR-коду")
+        changePhoneButton = NSButton(title: "Изменить номер телефона", target: self, action: #selector(changeAuthenticationPhoneNumber))
+        changePhoneButton.isBordered = false
+        changePhoneButton.contentTintColor = .systemBlue
+        changePhoneButton.frame = .zero
+        changePhoneButton.isHidden = true
+        changePhoneButton.setAccessibilityLabel("Изменить номер телефона")
+        changePhoneButton.setAccessibilityHelp("Вернуться к вводу номера в этом профиле. Профиль и его локальные данные сохраняются.")
         addAccountButton = NSButton(title: "Добавить ещё аккаунт", target: self, action: #selector(addAccount))
         addAccountButton.isBordered = false
         addAccountButton.contentTintColor = .systemBlue
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, loginDisclosure, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -624,6 +632,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             actionButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             qrButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
+            changePhoneButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            changePhoneButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), changePhoneButton.heightAnchor.constraint(equalToConstant: 32),
         ])
 
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))
@@ -896,6 +906,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func setAuthCardVisible(_ visible: Bool) {
         authCard.isHidden = !visible
         if visible {
+            // Every auth screen starts without recovery actions; the active
+            // TDLib state explicitly enables the one action it supports.
+            changePhoneButton.isHidden = true
+            changePhoneButton.isEnabled = false
             countrySuggestionLabel.isHidden = true
             window.minSize = NSSize(width: 560, height: 520)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
@@ -1468,10 +1482,46 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             pendingAuthRequestsByExtra[extra] = (runtime.account, authType)
             authRequestInFlight = true
             actionButton.isEnabled = false
+            changePhoneButton.isEnabled = false
             setStatus("Запрос отправлен TDLib. Ожидание следующего шага…")
         } catch {
             setStatus("Не удалось отправить запрос авторизации.")
         }
+    }
+
+    @objc private func changeAuthenticationPhoneNumber() {
+        guard !lockState, !closingForTermination else { return }
+#if DEBUG
+        if authLayoutPreviewEnabled {
+            guard AuthorizationRecoveryPolicy.canChangePhoneNumber(
+                from: pendingAuthorizationType,
+                hasRuntime: true,
+                isLocked: lockState,
+                requestInFlight: authRequestInFlight
+            ) else { return }
+            pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+            showingQR = false
+            showPhoneEntry()
+            window.title = "\(ProductIdentity.displayName) · auth preview phone"
+            setStatus("Предпросмотр: номер можно исправить в этом профиле. Сетевые запросы отключены.")
+            announceAuthorizationStep(pendingAuthorizationType)
+            return
+        }
+#endif
+        guard AuthorizationRecoveryPolicy.canChangePhoneNumber(
+            from: pendingAuthorizationType,
+            hasRuntime: runtime != nil,
+            isLocked: lockState,
+            requestInFlight: authRequestInFlight
+        ) else { return }
+        if let account = runtime?.account {
+            authPresentationInfoByAccount.removeValue(forKey: account)
+        }
+        pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
+        showingQR = false
+        showPhoneEntry()
+        setStatus("Введите номер для этого профиля. Существующие данные не удаляются.")
+        announceAuthorizationStep(pendingAuthorizationType)
     }
 
     private func validatedPhoneNumber() -> String? {
@@ -3695,6 +3745,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 if target === runtime, target.account == pending.account { authRequestInFlight = false }
                 guard !lockState, target === runtime, target.account == pending.account else { return }
                 actionButton.isEnabled = true
+                changePhoneButton.isEnabled = !changePhoneButton.isHidden
                 qrButton.isEnabled = true
                 announceAuthenticationFailure(for: pending.step)
                 return
@@ -6961,6 +7012,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         actionButton.isHidden = false
         actionButton.title = button
         actionButton.isEnabled = !authRequestInFlight
+        let isPhoneCodeStep = pendingAuthorizationType == "authorizationStateWaitCode"
+#if DEBUG
+        let hasAuthenticationOwner = runtime != nil || authLayoutPreviewEnabled
+#else
+        let hasAuthenticationOwner = runtime != nil
+#endif
+        changePhoneButton.isHidden = !AuthorizationRecoveryPolicy.canChangePhoneNumber(
+            from: pendingAuthorizationType,
+            hasRuntime: hasAuthenticationOwner,
+            isLocked: lockState,
+            requestInFlight: authRequestInFlight
+        )
+        changePhoneButton.isEnabled = isPhoneCodeStep && !lockState && !authRequestInFlight
         if secure { secureInputField.becomeFirstResponder() } else { inputField.becomeFirstResponder() }
     }
 
@@ -7119,6 +7183,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func showEmailEntry() {
         setAuthCardVisible(true)
         registrationTermsScroll.isHidden = true
+        changePhoneButton.isEnabled = false
         phoneField.stringValue = ""
         inputField.stringValue = ""
         secureInputField.stringValue = ""
@@ -7605,6 +7670,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // rejected after it; it cannot slip through while drafts are flushed.
         privacyDispatchBarrier.setLocked(true)
         lockState = true
+        changePhoneButton.isEnabled = false
         refreshStatusMenu()
         lastAuthorizationAnnouncementContext = nil
         stopTypingAction()

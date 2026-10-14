@@ -7,6 +7,24 @@ public enum AuthorizationUIAvailability: Sendable, Equatable {
     case nonInteractive
 }
 
+/// Authorization recovery actions that TDLib explicitly permits from the
+/// current state. This is intentionally narrower than "any login screen":
+/// changing the phone number is supported from WaitCode, but not from QR
+/// confirmation or email/password steps.
+public enum AuthorizationRecoveryPolicy {
+    public static func canChangePhoneNumber(
+        from tdlibType: String?,
+        hasRuntime: Bool,
+        isLocked: Bool,
+        requestInFlight: Bool
+    ) -> Bool {
+        hasRuntime
+            && !isLocked
+            && !requestInFlight
+            && AuthorizationStep(tdlibType: tdlibType) == .code
+    }
+}
+
 /// Typed view of TDLib authorization states used to keep account-status copy
 /// and interactive login handling aligned with the pinned TDLib schema.
 public enum AuthorizationStep: String, CaseIterable, Sendable {
