@@ -1707,6 +1707,66 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     ), "A background startup cannot replace an already visible runtime")
 }
 
+@MainActor @Test func profileStartupRegistryIsolatesStallsFailuresAndRetries() async {
+    enum StartupFailure: Error { case temporary }
+
+    let registry = AccountStartupTaskRegistry()
+    let presentation = AccountStartupPresentationCoordinator()
+    let stalledAccount = AccountUUID()
+    let failingAccount = AccountUUID()
+    let stalledGate = AsyncTestGate()
+    let stalledStarted = LockedTestValue(false)
+    let stalledRuns = LockedTestValue(0)
+    let duplicateRuns = LockedTestValue(0)
+    let retryCount = LockedTestValue(0)
+    let failureMessage = LockedTestValue("")
+
+    let stalledTask = registry.start(account: stalledAccount) {
+        stalledRuns.mutate { $0 += 1 }
+        stalledStarted.set(true)
+        await stalledGate.wait()
+    }
+    #expect(await waitForTrue(stalledStarted, timeout: .seconds(2)))
+
+    _ = registry.start(account: stalledAccount) {
+        duplicateRuns.mutate { $0 += 1 }
+    }
+    #expect(registry.startingAccounts == Set([stalledAccount]), "Duplicate opens for one account reuse its in-flight task")
+
+    let failedTask = registry.start(
+        account: failingAccount,
+        operation: { throw StartupFailure.temporary },
+        onCompletion: { result in
+            if case .failure(let error) = result { failureMessage.set(String(describing: error)) }
+        }
+    )
+    await failedTask.value
+    #expect(failureMessage.get().contains("temporary"), "The failing account receives its own startup failure")
+    #expect(registry.contains(stalledAccount), "A stalled profile remains registered while the other profile fails")
+    #expect(!registry.contains(failingAccount), "A completed failure releases only its own startup registration")
+
+    presentation.select(failingAccount)
+    #expect(!presentation.shouldPresentStartupRuntime(
+        account: stalledAccount,
+        explicitlySelected: false,
+        hasPresentedRuntime: false
+    ), "The stalled background profile cannot replace the selected profile")
+
+    let retryTask = registry.start(account: failingAccount) {
+        retryCount.mutate { $0 += 1 }
+    }
+    await retryTask.value
+    #expect(registry.contains(stalledAccount))
+    #expect(!registry.contains(failingAccount))
+
+    await stalledGate.open()
+    await stalledTask.value
+    #expect(registry.startingAccounts.isEmpty)
+    #expect(stalledRuns.get() == 1)
+    #expect(duplicateRuns.get() == 0)
+    #expect(retryCount.get() == 1)
+}
+
 @Test func cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable() async {
     let scheduler = RuntimeStartupScheduler(parallelism: 1)
     let activeStartup = AsyncTestGate()

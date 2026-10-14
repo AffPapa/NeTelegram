@@ -65,7 +65,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var profileOrder: [AccountUUID] = []
     private var profileStartupFailures: Set<AccountUUID> = []
     private var profileOpenRequests: Set<AccountUUID> = []
-    private var profileStartupTasks: [AccountUUID: (id: UUID, task: Task<Void, Never>)] = [:]
+    private let accountStartupTasks = AccountStartupTaskRegistry()
     private var closedProfileToRetry: AccountUUID?
     private var catalogueRoot: URL?
     private var runtimesByClient: [Int32: LocalAccountRuntime] = [:]
@@ -883,7 +883,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let selectedRuntime = selectedID.flatMap { runtimesByAccount[$0] }
             let busy = selectedID.map {
                 profileRestoreInProgress || closingForTermination
-                    || profileStartupTasks[$0] != nil || profileOpenRequests.contains($0)
+                    || accountStartupTasks.contains($0) || profileOpenRequests.contains($0)
             } ?? true
             item.isEnabled = !lockState && !busy && profile != nil
                 && profile?.telegramUserID == nil && selectedRuntime?.telegramUserID == nil
@@ -1199,7 +1199,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             return
         }
         guard let selected = runtimesByAccount[account] else {
-            if profileStartupTasks[account] != nil || profileOpenRequests.contains(account) {
+            if accountStartupTasks.contains(account) || profileOpenRequests.contains(account) {
                 prepareToSelectUnopenedProfile(account)
                 return
             }
@@ -1274,7 +1274,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 telegramUserID: runtime?.telegramUserID ?? profile.telegramUserID,
                 candidate: runtime?.displayName ?? profile.displayName,
                 authorizationState: runtime?.authorizationState,
-                runtimeIsOpen: runtime != nil || profileStartupTasks[id] != nil,
+                runtimeIsOpen: runtime != nil || accountStartupTasks.contains(id),
                 hasError: profileStartupFailures.contains(id) || runtime?.lastTDLibError != nil,
                 logoutCleanupPending: profile.logoutCleanupPending == true,
                 unverifiedRemovalPending: profile.unverifiedRemovalPending == true,
@@ -1309,7 +1309,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func retryOpeningProfile(_ account: AccountUUID) {
         guard !lockState, !profileRestoreInProgress, !closingForTermination,
               !profileOpenRequests.contains(account),
-              profileStartupTasks[account] == nil,
+              !accountStartupTasks.contains(account),
               let profile = knownProfilesByAccount[account] else { return }
         prepareToSelectUnopenedProfile(account)
         if profile.logoutCleanupPending == true {
@@ -1366,7 +1366,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard !closingForTermination,
               !profileOpenRequests.contains(account),
               runtimesByAccount[account] == nil,
-              profileStartupTasks[account] == nil else { return false }
+              !accountStartupTasks.contains(account) else { return false }
         if profile.logoutCleanupPending == true, profile.telegramUserID == nil {
             profileStartupFailures.insert(account)
             return false
@@ -1438,7 +1438,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func retryPendingUnverifiedProfileCleanup(_ profile: AccountProfile) {
         guard !profileRestoreInProgress, !closingForTermination,
               !profileOpenRequests.contains(profile.id),
-              profileStartupTasks[profile.id] == nil,
+              !accountStartupTasks.contains(profile.id),
               runtimesByAccount[profile.id] == nil,
               profile.unverifiedRemovalPending == true,
               profile.telegramUserID == nil else { return }
@@ -1736,7 +1736,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               let profile = knownProfilesByAccount[account],
               profile.telegramUserID == nil,
               profile.logoutCleanupPending != true,
-              profileStartupTasks[account] == nil,
+              !accountStartupTasks.contains(account),
               !profileOpenRequests.contains(account),
               !profileRestoreInProgress else {
             setStatus("Удалить можно только выбранный незавершённый вход после завершения его запуска.")
@@ -1759,7 +1759,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         guard !lockState, !closingForTermination,
               knownProfilesByAccount[account]?.telegramUserID == nil,
               runtimesByAccount[account] === target,
-              profileStartupTasks[account] == nil else {
+              !accountStartupTasks.contains(account) else {
             setStatus("Профиль изменился или запуск ещё работает; удаление не начато.")
             return
         }
@@ -1937,7 +1937,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let cleanupCandidates = profiles.filter {
                 ($0.logoutCleanupPending == true || $0.unverifiedRemovalPending == true)
                     && runtimesByAccount[$0.id] == nil
-                    && profileStartupTasks[$0.id] == nil
+                    && !accountStartupTasks.contains($0.id)
                     && !profileOpenRequests.contains($0.id)
             }
             let pendingCleanups = AccountRestorePlanner.enqueuePendingCleanups(cleanupCandidates) { profile in
@@ -2001,7 +2001,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let enqueueResult = AccountRestorePlanner.enqueueStartupProfiles(
                 candidates: candidates,
                 running: Set(runtimesByAccount.keys),
-                starting: Set(profileStartupTasks.keys),
+                starting: accountStartupTasks.startingAccounts,
                 enqueue: { profile in
                     scheduleProfileStartup(profile, apiHash: apiHash) != nil
                 }
@@ -2113,10 +2113,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func cancelPendingProfileStartsForTermination() -> Bool {
-        let tasks = profileStartupTasks.values.map { $0.task }
-        profileStartupTasks.removeAll()
-        tasks.forEach { $0.cancel() }
-        return !tasks.isEmpty
+        accountStartupTasks.cancelAll()
     }
 
     private func addAccountProfile() async {
@@ -2160,20 +2157,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         select: Bool = false
     ) -> Task<Void, Never>? {
         guard !closingForTermination, runtimesByAccount[profile.id] == nil else { return nil }
-        if let pending = profileStartupTasks[profile.id] { return pending.task }
-        let taskID = UUID()
-        let task = Task { @MainActor [weak self] in
-            guard let self else { return }
-            defer {
-                if self.profileStartupTasks[profile.id]?.id == taskID {
-                    self.profileStartupTasks.removeValue(forKey: profile.id)
-                    self.refreshAccountPicker(select: self.runtime?.account == profile.id ? profile.id : nil)
-                    self.refreshStatusMenu()
-                }
+        let task = accountStartupTasks.start(
+            account: profile.id,
+            operation: { [weak self] in
+                guard let self else { return }
+                await self.openProfile(profile, apiHash: apiHash, select: select)
+            },
+            onCompletion: { [weak self] _ in
+                guard let self else { return }
+                self.refreshAccountPicker(select: self.runtime?.account == profile.id ? profile.id : nil)
+                self.refreshStatusMenu()
             }
-            await self.openProfile(profile, apiHash: apiHash, select: select)
-        }
-        profileStartupTasks[profile.id] = (taskID, task)
+        )
         refreshAccountPicker(select: runtime?.account == profile.id ? profile.id : nil)
         return task
     }

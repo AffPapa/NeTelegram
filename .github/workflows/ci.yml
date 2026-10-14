@@ -58,12 +58,23 @@ jobs:
           restore-keys: |
             macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-
 
-      - name: Probe Swift Testing runner
-        # Probe the exact restore-cleanup isolation regression before the full
-        # serial suite. This distinguishes a runner startup stall from a later
-        # suite stall and validates the changed contract on the hosted toolchain.
-        timeout-minutes: 2
-        run: swift test --no-parallel --verbose --filter lateBackgroundStartupCannotStealNewerAccountSelection
+      - name: Probe account startup task registry
+        # Exercise the production task registry and selection handoff first.
+        # This also verifies Swift Testing runner startup on the hosted toolchain.
+        timeout-minutes: 1
+        run: swift test --no-parallel --verbose --filter profileStartupRegistryIsolatesStallsFailuresAndRetries
+
+      - name: Probe API hash timeout and retry handoff
+        # This test uses a timed waiter and a deliberately stalled lookup. Run
+        # alone so a failure is attributable before the full suite starts.
+        timeout-minutes: 1
+        run: swift test --no-parallel --verbose --filter apiHashReadTimeoutRetriesJoinOneLookupAndCacheItsLateResult
+
+      - name: Probe twenty-client receive drain
+        # This test exercises the async reducer-exit barrier after accepted
+        # updates drain; keep it isolated from suite-level scheduling effects.
+        timeout-minutes: 1
+        run: swift test --no-parallel --verbose --filter twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates
 
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output
