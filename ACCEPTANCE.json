@@ -1,33 +1,33 @@
 {
   "schema_version": 2,
-  "status": "CORE-RUNTIME-03 post-await update route ownership revalidation: fixed stale route ownership validation after async suspension; focused test 1/1 and exact-source macOS test job succeeded; canonical Dev.app 477404a launched; public Site v193 records the fix. Real login, 20-account coverage, Developer ID signing and notarization remain unverified.",
+  "status": "APP09 accepted-send cleanup of locked dirty-draft recovery: exact-value cleanup added; focused regression 1/1, exact-source GitHub macOS CI passed, and canonical Dev.app smoke passed. Real login, 20-account coverage, Developer ID signing, notarization and release remain unverified.",
   "current_evidence": {
-    "app_source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-    "local_suite": "Focused current-source route test PASS 1/1. Full serial suite not rerun for this one-line ordering correction; exact-source GitHub macOS test job completed successfully, overall workflow still in_progress at last observation.",
-    "focused_test": "asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement PASS 1/1 (compiled current AppKit target; focused test).",
+    "app_source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "local_suite": "Focused APP09 regression PASS 1/1; full local suite not rerun. Exact-source GitHub macOS CI completed successfully for this SHA.",
+    "focused_test": "acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery PASS 1/1; compiled the current AppKit target.",
     "hosted_ci": {
-      "run_id": 38547546152,
+      "run_id": 38550170386,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38547546152",
-      "workflow_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "app_source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "scope": "The sole exact-source macOS test job completed successfully, including Run core test suite. GitHub workflow run API still reported in_progress at last observation; top-level workflow completion was not verified."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38550170386",
+      "workflow_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "app_source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "scope": "Exact-source macOS CI completed successfully; Swift tests job and Run core test suite step succeeded for this source SHA."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "source_fingerprint_sha256": "e03e9a5dc13976899b697ea0ab0d4a72089ce4dbbcde1bd57fb666ead188dff4",
-      "executable_sha256": "a3aafd2c2cab14e0dc4537881ffceb78b18ec491332ebe0a526efa02194cd38c",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe5e4e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "af4ada2f997d1165aa9e14832473275b8264baf88cd8f82c8c81474bfa102674",
-      "build_record_sha256": "0ff3ce59d84b7e383db5e7081f3d408eada647642e2e6b4491d81981415c9eda",
+      "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "source_fingerprint_sha256": "1a1f4e24497af23046f7fb926dc6e83b60c7514320f5a5696fb8aada0f64b7ab",
+      "executable_sha256": "5ca2e975fff3e8082c3baf67e8db062a3ed1140c5c91d1de57452148ecee4030",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "build_info_sha256": "33c8876cc8098ef8822a88d3613b2f9a77dd6849eb1f76369db7894a9925e38a",
+      "build_record_sha256": "460f84357fefeda2f2f6b08faf6bca5c04a2dbba611c03cd6d46c8876b67ad56",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "One canonical Dev.app was built from exact source and launched once. CUA title NeTelegram · dev 477404af; clean accountless authorization screen showed Thailand +66, phone field, Continue, and QR. No account or credentials were entered.",
-      "scope": "Native build and accountless UI launch only; no login, real account, 20-runtime test, Developer ID signing, or notarization.",
-      "process_state": "Running from canonical exact-source Dev.app; do not replace without checking process state."
+      "smoke": "One canonical Dev.app built from exact source 62ee5434 and launched once. CUA title NeTelegram · dev 62ee5434; clean accountless authorization screen shown. No account or credentials entered.",
+      "scope": "Focused synthetic APP09 regression 1/1; AppKit build and accountless launch only. No real login, real account, 20-runtime certification, Developer ID signing, or notarization.",
+      "process_state": "Running from canonical exact-source Dev.app."
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -97,29 +97,29 @@
       "scope": "The test build compiled the changed AppKit executable and Core navigation plan. It did not replace or launch the canonical Dev.app or verify a Telegram account."
     },
     "latest_acceptance_slice": {
-      "id": "CORE-RUNTIME-03 post-await update route ownership revalidation",
-      "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "local_focused_test": "asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement PASS 1/1 (compiled current AppKit target; focused test).",
-      "local_suite": "Not rerun for 477404a; existing exact-source GitHub macOS test job completed successfully, but workflow-level completion was still in_progress at last check.",
-      "hosted_ci": "GitHub macOS test job in run 38547546152 completed successfully for exact app-source SHA 477404afd89378affb9cc21eb6c0e32745cb5091; overall workflow remained in_progress at last check.",
+      "id": "APP09 accepted-send cleanup of locked dirty-draft recovery",
+      "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "local_focused_test": "acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery PASS 1/1; compiled the current AppKit target.",
+      "local_suite": "Not rerun; only the focused regression was required for this changed reducer/cache path.",
+      "hosted_ci": "Not yet observed for source commit 62ee54349c8c63ada7d98981ec6d960b03e935e2.",
       "native_bundle": {
         "path": "/private/tmp/NeTelegram-Dev.app",
         "support_root": "/private/tmp/netelegram-dev-support-clean",
-        "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-        "source_fingerprint_sha256": "e03e9a5dc13976899b697ea0ab0d4a72089ce4dbbcde1bd57fb666ead188dff4",
-        "executable_sha256": "a3aafd2c2cab14e0dc4537881ffceb78b18ec491332ebe0a526efa02194cd38c",
-        "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe5e4e172bfc55ab38abc3e68d7842efdc1",
-        "build_info_sha256": "af4ada2f997d1165aa9e14832473275b8264baf88cd8f82c8c81474bfa102674",
-        "build_record_sha256": "0ff3ce59d84b7e383db5e7081f3d408eada647642e2e6b4491d81981415c9eda",
+        "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+        "source_fingerprint_sha256": "1a1f4e24497af23046f7fb926dc6e83b60c7514320f5a5696fb8aada0f64b7ab",
+        "executable_sha256": "5ca2e975fff3e8082c3baf67e8db062a3ed1140c5c91d1de57452148ecee4030",
+        "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+        "build_info_sha256": "33c8876cc8098ef8822a88d3613b2f9a77dd6849eb1f76369db7894a9925e38a",
+        "build_record_sha256": "460f84357fefeda2f2f6b08faf6bca5c04a2dbba611c03cd6d46c8876b67ad56",
         "architecture": "arm64",
         "minimum_macos": "14.0",
         "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-        "smoke": "One canonical Dev.app was built from exact source and launched once. CUA title NeTelegram · dev 477404af; clean accountless authorization screen showed Thailand +66, phone field, Continue, and QR. No account or credentials were entered.",
-        "scope": "Native build and accountless UI launch only; no login, real account, 20-runtime test, Developer ID signing, or notarization.",
-        "process_state": "Running from canonical exact-source Dev.app; do not replace without checking process state."
+        "smoke": "One canonical Dev.app built from exact source 62ee5434 and launched once. CUA title NeTelegram · dev 62ee5434; clean accountless authorization screen shown. No account or credentials entered.",
+        "scope": "Focused synthetic APP09 regression 1/1; AppKit build and accountless launch only. No real login, real account, 20-runtime certification, Developer ID signing, or notarization.",
+        "process_state": "Running canonical exact-source Dev.app after rebuild."
       },
-      "implementation": "After the update receiver awaits RuntimeCoordinator.isCurrent(route), AppDelegate synchronously rechecks target.route and runtimesByClient ownership before applying side effects. This closes the stale-local-reference window across MainActor suspension.",
-      "remaining": "Focused synthetic route test and exact-source CI job only. No real login, 20-runtime certification, Developer ID, notarization, or release."
+      "implementation": "On TDLib send confirmation, remove only the exact acknowledged text from both visible drafts and lock-time dirty recovery. Preserve newer or unrelated unsaved text and keep the account dirty barrier for the remaining recovery snapshot.",
+      "remaining": "OS disk exhaustion and dirty-state quit barrier under real disk-full remain unverified; no login, 20-runtime certification, Developer ID, notarization, or release."
     },
     "historical_native_build": {
       "status": "PASS_canonical_dev_bundle_build_and_auth_layout_preview",
@@ -232,7 +232,7 @@
       "method": "storage fault injection",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "A deterministic encrypted-draft storage fault test injects replacement failure after a prior durable save; it verifies persistence error and byte-for-byte preservation/reload of the prior draft. The existing locked-draft quit snapshot test also passes. Exact-source local Swift suite passes 126/126. Actual OS disk exhaustion, native app dirty-state recovery UI, and quit-barrier behavior under disk-full remain unverified."
+      "evidence": "A deterministic encrypted-draft storage fault test injects replacement failure after a prior durable save; it verifies persistence error and byte-for-byte preservation/reload of the prior draft. The existing locked-draft quit snapshot test also passes. Exact-source local Swift suite passes 126/126. Actual OS disk exhaustion, native app dirty-state recovery UI, and quit-barrier behavior under disk-full remain unverified. Focused regression on source 62ee54349c8c63ada7d98981ec6d960b03e935e2 passed 1/1: TDLib-acknowledged text is removed from locked dirty recovery by exact value; a newer draft and an unrelated unsaved draft remain. Canonical arm64 Dev.app rebuilt from the same clean source, strict ad-hoc signature verified, and accountless CUA smoke passed. Native integration of actual disk-full and quit barrier still not demonstrated."
     },
     {
       "id": "APP10",
@@ -615,20 +615,20 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-    "app_source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-core-runtime-03 --filter asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement",
-    "local_result": "PASS 1/1 focused route-generation ownership test; AppKit target compiled. Full suite not rerun.",
+    "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "app_source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app09-dirtydraft --filter acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery",
+    "local_result": "PASS 1/1 focused accepted-send/locked-dirty-recovery regression; current AppKit target compiled. Full local suite not rerun.",
     "hosted_ci": {
-      "run_id": 38547546152,
+      "run_id": 38550170386,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38547546152",
-      "workflow_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "app_source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "scope": "The sole exact-source macOS test job completed successfully, including Run core test suite. GitHub workflow run API still reported in_progress at last observation; top-level workflow completion was not verified."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38550170386",
+      "workflow_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "app_source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "scope": "Exact-source macOS CI completed successfully; Swift tests job and Run core test suite step succeeded for this source SHA."
     },
-    "native_dev_app_smoke": "One canonical Dev.app was built from exact source and launched once. CUA title NeTelegram · dev 477404af; clean accountless authorization screen showed Thailand +66, phone field, Continue, and QR. No account or credentials were entered.",
-    "scope": "One targeted synthetic callback route ownership regression and native accountless launch; no authenticated accounts or 20-account lifecycle."
+    "native_dev_app_smoke": "One canonical Dev.app built from exact source 62ee5434 and launched once. CUA title NeTelegram · dev 62ee5434; clean accountless authorization screen shown. No account or credentials entered.",
+    "scope": "Synthetic APP09 regression, exact-source GitHub macOS test job, and accountless canonical Dev.app launch; no authenticated account or 20-account lifecycle."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -669,7 +669,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "APP09: inspect dirty draft persistence on disk-full/Keychain/storage errors. Verify the in-memory dirty-state barrier cannot be overwritten by a later empty snapshot; add/run one focused fixture only if a concrete gap is missing. No app rebuild or Site deploy for storage-only evidence.",
+  "next_action": "APP10: audit RuntimeCoordinator state writes for stale-generation updates; inspect current source at the pinned app SHA, then add one focused regression only if a concrete gap is confirmed. Do not rebuild or deploy for read-only audit.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -699,53 +699,53 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
+    "app_source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
     "branch": "main",
     "working_tree": "app source clean; checkpoint metadata update pending",
-    "local_tests": "Focused regression 1/1; full suite not rerun for 477404a.",
-    "hosted_validation": "The sole exact-source macOS test job completed successfully, including Run core test suite. GitHub workflow run API still reported in_progress at last observation; top-level workflow completion was not verified.",
+    "local_tests": "Focused APP09 regression PASS 1/1; full suite not rerun for this change.",
+    "hosted_validation": "Not yet observed for exact app-source SHA 62ee54349c8c63ada7d98981ec6d960b03e935e2.",
     "native_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "source_fingerprint_sha256": "e03e9a5dc13976899b697ea0ab0d4a72089ce4dbbcde1bd57fb666ead188dff4",
-      "executable_sha256": "a3aafd2c2cab14e0dc4537881ffceb78b18ec491332ebe0a526efa02194cd38c",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe5e4e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "af4ada2f997d1165aa9e14832473275b8264baf88cd8f82c8c81474bfa102674",
-      "build_record_sha256": "0ff3ce59d84b7e383db5e7081f3d408eada647642e2e6b4491d81981415c9eda",
+      "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "source_fingerprint_sha256": "1a1f4e24497af23046f7fb926dc6e83b60c7514320f5a5696fb8aada0f64b7ab",
+      "executable_sha256": "5ca2e975fff3e8082c3baf67e8db062a3ed1140c5c91d1de57452148ecee4030",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "build_info_sha256": "33c8876cc8098ef8822a88d3613b2f9a77dd6849eb1f76369db7894a9925e38a",
+      "build_record_sha256": "460f84357fefeda2f2f6b08faf6bca5c04a2dbba611c03cd6d46c8876b67ad56",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "One canonical Dev.app was built from exact source and launched once. CUA title NeTelegram · dev 477404af; clean accountless authorization screen showed Thailand +66, phone field, Continue, and QR. No account or credentials were entered.",
-      "scope": "Native build and accountless UI launch only; no login, real account, 20-runtime test, Developer ID signing, or notarization.",
-      "process_state": "Running from canonical exact-source Dev.app; do not replace without checking process state."
+      "smoke": "One canonical Dev.app built from exact source 62ee5434 and launched once. CUA title NeTelegram · dev 62ee5434; clean accountless authorization screen shown. No account or credentials entered.",
+      "scope": "Focused synthetic APP09 regression 1/1; AppKit build and accountless launch only. No real login, real account, 20-runtime certification, Developer ID signing, or notarization.",
+      "process_state": "Running canonical exact-source Dev.app after rebuild."
     },
     "date": "2026-10-14"
   },
   "latest_acceptance_slice": {
-    "id": "CORE-RUNTIME-03 post-await update route ownership revalidation",
-    "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-    "local_focused_test": "asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement PASS 1/1 (compiled current AppKit target; focused test).",
-    "local_suite": "Not rerun for 477404a; existing exact-source GitHub macOS test job completed successfully, but workflow-level completion was still in_progress at last check.",
-    "hosted_ci": "GitHub macOS test job in run 38547546152 completed successfully for exact app-source SHA 477404afd89378affb9cc21eb6c0e32745cb5091; overall workflow remained in_progress at last check.",
+    "id": "APP09 accepted-send cleanup of locked dirty-draft recovery",
+    "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "local_focused_test": "acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery PASS 1/1; compiled the current AppKit target.",
+    "local_suite": "Not rerun; only the focused regression was required for this changed reducer/cache path.",
+    "hosted_ci": "Not yet observed for source commit 62ee54349c8c63ada7d98981ec6d960b03e935e2.",
     "native_bundle": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-      "source_fingerprint_sha256": "e03e9a5dc13976899b697ea0ab0d4a72089ce4dbbcde1bd57fb666ead188dff4",
-      "executable_sha256": "a3aafd2c2cab14e0dc4537881ffceb78b18ec491332ebe0a526efa02194cd38c",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe5e4e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "af4ada2f997d1165aa9e14832473275b8264baf88cd8f82c8c81474bfa102674",
-      "build_record_sha256": "0ff3ce59d84b7e383db5e7081f3d408eada647642e2e6b4491d81981415c9eda",
+      "source_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+      "source_fingerprint_sha256": "1a1f4e24497af23046f7fb926dc6e83b60c7514320f5a5696fb8aada0f64b7ab",
+      "executable_sha256": "5ca2e975fff3e8082c3baf67e8db062a3ed1140c5c91d1de57452148ecee4030",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "build_info_sha256": "33c8876cc8098ef8822a88d3613b2f9a77dd6849eb1f76369db7894a9925e38a",
+      "build_record_sha256": "460f84357fefeda2f2f6b08faf6bca5c04a2dbba611c03cd6d46c8876b67ad56",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "One canonical Dev.app was built from exact source and launched once. CUA title NeTelegram · dev 477404af; clean accountless authorization screen showed Thailand +66, phone field, Continue, and QR. No account or credentials were entered.",
-      "scope": "Native build and accountless UI launch only; no login, real account, 20-runtime test, Developer ID signing, or notarization.",
-      "process_state": "Running from canonical exact-source Dev.app; do not replace without checking process state."
+      "smoke": "One canonical Dev.app built from exact source 62ee5434 and launched once. CUA title NeTelegram · dev 62ee5434; clean accountless authorization screen shown. No account or credentials entered.",
+      "scope": "Focused synthetic APP09 regression 1/1; AppKit build and accountless launch only. No real login, real account, 20-runtime certification, Developer ID signing, or notarization.",
+      "process_state": "Running canonical exact-source Dev.app after rebuild."
     },
-    "implementation": "After the update receiver awaits RuntimeCoordinator.isCurrent(route), AppDelegate synchronously rechecks target.route and runtimesByClient ownership before applying side effects. This closes the stale-local-reference window across MainActor suspension.",
-    "remaining": "Focused synthetic route test and exact-source CI job only. No real login, 20-runtime certification, Developer ID, notarization, or release."
+    "implementation": "On TDLib send confirmation, remove only the exact acknowledged text from both visible drafts and lock-time dirty recovery. Preserve newer or unrelated unsaved text and keep the account dirty barrier for the remaining recovery snapshot.",
+    "remaining": "OS disk exhaustion and dirty-state quit barrier under real disk-full remain unverified; no login, 20-runtime certification, Developer ID, notarization, or release."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -803,13 +803,13 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
-    "case": "APP05",
-    "test_commit": "b834969cd35c6c7591e92dfd75f51b706541095b",
-    "app_code_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
-    "test": "privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock",
+    "case": "APP09",
+    "test_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "app_code_commit": "62ee54349c8c63ada7d98981ec6d960b03e935e2",
+    "test": "acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery",
     "result": "PASS 1/1",
-    "command": "swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app05-lock --filter privacyLockInvalidatesInFlightPhotoDecodeAndAllowsFreshPreviewAfterUnlock",
-    "scope": "Synthetic PhotoPipeline boundary: cancellation and cache invalidation during a blocked decode suppress late callback/cache data; a fresh post-unlock preview succeeds. Does not prove AppKit integration, system photo viewers, or real-account behavior."
+    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/netelegram-app09-dirtydraft --filter acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery",
+    "scope": "Synthetic cache/recovery behavior: confirmed text is removed, newer exact-conversation and unrelated dirty drafts remain. Does not prove native disk-full or quit-barrier behavior."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",

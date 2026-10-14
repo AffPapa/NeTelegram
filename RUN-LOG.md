@@ -1245,3 +1245,11 @@
 - Read current app-source `477404afd89378affb9cc21eb6c0e32745cb5091`. The async system-permission callback checks runtime object identity, exact routed notification equality, and active ID under the shared PrivacyDispatchBarrier before scheduling. Click routing rechecks verified account identity and authorization; locked handoff validates route membership, runtime generation, Telegram user ID, and ready state after system unlock, and is cleared on account/message removal.
 - No concrete new source race found. Existing synthetic barrier and handoff tests apply; native Notification Center completion ordering and real-account close/reconcile remain unverified. No code/tests/build/site deploy changed for this review. APP08 remains partial.
 - Resume action moved to APP09 dirty-draft persistence under disk-full/storage failure.
+
+## 2026-10-14 — APP09 accepted-send cleanup of locked dirty-draft recovery
+
+- Found a concrete privacy-lock edge: after TDLib confirmed a send while an earlier draft flush had failed, the exact sent text could remain in `lockedDirtyDraftRecovery` and return as a draft after unlock. Added exact-value cleanup across visible and locked recovery maps; newer and unrelated unsaved text stay protected by the dirty-account barrier.
+- App/test commit `62ee54349c8c63ada7d98981ec6d960b03e935e2`. Focused `acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery` passed 1/1; full suite not rerun.
+- Rebuilt the single canonical `/private/tmp/NeTelegram-Dev.app` from that clean SHA once; AppKit build and strict ad-hoc signature verification passed. CUA confirmed `NeTelegram · dev 62ee5434` on the clean accountless entry screen. No credentials or Telegram account were used.
+- This is synthetic recovery evidence plus accountless native smoke. OS-level disk-full and native quit-barrier behavior, real login, 20 authorized runtimes, Developer ID/notarization, and release remain open. No app release was created.
+- Process lesson: sandboxed process enumeration returned “unable to prove absence” even after CUA showed the app closed. The release guard was kept intact; one escalated read-only process check proved exit, then the same canonical build ran once. Do not fake a negative process result or repeat the blocked check in the same sandbox.
