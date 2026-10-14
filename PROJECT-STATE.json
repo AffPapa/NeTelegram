@@ -117,7 +117,7 @@
     "latest_pushed_commit": {
       "sha": "819071d40371bbc5ae14f372454162dcfdac3f9a",
       "branch": "main",
-      "verified": "Current checkout is clean and origin/main matches this SHA; exact-source Actions run passed.",
+      "verified": "Current app-source SHA is pushed; later commits on main update project checkpoint metadata only.",
       "ci_status": "PASS exact-source macOS CI, run 38570078255."
     },
     "latest_native_candidate": {
@@ -140,7 +140,7 @@
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
-    "support_root": "/private/tmp/netetelegram-dev-support-clean",
+    "support_root": "/private/tmp/netelegram-dev-support-clean",
     "source_fingerprint_sha256": "a047da8ba31e18fa42f73cf31d950e18a954a2b999b2c2836f161ab4162bd52c",
     "executable_sha256": "321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
@@ -854,7 +854,7 @@
   "latest_native_candidate": {
     "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "support_root": "/private/tmp/netetelegram-dev-support-clean",
+    "support_root": "/private/tmp/netelegram-dev-support-clean",
     "source_fingerprint_sha256": "a047da8ba31e18fa42f73cf31d950e18a954a2b999b2c2836f161ab4162bd52c",
     "executable_sha256": "321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
