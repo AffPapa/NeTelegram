@@ -1340,3 +1340,10 @@
 - After exact-source CI passed, read-only process check confirmed canonical Dev.app PID 67677 was still running source 92b8ca3. A graceful quit request returned `user-cancelled (-128)`; a second read-only check confirmed the process remains open.
 - No repeat quit, force termination, replacement build, or second app copy was attempted. The candidate build is deferred until the owner closes the app. Source `632bf5514ffa2851a55665e95db5d17dae8fa1b7` and CI run 38560168478 remain the fixed candidate inputs.
 - No API hash was read from chat, process state, files, or Keychain. Site v194 and GitHub releases were not changed.
+
+
+## 2026-10-14 — Protected API hash dialog blocks safe app close
+
+- Fresh CUA inventory shows NeTelegram Dev is still running. A read-only accessibility snapshot identifies a protected API hash settings dialog with a secure text field focused. The value was not read or copied.
+- This explains why the earlier graceful quit returned user-cancelled (-128). Do not dismiss the dialog, read the field, or retry quit. The owner must press Save to Keychain for the intended value or Cancel directly in the app.
+- The app-source candidate remains `632bf5514ffa2851a55665e95db5d17dae8fa1b7`; CI 38560168478 passed 179/179. Rebuild remains deferred until the dialog is resolved and the same app is closed.

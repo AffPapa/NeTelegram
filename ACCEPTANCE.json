@@ -673,7 +673,7 @@
     "push": "success; GitHub connector verified exact commit",
     "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection PASS 1/1; SwiftPM compiled NeTelegramApp and NeTelegramCoreTests",
     "exact_source_ci": "PASS 179/179; run 38560168478",
-    "canonical_dev_app": "PID 67677 still running source 92b8ca3; graceful quit request returned user-cancelled (-128), so no rebuild was attempted.",
+    "canonical_dev_app": "CUA read-only confirms Dev.app is running with secure API hash dialog open. Field value not read. User must save/cancel; no rebuild attempted.",
     "real_account": "not used"
   },
   "latest_site_deployment": {
@@ -715,7 +715,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "The canonical Dev.app (PID 67677, source 92b8ca3) remains open. Its graceful quit request returned user-cancelled (-128); do not retry or interact with it. When the owner closes it, build the canonical Dev.app exactly once from source 632bf551, then run the short native first-run/auth smoke. API hash is never read from chat or logged. No Developer ID identity is currently available and notary credentials are unverified; keep Site v194 unchanged until signed/notarized assets exist.",
+  "next_action": "A read-only CUA check found the canonical Dev.app open on its protected API hash save dialog; the secure field value was not read. The user must save the intended value to Keychain or cancel in the app. Do not dismiss or retry quitting. After the dialog is resolved and the owner closes Dev.app, build source 632bf551 exactly once and run the short first-run/auth smoke. Signing inventory is 0 and notary credentials are unverified; no app release/download is ready. Site v194 stays unchanged.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -788,7 +788,7 @@
     "scope": "Records initial auto-presented runtime as selection intent and proves later user selection invalidates cleanup eligibility. This policy test does not execute native TDLib cleanup, real login or 20-runtime operation.",
     "native_bundle_local": {
       "source_commit": "92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f",
-      "status": "running prior canonical bundle; quit request cancelled, no rebuild",
+      "status": "running prior canonical bundle; protected secure API hash dialog open; value not read",
       "pid": 67677,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "candidate_source_commit": "632bf5514ffa2851a55665e95db5d17dae8fa1b7"
