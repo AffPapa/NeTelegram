@@ -46,6 +46,10 @@ def validate_records(project: dict, acceptance: dict) -> None:
     acceptance_site = acceptance["latest_site_deployment"]
     acceptance_slice = acceptance["latest_acceptance_slice"]
     checks = [
+        (acceptance["status"].startswith(acceptance_slice["id"]),
+         "ACCEPTANCE.status is stale; it must identify latest_acceptance_slice"),
+        (acceptance_slice["source_commit"] == app_sha,
+         "ACCEPTANCE.latest_acceptance_slice source differs from current_evidence"),
         (project["product"]["app_source_commit"] == app_sha,
          "PROJECT-STATE.product.app_source_commit != ACCEPTANCE.current_evidence.app_source_commit"),
         (project["next_action"] == acceptance["next_action"],

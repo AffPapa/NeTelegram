@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "APP20 photo flow exact-source local and hosted synthetic suites passed 169/169 after adding explicit photo-content-open dispatch; native/account interaction and real account/release gates remain incomplete.",
+  "status": "APP22 safe composer Cmd+Return send: exact-source local serial suite 170/170 and GitHub macOS CI passed; canonical Dev.app lifecycle smoke passed. Native account interaction, real Telegram accounts, 20-runtime certification, Developer ID release, and compatibility gates remain incomplete.",
   "current_evidence": {
     "app_source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
     "local_suite": "PASS 170/170 serial macOS Swift suite on arm64e / Xcode beta / Swift 6.4 in 0.457s; focused composer keyboard policy regression PASS 1/1.",
