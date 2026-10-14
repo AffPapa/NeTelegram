@@ -27,4 +27,31 @@ struct ProductIdentityTests {
         #expect(!release.path.localizedCaseInsensitiveContains("Telegram Desktop"))
         #expect(!release.path.localizedCaseInsensitiveContains("org.telegram"))
     }
+
+    @Test func developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo() throws {
+        let buildInfo = try JSONSerialization.data(withJSONObject: ["support_root": "/tmp/netelegram-build-root"])
+        let arguments = ["NeTelegram", "--app-support-root", "/tmp/netelegram-argument-root"]
+        let environment = ["NETELEGRAM_APP_SUPPORT_ROOT": "/tmp/netelegram-environment-root"]
+
+        #expect(AccountStorageRoot.developmentOverride(
+            arguments: arguments,
+            environment: environment,
+            buildInfo: buildInfo
+        )?.path == "/tmp/netelegram-argument-root")
+        #expect(AccountStorageRoot.developmentOverride(
+            arguments: ["NeTelegram"],
+            environment: environment,
+            buildInfo: buildInfo
+        )?.path == "/tmp/netelegram-environment-root")
+        #expect(AccountStorageRoot.developmentOverride(
+            arguments: ["NeTelegram"],
+            environment: [:],
+            buildInfo: buildInfo
+        )?.path == "/tmp/netelegram-build-root")
+        #expect(AccountStorageRoot.developmentOverride(
+            arguments: ["NeTelegram", "--app-support-root", "relative/path"],
+            environment: [:],
+            buildInfo: nil
+        ) == nil)
+    }
 }

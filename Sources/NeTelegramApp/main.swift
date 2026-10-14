@@ -359,8 +359,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildWindow() {
-        let contentWidth: CGFloat = 1060
-        let contentHeight: CGFloat = 720
+        let contentWidth: CGFloat = 920
+        let contentHeight: CGFloat = 660
         let content = NSView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
@@ -370,24 +370,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let mark = NSView(frame: .zero)
         mark.wantsLayer = true
         mark.layer?.backgroundColor = NSColor.systemBlue.cgColor
-        mark.layer?.cornerRadius = 32
+        mark.layer?.cornerRadius = 28
         let markLabel = NSTextField(labelWithString: "N")
-        markLabel.font = .systemFont(ofSize: 34, weight: .bold)
+        markLabel.font = .systemFont(ofSize: 30, weight: .bold)
         markLabel.textColor = .white
         markLabel.alignment = .center
-        markLabel.frame = NSRect(x: 0, y: 11, width: 64, height: 42)
+        markLabel.frame = NSRect(x: 0, y: 8, width: 56, height: 40)
         mark.addSubview(markLabel)
 
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
-        loginHeading.font = .systemFont(ofSize: 25, weight: .semibold)
+        loginHeading.font = .systemFont(ofSize: 23, weight: .semibold)
         loginHeading.alignment = .center
         loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
-        loginSubtitle.font = .systemFont(ofSize: 14)
+        loginSubtitle.font = .systemFont(ofSize: 13)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
-        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент на Telegram API и TDLib; не связан с Telegram Messenger LLP и не переносит сессии других приложений.")
+        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
         loginDisclosure.font = .systemFont(ofSize: 11)
-        loginDisclosure.textColor = .secondaryLabelColor
+        loginDisclosure.textColor = .tertiaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
         loginDisclosure.alignment = .center
         loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
@@ -514,7 +514,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
-        authStack.spacing = 14
+        authStack.spacing = 12
         authStack.translatesAutoresizingMaskIntoConstraints = false
         authCard = AuthenticationCardView(frame: .zero)
         authCard.translatesAutoresizingMaskIntoConstraints = false
@@ -533,29 +533,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         NSLayoutConstraint.activate([
             authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
-            authCard.widthAnchor.constraint(equalToConstant: 568).withPriority(.defaultHigh),
+            authCard.widthAnchor.constraint(equalToConstant: 480).withPriority(.defaultHigh),
             authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
             authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
-            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 14),
-            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -14),
-            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 14),
-            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -14),
+            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 10),
+            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -10),
+            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 10),
+            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -10),
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
             authStack.leadingAnchor.constraint(equalTo: authScrollContent.leadingAnchor, constant: 4),
             authStack.trailingAnchor.constraint(equalTo: authScrollContent.trailingAnchor, constant: -4),
             authStack.topAnchor.constraint(equalTo: authScrollContent.topAnchor, constant: 12),
             authStack.bottomAnchor.constraint(equalTo: authScrollContent.bottomAnchor, constant: -12),
-            mark.widthAnchor.constraint(equalToConstant: 64), mark.heightAnchor.constraint(equalToConstant: 64),
+            mark.widthAnchor.constraint(equalToConstant: 56), mark.heightAnchor.constraint(equalToConstant: 56),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
             loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginHeading.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            loginHeading.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginSubtitle.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            loginSubtitle.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            loginDisclosure.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            loginDisclosure.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            registrationTermsScroll.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh),
@@ -564,24 +564,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPicker.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPicker.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
+            phoneField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            emailField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
+            emailField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            inputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
+            inputField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
             secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            secureInputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
+            secureInputField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
             firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            firstNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
+            firstNameField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
             lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            lastNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
+            lastNameField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
             registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationConsent.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             statusLabel.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            actionButton.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
+            actionButton.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             qrButton.widthAnchor.constraint(equalToConstant: 280).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 28),
         ])
@@ -2081,12 +2081,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         if let catalogueRoot { return catalogueRoot }
         let applicationSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
 #if DEBUG
-        let arguments = CommandLine.arguments
-        let argumentRoot: String? = arguments.firstIndex(of: "--app-support-root").flatMap { index in
-            arguments.indices.contains(index + 1) ? arguments[index + 1] : nil
-        }
-        let override = (argumentRoot ?? ProcessInfo.processInfo.environment["NETELEGRAM_APP_SUPPORT_ROOT"])
-            .flatMap { $0.isEmpty ? nil : URL(fileURLWithPath: $0, isDirectory: true) }
+        let buildInfoData = Bundle.main.url(forResource: "BuildInfo", withExtension: "json")
+            .flatMap { try? Data(contentsOf: $0) }
+        let override = AccountStorageRoot.developmentOverride(
+            arguments: CommandLine.arguments,
+            environment: ProcessInfo.processInfo.environment,
+            buildInfo: buildInfoData
+        )
         let support = AccountStorageRoot.resolve(
             applicationSupportDirectory: applicationSupport,
             bundleIdentifier: Bundle.main.bundleIdentifier,
@@ -7843,11 +7844,11 @@ private final class AuthenticationCardView: NSView {
         super.updateLayer()
         guard let layer else { return }
         effectiveAppearance.performAsCurrentDrawingAppearance {
-            layer.backgroundColor = NSColor.controlBackgroundColor.cgColor
-            layer.borderColor = NSColor.separatorColor.cgColor
+            layer.backgroundColor = NSColor.windowBackgroundColor.cgColor
+            layer.borderColor = NSColor.clear.cgColor
         }
         layer.borderWidth = 1 / max(window?.backingScaleFactor ?? 2, 1)
-        layer.cornerRadius = 18
+        layer.cornerRadius = 0
     }
 
     override func viewDidChangeEffectiveAppearance() {
