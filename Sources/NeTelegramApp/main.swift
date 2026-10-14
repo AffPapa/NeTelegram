@@ -1463,12 +1463,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
         apiHashAccessCheckInProgress = true
         setStatus("Запрашиваю разрешение macOS прочитать сохранённый API hash. Само значение не отображается; вход в Telegram не запускается…")
-        telegramAPIHashReadiness.invalidate()
         Task { @MainActor [weak self] in
             guard let self else { return }
             defer { self.apiHashAccessCheckInProgress = false }
             do {
-                let value = try await self.telegramAPIHashReadiness.value(timeout: 12) {
+                let value = try await self.telegramAPIHashReadiness.value(
+                    timeout: 12,
+                    supersedingInFlight: true
+                ) {
                     try await SecretsStore.performKeychainOperation {
                         try SecretsStore().telegramAPIHash(allowingUserInteraction: true)
                     }

@@ -13,6 +13,7 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
 
     private let lock = NSLock()
     private var activeGeneration: UInt64?
+    private var explicitReadGeneration: UInt64?
     private var pendingLoader: Loader?
     private var cachedValue: (generation: UInt64, value: String)?
     private var replacementInProgress = false
@@ -23,35 +24,58 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
 
     public func value(
         timeout: TimeInterval = 10,
+        supersedingInFlight: Bool = false,
         load: @escaping @Sendable () async throws -> String
     ) async throws -> String {
         let waiterID = UUID()
         return try await withCheckedThrowingContinuation { continuation in
             lock.lock()
-            let requestedGeneration = generation
-            if let cachedValue, cachedValue.generation == requestedGeneration {
+            var requestedGeneration = generation
+            if !supersedingInFlight,
+               let cachedValue,
+               cachedValue.generation == requestedGeneration {
                 lock.unlock()
                 continuation.resume(returning: cachedValue.value)
                 return
             }
-            waiters[requestedGeneration, default: [:]][waiterID] = continuation
+
+            var supersededWaiters: [CheckedContinuation<String, any Error>] = []
             var operationToStart: (Loader, UInt64)?
-            if activeGeneration == nil {
+            if supersedingInFlight, !replacementInProgress {
+                if explicitReadGeneration == generation {
+                    // A retry while the explicit OS query is still running
+                    // joins it instead of filling the bounded Keychain queue.
+                } else {
+                    let staleGeneration = generation
+                    generation &+= 1
+                    requestedGeneration = generation
+                    cachedValue = nil
+                    pendingLoader = nil
+                    supersededWaiters = waiters.removeValue(forKey: staleGeneration).map { Array($0.values) } ?? []
+                    explicitReadGeneration = requestedGeneration
+                    activeGeneration = requestedGeneration
+                    operationToStart = (load, requestedGeneration)
+                }
+            }
+            waiters[requestedGeneration, default: [:]][waiterID] = continuation
+            if operationToStart == nil, activeGeneration == nil {
                 if replacementInProgress {
                     pendingLoader = load
                 } else {
                     activeGeneration = requestedGeneration
                     operationToStart = (load, requestedGeneration)
                 }
-            } else if activeGeneration != requestedGeneration, pendingLoader == nil {
+            } else if operationToStart == nil, activeGeneration != requestedGeneration, pendingLoader == nil {
                 // The old synchronous Security call cannot be cancelled. Defer
                 // a fresh read until it returns, then discard its stale value.
                 pendingLoader = load
             }
             lock.unlock()
+            supersededWaiters.forEach { $0.resume(throwing: TelegramAPIHashReadinessError.invalidated) }
 
+            let timeoutGeneration = requestedGeneration
             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + max(0, timeout)) { [weak self] in
-                self?.expire(waiterID, generation: requestedGeneration)
+                self?.expire(waiterID, generation: timeoutGeneration)
             }
 
             if let operationToStart { start(operationToStart.0, generation: operationToStart.1) }
@@ -72,6 +96,7 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
         let staleGeneration = generation
         generation &+= 1
         cachedValue = (generation, value)
+        explicitReadGeneration = nil
         pendingLoader = nil
         replacementInProgress = false
         let staleWaiters = waiters.removeValue(forKey: staleGeneration).map { Array($0.values) } ?? []
@@ -86,6 +111,7 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
         let invalidatedGeneration = generation
         generation &+= 1
         cachedValue = nil
+        explicitReadGeneration = nil
         replacementInProgress = true
         pendingLoader = nil
         let continuations = waiters.removeValue(forKey: invalidatedGeneration).map { Array($0.values) } ?? []
@@ -138,6 +164,9 @@ public final class TelegramAPIHashReadiness: @unchecked Sendable {
             return
         }
         activeGeneration = nil
+        if explicitReadGeneration == operationGeneration {
+            explicitReadGeneration = nil
+        }
         var continuations: [CheckedContinuation<String, any Error>] = []
         var operationToStart: (Loader, UInt64)?
         if operationGeneration == generation {

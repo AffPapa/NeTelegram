@@ -3939,6 +3939,68 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(try await readiness.value { "unexpected third read" } == "synthetic-authorized-value")
 }
 
+@Test func explicitInteractiveAPIHashReadBypassesOneStalledLookupAndDeduplicatesRetries() async throws {
+    let readiness = TelegramAPIHashReadiness()
+    let stalledStarted = LockedTestValue(false)
+    let interactiveStarted = LockedTestValue(false)
+    let interactiveLoadCount = LockedTestValue(0)
+    let releaseStalledRead = DispatchSemaphore(value: 0)
+    let releaseInteractiveRead = DispatchSemaphore(value: 0)
+    defer { releaseStalledRead.signal() }
+    defer { releaseInteractiveRead.signal() }
+
+    let staleWaiter = Task {
+        try await readiness.value(timeout: 2) {
+            try await SecretsStore.performKeychainOperation {
+                stalledStarted.set(true)
+                releaseStalledRead.wait()
+                return "synthetic-stale-value"
+            }
+        }
+    }
+    #expect(await waitForTrue(stalledStarted, timeout: .seconds(1)))
+
+    let explicitRead = Task {
+        try await readiness.value(timeout: 2, supersedingInFlight: true) {
+            try await SecretsStore.performKeychainOperation {
+                interactiveLoadCount.mutate { $0 += 1 }
+                interactiveStarted.set(true)
+                releaseInteractiveRead.wait()
+                return "synthetic-interactive-value"
+            }
+        }
+    }
+    #expect(await waitForTrue(interactiveStarted, timeout: .seconds(1)))
+
+    do {
+        _ = try await staleWaiter.value
+        Issue.record("The previous noninteractive waiter should be invalidated")
+    } catch TelegramAPIHashReadinessError.invalidated {
+        #expect(true)
+    }
+
+    let retry = Task {
+        try await readiness.value(timeout: 2, supersedingInFlight: true) {
+            interactiveLoadCount.mutate { $0 += 1 }
+            return "duplicate interactive lookup"
+        }
+    }
+    try await Task.sleep(for: .milliseconds(20))
+    #expect(interactiveLoadCount.get() == 1)
+    releaseInteractiveRead.signal()
+    #expect(try await explicitRead.value == "synthetic-interactive-value")
+    #expect(try await retry.value == "synthetic-interactive-value")
+    #expect(interactiveLoadCount.get() == 1)
+
+    releaseStalledRead.signal()
+    #expect(try await readiness.value { "unexpected fresh read" } == "synthetic-interactive-value")
+    #expect(try await readiness.value(timeout: 2, supersedingInFlight: true) {
+        interactiveLoadCount.mutate { $0 += 1 }
+        return "synthetic-reverified-value"
+    } == "synthetic-reverified-value")
+    #expect(interactiveLoadCount.get() == 2)
+}
+
 @Test func replacingAPIHashDiscardsOldInFlightLookupBeforeStartingProfiles() async throws {
     let readiness = TelegramAPIHashReadiness()
     let oldGate = AsyncStringGate()
