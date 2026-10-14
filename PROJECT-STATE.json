@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "AUTH05 disclosure contrast correction verified at exact app source 0a7cbe6. Exact-source macOS CI 38501111688 passed; canonical Dev.app rebuilt from the same SHA in 5.24s, signature verified, and CUA screenshot confirmed readable secondary disclosure. Real auth remains deferred.",
+  "phase": "APP02 combined stalled-profile preparation regression passed locally at test commit pending; hosted exact-source CI is the next gate. Dev.app app source remains 0a7cbe6; no app rebuild required.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",

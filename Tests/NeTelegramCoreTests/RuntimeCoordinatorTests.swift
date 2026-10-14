@@ -3318,6 +3318,77 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await scheduler.queuedStarts() == 0)
 }
 
+@Test func oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let scheduler = RuntimeStartupScheduler(parallelism: 2)
+    let accounts = (0..<20).map { _ in AccountUUID() }
+    let blockedEntered = LockedTestValue(false)
+    let blockedCompleted = LockedTestValue(false)
+    let completedProfiles = LockedTestValue(0)
+    let releaseBlockedKeychain = DispatchSemaphore(value: 0)
+    defer { releaseBlockedKeychain.signal() }
+
+    let blockedBackend = FakeKeychainItemBackend()
+    let blockedProfile = Task {
+        await scheduler.withPermit {
+            try? await SecretsStore.performKeychainOperation {
+                blockedEntered.set(true)
+                releaseBlockedKeychain.wait()
+                _ = try ProfileStoragePreparer.prepare(
+                    account: accounts[0],
+                    rootURL: root,
+                    secrets: SecretsStore(backend: blockedBackend)
+                )
+            }
+            blockedCompleted.set(true)
+        }
+    }
+
+    #expect(await waitForTrue(blockedEntered, timeout: .seconds(2)))
+
+    let otherProfiles = accounts.dropFirst().map { account in
+        Task {
+            await scheduler.withPermit {
+                let accountName = account.id.uuidString.lowercased()
+                let backend = FakeKeychainItemBackend(values: [
+                    FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.database-key"): Data(repeating: 1, count: 32),
+                    FakeKeychainCoordinate(account: accountName, service: "org.affpapa.netelegram.app-state-key"): Data(repeating: 2, count: 32),
+                ])
+                do {
+                    _ = try await SecretsStore.performKeychainOperation {
+                        try ProfileStoragePreparer.prepare(
+                            account: account,
+                            rootURL: root,
+                            secrets: SecretsStore(backend: backend)
+                        )
+                    }
+                    completedProfiles.mutate { $0 += 1 }
+                } catch {
+                    Issue.record("An unrelated profile failed while one Keychain preparation was stalled: \(error)")
+                }
+            }
+        }
+    }
+
+    #expect(
+        await waitForCount(completedProfiles, atLeast: 19, timeout: .seconds(5)),
+        "A single stalled profile must not retain the only path for the other 19 profiles"
+    )
+    #expect(!blockedCompleted.get(), "The injected Keychain stall must still be active during the assertion")
+    #expect(await scheduler.activeStarts() == 1)
+
+    releaseBlockedKeychain.signal()
+    await blockedProfile.value
+    for task in otherProfiles { await task.value }
+
+    #expect(blockedCompleted.get())
+    #expect(completedProfiles.get() == 19)
+    #expect(await scheduler.activeStarts() == 0)
+    #expect(await scheduler.queuedStarts() == 0)
+}
+
 @Test func quittingInvalidatesAProfileRestoreThatMayResumeLate() {
     var gate = ProfileRestoreGenerationGate()
     let firstRestore = gate.begin()
