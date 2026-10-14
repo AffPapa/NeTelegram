@@ -1,35 +1,35 @@
 {
   "schema_version": 2,
-  "status": "CORE-RUNTIME-05 production startup registration fanout — exact-source CI, focused synthetic regression, and matching canonical Dev.app smoke passed; real account acceptance remains partial.",
+  "status": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance — focused regression, exact-source CI 181/181, and canonical clean Dev.app smoke passed; real account acceptance remains partial.",
   "current_evidence": {
-    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-    "local_suite": "Focused test passed 1/1; compiled NeTelegramCore, NeTelegramApp and test target. No full local suite run.",
-    "focused_test": "twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges PASS 1/1; production startup and test now use the same registry+scheduler overload.",
+    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "local_suite": "Focused regression passed 1/1; compiled NeTelegramCore, NeTelegramApp, and test target. Full local suite not rerun.",
+    "focused_test": "developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo PASS 1/1; covers args > environment > embedded BuildInfo and rejects a relative path.",
     "hosted_ci": {
-      "run_id": 38570078255,
+      "run_id": 38572666648,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
-      "workflow_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "scope": "Exact-source GitHub macOS serial suite passed after startup registration was unified; no real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
+      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "a047da8ba31e18fa42f73cf31d950e18a954a2b999b2c2836f161ab4162bd52c",
-      "executable_sha256": "321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183",
+      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
+      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once and launched by its exact path after `open` returned kLSNoExecutableErr. CUA title and screenshot match source 819071d4; AX confirms accountless phone form, country search/selector, phone field, Continue, QR, and disclosure. No profile, phone, code, or credential entered.",
-      "scope": "Native accountless login screen only; no authentication, real chats, read/send, 20 real runtimes, Developer ID, or notarization."
+      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
+      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -55,7 +55,7 @@
       "saved_archive_size_bytes": 491520,
       "saved_archive_file_count": 14
     },
-    "scope": "Exact-source focused synthetic startup test + exact CI + native accountless login smoke. No real auth, read/send, 20 authorized runtimes, distribution signing or notarization."
+    "scope": "Clean accountless Dev.app native smoke and exact-source CI; no real auth/read/send, 20 real runtimes, signed release, or Site download."
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -540,25 +540,54 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/nettelegram-clang-module-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/nettelegram-swift-module-cache swift test --no-parallel --jobs 2 --disable-sandbox --scratch-path /private/tmp/nettelegram-startup-integration --filter twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges",
-    "local_result": "PASS 1/1 focused; SwiftPM compiled NeTelegramCore, NeTelegramApp, and test target.",
-    "hosted_ci_run_id": 38570078255,
+    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "local_command": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-quickcheck --filter developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo",
+    "local_result": "PASS 1/1; app and test targets compiled.",
+    "hosted_ci_run_id": 38572666648,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
-    "scope": "Synthetic 20-profile startup fanout through production registry/scheduler path; does not prove real accounts."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
+    "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration. Native app screen verified separately through CUA."
   },
   "current_local_slice": {
-    "commit": "c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9",
-    "parent_source_commit": "4e2779109dfd644668fbae0fde5d85b00b23cbf3",
-    "push": "success; exact source is origin/main.",
-    "local_build": "Targeted SwiftPM test compiled NeTelegramCore and NeTelegramApp.",
-    "targeted_test": "PASS callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime 1/1.",
-    "exact_source_ci": "PASS run 38566830872 for exact source SHA c9516a27a5bc3b0c9d124bd82878af2a60a1fcc9.",
-    "canonical_dev_app": "Canonical bundle rebuilt/launched from exact source. BuildInfo/Info.plist agree; strict ad-hoc signature verification passed.",
-    "real_account": "not tested; owner previously deferred auth.",
-    "native_smoke": "PASS accountless phone-login state only; no phone/OTP entered.",
+    "id": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance",
+    "commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "parent_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "push": "success; GitHub connector fetched exact commit from AffPapa/NeTelegram main",
+    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netetelegram-quickcheck-modules swift test --disable-sandbox --scratch-path /private/tmp/netelegram-quickcheck --filter developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo",
+    "local_result": "PASS 1/1; compiled NeTelegramCore, NeTelegramApp, and focused test target.",
+    "exact_source_ci": {
+      "run_id": 38572666648,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
+      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
+    },
+    "change": "Reduced initial auth window/card/form dimensions and removed contrasting panel background; shortened disclosure; debug support root now falls back to bundled BuildInfo when launched without args.",
+    "coverage_limit": "One accountless login screen only; no real TDLib login/read/send or 20 authorized runtimes.",
+    "canonical_dev_app": {
+      "bundle_id": "org.affpapa.netelegram.dev",
+      "version": "0.0.0-dev",
+      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "dirty_source": false,
+      "distribution_ready": false,
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "support_root": "/private/tmp/netelegram-dev-support-clean",
+      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
+      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+      "architecture": "arm64",
+      "minimum_macos": "14.0",
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
+      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
+    },
+    "real_account": "not tested; owner has deferred login.",
+    "site": "public v194; no app download; unchanged.",
+    "release": "No app release/assets. Latest recorded preflight: 0 Developer ID identities; notary credentials unverified.",
+    "native_smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
     "pending_native_candidate": null
   },
   "latest_site_deployment": {
@@ -600,7 +629,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "The canonical Dev.app and current app source now both match 819071d. Highest-value next acceptance is owner-operated first-account smoke in this already-open app: authenticate → actual chat list → open/read → send one text to an intended recipient → close/reopen. Do not request credentials in chat or launch another app. After the owner reports completion, verify only that scenario and fix the first observed defect. Site remains v194 without downloads until signed/notarized release gates pass.",
+  "next_action": "The canonical Dev.app is open at the empty phone-login screen, source 2eadea7. When ready, the owner completes login in this one app; do not send phone/code/hash in chat or import any sessions. After a real chat appears, verify only open/read/send and close/reopen. Then continue the all-active 20-runtime slice. GitHub app release and Site download remain gated on real-account acceptance, signing/notarization, and Telegram compatibility decisions; Site stays v194 with no download CTA.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -630,45 +659,45 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
     "branch": "main",
-    "working_tree": "clean app-source tree; exact origin/main source commit is 819071d",
-    "local_tests": "Focused startup test passed 1/1; no full local suite rerun.",
-    "hosted_validation": "Exact-source macOS suite 38570078255 passed.",
+    "working_tree": "clean app-source tree; exact source commit 2eadea7 is on origin/main.",
+    "local_tests": "Focused support-root regression passed 1/1; no full local suite rerun.",
+    "hosted_validation": "Exact-source macOS suite 38572666648 passed 181/181.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+      "application_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "a047da8ba31e18fa42f73cf31d950e18a954a2b999b2c2836f161ab4162bd52c",
-      "executable_sha256": "321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183",
+      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
+      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once and launched by its exact path after `open` returned kLSNoExecutableErr. CUA title and screenshot match source 819071d4; AX confirms accountless phone form, country search/selector, phone field, Continue, QR, and disclosure. No profile, phone, code, or credential entered.",
-      "scope": "Native accountless login screen only; no authentication, real chats, read/send, 20 real runtimes, Developer ID, or notarization."
+      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
+      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
     },
-    "scope": "Native accountless login screen only; no authentication, real chats, read/send, 20 real runtimes, Developer ID, or notarization."
+    "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
   },
   "latest_acceptance_slice": {
-    "id": "CORE-RUNTIME-05 production startup registration fanout",
-    "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-    "local_focused_test": "twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges PASS 1/1",
+    "id": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance",
+    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+    "local_focused_test": "developmentSupportRootUsesLaunchOverrideThenEnvironmentThenBuildInfo PASS 1/1; AppKit and test target compiled.",
     "hosted_ci": {
-      "run_id": 38570078255,
+      "run_id": 38572666648,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38570078255",
-      "workflow_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
-      "scope": "Exact-source GitHub macOS serial suite passed after startup registration was unified; no real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38572666648",
+      "workflow_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
+      "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed 181/181 for source 2eadea7; focused debug-root regression included. No real Telegram account integration."
     },
-    "native_smoke": "PASS canonical Dev.app rebuilt and launched once from exact source 819071d; CUA AX and screenshot show the accountless phone authorization screen. No login or credentials.",
-    "scope": "The 20 synthetic profile test and production schedule path now use the same registry+scheduler API. APP01 remains partial until real authorized account runtime and resource validation."
+    "native_smoke": "PASS: clean canonical Dev.app source 2eadea7, exact path launch without args, CUA AX and screenshot match compact auth UI; BuildInfo support-root fallback; no account data.",
+    "scope": "Design and debug launch provenance only. No real auth/chat/send, 20-account runtime/performance, Developer ID, notarization, release, or Site deployment."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -751,22 +780,22 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "CORE-RUNTIME-04 post-authorization callback ownership — focused race test, exact-source CI, and canonical Dev.app smoke passed; real Telegram authentication remains owner-operated.",
+  "phase": "AUTH-DESIGN-01 compact login hierarchy and debug-root provenance — focused regression, exact-source CI 181/181, and canonical clean Dev.app smoke passed; real account acceptance remains partial.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
     "command": "Scripts/dev-app.sh",
-    "result": "PASS canonical arm64 Dev.app built once in 5.71s, BuildInfo matches clean source, pinned TDLib c15d3f5, minimum macOS 14.0, ad-hoc signature strict verification passed. LaunchServices open returned kLSNoExecutableErr; one CUA exact-path launch succeeded and showed the expected source SHA."
+    "result": "PASS: canonical arm64 Dev.app built from clean 2eadea7; source fingerprint, BuildInfo, support root, ad-hoc signature and executable hash recorded; direct-path CUA launch verified."
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "819071d40371bbc5ae14f372454162dcfdac3f9a",
+    "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "a047da8ba31e18fa42f73cf31d950e18a954a2b999b2c2836f161ab4162bd52c",
-    "executable_sha256": "321365aedaada20e6a71dd2afb53d6c642ba06f92a12b3b7e538361fe529a183",
+    "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
+    "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS canonical exact-source accountless phone-login screen; CUA AX and screenshot verified.",
-    "scope": "Native accountless login screen only; no authentication, real chats, read/send, 20 real runtimes, Developer ID, or notarization."
+    "result": "PASS: clean canonical Dev.app launched directly with the accountless compact phone-login screen.",
+    "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
   }
 }
