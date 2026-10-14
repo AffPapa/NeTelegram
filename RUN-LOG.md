@@ -1096,3 +1096,11 @@
 - Existing public Site `appgprj_6acba85192e08191acdf7011928848cf` deployed v185 (`appgdep_6acf3695e7ac8191afa6d7c4e08fa650`) from source `06b0328911292a281e0f0e9dffd38c9982084c8b` at https://netelegram.iryadom.chatgpt.site. Archive SHA-256 `17e320005bb09f534294503466ba253a1eedc6cfb875f32056e8c106713cbab9`, 197486 local bytes; saved archive hash `sha256:b420c00d5125c46968b2d62d592b97333cff16a413f7f4f3653a8f29196697c6`, 14 files.
 - Static validation passed all 8 routes. Anonymous checks returned 200 `text/html` for `/devlog/` and `/downloads/`, and 200 `text/xml` for `/updates/stable.xml` and `/updates/alpha.xml`. The devlog links exact source and CI; downloads still has no binary.
 - No authorized account search/login, 20-runtime certification, notarization, Gatekeeper or app release was performed.
+
+
+## 2026-10-14 — Release preflight refreshed without reading credentials
+
+- Fresh local signing check reported four valid code-signing identities, including two `Developer ID Application` identities for team `H6VGU2M6JD`. This confirms signing identities are available in this macOS account; it does not prove that a particular app bundle is correctly signed. No binary was signed.
+- Xcode is selected from `/Applications/Xcode-beta.app/Contents/Developer`; `notarytool` 1.1.3 (42) is installed and Gatekeeper assessment is enabled. A non-secret Keychain-item existence check for `com.apple.gke.notary.tool` returned absent or inaccessible. No credential value/profile secret was read and no notarization submission was attempted.
+- The canonical Dev.app remains running as PID 79726 from `87c0c06560ac0986f7e004d6578b1e3b034c9244`; current source `7683cc6bace702b3376a08a9a2aaf4aaf881a691` still awaits normal quit and positive process absence before in-place rebuild.
+- No app source changed, so no Swift tests, app build, Site deployment, or app release was repeated.
