@@ -681,7 +681,10 @@
     "environment_note": "Initial restricted SwiftPM attempts were denied before compilation because manifest sandbox setup could not access its cache. Same targeted command succeeded after approved host execution with caches/scratch under /private/tmp.",
     "canonical_dev_app": "left running and untouched; not replaced",
     "real_account": "not used; login remains deferred",
-    "recommended_follow_up": "Use the source-backed UI review to keep the existing two-pane shell and validate real-data visual states after login. Recheck signing identity and GitHub transport before planning release; do not publish ad-hoc Dev.app."
+    "recommended_follow_up": "Use the source-backed UI review to keep the existing two-pane shell and validate real-data visual states after login. Recheck signing identity and GitHub transport before planning release; do not publish ad-hoc Dev.app.",
+    "commit": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+    "push": "Verified on AffPapa/NeTelegram by GitHub connector fetch_commit; same coordinator source blob SHA 8e99b35f6c23154e3bf3de7122ba1004387ee8eb is present on main.",
+    "ci": "No status checks reported yet for this pushed commit; exact-source CI remains pending/unverified."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",

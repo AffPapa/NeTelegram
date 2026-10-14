@@ -113,6 +113,12 @@
       "workflow_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
       "app_source_commit": "9e47764561030c82ba3f2c1f475533f1fb85eefd",
       "scope": "Exact-source pinned TDLib build and isolated arm64 Dev.app assembly/verification passed; build artifact uploaded for review. This is hosted build evidence, not real-account acceptance or a signed public release."
+    },
+    "latest_pushed_commit": {
+      "sha": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+      "branch": "main",
+      "verified": "GitHub connector fetched this exact commit and source blob from AffPapa/NeTelegram.",
+      "ci_status": "No status checks reported yet; pending/unverified."
     }
   },
   "local_development_candidate": {
@@ -774,5 +780,11 @@
     "verified": "Official docs describe obtaining api_id/api_hash through my.telegram.org and state one api_id per phone number.",
     "not_verified": "No official self-service api_hash rotation/reissue procedure found in reviewed docs.",
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
+  },
+  "current_local_slice": {
+    "commit": "5f98842dbb3b4c1dbd8ca5f3537db2f4b96cd637",
+    "push": "success; commit confirmed in GitHub main through the GitHub connector",
+    "ci": "pending/unverified; GitHub returned no status rows yet",
+    "canonical_dev_app": "still running the prior source; not replaced"
   }
 }
