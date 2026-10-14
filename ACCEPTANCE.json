@@ -16,7 +16,14 @@
     },
     "native_build": {
       "status": "success_local",
-      "scope": "Single canonical arm64 Dev.app from app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b; executable SHA-256 07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; codesign --verify --deep --strict passed."
+      "scope": "Single canonical arm64 Dev.app from app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b; executable SHA-256 07bc80f23426dc370c4e2226fb37896a592aba6ddaa3ce249c71b4962d5feb25; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; codesign --verify --deep --strict passed.",
+      "hosted_run": {
+        "run_id": 38515770287,
+        "status": "success",
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38515770287",
+        "workflow_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
+        "scope": "Pinned TDLib and arm64 Dev.app assembled and verified; CI development bundle uploaded. Not signed for distribution; no account login."
+      }
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
@@ -524,7 +531,8 @@
     "local_result": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
     "hosted_ci": "Exact-source macOS Actions job passed all 167 Swift tests in 0.860s; the formerly hanging twenty-client shutdown regression passed in 0.012s. The workflow ran one full serial test process. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38514102824",
     "native_dev_app_smoke": "Not run for this source. The single canonical Dev.app remains at 4dcddcc and is currently running; no second bundle was built.",
-    "scope": "Core shutdown producer/EOF barrier, 40 focused test repetitions, and the 167-test synthetic hosted suite. No Dev.app rebuild, real login, 20 authorized accounts, signing or notarization."
+    "scope": "Core shutdown producer/EOF barrier, 40 focused test repetitions, and the 167-test synthetic hosted suite. No Dev.app rebuild, real login, 20 authorized accounts, signing or notarization.",
+    "checkpoint_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818"
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -572,11 +580,12 @@
     "release_readiness": "No app release. Real-account coverage, Developer ID/notarization, compatibility decisions, Gatekeeper install and updater smoke remain open."
   },
   "latest_ci_scope_change": {
-    "checkpoint_commit": "4ee0a210d36a9ca2b9c2bf0cc783b167f239d16e",
-    "workflow": "macOS CI",
-    "run_id": 38484677460,
-    "status": "passed",
-    "scope": "Filtered probe and full serial Swift suite passed. Trigger path is Tests/NeTelegramCoreTests/**; release Python tests remain in the Ubuntu metadata workflow."
+    "commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
+    "metadata_run": 38515770379,
+    "metadata_status": "success",
+    "native_run": 38515770287,
+    "native_status": "success",
+    "scope": "Process detection regression and canonical arm64 Dev.app/TDLib workflow on exact pushed checkpoint; exact app source remains 7fd0030."
   },
   "latest_native_workflow_efficiency": {
     "date": "2026-10-14",
@@ -591,7 +600,7 @@
   },
   "current_local_candidate": {
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "parent": "15cb17949aa7e09c885cf605ad47889b42a0309a",
+    "parent": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
     "branch": "main",
     "working_tree": "product source clean at exact app-source build; tooling and checkpoint changes local/uncommitted",
     "local_tests": "Focused regression 1/1; local serial Swift suite 166/166.",

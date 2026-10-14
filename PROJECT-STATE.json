@@ -35,9 +35,9 @@
       "repo": "AffPapa/NeTelegram",
       "git_transport_push": {
         "result": "success",
-        "commit": "c646b9ece3ae45a808bf39a2723098789829985f",
+        "commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
         "remote": "AffPapa/NeTelegram main",
-        "method": "existing Git credential helper; authorized fast-forward push; no new credential"
+        "method": "authorized Git push via configured credential helper; no new credential"
       },
       "gh_cli": {
         "version": "2.88.1",
@@ -51,11 +51,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38514841734,
+      "run_id": 38515770379,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38514841734",
-      "workflow_commit": "c646b9ece3ae45a808bf39a2723098789829985f",
-      "scope": "Metadata validation passed for the checkpoint that records app CI 38514102824 and public Site v174."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38515770379",
+      "workflow_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
+      "scope": "Metadata validation passed for the checkpoint describing canonical Dev.app source 7fd0030 and the process/build tooling fix."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,
@@ -65,7 +65,7 @@
       "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
       "scope": "Pinned TDLib arm64 Dev.app assembly passed; local canonical Dev.app separately launched and country search/select was checked. No Telegram credentials entered."
     },
-    "last_audited_checkpoint_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "last_audited_checkpoint_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null
   },
@@ -173,7 +173,15 @@
       "app_source_commit": "1de572048aec9ecb6fa04f2f7c6ed786473888df",
       "scope": "Pinned TDLib arm64 Dev.app build and automated accountless window close/reopen/quit smoke."
     },
-    "site_public_v167": "Anonymous in-app browser rendered the public /devlog/ route. Accessibility tree shows the 752f684 entry, three exact-SHA CI links, and remaining limits. Deployment metadata confirms public audience; /downloads/ remains no-release."
+    "site_public_v167": "Anonymous in-app browser rendered the public /devlog/ route. Accessibility tree shows the 752f684 entry, three exact-SHA CI links, and remaining limits. Deployment metadata confirms public audience; /downloads/ remains no-release.",
+    "latest_native_build": {
+      "run_id": 38515770287,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38515770287",
+      "workflow_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
+      "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+      "scope": "Pinned TDLib and arm64 Dev.app assembled and verified; reproducible development bundle uploaded for review. No user login or release signing."
+    }
   },
   "site": {
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
@@ -221,13 +229,13 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "repo_head_before_checkpoint": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
     "app_source_commit_authority": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
     "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "repo_head": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "origin_main": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "repo_head": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
+    "origin_main": "0e88386f9db97b6a2e044ca91266d6693f1f7818",
     "upstream": "origin/main",
-    "dirty_state": "Product source is clean at 7fd0030; only build/launch helper and focused regression test are uncommitted. Canonical app bundle built from exact app-source SHA 7fd0030 and opened by CUA."
+    "dirty_state": "Tooling and checkpoint commit 0e88386 pushed to origin/main. Canonical app-source remains 7fd0030; app bundle built and CUA-opened from that exact source."
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
