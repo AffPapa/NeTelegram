@@ -1452,6 +1452,27 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await coordinator.route(for: newRoute.client) == nil)
 }
 
+@Test func staleRuntimeStatusWriteCannotOverwriteNewGeneration() async throws {
+    let coordinator = RuntimeCoordinator()
+    let account = AccountUUID()
+    let oldRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(191))
+    #expect(await coordinator.setState(.failed("pre-client startup failure"), for: account))
+    try await coordinator.registerBeforeFirstRequest(oldRoute)
+    #expect(await coordinator.setState(.waitingForAuthorization, from: oldRoute))
+    #expect(await coordinator.applyAuthorizationState("authorizationStateClosed", telegramUserID: nil, from: oldRoute))
+
+    let newRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(192))
+    try await coordinator.registerBeforeFirstRequest(newRoute)
+    #expect(!(await coordinator.setState(.failed("late old-generation error"), from: oldRoute)))
+    #expect(await coordinator.state(for: account) == .starting)
+
+    #expect(await coordinator.applyAuthorizationState("authorizationStateReady", telegramUserID: 842, from: newRoute))
+    #expect(!(await coordinator.setState(.failed("route-less stale error"), for: account)))
+    #expect(await coordinator.state(for: account) == .active(telegramUserID: 842))
+    #expect(await coordinator.setState(.closing, from: newRoute))
+    #expect(await coordinator.state(for: account) == .closing)
+}
+
 @Test func rejectedFirstRequestRemovesOnlyItsUninitializedRoute() async throws {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()

@@ -2284,7 +2284,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     }
                 )
             }
-            await runtimeCoordinator.setState(.waitingForAuthorization, for: profile.id)
+            _ = await runtimeCoordinator.setState(.waitingForAuthorization, from: route)
             guard !Task.isCancelled, !closingForTermination else { return }
             try runtime.send(parametersRequest(for: runtime))
             do {
@@ -2328,11 +2328,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                         }
                         setStatus("TDLib не принял первый запрос. Незапущенный route снят; профиль и данные сохранены. Повторный вход не начат автоматически.")
                     } else {
-                        await runtimeCoordinator.setState(.failed("Profile startup route ownership changed"), for: profile.id)
+                        if let ownedRoute = startupRuntime.route {
+                            _ = await runtimeCoordinator.setState(
+                                .failed("Profile startup route ownership changed"),
+                                from: ownedRoute
+                            )
+                        }
                         setStatus("Не удалось подтвердить владение стартовым route; профиль не будет открыт повторно до проверки состояния.")
                     }
                 } else if startupRuntime.close() {
-                    await runtimeCoordinator.setState(.closing, for: profile.id)
+                    if let ownedRoute = startupRuntime.route {
+                        _ = await runtimeCoordinator.setState(.closing, from: ownedRoute)
+                    }
                     if self.runtime === startupRuntime {
                         pendingAuthorizationType = nil
                         pendingInitialAuthorizationAction = nil
@@ -2343,11 +2350,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     }
                     setStatus("Не удалось завершить запуск профиля; отправлен запрос TDLib close. Освобождение профиля дождётся подтверждения Closed.")
                 } else {
-                    await runtimeCoordinator.setState(.failed("Profile startup failed; TDLib close was not accepted"), for: profile.id)
+                    if let ownedRoute = startupRuntime.route {
+                        _ = await runtimeCoordinator.setState(
+                            .failed("Profile startup failed; TDLib close was not accepted"),
+                            from: ownedRoute
+                        )
+                    }
                     setStatus("Не удалось завершить запуск и TDLib не принял close. Профиль останется занятым до подтверждённого закрытия; база не будет открыта повторно.")
                 }
             } else {
-                await runtimeCoordinator.setState(.failed("Profile startup failed before TDLib initialization"), for: profile.id)
+                _ = await runtimeCoordinator.setState(
+                    .failed("Profile startup failed before TDLib initialization"),
+                    for: profile.id
+                )
                 setStatus("Не удалось подготовить профиль до запуска TDLib. Сохранённые данные не удалены.")
             }
             profileStartupFailures.insert(profile.id)
@@ -2453,7 +2468,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                     }
                     if let client = target.route?.client.value, target.requestCloseAfterIdentityMismatch() {
                         pendingClosures.insert(client)
-                        await runtimeCoordinator.setState(.closing, for: target.account)
+                        if let route = target.route {
+                            _ = await runtimeCoordinator.setState(.closing, from: route)
+                        }
                     }
                 } else if target === runtime {
                     setStatus("Аккаунт вошёл, но его серверная identity не сохранена. Повторный запуск не сможет восстановить этот профиль автоматически.")

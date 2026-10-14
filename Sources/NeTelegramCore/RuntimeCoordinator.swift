@@ -174,8 +174,23 @@ public actor RuntimeCoordinator {
         return true
     }
 
-    public func setState(_ state: AccountAvailability, for account: AccountUUID) {
+    /// Updates account-level state only when no runtime route owns the account.
+    /// This is reserved for failures before TDLib client registration; it cannot
+    /// overwrite state belonging to a newly opened generation.
+    @discardableResult
+    public func setState(_ state: AccountAvailability, for account: AccountUUID) -> Bool {
+        guard !routes.values.contains(where: { $0.account == account }) else { return false }
         states[account] = state
+        return true
+    }
+
+    /// Applies status produced by a specific runtime only while that exact
+    /// client/account/generation still owns the route.
+    @discardableResult
+    public func setState(_ state: AccountAvailability, from route: RuntimeRoute) -> Bool {
+        guard routes[route.client] == route else { return false }
+        states[route.account] = state
+        return true
     }
 
     /// Permits cover local client construction only; callers release before an
