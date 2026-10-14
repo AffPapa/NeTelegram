@@ -2650,6 +2650,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     setStatus("TDLib update пришёл от устаревшего поколения профиля и не изменил его состояние.")
                     return
                 }
+                // applyAuthorizationState is an actor hop. The route may have
+                // been replaced after that actor accepted the update but
+                // before this MainActor continuation resumes.
+                guard await RuntimeUpdateOwnership.isCurrent(
+                    route,
+                    coordinatorRouteIsCurrent: { await runtimeCoordinator.isCurrent(route) },
+                    localOwnerIsCurrent: {
+                        target.route == route
+                            && runtimesByClient[route.client.value] === target
+                    }
+                ) else { return }
             }
             if target.takeIdentityPersistenceFailureNotice() {
                 if target.identityMismatchDetected {
