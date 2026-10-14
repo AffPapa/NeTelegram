@@ -422,15 +422,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
         countryPicker.setAccessibilityHelp("Регион macOS — только подсказка. Для местного номера выберите страну явно; полный номер с + принимается отдельно.")
         countrySearchField = NSSearchField(frame: .zero)
-        countrySearchField.placeholderString = "Поиск страны или кода"
+        countrySearchField.placeholderString = "Страна / код"
         countrySearchField.setAccessibilityLabel("Поиск страны или телефонного кода")
         countrySearchField.target = self
         countrySearchField.action = #selector(searchCountries)
         countrySearchField.delegate = self
         countryPickerStack = NSStackView(views: [countrySearchField, countryPicker])
-        countryPickerStack.orientation = .vertical
-        countryPickerStack.alignment = .centerX
-        countryPickerStack.spacing = 6
+        countryPickerStack.orientation = .horizontal
+        countryPickerStack.alignment = .centerY
+        countryPickerStack.distribution = .fill
+        countryPickerStack.spacing = 8
         countryPickerStack.isHidden = true
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
@@ -581,9 +582,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh),
             countrySearchField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 132).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
             countryPicker.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPicker.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.widthAnchor.constraint(equalToConstant: 220).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             phoneField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -1470,12 +1471,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         if let region = phoneCountrySelection.selectedRegionCode,
            let country = phoneCountries.first(where: { $0.code == region }),
            let callingCode = country.callingCodes.first {
-            return "Выбрана страна \(country.name) (+\(callingCode)). Введите номер или полный номер с +."
+            return "Страна: \(country.name) (+\(callingCode))."
         }
-        if phoneCountrySelection.suggestedRegionCode != nil {
-            return "Выберите страну и введите номер. Международный номер можно ввести целиком, начиная с +."
+        if let region = phoneCountrySelection.suggestedRegionCode,
+           let country = phoneCountries.first(where: { $0.code == region }),
+           let callingCode = country.callingCodes.first {
+            return "Регион Mac: \(country.name) (+\(callingCode)); выберите страну."
         }
-        return "Выберите страну и введите номер телефона или укажите полный номер с +."
+        return "Выберите страну или введите номер с +."
     }
 
     private func beginFirstAccount() {

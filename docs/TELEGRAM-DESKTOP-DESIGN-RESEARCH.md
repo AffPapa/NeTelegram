@@ -8,6 +8,33 @@ a source-structure review, not pixel parity. NeTelegram remains a native
 AppKit client and does not copy Telegram Desktop's implementation or feature
 surface.
 
+## Apple platform review
+
+Reviewed Apple's current guidance for [designing for macOS](https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/), [windows](https://developer.apple.com/design/human-interface-guidelines/windows), [layout](https://developer.apple.com/design/human-interface-guidelines/layout), [color](https://developer.apple.com/design/human-interface-guidelines/color), and [focus and selection](https://developer.apple.com/design/human-interface-guidelines/focus-and-selection/). For this AppKit client, the applied rules are:
+
+- Keep normal window chrome and native controls so active/inactive, light/dark,
+  focus-ring, keyboard, and system accessibility appearances remain platform
+  owned. Use semantic colors instead of fixed gray values.
+- Build resizable content from Auto Layout relationships and a small number of
+  consistent widths. Keep the first-run sign-in form compact and centered;
+  avoid a decorative card that competes with the native window surface.
+- Order the sign-in task as country lookup/selection, phone number, one concise
+  status or validation line, primary action, then the alternate QR action.
+  Avoid duplicating the same instruction in the subtitle, control placeholder,
+  and status text.
+- Use system font styles and labels, preserve keyboard focus and full keyboard
+  access, and make controls understandable without color. Screen-reader speech
+  and real IME interaction still require native-user verification.
+
+Review of the current accountless screenshot found that country search and the
+country menu each consumed a full row, while the status repeated the subtitle's
+instructions. The login form now places the searchable country field and native
+country menu side by side on the same 360 pt grid, with the phone field below;
+the status identifies the selected/suggested region briefly. The phone value,
+TDLib request, and country-selection policy are unchanged. This is a focused
+layout correction, not a claim that authenticated conversation screens have
+passed visual review.
+
 ## Useful interaction structure
 
 - **Workspace:** Telegram Desktop separates main navigation, dialogs and the
