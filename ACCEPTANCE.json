@@ -1,18 +1,17 @@
 {
   "schema_version": 2,
-  "status": "Final app ZIP audit tooling commit 428f49d passed GitHub metadata CI 38519326151 and the existing public Site advanced to v177 with anonymous devlog/download checks. No signed/notarized app release exists; real login and 20-account certification remain incomplete.",
+  "status": "APP20 photo-download capability guard passed exact-source local and hosted synthetic suites (168/168); native/account interaction and all real account/release gates remain incomplete.",
   "current_evidence": {
-    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "local_suite": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
-    "focused_test": "The final TDLib receive update now remains readable until the receive worker exits. Local repeated run passed 20/20 for `twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates` and 20/20 for `updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput`.",
+    "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+    "local_suite": "PASS 168/168 exact-source serial macOS Swift suite on Xcode beta / Swift 6.4; focused photo download-capability regression passed 1/1; local suite 0.459s, hosted CI 0.940s.",
+    "focused_test": "PhotoSizeCatalog now treats absent local.can_be_downloaded as false; AppKit rechecks the captured photo capability immediately before downloadFile. Focused photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened passed 1/1.",
     "hosted_ci": {
-      "run_id": 38514102824,
+      "run_id": 38521289189,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38514102824",
-      "workflow_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-      "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-      "scope": "Exact-source macOS Actions job passed all 167 Swift tests in 0.860s; the formerly hanging twenty-client shutdown regression passed in 0.012s. The workflow ran one full serial test process.",
-      "diagnosis": "The previous timeout was a confirmed queue EOF race: close(allowInFlightReceive:true) woke a blocked final append, while the reducer could observe closed+empty and exit first. The final event then remained queued and the drain barrier waited forever."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521289189",
+      "workflow_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+      "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+      "scope": "Exact-source macOS Actions job passed the full serial Swift suite, 168/168 tests in 0.940s."
     },
     "native_build": {
       "status": "success_local",
@@ -259,7 +258,7 @@
       "method": "native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial. Static review found that the current v1.8.68 TDLib schema requires `openMessageContent` when photo content is actually opened, but the AppKit full-size photo viewer did not issue it. The viewer now sends that request only after the full-size image is successfully decoded and presented; the call is bound to the selected account, expected Telegram identity, runtime generation, and privacy epoch through PrivacyDispatchBarrier. Final exact-worktree serial suite passed 151/151 in 0.207 seconds; AppKit/Core build completed in 5.33 seconds on Xcode 27 / Swift 6.4. Exact hosted CI, pinned Dev.app compile/smoke, and real-account photo interaction remain pending; APP20 stays partial. Test-only deterministic cache injection prevents scoped delete assertions from depending on NSCache retention under system memory pressure; production continues to use NSCache."
+      "evidence": "Photo pipeline, album grouping, bounded decode, staged-send and manifest regressions remain in the 80/80 exact-source suite for fe39bc1bd7141fb5b9c1ea706cdc1c06d357e63a. This does not prove real-account photo delivery or memory-pressure behavior; status stays partial. Static review found that the current v1.8.68 TDLib schema requires `openMessageContent` when photo content is actually opened, but the AppKit full-size photo viewer did not issue it. The viewer now sends that request only after the full-size image is successfully decoded and presented; the call is bound to the selected account, expected Telegram identity, runtime generation, and privacy epoch through PrivacyDispatchBarrier. Final exact-worktree serial suite passed 151/151 in 0.207 seconds; AppKit/Core build completed in 5.33 seconds on Xcode 27 / Swift 6.4. Exact hosted CI, pinned Dev.app compile/smoke, and real-account photo interaction remain pending; APP20 stays partial. Test-only deterministic cache injection prevents scoped delete assertions from depending on NSCache retention under system memory pressure; production continues to use NSCache. New exact-source commit 05cfe67130b6c796a2baad062393158101a99c08 makes missing `local.can_be_downloaded` fail closed and rechecks the capability immediately before `downloadFile`. Regression `photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened` passed 1/1; local serial suite passed 168/168; exact-source GitHub macOS CI run 38521289189 passed 168/168. This still does not verify native photo interaction, real Telegram content, protected/paid/expiring media, or memory-pressure behavior; APP20 remains partial."
     },
     {
       "id": "APP21",
@@ -525,14 +524,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "local_command": "swift test --no-parallel --filter 'twentyClientPipelineStopsBlockedReceiveAndDrainsAcceptedUpdates|updateBufferShutdownPreservesCriticalInFlightDeleteAndRejectsLaterInput' --maximum-repetitions 20 --repeat-until fail",
-    "local_result": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
-    "hosted_ci": "Exact-source macOS Actions job passed all 167 Swift tests in 0.860s; the formerly hanging twenty-client shutdown regression passed in 0.012s. The workflow ran one full serial test process. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38514102824",
-    "native_dev_app_smoke": "Not run for this source. The single canonical Dev.app remains at 4dcddcc and is currently running; no second bundle was built.",
-    "scope": "Core shutdown producer/EOF barrier, 40 focused test repetitions, and the 167-test synthetic hosted suite. No Dev.app rebuild, real login, 20 authorized accounts, signing or notarization.",
-    "checkpoint_commit": "0e88386f9db97b6a2e044ca91266d6693f1f7818"
+    "source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+    "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+    "local_command": "SWIFTPM_CACHE_PATH=/private/tmp/netelegram-swift-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --scratch-path /private/tmp/netelegram-swift-build --no-parallel",
+    "local_result": "PASS 168/168 exact-source serial macOS Swift suite on Xcode beta / Swift 6.4; focused photo download-capability regression passed 1/1; local suite 0.459s, hosted CI 0.940s. Full suite ran on arm64e / Xcode beta / Swift 6.4; the focused regression was also run separately.",
+    "hosted_ci": "PASS exact-source macOS CI, 168/168 tests; run https://github.com/AffPapa/NeTelegram/actions/runs/38521289189",
+    "native_dev_app_smoke": "Not run for this source. The canonical Dev.app remains at 7fd00308 and was not replaced or relaunched.",
+    "scope": "Fail-closed TDLib photo download capability, AppKit dispatch recheck, and synthetic exact-source suite. No real Telegram account, actual photo download, memory-pressure run, Developer ID signing, notarization, or release."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -569,7 +567,7 @@
     "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
     "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Continue from app-source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b and the canonical open /private/tmp/NeTelegram-Dev.app without rebuilding unchanged source. The final ZIP snapshot fix is pushed, exact metadata CI passed, and public Site v178 is verified. Next runtime evidence is user-entered single-account login/read/send; 20-account certification is a separate later gate. Real signing/notarization, compatibility gates, updater, and public download readiness remain open.",
+  "next_action": "Continue from app-source 05cfe67130b6c796a2baad062393158101a99c08. The exact-source local serial suite passed 168/168 and GitHub macOS CI passed in run 38521289189. The existing canonical Dev.app is still at 7fd00308; rebuild that one app only after its normal Quit and positive process-absence check. Then verify accountless native photo capability behavior. Real login remains user-deferred; all-20 real-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public download remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -628,13 +626,13 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "SITE v175 bilingual tooling/build devlog",
-    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "local_focused_tests": "Tooling commit 0e88386 process-check tests 6/6; checkpoint validator tests 5/5; static site validator passed 8 routes.",
-    "hosted_serial_suite": "Exact-source app CI 38514102824 passed 167/167; unchanged for this website-only milestone.",
-    "native_bundle_workflow": "Pinned TDLib and arm64 Dev.app workflow 38515770287 succeeded for tooling checkpoint; local CUA verified accountless login UI.",
-    "implementation": "Existing public Site v175 has a bilingual devlog entry for tooling commit 0e88386, accountless UI evidence, exact CI links, and explicit non-release limitations.",
-    "remaining": "Public download/release does not exist; real login, all-20 live account coverage, performance, notarization and Telegram compatibility gates remain open."
+    "id": "APP20 photo download capability fail-closed",
+    "source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
+    "local_focused_tests": "photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened PASS 1/1; full serial suite PASS 168/168 on exact source.",
+    "hosted_serial_suite": "GitHub macOS CI 38521289189 passed 168/168 on exact source 05cfe67130b6c796a2baad062393158101a99c08 in 0.940s.",
+    "native_bundle_workflow": "Not rerun. Canonical Dev.app remains at 7fd00308; no new app bundle was created or launched.",
+    "implementation": "The preview-download path now fails closed: missing TDLib local.can_be_downloaded no longer means downloadable, and the AppKit action rechecks the current rendered variant capability immediately before sending downloadFile. Added a regression for missing/false/true capability and incomplete local files.",
+    "remaining": "APP20 remains partial: real Telegram photo interactions, native picker/viewer behavior, memory pressure and protected/paid/expiring content are not proven by synthetic tests. The canonical local Dev.app is still source 7fd00308 and must only be replaced after it is quit and absence is confirmed."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
