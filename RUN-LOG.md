@@ -1697,3 +1697,11 @@
 - No current-source local screenshot: the only canonical Dev.app is still old source 291cd0a, with the protected API-hash dialog open. Its field was not read and its app was not replaced. Image `dev 5f414650` is historical.
 - Public title compatibility remains unresolved under Telegram API Terms §2.3; no public release or Site download was created. Real login, 20-runtime, signing/notarization and other compatibility gates remain open.
 - Next: owner saves or cancels the protected dialog and quits the same app; rebuild the single canonical bundle and inspect default/resized visual states.
+
+
+## 2026-10-15 — AUTH-FORM-ALIGN-07
+
+- Source `f56cc73fa71dc4f7570a2265d3c3bf328ea19d2f` aligns country search and selection controls vertically at a consistent width, following Apple HIG guidance for scanning form fields. No login behavior changed.
+- Exact-source macOS tests passed: [run 38616087277](https://github.com/AffPapa/NeTelegram/actions/runs/38616087277). Pinned TDLib arm64 Dev.app build and strict verification passed: [run 38616086721](https://github.com/AffPapa/NeTelegram/actions/runs/38616086721).
+- Local GUI review remains pending: the single canonical Dev.app still has its protected API-hash setup dialog open. The field was not read or changed; no local bundle was replaced.
+- Next: owner saves or cancels that protected dialog and normally quits the same app; then rebuild the one canonical Dev.app from this source SHA and inspect default/resized and light/dark presentation. No release or Site download changed.
