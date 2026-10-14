@@ -1621,3 +1621,9 @@
 - Local `swift test` could not enter compilation because the sandbox rejected `sandbox_apply`; exact hosted suite is the test evidence. Real auth, authenticated UI, VoiceOver speech, RTL/IME and all-20 runtime remain unverified. Site/release unchanged.
 - Metadata validation run 38602612320 initially failed because `test_native_workflow_scope.py` encoded the former exclusion of `Sources/**`; updated the test to match the new trigger and focused scope tests pass 2/2. Re-run metadata CI after this correction.
 - Metadata validation rerun 38602838474 passed for checkpoint commit `e0a1c09`; the earlier test-contract failure is resolved.
+## 2026-10-15 — APP25 installed-bundle boundary
+
+- Read-only native UI check against the existing canonical `/private/tmp/NeTelegram-Dev.app` (`org.affpapa.netelegram.dev`, app source `45a5451cb614202989ccc3a3981f539eadf0d7fb`): opened NeTelegram Dev → “Запускать при входе в macOS…”. macOS returned “macOS не нашла службу автозапуска NeTelegram” and instructed to open an installed package.
+- No checkbox was changed, no Login Items entry was registered/unregistered, and the existing Dev.app was left open at the accountless phone screen.
+- This confirms the previous APP25 gap is an environment/package boundary: the temporary ad-hoc development bundle is not eligible for `SMAppService.mainApp`; policy tests and CI cannot certify installed-app persistence/removal. APP25 remains `partial`. Complete it only against a disposable installation of the real app bundle, then verify both registration and removal without leaving startup enabled.
+- No source code/build changed. Checkpoint validation and current branch/commit verification follow this entry.

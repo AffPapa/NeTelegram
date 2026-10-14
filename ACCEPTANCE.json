@@ -289,7 +289,7 @@
       "method": "native supported OS",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Targeted APP25 policy test passed 1/1 locally on Xcode 27.0 / Swift 6.4. It covers eight combinations of requested state and SMAppService-derived state (not registered, requires approval, enabled, unavailable). Exact-source CI 38407467618 succeeded; pinned TDLib/Dev.app workflow 38407466662 succeeded and assembled/verified an arm64 bundle but did not launch the app. macOS Login Items registration persistence/removal was not exercised; APP25 remains partial."
+      "evidence": "Targeted APP25 policy test passed 1/1 locally on Xcode 27.0 / Swift 6.4. It covers eight combinations of requested state and SMAppService-derived state (not registered, requires approval, enabled, unavailable). Exact-source CI 38407467618 succeeded; pinned TDLib/Dev.app workflow 38407466662 succeeded. On 2026-10-15, CUA opened NeTelegram Dev's Autostart menu; macOS reported it could not find the login service and instructed opening an installed package. This is expected for the temporary ad-hoc Dev.app, so no toggle was applied and the user's Login Items were not changed. Real registration persistence/removal still requires an installed application bundle; APP25 remains partial."
     },
     {
       "id": "APP26",

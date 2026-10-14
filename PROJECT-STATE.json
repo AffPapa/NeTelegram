@@ -335,7 +335,7 @@
     "Telegram title conflict: user requires NeTelegram; official API Terms §2.3 require “Unofficial” before “Telegram”. Do not rename silently; compatibility/stable-release claim remains open.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
-    "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session.",
+    "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
   "next_action": "Continue from exact app source 45a5451, one bounded slice at a time. Reuse this canonical Dev.app until application source changes. Next product blocker is owner-operated Telegram auth for real login/read/send; do not inspect or import sessions. No app download before real-account/runtime, Telegram policy, Developer ID and notarization gates pass.",
