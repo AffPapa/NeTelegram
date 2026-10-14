@@ -1309,29 +1309,64 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
 @Test func chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure() {
     var state = ChatListLoadState()
     let firstLoad = state.beginLoad()
-    #expect(firstLoad)
+    #expect(firstLoad != nil)
     #expect(state.state == .loading)
     let duplicateLoad = state.beginLoad()
-    #expect(!duplicateLoad)
+    #expect(duplicateLoad == nil)
 
-    state.completeLoad()
+    let firstCompleted = state.completeLoad(requestID: firstLoad!)
+    #expect(firstCompleted)
     #expect(state.state == .loaded)
     let alreadyLoaded = state.beginLoad()
-    #expect(!alreadyLoaded)
+    #expect(alreadyLoaded == nil)
+
+    let nextPage = state.beginNextPage()
+    #expect(nextPage != nil)
+    #expect(state.state == .loading)
+    let nextPageCompleted = state.completeLoad(requestID: nextPage!)
+    #expect(nextPageCompleted)
+    #expect(state.state == .loaded)
+
+    let finalPage = state.beginNextPage()
+    #expect(finalPage != nil)
+    let exhausted = state.finishNoMoreChats(requestID: finalPage!)
+    #expect(exhausted)
+    #expect(state.state == .exhausted)
+    #expect(state.beginNextPage() == nil)
 
     state.invalidate()
     #expect(state.state == .needsLoad)
     let privacyReload = state.beginLoad()
-    #expect(privacyReload)
-    state.failLoad()
+    #expect(privacyReload != nil)
+    let failed = state.failLoad(requestID: privacyReload!)
+    #expect(failed)
+    #expect(state.state == .failed)
     let retryAfterFailure = state.beginLoad()
-    #expect(retryAfterFailure)
-    state.completeLoad()
+    #expect(retryAfterFailure != nil)
+    let retryCompleted = state.completeLoad(requestID: retryAfterFailure!)
+    #expect(retryCompleted)
     #expect(state.state == .loaded)
 
     let forcedReload = state.beginLoad(reload: true)
-    #expect(forcedReload)
+    #expect(forcedReload != nil)
     #expect(state.state == .loading)
+}
+
+@Test func staleChatListPageResponseCannotCompleteReplacementSnapshot() {
+    var state = ChatListLoadState()
+    let first = state.beginLoad()
+    #expect(first != nil)
+
+    state.invalidate()
+    let replacement = state.beginLoad()
+    #expect(replacement != nil)
+    #expect(replacement != first)
+    let staleResponseAccepted = state.completeLoad(requestID: first!)
+    #expect(!staleResponseAccepted)
+    #expect(state.state == .loading)
+    let replacementCompleted = state.completeLoad(requestID: replacement!)
+    #expect(replacementCompleted)
+    #expect(state.state == .loaded)
 }
 
 @Test func restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains() async {

@@ -109,6 +109,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var conversationPane: NSView!
     private var chatWorkspaceSplit: NSSplitView!
     private var chatListScroll: NSScrollView!
+    private var chatListPaginationTriggeredAtEnd = false
     private var conversationTitleLabel: NSTextField!
     private var sidebarTitleLabel: NSTextField!
     private var chatList: NSStackView!
@@ -640,6 +641,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         chatListScroll.hasVerticalScroller = true
         chatListScroll.drawsBackground = false
         chatListScroll.setAccessibilityLabel("Список переписок и результатов поиска")
+        chatListScroll.contentView.postsBoundsChangedNotifications = true
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(chatListViewportBoundsDidChange(_:)),
+            name: NSView.boundsDidChangeNotification,
+            object: chatListScroll.contentView
+        )
         chatListScroll.documentView = chatList
         sidebarPane.addSubview(chatListScroll)
         NSLayoutConstraint.activate([
@@ -908,6 +916,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         guard let clipView = notification.object as? NSClipView,
               clipView === messageScroll?.contentView else { return }
         scheduleVisibleReadReceiptEvaluation()
+    }
+
+    @objc private func chatListViewportBoundsDidChange(_ notification: Notification) {
+        guard let clipView = notification.object as? NSClipView,
+              clipView === chatListScroll?.contentView else { return }
+        guard activeSearchQuery.isEmpty,
+              !lockState,
+              let selected = runtime,
+              AccountPresentation.restoresAuthenticatedChat(
+                telegramUserID: selected.telegramUserID,
+                authorizationState: selected.authorizationState
+              ) else {
+            chatListPaginationTriggeredAtEnd = false
+            return
+        }
+        guard let scroller = chatListScroll.verticalScroller else { return }
+        let isNearEnd = CGFloat(scroller.floatValue) + scroller.knobProportion >= 0.88
+        guard isNearEnd else {
+            chatListPaginationTriggeredAtEnd = false
+            return
+        }
+        guard !chatListPaginationTriggeredAtEnd else { return }
+        chatListPaginationTriggeredAtEnd = true
+        selected.loadMainChats(nextPage: true)
+        refreshChatList()
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -2648,6 +2681,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let previousDisplayName = target.displayName
             let previousError = target.lastTDLibError
             let previousIdentityPersistenceFailure = target.identityPersistenceFailed
+            let previousMainChatLoadRevision = target.mainChatLoadRevision
             await target.consume(object)
             // consume may suspend while saving a verified identity. A close or
             // replacement can happen during that await, so revalidate both the
@@ -2665,6 +2699,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         && runtimesByClient[update.route.client.value] === target
                 }
             ) else { return }
+            if target === runtime,
+               !lockState,
+               target.mainChatLoadRevision != previousMainChatLoadRevision {
+                refreshChatList()
+            }
             if previousTelegramUserID != nil,
                target.telegramUserID == nil,
                !target.isLogoutRequested {
@@ -4028,11 +4067,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return
         }
         let account = runtime?.account
-        for (id, value) in (runtime.flatMap { chatRowsByAccount[$0.account] } ?? [:]).sorted(by: { lhs, rhs in
+        let rows = (runtime.flatMap { chatRowsByAccount[$0.account] } ?? [:]).sorted(by: { lhs, rhs in
             let leftOrder = account.flatMap { chatOrderByAccount[$0]?[lhs.key] } ?? 0
             let rightOrder = account.flatMap { chatOrderByAccount[$0]?[rhs.key] } ?? 0
             return leftOrder == rightOrder ? lhs.key > rhs.key : leftOrder > rightOrder
-        }) {
+        })
+        let loadState = runtime?.mainChatListLoadState ?? .needsLoad
+        guard !rows.isEmpty else {
+            switch loadState {
+            case .needsLoad, .loading:
+                addChatListState("Загружаю переписки…")
+            case .loaded:
+                addChatListState(
+                    "Нет загруженных переписок",
+                    detail: "TDLib пока не сообщила ни одной переписки. Можно запросить ещё одну страницу.",
+                    allowsRetry: true,
+                    retryTitle: "Загрузить ещё"
+                )
+            case .exhausted:
+                addChatListState("Переписок пока нет")
+            case .failed:
+                addChatListState("Не удалось загрузить переписки", detail: "Проверьте соединение и повторите попытку.", allowsRetry: true)
+            }
+            return
+        }
+        for (id, value) in rows {
             let isSelected = account.flatMap { selectedChatByAccount[$0] } == id
             let button = ConversationListRowButton(
                 conversationTitle: value.title,
@@ -4050,6 +4109,63 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             button.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
             chatList.addArrangedSubview(button)
         }
+        switch loadState {
+        case .loading:
+            addChatListState("Загружаю ещё переписки…")
+        case .failed:
+            addChatListState("Не удалось загрузить следующие переписки", allowsRetry: true)
+        case .needsLoad, .loaded, .exhausted:
+            break
+        }
+    }
+
+    private func addChatListState(
+        _ message: String,
+        detail: String? = nil,
+        allowsRetry: Bool = false,
+        retryTitle: String = "Повторить"
+    ) {
+        let label = NSTextField(wrappingLabelWithString: message)
+        label.alignment = .center
+        label.font = .systemFont(ofSize: 13, weight: .medium)
+        label.textColor = .secondaryLabelColor
+        label.setAccessibilityLabel(message)
+        let content = NSStackView()
+        content.orientation = .vertical
+        content.alignment = .centerX
+        content.spacing = 8
+        content.translatesAutoresizingMaskIntoConstraints = false
+        content.addArrangedSubview(label)
+        if let detail {
+            let detailLabel = NSTextField(wrappingLabelWithString: detail)
+            detailLabel.alignment = .center
+            detailLabel.font = .systemFont(ofSize: 12)
+            detailLabel.textColor = .tertiaryLabelColor
+            content.addArrangedSubview(detailLabel)
+        }
+        if allowsRetry {
+            let retryButton = NSButton(title: retryTitle, target: self, action: #selector(retryChatListLoad))
+            retryButton.bezelStyle = .rounded
+            retryButton.setAccessibilityLabel(retryTitle == "Загрузить ещё" ? "Загрузить ещё переписки" : "Повторить загрузку переписок")
+            content.addArrangedSubview(retryButton)
+        }
+        chatList.addArrangedSubview(content)
+        content.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
+    }
+
+    @objc private func retryChatListLoad() {
+        guard !lockState,
+              let selected = runtime,
+              AccountPresentation.restoresAuthenticatedChat(
+                telegramUserID: selected.telegramUserID,
+                authorizationState: selected.authorizationState
+              ) else { return }
+        if selected.mainChatListLoadState == .loaded {
+            selected.loadMainChats(nextPage: true)
+        } else {
+            selected.loadMainChats()
+        }
+        refreshChatList()
     }
 
     private func formattedChatTime(_ timestamp: Int64?) -> String {
@@ -7673,6 +7789,11 @@ private final class LocalAccountRuntime {
     private var privateAppStateHydrationAttempted = false
     private var identityMismatchCloseRequested = false
     private var mainChatLoadState = ChatListLoadState()
+    private var mainChatRequestExtra: String?
+    private var mainChatRequestID: UInt64?
+    private var reloadMainChatsAfterPendingRequest = false
+    private(set) var mainChatLoadRevision: UInt64 = 0
+    var mainChatListLoadState: ChatListLoadState.State { mainChatLoadState.state }
     private var didSendTDLibParameters = false
     fileprivate var initializationRequestWasQueued: Bool { didSendTDLibParameters }
     private(set) var authorizationState: String?
@@ -7766,14 +7887,29 @@ private final class LocalAccountRuntime {
         try send(["@type": "setNetworkType", "type": ["@type": type]])
     }
 
-    func loadMainChats(reload: Bool = false) {
+    func loadMainChats(reload: Bool = false, nextPage: Bool = false) {
         guard authorizationState == "authorizationStateReady", telegramUserID != nil else { return }
-        guard mainChatLoadState.beginLoad(reload: reload) else { return }
+        if mainChatRequestExtra != nil {
+            if reload {
+                mainChatLoadState.invalidate()
+                reloadMainChatsAfterPendingRequest = true
+            }
+            return
+        }
+        let requestID = nextPage
+            ? mainChatLoadState.beginNextPage()
+            : mainChatLoadState.beginLoad(reload: reload)
+        guard let requestID else { return }
+        let extra = "chat-list-\(account.id.uuidString.lowercased())-\(generation.value)-\(requestID)"
+        mainChatRequestID = requestID
+        mainChatRequestExtra = extra
         do {
-            try send(["@type": "loadChats", "chat_list": NSNull(), "limit": 100])
-            mainChatLoadState.completeLoad()
+            try send(["@type": "loadChats", "chat_list": NSNull(), "limit": 100, "@extra": extra])
         } catch {
-            mainChatLoadState.failLoad()
+            _ = mainChatLoadState.failLoad(requestID: requestID)
+            mainChatRequestID = nil
+            mainChatRequestExtra = nil
+            mainChatLoadRevision &+= 1
         }
     }
 
@@ -7782,7 +7918,26 @@ private final class LocalAccountRuntime {
     }
 
     func consume(_ object: [String: Any]) async {
-        if object["@type"] as? String == "updateAuthorizationState",
+        if let extra = object["@extra"] as? String,
+           extra == mainChatRequestExtra,
+           let requestID = mainChatRequestID {
+            mainChatRequestID = nil
+            mainChatRequestExtra = nil
+            if object["@type"] as? String == "ok" {
+                _ = mainChatLoadState.completeLoad(requestID: requestID)
+            } else if object["@type"] as? String == "error",
+                      (object["code"] as? NSNumber)?.intValue == 404 {
+                _ = mainChatLoadState.finishNoMoreChats(requestID: requestID)
+            } else {
+                _ = mainChatLoadState.failLoad(requestID: requestID)
+            }
+            mainChatLoadRevision &+= 1
+            if reloadMainChatsAfterPendingRequest {
+                reloadMainChatsAfterPendingRequest = false
+                loadMainChats(reload: true)
+            }
+            return
+        } else if object["@type"] as? String == "updateAuthorizationState",
            let authorization = object["authorization_state"] as? [String: Any],
            let state = authorization["@type"] as? String {
             let previousState = authorizationState
