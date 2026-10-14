@@ -119,19 +119,6 @@
       "sha": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
       "verified": "Git push succeeded; public Actions run completed successfully for this exact SHA.",
       "ci_status": "success"
-    },
-    "latest_native_candidate": {
-      "app_source_commit": "2eadea7efad0b2ac83f9f2af3059c03dd7f846a6",
-      "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "0617b1e5942027bb0c14c9c2743d22e8c85eebf605c01b10c66e140d7b60c483",
-      "executable_sha256": "3f5217ef6924db3d3086991612c40e913b519cf63f3d4e0da42eae8bec02a484",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "minimum_macos": "14.0",
-      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Clean canonical arm64 Dev.app was built from source 2eadea7 and launched by exact path without command-line args. BuildInfo support_root fallback was used by the debug code path. CUA AX and screenshot show compact, cardless native phone authorization with country search/selector, empty phone field, Continue, QR, and independent-client disclosure. No account or credentials entered.",
-      "scope": "Accountless native startup/login presentation only; real authentication, chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
     }
   },
   "local_development_candidate": {
@@ -500,20 +487,6 @@
     "saved_archive_size_bytes": 491520,
     "saved_archive_file_count": 14
   },
-  "current_native_smoke": {
-    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
-    "bundle_id": "org.affpapa.netelegram.dev",
-    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "b7cd08bd2a6ca6f780e269b9fd29ae929f544ba27f6a5a01caaeb50f729abe15",
-    "executable_sha256": "8a544d6d477dcc059d71164a86d50af92a98c5e574ca4aa82a12675ddc732ba7",
-    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-    "architecture": "arm64",
-    "minimum_macos": "14.0",
-    "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "live_ui": "CUA verified exact title NeTelegram · dev af72c458 and accountless first-run phone/QR screen through accessibility tree. No credentials or account data entered.",
-    "scope": "Accountless native login presentation and exact-source bundle identity only; QR request response, real authentication/chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified.",
-    "process_state": "Running from canonical exact-source Dev.app."
-  },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",
     "change": "Added Sources/** to native-app.yml push and pull_request filters so all Swift app-source changes get an exact-SHA pinned-TDLib Dev.app lifecycle smoke.",
@@ -864,23 +837,11 @@
     "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
     "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed for af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c; no real Telegram account integration."
   },
-  "latest_native_candidate": {
-    "app_source_commit": "af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c",
-    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "b7cd08bd2a6ca6f780e269b9fd29ae929f544ba27f6a5a01caaeb50f729abe15",
-    "executable_sha256": "8a544d6d477dcc059d71164a86d50af92a98c5e574ca4aa82a12675ddc732ba7",
-    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-    "architecture": "arm64",
-    "minimum_macos": "14.0",
-    "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "Canonical arm64 Dev.app rebuilt once from exact source af72c458ef90200f0bbf9f7f6cd3772fe5aeb29c after a targeted process-absence check. CUA window title and accessibility tree match af72c458; first-run phone/QR login controls and independent-client disclosure are visible. No account or credentials entered.",
-    "scope": "Accountless native login presentation and exact-source bundle identity only; QR request response, real authentication/chat/read/send, 20 real runtimes, Developer ID, and notarization remain unverified."
-  },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
     "observation": "CUA menu quit removed the NeTelegram app from its inventory, but the sandboxed local process guard could not prove absence and correctly refused replacement.",
     "resolution": "Used a narrowly scoped elevated pgrep for only NeTelegram; exit 1 confirmed absence. Then the existing canonical Scripts/dev-app.sh --launch workflow built exactly once and launched the pinned current-source bundle. No guard was bypassed.",
     "future_rule": "If process enumeration is restricted, first quit through the app UI; then use a narrow authorized process check. Never infer absence from LaunchServices alone, never force-kill, and never create a second Dev.app."
-  }
+  },
+  "checkpoint_pointer_policy": "Canonical current Dev.app identity lives only at local_development_candidate and is mirrored as required at ACCEPTANCE.current_evidence.local_dev_app. Older build/smoke evidence stays in append-only RUN-LOG.md; no competing latest/current native bundle pointers."
 }

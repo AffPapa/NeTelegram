@@ -1455,3 +1455,8 @@
 - Read-only audit confirmed the existing synthetic regression oneStalledProfileKeychainPreparationDoesNotBlockTheOtherNineteen at Tests/NeTelegramCoreTests/RuntimeCoordinatorTests.swift:3668 exercises the current two-permit startup scheduler and two-worker Keychain executor. One stalled preparation leaves one permit and worker for the other profiles; no duplicate test or code change was needed.
 - Boundary: two simultaneously wedged synchronous SecItem preparations can occupy both bounded workers and startup permits. No timeout/retry patch was added: releasing a waiter while its Keychain operation remains live could allow concurrent key creation or database ownership for the same account. Recovery from two permanently wedged OS Keychain calls would require an explicit saturation policy and resource decision, not a naive timeout.
 - This remains synthetic evidence. It does not prove Keychain behavior under real macOS failure or real 20-account startup.
+
+## 2026-10-14 — Remove conflicting native bundle checkpoint copies
+
+- Removed three unused duplicate current/latest native bundle pointers from PROJECT-STATE.json; one pointed at an obsolete source SHA. The checkpoint validator and release workflow use local_development_candidate as the canonical bundle pointer, mirrored only where ACCEPTANCE requires it. Previous build receipts remain in RUN-LOG.md/Git history.
+- No app source, binary, tests, or Site content changed.
