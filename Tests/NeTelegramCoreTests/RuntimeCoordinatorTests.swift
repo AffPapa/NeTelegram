@@ -4177,6 +4177,60 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
     func remove(forKey key: String) { values.removeValue(forKey: key) }
 }
 
+@Test func photoPipelineReportsDecodeFailureAndReleasesSlotForRetry() async {
+    let account = AccountUUID()
+    let decoderCalls = LockedTestValue(0)
+    let failedToken = LockedTestValue<PhotoPreviewToken?>(nil)
+    let failedCallbacks = LockedTestValue(0)
+    let successfulCallbacks = LockedTestValue(0)
+    let pipeline = PhotoPipeline(
+        maxConcurrentDecodes: 1,
+        maxQueuedDecodes: 0,
+        decoder: { _, _ in
+            let call = decoderCalls.get() + 1
+            decoderCalls.set(call)
+            return call == 1 ? nil : Data([0x42])
+        }
+    )
+    let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
+    let completion: @Sendable (PhotoPreviewToken, Data?) -> Void = { token, data in
+        if let data {
+            if data == Data([0x42]) { successfulCallbacks.set(successfulCallbacks.get() + 1) }
+        } else {
+            failedToken.set(token)
+            failedCallbacks.set(failedCallbacks.get() + 1)
+        }
+    }
+
+    let firstToken = pipeline.requestPreview(
+        account: account,
+        messageID: 91,
+        fileID: 12,
+        fileURL: url,
+        maxPixelSize: 320,
+        completion: completion
+    )
+    #expect(await waitForCount(failedCallbacks, atLeast: 1, timeout: .seconds(2)))
+    #expect(failedToken.get() == firstToken)
+    let clock = ContinuousClock()
+    let deadline = clock.now.advanced(by: .seconds(2))
+    while pipeline.outstandingDecodeCount(for: account) != 0, clock.now < deadline {
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    #expect(pipeline.outstandingDecodeCount(for: account) == 0)
+
+    _ = pipeline.requestPreview(
+        account: account,
+        messageID: 91,
+        fileID: 12,
+        fileURL: url,
+        maxPixelSize: 320,
+        completion: completion
+    )
+    #expect(await waitForCount(successfulCallbacks, atLeast: 1, timeout: .seconds(2)))
+    #expect(decoderCalls.get() == 2)
+}
+
 @Test func photoPipelinePurgesDeletedMessagePreviewWithoutEvictingOtherMessages() async {
     let account = AccountUUID()
     let decoderCalls = LockedTestValue(0)

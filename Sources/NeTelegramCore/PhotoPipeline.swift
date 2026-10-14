@@ -132,7 +132,20 @@ public final class PhotoPipeline: @unchecked Sendable {
             self.lock.unlock()
             guard generationIsCurrent, !operation.isCancelled else { return }
             let data = cachedData ?? self.decoder(fileURL, pixelSize)
-            guard !operation.isCancelled, let data else { return }
+            guard !operation.isCancelled else { return }
+            guard let data else {
+                let completedOperation = operation
+                DispatchQueue.main.async { [weak self, completedOperation] in
+                    guard let self, !completedOperation.isCancelled else { return }
+                    self.lock.lock()
+                    let generationIsCurrent = self.generationByAccount[account, default: 0] == requestGeneration
+                        && self.generationByMessage[messageKey, default: 0] == requestMessageGeneration
+                    self.lock.unlock()
+                    guard generationIsCurrent else { return }
+                    completion(token, nil)
+                }
+                return
+            }
             if cachedData == nil {
                 self.lock.lock()
                 if self.generationByAccount[account, default: 0] == requestGeneration,
@@ -149,8 +162,9 @@ public final class PhotoPipeline: @unchecked Sendable {
                 }
                 self.lock.unlock()
             }
-            DispatchQueue.main.async {
-                guard !operation.isCancelled else { return }
+            let completedOperation = operation
+            DispatchQueue.main.async { [weak self, completedOperation] in
+                guard let self, !completedOperation.isCancelled else { return }
                 self.lock.lock()
                 let generationIsCurrent = self.generationByAccount[account, default: 0] == requestGeneration
                     && self.generationByMessage[messageKey, default: 0] == requestMessageGeneration
