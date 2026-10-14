@@ -1,35 +1,35 @@
 {
   "schema_version": 2,
-  "status": "AUTH03 adaptive auth and registration layout — exact-source macOS CI PASS; canonical Dev.app 3f98f85 rebuilt and compact dark registration wrapping verified in local preview; real authentication remains unverified.",
+  "status": "UX01 internal IDs never appear as chat titles — exact-source CI PASS; focused title policy 2/2; canonical Dev.app 3dc8a11e build/signature and accountless launch verified; real chat rendering remains unverified.",
   "current_evidence": {
-    "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-    "local_suite": "Exact-source GitHub macOS Swift test job passed in run 38586251707 for source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; no redundant local suite rerun. Geometry-specific native preview reviewed compact dark phone and registration steps.",
-    "focused_test": "No geometry-specific Swift test was added; fix is native text-view/scroll-viewport sizing, verified by exact-source CI plus CUA compact dark preview.",
+    "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+    "local_suite": "Focused ChatDisplayTitlePolicyTests passed 2/2; exact-source full GitHub macOS Swift suite run 38587526545 passed.",
+    "focused_test": "ChatDisplayTitlePolicyTests passed 2/2 (nil/blank fallback and whitespace-normalized server title).",
     "hosted_ci": {
-      "run_id": 38586251707,
+      "run_id": 38587526545,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38586251707",
-      "workflow_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "scope": "Exact-source GitHub macOS CI job Swift tests passed for AUTH03 registration layout fix. This is not live Telegram authentication or account coverage."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38587526545",
+      "workflow_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "scope": "Exact-source GitHub macOS Swift tests passed, including new ChatDisplayTitlePolicy regressions. No real account/chat rendering was exercised."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
+      "application_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "d57cb3a1faf5b4718b6a2557a9fe310ddd2060969d65be32417e38c631a601c3",
-      "executable_sha256": "ae6f9808cdab55fd1e186bd28ac464889bda20f6d2cf45697f0e63045e0c6a7d",
+      "source_fingerprint_sha256": "456ca3cdaa5f599f5889adac72f2ad726337a4ba4ac0bc9a27ba7b4c85595ad9",
+      "executable_sha256": "60431bd9703bf729244ab1a609590dd6167ad2a9f90d3e721de7c2a820b200cd",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical Dev.app rebuilt once from clean source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; strict ad-hoc signature verification passed. CUA reviewed compact dark AUTH03 phone and registration preview; registration terms wrap inside the available width, name/optional surname/consent controls are present and keyboard reachable. This is a local preview only: no login data entered, no server auth or account tested.",
-      "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+      "smoke": "Canonical Dev.app built once from clean source 3dc8a11e49438cf8e4e79280a4f851c86834db2c, strict signature verification passed, then launched through CUA by exact bundle path after LaunchServices open returned kLSNoExecutableErr. CUA AX title `NeTelegram · dev 3dc8a11e` and blank phone/QR auth screen match embedded BuildInfo. No account or credentials entered.",
+      "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -547,7 +547,7 @@
       "method": "Exact-source AppKit build + accountless native workspace smoke; selected-row visual review with a real chat when owner completes login.",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Source 92b8ca3 adds semibold chat title, secondary snippet, full-width native selection background, and a selected-conversation accessibility label. Exact-source CI 38555778654 passed. Canonical Dev.app built and launched in explicit accountless preview; no fabricated profiles or chat rows were added. Because no real chat data was available, selected-row colors/geometry have not been visually observed. No real account or 20-runtime behavior is claimed."
+      "evidence": "Source 92b8ca3 adds semibold chat title, secondary snippet, full-width native selection background, and a selected-conversation accessibility label. Exact-source CI 38555778654 passed. Canonical Dev.app built and launched in explicit accountless preview; no fabricated profiles or chat rows were added. Because no real chat data was available, selected-row colors/geometry have not been visually observed. No real account or 20-runtime behavior is claimed. Current source 3dc8a11e49438cf8e4e79280a4f851c86834db2c: centralized title policy prevents fallback to numeric TDLib chat IDs in list updates and chat/message search results; blank server titles use `Чат без названия`. Focused tests passed 2/2, exact-source CI 38587526545 passed, and the exact canonical accountless app launched. Real conversation row/search rendering remains unverified pending owner-operated login."
     },
     {
       "id": "UI02",
@@ -558,18 +558,27 @@
       "status": "partial",
       "source_commit": "1408ab50343325c7cf6949d8f030771761f49189",
       "evidence": "Telegram Desktop source pinned at fad667c6d71c5e965a9da71e48dc1ab82ba0568d and adapted in docs/TELEGRAM-DESKTOP-DESIGN-RESEARCH.md. Parent source 15002cac passed two focused text/entity tests; final 1408ab5 exact-source macOS CI run 38584832394 succeeded. Canonical Dev.app 1408ab50 built and accountless login AX confirmed. No authenticated conversation was available; incoming/outgoing bubble appearance remains visually unverified against real TDLib messages."
+    },
+    {
+      "id": "UX01",
+      "name": "Не показывать внутренние ID как имена бесед",
+      "expected": "Человек видит серверное имя беседы или честную общую подпись, но никогда внутренний TDLib chat ID как заголовок.",
+      "method": "policy unit test, exact-source CI, native review with an authorized real chat",
+      "required_for": "all releases",
+      "status": "partial",
+      "evidence": "Current exact app source 3dc8a11e49438cf8e4e79280a4f851c86834db2c centralizes title normalization; nil/blank title fallback and whitespace-trimmed server title passed 2/2. Search and list fallback paths no longer interpolate chat IDs. Exact-source CI run 38587526545 passed and canonical accountless Dev.app launched. Actual authorized chat rendering/search remains pending."
     }
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-    "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-    "local_command": "No repeated local Swift suite; CUA compact dark auth layout preview and strict signature check on the exact canonical Dev.app.",
-    "local_result": "Native preview: phone/registration forms reviewed; registration terms wrap within viewport. Exact-source GitHub macOS Swift CI PASS.",
-    "hosted_ci_run_id": 38586251707,
+    "source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+    "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+    "local_command": "Focused ChatDisplayTitlePolicyTests; Scripts/dev-app.sh; strict codesign verification; CUA exact-path launch.",
+    "local_result": "Focused tests 2/2. Canonical arm64 app built in 5.82s, strict signature verified, CUA confirms exact embedded source and accountless phone/QR screen.",
+    "hosted_ci_run_id": 38587526545,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38586251707",
-    "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38587526545",
+    "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
   },
   "current_local_slice": {
     "id": "AUTH05 locale suggestion versus explicit country selection",
@@ -641,7 +650,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Continue the next bounded app acceptance slice from the current source. Keep one pinned source SHA and one canonical Dev.app; rebuild only after app code changes. For each slice, run only its focused check plus exact-source CI and the native interaction that changed. Do not re-run unchanged suites or launch another bundle. Owner-operated login/read/send and 20-account evidence remain pending. GitHub release requires a signed/notarized candidate and compatibility gates; update the existing Site only after immutable public bytes verify.",
+  "next_action": "Next implement or close one APP20 incoming-photo presentation gap: trace the exact TDLib photo update → bounded download → viewport preview path, then add only a focused regression for a concrete defect found. Keep the current canonical Dev.app and exact source SHA; rebuild once only if app code changes. Do not claim photo/account coverage until owner-operated login and a real chat are tested. After working app scenarios, complete Developer ID/notarization gates, publish immutable GitHub release assets, then update the existing Site download button from verified public bytes.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -671,45 +680,45 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
+    "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
     "branch": "main",
-    "working_tree": "Clean at app source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; pushed to origin/main; metadata checkpoint update follows this app commit.",
+    "working_tree": "Clean at app source 3dc8a11e49438cf8e4e79280a4f851c86834db2c; pushed to origin/main; checkpoint receipt follows.",
     "local_tests": "runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain PASS 1/1; covers pending quit through Closed acknowledgements, receiver-drain phase, then finished disposition. Exact-source macOS CI passed.",
-    "hosted_validation": "Exact-source GitHub macOS CI run 38586251707 passed.",
+    "hosted_validation": "Exact-source macOS Swift CI run 38587526545 passed.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
+      "application_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "d57cb3a1faf5b4718b6a2557a9fe310ddd2060969d65be32417e38c631a601c3",
-      "executable_sha256": "ae6f9808cdab55fd1e186bd28ac464889bda20f6d2cf45697f0e63045e0c6a7d",
+      "source_fingerprint_sha256": "456ca3cdaa5f599f5889adac72f2ad726337a4ba4ac0bc9a27ba7b4c85595ad9",
+      "executable_sha256": "60431bd9703bf729244ab1a609590dd6167ad2a9f90d3e721de7c2a820b200cd",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical Dev.app rebuilt once from clean source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; strict ad-hoc signature verification passed. CUA reviewed compact dark AUTH03 phone and registration preview; registration terms wrap inside the available width, name/optional surname/consent controls are present and keyboard reachable. This is a local preview only: no login data entered, no server auth or account tested.",
-      "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+      "smoke": "Canonical Dev.app built once from clean source 3dc8a11e49438cf8e4e79280a4f851c86834db2c, strict signature verification passed, then launched through CUA by exact bundle path after LaunchServices open returned kLSNoExecutableErr. CUA AX title `NeTelegram · dev 3dc8a11e` and blank phone/QR auth screen match embedded BuildInfo. No account or credentials entered.",
+      "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
     },
-    "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+    "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH03 adaptive auth and registration layout",
-    "source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-    "local_focused_test": "No new Swift regression test was needed for this geometry-only change; exact-source macOS CI run 38586251707 passed the Swift test job. Native compact-window CUA visual/AX review is recorded separately.",
+    "id": "UX01 internal IDs never appear as chat titles",
+    "source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+    "local_focused_test": "ChatDisplayTitlePolicyTests passed 2/2 (nil/blank fallback and whitespace-normalized server title).",
     "hosted_ci": {
-      "run_id": 38586251707,
+      "run_id": 38587526545,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38586251707",
-      "workflow_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-      "scope": "Exact-source GitHub macOS CI job Swift tests passed for AUTH03 registration layout fix. This is not live Telegram authentication or account coverage."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38587526545",
+      "workflow_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+      "scope": "Exact-source GitHub macOS Swift tests passed, including new ChatDisplayTitlePolicy regressions. No real account/chat rendering was exercised."
     },
-    "native_smoke": "Canonical Dev.app rebuilt once from clean source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; strict ad-hoc signature verification passed. CUA reviewed compact dark AUTH03 phone and registration preview; registration terms wrap inside the available width, name/optional surname/consent controls are present and keyboard reachable. This is a local preview only: no login data entered, no server auth or account tested.",
-    "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+    "native_smoke": "Canonical Dev.app built once from clean source 3dc8a11e49438cf8e4e79280a4f851c86834db2c, strict signature verification passed, then launched through CUA by exact bundle path after LaunchServices open returned kLSNoExecutableErr. CUA AX title `NeTelegram · dev 3dc8a11e` and blank phone/QR auth screen match embedded BuildInfo. No account or credentials entered.",
+    "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -765,9 +774,9 @@
     "notary_credentials": "Prior metadata preflight reported absent or inaccessible. No credentials were read, and no submission was attempted in this continuation.",
     "api_credentials": "The api_hash is absent from source and is read only through the app Keychain item. Its presence/value was not checked. The value previously pasted into chat remains retired and must not be copied or reused; if Keychain reports missing, the owner should enter a fresh/current value directly in the app secure settings UI.",
     "telegram_compatibility": "Official API Terms §2.3 forbids Telegram in app title unless preceded by Unofficial; the current requested display name NeTelegram conflicts and remains unresolved. §1.3/1.4 basic functionality review remains open. §3.3 requires sponsored channel content. The pinned TDLib documents fullscreen sponsored-video flows; the user previously declined adding a player and deferred channel access or stable release if required. Do not claim channels/stable compatibility.",
-    "github": "Public AffPapa/NeTelegram source commit 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1 passed exact-source macOS CI run 38586251707. No application release/tag/assets exist.",
+    "github": "Public AffPapa/NeTelegram source commit 3dc8a11e49438cf8e4e79280a4f851c86834db2c passed exact-source macOS CI run 38587526545. No application release/tag/assets exist.",
     "site": "Live anonymous GET https://netelegram.iryadom.chatgpt.site/downloads/ verified page title `Загрузки и установка — NeTelegram` and explicit state `Приложение для скачивания отсутствует`; no download CTA points to an asset. Existing Site remains v194; no Site mutation.",
-    "release_status": "No signed/notarized release. The only canonical local candidate is accountless development bundle source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1, ad-hoc signed; no user login/read/send or 20-real-runtime evidence.",
+    "release_status": "No signed/notarized release. Canonical accountless Dev.app source is 3dc8a11e49438cf8e4e79280a4f851c86834db2c, ad-hoc development signed; no login/read/send or real 20-runtime evidence.",
     "api_id": "Source TelegramApplicationIdentity.apiID is 37110989, matching the owner-provided App api_id."
   },
   "latest_targeted_acceptance_check": {
@@ -792,22 +801,22 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH03 adaptive auth and registration layout — exact-source macOS CI PASS; canonical Dev.app 3f98f85 rebuilt and compact dark registration wrapping verified in local preview; real authentication remains unverified.",
+  "phase": "UX01 internal IDs never appear as chat titles — exact-source CI PASS; focused title policy 2/2; canonical Dev.app 3dc8a11e build/signature and accountless launch verified; real chat rendering remains unverified.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
-    "command": "Scripts/dev-app.sh --launch-auth-layout-preview-compact-dark",
-    "result": "PASS: one canonical arm64 Dev.app built from clean 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; source fingerprint d57cb3a1faf5b4718b6a2557a9fe310ddd2060969d65be32417e38c631a601c3; executable SHA-256 ae6f9808cdab55fd1e186bd28ac464889bda20f6d2cf45697f0e63045e0c6a7d; pinned TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; strict ad-hoc codesign verification passed."
+    "source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
+    "command": "Scripts/dev-app.sh",
+    "result": "PASS: one canonical arm64 Dev.app built from clean source 3dc8a11e49438cf8e4e79280a4f851c86834db2c (5.82s); fingerprint 456ca3cdaa5f599f5889adac72f2ad726337a4ba4ac0bc9a27ba7b4c85595ad9; executable SHA-256 60431bd9703bf729244ab1a609590dd6167ad2a9f90d3e721de7c2a820b200cd; pinned TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1; strict ad-hoc codesign verification passed."
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "3f98f85f7869af0a8bd17eac641573c1f5b2a3c1",
+    "app_source_commit": "3dc8a11e49438cf8e4e79280a4f851c86834db2c",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "d57cb3a1faf5b4718b6a2557a9fe310ddd2060969d65be32417e38c631a601c3",
-    "executable_sha256": "ae6f9808cdab55fd1e186bd28ac464889bda20f6d2cf45697f0e63045e0c6a7d",
+    "source_fingerprint_sha256": "456ca3cdaa5f599f5889adac72f2ad726337a4ba4ac0bc9a27ba7b4c85595ad9",
+    "executable_sha256": "60431bd9703bf729244ab1a609590dd6167ad2a9f90d3e721de7c2a820b200cd",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical Dev.app rebuilt once from clean source 3f98f85f7869af0a8bd17eac641573c1f5b2a3c1; strict ad-hoc signature verification passed. CUA reviewed compact dark AUTH03 phone and registration preview; registration terms wrap inside the available width, name/optional surname/consent controls are present and keyboard reachable. This is a local preview only: no login data entered, no server auth or account tested.",
-    "scope": "AUTH03 fixes compact-window registration terms clipping by sizing the text view to the scroll viewport and recalculating on layout changes. Preview evidence covers compact dark phone and registration geometry only; actual auth flow and complete VoiceOver/IME/RTL/accessibility checks remain open."
+    "result": "Canonical Dev.app built once from clean source 3dc8a11e49438cf8e4e79280a4f851c86834db2c, strict signature verification passed, then launched through CUA by exact bundle path after LaunchServices open returned kLSNoExecutableErr. CUA AX title `NeTelegram · dev 3dc8a11e` and blank phone/QR auth screen match embedded BuildInfo. No account or credentials entered.",
+    "scope": "User-facing chat/search title fallbacks no longer expose TDLib chat IDs; missing server titles resolve to the factual generic label `Чат без названия`. Build and accountless login screen were verified. No authenticated chats were available to inspect actual row rendering."
   }
 }
