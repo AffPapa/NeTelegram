@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "CHAT-LIST-RECONCILE-01: incremental keyed AppKit row updates compile and pass exact-source CI; canonical local Dev.app visual verification is pending because process absence is unproven.",
+  "phase": "AUTH-LAYOUT-RHYTHM-05: AppKit sign-in controls now remain grouped and centered as the window grows; exact-source tests and pinned TDLib bundle passed; canonical local visual verification is pending because the protected API-hash dialog remains open.",
   "verified_at": "2026-10-15",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
@@ -35,10 +35,10 @@
     }
   },
   "product": {
-    "public_name": "AffPapa Chat",
+    "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95"
+    "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -46,12 +46,12 @@
     "branch": "main",
     "github_visibility": "public",
     "latest_exact_commit_ci": {
-      "run_id": 38611394780,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394780",
-      "workflow_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "scope": "Exact-source macOS 15 Apple Silicon serial Swift test workflow passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "published_application_releases": [],
     "github_access": {
@@ -108,20 +108,20 @@
       "scope": "Metadata validation passed after the native workflow trigger test was updated; checkpoint source/Dev.app/Site pointers agree."
     },
     "latest_exact_source_ci": {
-      "run_id": 38607088774,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "latest_native_workflow_ci": {
-      "run_id": 38607088681,
+      "run_id": 38614052536,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088681",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed for the exact commit; hosted artifact is development evidence only."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052536",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for exact source. This is not a local GUI smoke."
     },
     "latest_pushed_commit": {
       "branch": "main",
@@ -147,7 +147,7 @@
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
     "smoke": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
-    "pending_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95"
+    "pending_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4"
   },
   "verification": {
     "current_head_targeted_tests": {
@@ -173,12 +173,12 @@
     "github_release_inventory": "Public GitHub REST releases endpoint returned an empty list; no app releases are published.",
     "twenty_profile_core_composition": "At app source 6434b101b8bd7124321858e79beb8535536b1aca, AppDelegate uses AccountRestorePlanner.enqueueStartupProfiles. Three focused local tests passed and exact-SHA macOS CI 38417637060 plus native Dev.app lifecycle smoke 38417637092 passed. This is synthetic queue dispatch and accountless GUI evidence, not authorized sessions, 20 real runtimes or performance certification.",
     "latest_exact_source_ci": {
-      "run_id": 38607088774,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "historical_native_build_870b894": {
       "status": "success_local",
@@ -329,7 +329,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "The only running local NeTelegram process is an offline auth-layout preview (PID 81742, source 291cd0a); login/QR are intentionally disabled there. App API-hash Keychain lookup is not_found. Owner: save the intended app hash in the protected app dialog or cancel it, then quit the preview normally and tell me it is closed. I will launch the one canonical bundle in normal mode from app source 9e0af7a, verify no preview flags, then perform the owner-operated one-account login/read/send/close smoke. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
+  "next_action": "The source change is pushed and both exact-source GitHub workflows passed. The only canonical local Dev.app is still on older source 291cd0a with its protected API-hash setup dialog open. Save the intended app hash there or cancel the dialog, then quit that same app normally and tell me it is closed. I will rebuild the one canonical bundle from 115716a and inspect the real resized sign-in screen before making any further design pass. Do not use the old dev 5f414650 screenshot as current evidence. Real login, 20-account coverage, signing/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -548,42 +548,42 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "CHAT-LIST-RECONCILE-01",
-    "source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-    "change": "Keep keyed AppKit conversation-row views across TDLib refreshes; update only the changed chat presentation fields, insert/remove rows as the snapshot changes, and move existing row views only when server ordering changes. Search/loading/privacy clear paths still remove row caches. No product behavior or auth data changed.",
-    "focused_test": "PASS: isolated `swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-chatrows-3eabf4b` completed in 10.05s after redirecting module caches to /private/tmp. Exact-source GitHub serial Swift suite and pinned TDLib/Dev.app workflow both passed. No local GUI smoke because process guard still cannot prove canonical Dev.app is absent.",
+    "id": "AUTH-LAYOUT-RHYTHM-05",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "change": "Center the vertical sign-in stack as one compact group and let the scroll document grow only for longer authorization steps, avoiding stretched uneven gaps in tall windows. Set the non-affiliation note to NeTelegram and a 13 pt system font; update app-facing identity/accessibility copy and identity tests. No chat/session data or auth flow changed.",
+    "focused_test": "git diff --check passed. The local Swift command could not start because the managed sandbox rejected sandbox_apply with Operation not permitted; exact-source macOS Swift tests passed in CI and pinned TDLib/Dev.app build passed. Canonical local visual smoke was not run because the older Dev.app remains open on the protected API-hash dialog.",
     "hosted_ci": {
-      "run_id": 38611394780,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394780",
-      "workflow_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "scope": "Exact-source macOS 15 Apple Silicon serial Swift test workflow passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "exact_source_ci": {
-      "run_id": 38611394780,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394780",
-      "workflow_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "scope": "Exact-source macOS 15 Apple Silicon serial Swift test workflow passed."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "native_workflow": {
-      "run_id": 38611394887,
+      "run_id": 38614052536,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394887",
-      "workflow_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for this exact source; this does not replace the local canonical app."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052536",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for exact source. This is not a local GUI smoke."
     },
     "native_smoke": {
       "date": "2026-10-15",
       "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "result": "Not run for this slice. The process guard cannot prove the existing canonical Dev.app is absent; no replacement or second bundle was created.",
-      "scope": "Local source-to-bundle GUI behavior remains unverified for CHAT-LIST-RECONCILE-01."
+      "result": "Not run for source 115716a: the canonical older Dev.app remains open with the protected API-hash setup dialog. No secret field read, saved, cancelled, or modified by this turn.",
+      "scope": "Native resized-window visual verification pending; CI bundle assembly does not establish local layout or login behavior."
     },
-    "coverage_limit": "Hosted CI verifies compile/tests and isolated native bundle assembly only. Canonical local app remains at prior source 291cd0a; chat-row behavior has not been visually exercised in the app. Account login and authenticated conversation behavior remain unverified."
+    "coverage_limit": "CI tests and isolated assembly only. No local GUI visual smoke, real login, authenticated conversations, VoiceOver speech, light-mode/resizing QA, or account/runtime coverage for this change."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -724,7 +724,7 @@
     "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
-  "status": "CHAT-LIST-RECONCILE-01: incremental keyed AppKit row updates compile and pass exact-source CI; canonical local Dev.app visual verification is pending because process absence is unproven.",
+  "status": "AUTH-LAYOUT-RHYTHM-05: AppKit sign-in controls now remain grouped and centered as the window grows; exact-source tests and pinned TDLib bundle passed; canonical local visual verification is pending because the protected API-hash dialog remains open.",
   "latest_design_research": {
     "date": "2026-10-14",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
@@ -742,7 +742,10 @@
       "https://developer.apple.com/design/human-interface-guidelines/dark-mode",
       "https://developer.apple.com/design/human-interface-guidelines/accessibility"
     ],
-    "github_reference": "https://github.com/telegramdesktop/tdesktop"
+    "github_reference": "https://github.com/telegramdesktop/tdesktop",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "conclusion": "Apple HIG uses normal resizable macOS windows, native AppKit controls, Auto Layout, and semantic colors. Sign-in stack was changed to remain grouped instead of stretching across spare vertical space. Telegram upstream was reviewed only for hierarchy and state structure; no source/assets copied.",
+    "visual_verification": "Not run against current source because canonical local Dev.app remains open on the protected API-hash setup dialog; screenshot dev 5f414650 is historical."
   },
   "latest_receipt_pipeline_change": {
     "date": "2026-10-14",
@@ -765,47 +768,42 @@
     "handling": "Do not tell the owner rotation is definitely available. The hash is not in the app Keychain; owner enters the intended app credential directly in the protected app field. Never copy it from chat, echo it, or log it."
   },
   "current_local_slice": {
-    "id": "AUTH-UI-DESIGN-04",
-    "source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-    "change": "Apple HIG-guided first-run layout now uses the full available scroll viewport with a consistent centered form column; the country search prompt fits, the macOS region hint does not silently select a calling code, and duplicate country guidance is hidden. Public app identity is AffPapa Chat; NeTelegram stays the repo codename.",
-    "focused_test": "Targeted local product identity/account-label suite passed 5/5. Full exact-source GitHub macOS serial test workflow passed. Native screenshot and AX showed one country hint, aligned search/country/phone/action controls, and no credentials or account data.",
+    "id": "AUTH-LAYOUT-RHYTHM-05",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "change": "Center the vertical sign-in stack as one compact group and let the scroll document grow only for longer authorization steps, avoiding stretched uneven gaps in tall windows. Set the non-affiliation note to NeTelegram and a 13 pt system font; update app-facing identity/accessibility copy and identity tests. No chat/session data or auth flow changed.",
+    "focused_test": "git diff --check passed. The local Swift command could not start because the managed sandbox rejected sandbox_apply with Operation not permitted; exact-source macOS Swift tests passed in CI and pinned TDLib/Dev.app build passed. Canonical local visual smoke was not run because the older Dev.app remains open on the protected API-hash dialog.",
     "hosted_ci": {
-      "run_id": 38607088774,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "exact_source_ci": {
-      "run_id": 38607088774,
+      "run_id": 38614052499,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088774",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Exact-source macOS arm64 serial Swift test workflow completed successfully for this commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
     },
     "native_workflow": {
-      "run_id": 38607088681,
+      "run_id": 38614052536,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38607088681",
-      "workflow_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
-      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly/verification passed for the exact commit; hosted artifact is development evidence only."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052536",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for exact source. This is not a local GUI smoke."
     },
     "native_smoke": {
       "date": "2026-10-15",
       "app_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-      "source_fingerprint_sha256": "c4468dffb0ee32402e6ad8fd48f069eeaf756ccf047684eaf3b0b69477ed9d6f",
-      "executable_sha256": "d2f8cdbdcde62145d9445d750c0fdcb87d198d7a4ed9cb9b3f5d5a023b0c09c8",
-      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "architecture": "arm64",
-      "result": "Canonical arm64 Dev.app rebuilt once after the exact old process was proven absent; CUA verified compact dark auth preview, aligned controls, visible non-affiliation text, no duplicate country guidance, and no silently applied macOS region. No account credentials were entered.",
-      "scope": "Accountless native auth phone-entry visual/AX smoke only; does not verify Telegram login, authenticated screens, accessibility speech, real chats, or runtime behavior."
+      "result": "Not run for source 115716a: the canonical older Dev.app remains open with the protected API-hash setup dialog. No secret field read, saved, cancelled, or modified by this turn.",
+      "scope": "Native resized-window visual verification pending; CI bundle assembly does not establish local layout or login behavior."
     },
-    "coverage_limit": "Accountless visual/AX check in compact dark appearance. Light appearance, VoiceOver speech, real auth, authenticated views, CJK IME, RTL, and real account/runtime behavior are not certified.",
-    "status": "partial"
+    "coverage_limit": "Native visual verification remains pending on the canonical local app."
   },
   "latest_chat_list_design_slice": {
     "date": "2026-10-14",
@@ -823,32 +821,33 @@
     "accounts": "No real accounts or synthetic identities used."
   },
   "latest_committed_ui_change": {
-    "date": "2026-10-14",
-    "source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-    "change": "Applied Apple macOS HIG review to the current auth flow: preserve native AppKit controls, system typography/semantic colors and Auto Layout; hide an auth status only when it exactly repeats the visible instruction; keep distinct progress/errors. Added native-app CI path trigger for Sources/** so AppKit edits build Dev.app automatically.",
-    "validation": "Exact-source macOS CI run 38602110387 passed 187/187; native pinned TDLib/Dev.app workflow 38602110256 passed; one canonical local arm64 Dev.app rebuilt in 5.48s and strict ad-hoc codesign passed; CUA verified five accountless auth states and absence of repeated status on code/2FA.",
-    "publication": "Source pushed to AffPapa/NeTelegram main. No app release or Site deployment."
+    "date": "2026-10-15",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "change": "Center the vertical sign-in stack as one compact group and let the scroll document grow only for longer authorization steps, avoiding stretched uneven gaps in tall windows. Set the non-affiliation note to NeTelegram and a 13 pt system font; update app-facing identity/accessibility copy and identity tests. No chat/session data or auth flow changed.",
+    "validation": "Exact-source macOS CI 38614052499 and pinned TDLib/Dev.app workflow 38614052536 passed. Native screenshot/layout smoke is pending; no claim of visual PASS.",
+    "publication": "App source pushed to AffPapa/NeTelegram main. No stable release, downloads, or Site deployment."
   },
   "pending_native_candidate": {
-    "source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
     "running_bundle_source_commit": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
     "status": "blocked_running_canonical_app",
-    "reason": "Canonical process is positively present as PID 81742 at /private/tmp/NeTelegram-Dev.app/Contents/MacOS/NeTelegram with --app-support-root /private/tmp/netelegram-dev-support-clean --ci-auth-layout-preview --ci-auth-layout-preview-compact --ci-appearance-dark. The process guard therefore correctly refused bundle replacement. A non-value `security find-generic-password -s org.affpapa.netelegram.telegram-api -a api-hash` lookup returned not_found without reading a secret. Do not close the current app until the owner confirms the protected API-hash entry is saved or intentionally cancelled."
+    "reason": "The canonical Dev.app is still running older source 291cd0a with its protected API-hash setup dialog open. Preserve the dialog and do not replace the bundle until the owner saves or cancels it and quits normally."
   },
   "latest_pushed_commit": {
     "branch": "main",
-    "sha": "4f9f083b20adb16c05d88b20afee24f5e4b2d64d",
-    "verified": "Pushed to AffPapa/NeTelegram main. Docs/checkpoint-only commit; app source remains 291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b.",
-    "ci_status": "not_run_docs_only",
-    "ci_run_id": null
+    "sha": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "verified": "Pushed AppKit sign-in layout and NeTelegram identity changes to AffPapa/NeTelegram main.",
+    "ci_status": "exact_source_and_native_success",
+    "ci_run_id": 38614052499,
+    "native_run_id": 38614052536
   },
   "latest_exact_source_ci": {
-    "run_id": 38602110387,
+    "run_id": 38614052499,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38602110387",
-    "workflow_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-    "app_source_commit": "45a5451cb614202989ccc3a3981f539eadf0d7fb",
-    "scope": "Exact-source GitHub macOS arm64 serial Swift suite passed: 187 tests, 0 failures."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+    "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
   },
   "app_process_guard_lesson": {
     "date": "2026-10-14",
@@ -949,12 +948,12 @@
     "status": "partial"
   },
   "latest_native_workflow_ci": {
-    "run_id": 38612755038,
+    "run_id": 38614052536,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755038",
-    "workflow_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
-    "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-    "scope": "Pinned TDLib and isolated arm64 Dev.app assembly passed; the workflow validates the canonical launch script, not a local account login or local GUI."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052536",
+    "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for exact source. This is not a local GUI smoke."
   },
   "latest_dev_mode_guard": {
     "date": "2026-10-15",
@@ -979,5 +978,31 @@
       "scope": "Pinned TDLib and isolated arm64 Dev.app assembly passed; the workflow validates the canonical launch script, not a local account login or local GUI."
     },
     "local_process": "PID 81742 remains running from /private/tmp/NeTelegram-Dev.app with the auth preview flags; no window, Keychain value, process, or bundle was modified."
+  },
+  "latest_auth_layout_rhythm": {
+    "date": "2026-10-15",
+    "source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+    "app_name": "NeTelegram",
+    "current_running_bundle_source": "291cd0a7fb27b07be13fdd9e2d4e2ef8f3b4311b",
+    "running_bundle_state": "Protected API-hash setup dialog open; value not read; app not replaced.",
+    "change": "Center the vertical sign-in stack as one compact group and let the scroll document grow only for longer authorization steps, avoiding stretched uneven gaps in tall windows. Set the non-affiliation note to NeTelegram and a 13 pt system font; update app-facing identity/accessibility copy and identity tests. No chat/session data or auth flow changed.",
+    "local_swift_invocation": "git diff --check passed. The local Swift command could not start because the managed sandbox rejected sandbox_apply with Operation not permitted; exact-source macOS Swift tests passed in CI and pinned TDLib/Dev.app build passed. Canonical local visual smoke was not run because the older Dev.app remains open on the protected API-hash dialog.",
+    "hosted_ci": {
+      "run_id": 38614052499,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052499",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow passed for the sign-in layout and product-identity changes."
+    },
+    "native_workflow": {
+      "run_id": 38614052536,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38614052536",
+      "workflow_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "app_source_commit": "115716ad1bd5e3fb3d87d64ede00851afc4139f4",
+      "scope": "Pinned TDLib build and isolated arm64 Dev.app assembly/verification passed for exact source. This is not a local GUI smoke."
+    },
+    "visual_smoke": "pending owner closing the same canonical app after save/cancel"
   }
 }

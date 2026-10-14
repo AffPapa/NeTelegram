@@ -30,6 +30,36 @@ Reviewed Apple's current guidance for [designing for macOS](https://developer.ap
   retain a separate status line only when it communicates new progress or an
   error, and keep secure input in `NSSecureTextField`.
 
+### Sign-in vertical rhythm update
+
+Apple's current [layout guidance](https://developer.apple.com/design/human-interface-guidelines/layout)
+calls for layouts that adapt across window sizes; its [macOS window guidance](https://developer.apple.com/design/human-interface-guidelines/windows)
+also recommends system window behavior and fluid resizing. The sign-in stack
+now remains a compact centered group when the window grows. Its scroll document
+keeps at least the visible viewport height and expands only when a longer
+authorization step needs scrolling, instead of stretching the stack between
+the document's top and bottom edges. This keeps the country row, phone input,
+status, primary action and QR action at stable relative spacing. The legal
+non-affiliation note uses a 13 pt system font and semantic secondary label
+color. No fixed dark palette or custom title bar was added; disabled controls
+remain AppKit's native disabled state.
+
+The authentication hierarchy was cross-checked against Telegram's public
+[iOS phone-entry controller](https://github.com/TelegramMessenger/Telegram-iOS/blob/master/submodules/AuthorizationUI/Sources/AuthorizationSequencePhoneEntryController.swift)
+as a structural reference only: explicit country selection, number entry,
+validation and a deliberate continue action. Its UIKit implementation, assets,
+and styling are not copied into this native AppKit client.
+
+The exact-source macOS test workflow and pinned TDLib/Dev.app assembly passed
+for the vertical-rhythm and product-identity change. A native visual PASS is
+still pending: the one canonical local Dev.app is running an older build with
+the protected API-hash setup dialog open. The screenshot tagged `dev 5f414650`
+is historical and is not evidence for the current source. The screenshot's
+gray primary button looks disabled; that old image does not establish why it
+was disabled. The active source keeps AppKit's native control state and
+semantic system colors. Keep the native
+smoke pending until that same canonical process is safely closed and rebuilt.
+
 Review of the current accountless screen found that country search and the
 country menu each consumed a full row, and the code/2FA preview repeated the
 subtitle's instruction as a second status line. The login form now places the

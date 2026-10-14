@@ -1680,3 +1680,11 @@
 - Local verification: launch-mode tests passed 5/5; `bash -n Scripts/dev-app.sh` and Python compile passed. No process or app bundle was changed.
 - Hosted verification on `6160d1a8ecc344955b6dadc9351723ec458a7879`: [metadata tests](https://github.com/AffPapa/NeTelegram/actions/runs/38612755032) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38612755038) passed.
 - Current boundary: local PID `81742` and app source `291cd0a` remain in auth preview; source `9e0af7a` is not installed locally. The app-specific Keychain item is `not_found`. No login, account data or secret was read.
+
+## 2026-10-15 — AUTH-LAYOUT-RHYTHM-05
+
+- Source: `115716ad1bd5e3fb3d87d64ede00851afc4139f4` pushed to `AffPapa/NeTelegram` main. App-facing identity now reads NeTelegram; the non-affiliation note uses 13 pt system text.
+- Layout: auth stack is centered as a group in tall windows; the scroll document grows for long auth steps instead of distributing spare height across controls. Native AppKit chrome, controls, semantic colors and Auto Layout retained.
+- Verification: exact-source tests [run 38614052499](https://github.com/AffPapa/NeTelegram/actions/runs/38614052499) and pinned native assembly [run 38614052536](https://github.com/AffPapa/NeTelegram/actions/runs/38614052536) passed. Local Swift invocation was blocked by sandbox `sandbox_apply: Operation not permitted`; not a test failure.
+- Visual status: no current-source local screenshot. The single canonical Dev.app still runs source `291cd0a` with its protected API-hash setup dialog open; its value was not read and the app was not replaced. Screenshot `dev 5f414650` is historical.
+- Next action: owner saves or cancels the protected dialog, quits that same app normally, then rebuild one canonical bundle and inspect the real resized screen. No release or Site download change.
