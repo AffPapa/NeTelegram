@@ -29,6 +29,13 @@
       "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
       "bundle_path": "/private/tmp/NeTelegram-Dev.app",
       "result": "Current-source CUA screenshot and accessibility tree confirm the accountless form and readable secondary disclosure. This does not claim VoiceOver, keyboard traversal, IME/RTL or real-auth coverage."
+    },
+    "auth03_window_review": {
+      "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
+      "appearance": "light",
+      "window_state": "centered default window after restoring the previous size",
+      "result": "CUA screenshot and accessibility tree show the complete accountless phone/QR form and readable non-affiliation disclosure at the default size. Minimum supported size, dark appearance, accessibility contrast, and later authorization steps were not verified.",
+      "status": "partial"
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -454,7 +461,7 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial."
+      "evidence": "Exact source content 209be94: AppKit login disclosure now states the client is independent, names Telegram API/TDLib accurately, disclaims direct affiliation, and says other-app sessions are not imported. Disclosure is 13 pt medium. Local full suite passed 157/157 and one canonical accountless Dev.app screenshot/AX smoke confirms readable text, country +66, phone, Continue, QR, no profile UUID, no credentials. Hosted exact-source CI pending. Minimum-window, dark/light, VoiceOver/IME, registration/code/2FA/QR-state geometry and real login remain unverified; status stays partial. Current-source review at 0a7cbe6 confirms the centered default window in light appearance; minimum size, dark appearance, accessibility contrast, later authorization steps, and real login remain unverified."
     },
     {
       "id": "AUTH04",
@@ -535,7 +542,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Choose the next bounded implementation slice from the current acceptance gaps. Batch related source changes into one app commit; run targeted regressions, one exact-source native workflow, and use one full local suite only if the hosted suite stalls. Reuse the canonical Dev.app; do not repeat unchanged attempts. Real login remains deferred, and no 20-account, Developer ID/notarization, or Telegram compatibility PASS is claimed.",
+  "next_action": "Next code slice: strengthen APP02 by exercising production AppDelegate restore orchestration with an injected stalled Keychain preparation and proving unrelated profiles advance. Add one deterministic regression, run the applicable hosted serial suite once, and reuse the current Dev.app because this slice does not change UI or lifecycle. Fold acceptance/checkpoint updates into that same source commit. Real Telegram login stays deferred; do not claim 20-account coverage.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",

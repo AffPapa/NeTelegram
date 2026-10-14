@@ -212,7 +212,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Continue the next bounded implementation slice against current ACCEPTANCE gaps. Preserve the one canonical Dev.app at 0a7cbe6; only rebuild after app-source/build-input change. Real login remains deferred until the user enters credentials. Site helper/DNS and stable-release terms gates remain separate.",
+  "next_action": "Next code slice: strengthen APP02 by exercising production AppDelegate restore orchestration with an injected stalled Keychain preparation and proving unrelated profiles advance. Add one deterministic regression, run the applicable hosted serial suite once, and reuse the current Dev.app because this slice does not change UI or lifecycle. Fold acceptance/checkpoint updates into that same source commit. Real Telegram login stays deferred; do not claim 20-account coverage.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",

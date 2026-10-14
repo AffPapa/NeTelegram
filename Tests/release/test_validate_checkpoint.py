@@ -38,6 +38,14 @@ class ValidateCheckpointTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "stale without a matching documented pending"):
             validate_records(project, acceptance)
 
+    def test_resume_action_must_match_across_checkpoint_files(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["next_action"] += " Do something else."
+
+        with self.assertRaisesRegex(ValueError, "next_action"):
+            validate_records(project, acceptance)
+
 
 if __name__ == "__main__":
     unittest.main()

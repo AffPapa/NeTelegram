@@ -32,6 +32,8 @@ def validate_records(project: dict, acceptance: dict) -> None:
     checks = [
         (project["product"]["app_source_commit"] == app_sha,
          "PROJECT-STATE.product.app_source_commit != ACCEPTANCE.current_evidence.app_source_commit"),
+        (project["next_action"] == acceptance["next_action"],
+         "PROJECT-STATE.next_action != ACCEPTANCE.next_action"),
         (acceptance["last_verification"]["app_source_commit"] == app_sha,
          "ACCEPTANCE.last_verification is stale; use current_evidence for the resume checkpoint"),
         (local_app["application_source_commit"] == bundle["source_commit"],
