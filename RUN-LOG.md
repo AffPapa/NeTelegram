@@ -1104,3 +1104,9 @@
 - Xcode is selected from `/Applications/Xcode-beta.app/Contents/Developer`; `notarytool` 1.1.3 (42) is installed and Gatekeeper assessment is enabled. A non-secret Keychain-item existence check for `com.apple.gke.notary.tool` returned absent or inaccessible. No credential value/profile secret was read and no notarization submission was attempted.
 - The canonical Dev.app remains running as PID 79726 from `87c0c06560ac0986f7e004d6578b1e3b034c9244`; current source `7683cc6bace702b3376a08a9a2aaf4aaf881a691` still awaits normal quit and positive process absence before in-place rebuild.
 - No app source changed, so no Swift tests, app build, Site deployment, or app release was repeated.
+
+## 2026-10-14 — Reject stale pending native candidate pointers
+
+- A checkpoint review found that `ACCEPTANCE.current_evidence.local_dev_app.pending_source_commit` still named `fc4485b` while APP26 and `PROJECT-STATE.pending_native_candidate` named `7683cc6`. The existing checkpoint validator did not compare that duplicate pointer.
+- `Scripts/validate_checkpoint.py` now requires both current checkpoint records to name the same pending app-source SHA whenever the canonical Dev.app is behind. Updated the stale APP26 pointer and the process-state sentence; the canonical bundle itself was not touched.
+- Added `test_pending_native_source_must_match_both_checkpoint_records`. Targeted checkpoint-validator tests passed 6/6, `Scripts/validate_checkpoint.py` passed, and `git diff --check` passed. No Swift build/tests, app launch, Site deployment, or release were needed.

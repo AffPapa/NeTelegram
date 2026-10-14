@@ -88,6 +88,12 @@ def validate_records(project: dict, acceptance: dict) -> None:
     errors = [message for condition, message in checks if not condition]
     pending = project.get("pending_native_candidate")
     if local_app["application_source_commit"] != app_sha:
+        pending_sources_match = (
+            local_app.get("pending_source_commit") == app_sha
+            and bundle.get("pending_source_commit") == app_sha
+        )
+        if not pending_sources_match:
+            errors.append("pending native source differs between current checkpoint records")
         pending_matches = (
             isinstance(pending, dict)
             and pending.get("source_commit") == app_sha

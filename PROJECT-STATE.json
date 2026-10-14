@@ -118,7 +118,7 @@
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
     "distribution_ready": false,
-    "process_state": "Canonical Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 with secure API hash configuration dialog open; current source fc4485b174b61fb14a085fea67d41a2b2606ef2e is pending rebuild. No field value inspected and no account login performed.",
+    "process_state": "Canonical Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 as PID 79726; current source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 is pending rebuild. No auth value was inspected and no account login was performed.",
     "source_fingerprint_sha256": "3bed580518b79f64cc21ddb0ac92891e6df3e1a4a4bacb28795b7bcdff8220d0",
     "app_executable_sha256": "baacd5d3a61d628bb058c34a41778883918668b09f25b350d343cd970b69c97d",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",

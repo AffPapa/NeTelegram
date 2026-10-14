@@ -23,6 +23,8 @@ class ValidateCheckpointTests(unittest.TestCase):
         running = project["local_development_candidate"]["application_source_commit"]
         project["product"]["app_source_commit"] = current
         project["latest_acceptance_slice"]["source_commit"] = current
+        project["local_development_candidate"]["pending_source_commit"] = current
+        acceptance["current_evidence"]["local_dev_app"]["pending_source_commit"] = current
         acceptance["current_evidence"]["app_source_commit"] = current
         acceptance["current_evidence"]["hosted_ci"]["workflow_commit"] = current
         acceptance["current_evidence"]["hosted_ci"]["app_source_commit"] = current
@@ -39,6 +41,14 @@ class ValidateCheckpointTests(unittest.TestCase):
 
         project["pending_native_candidate"]["source_commit"] = "different-source"
         with self.assertRaisesRegex(ValueError, "stale without a matching documented pending"):
+            validate_records(project, acceptance)
+
+    def test_pending_native_source_must_match_both_checkpoint_records(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["current_evidence"]["local_dev_app"]["pending_source_commit"] = "stale-source"
+
+        with self.assertRaisesRegex(ValueError, "pending native source differs"):
             validate_records(project, acceptance)
 
     def test_resume_action_must_match_across_checkpoint_files(self):
@@ -64,6 +74,7 @@ class ValidateCheckpointTests(unittest.TestCase):
         running = project["local_development_candidate"]["application_source_commit"]
         project["product"]["app_source_commit"] = current
         project["latest_acceptance_slice"]["source_commit"] = current
+        project["local_development_candidate"]["pending_source_commit"] = current
         project["pending_native_candidate"] = {
             "source_commit": current,
             "running_bundle_source_commit": running,
@@ -71,6 +82,7 @@ class ValidateCheckpointTests(unittest.TestCase):
             "reason": "The canonical development app is still running.",
         }
         acceptance["current_evidence"]["app_source_commit"] = current
+        acceptance["current_evidence"]["local_dev_app"]["pending_source_commit"] = current
         acceptance["current_evidence"]["hosted_ci"] = {
             "run_id": 123,
             "status": "failure",

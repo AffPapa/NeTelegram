@@ -26,8 +26,8 @@
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Prior accountless lifecycle smoke applies to source 87c0c06560ac0986f7e004d6578b1e3b034c9244 only; current source fc4485b174b61fb14a085fea67d41a2b2606ef2e has not been rebuilt or smoke-tested.",
-      "pending_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e"
+      "smoke": "Prior accountless lifecycle smoke applies only to source 87c0c06560ac0986f7e004d6578b1e3b034c9244. Current app source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 has not been rebuilt or smoke-tested because the canonical bundle process is still running.",
+      "pending_source_commit": "7683cc6bace702b3376a08a9a2aaf4aaf881a691"
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
