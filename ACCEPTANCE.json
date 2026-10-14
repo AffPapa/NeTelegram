@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "APP20 photo-download capability guard passed exact-source local and hosted synthetic suites (168/168); native/account interaction and all real account/release gates remain incomplete.",
+  "status": "APP20 photo flow exact-source local and hosted synthetic suites passed 169/169 after adding explicit photo-content-open dispatch; native/account interaction and real account/release gates remain incomplete.",
   "current_evidence": {
-    "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-    "local_suite": "PASS 168/168 exact-source serial macOS Swift suite on Xcode beta / Swift 6.4; focused photo download-capability regression passed 1/1; local suite 0.459s, hosted CI 0.940s.",
-    "focused_test": "PhotoSizeCatalog now treats absent local.can_be_downloaded as false; AppKit rechecks the captured photo capability immediately before downloadFile. Focused photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened passed 1/1.",
+    "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+    "local_suite": "PASS 169/169 serial macOS Swift suite on Xcode beta / Swift 6.4 in 0.456s; focused photo-content-open intent regression PASS 1/1. Initial unrestricted run had two Keychain concurrency timing assertions; isolated test passed 0.116s and explicit --no-parallel full suite passed.",
+    "focused_test": "PhotoContentOpenIntent binds openMessageContent to account, verified Telegram identity, runtime generation, and privacy epoch. App dispatch occurs only after the user explicitly shows a photo and the preview decodes; automatic previews do not dispatch.",
     "hosted_ci": {
-      "run_id": 38521289189,
+      "run_id": 38522612798,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38521289189",
-      "workflow_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-      "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-      "scope": "Exact-source macOS Actions job passed the full serial Swift suite, 168/168 tests in 0.940s."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38522612798",
+      "workflow_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+      "scope": "Exact-source macOS CI passed the full serial Swift suite, 169/169."
     },
     "native_build": {
       "status": "success_local",
@@ -524,13 +524,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-    "app_source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-    "local_command": "SWIFTPM_CACHE_PATH=/private/tmp/netelegram-swift-cache CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache swift test --scratch-path /private/tmp/netelegram-swift-build --no-parallel",
-    "local_result": "PASS 168/168 exact-source serial macOS Swift suite on Xcode beta / Swift 6.4; focused photo download-capability regression passed 1/1; local suite 0.459s, hosted CI 0.940s. Full suite ran on arm64e / Xcode beta / Swift 6.4; the focused regression was also run separately.",
-    "hosted_ci": "PASS exact-source macOS CI, 168/168 tests; run https://github.com/AffPapa/NeTelegram/actions/runs/38521289189",
-    "native_dev_app_smoke": "Not run for this source. The canonical Dev.app remains at 7fd00308 and was not replaced or relaunched.",
-    "scope": "Fail-closed TDLib photo download capability, AppKit dispatch recheck, and synthetic exact-source suite. No real Telegram account, actual photo download, memory-pressure run, Developer ID signing, notarization, or release."
+    "source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+    "app_source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+    "local_command": "swift test --no-parallel",
+    "local_result": "PASS 169/169 serial macOS Swift suite on Xcode beta / Swift 6.4 in 0.456s; focused photo-content-open regression PASS 1/1. An initial unrestricted invocation had transient Keychain test timing assertions; isolated rerun passed in 0.116s; explicit serial suite passed.",
+    "hosted_ci": "PASS exact-source GitHub macOS CI 169/169: https://github.com/AffPapa/NeTelegram/actions/runs/38522612798",
+    "native_dev_app_smoke": "Not run. Canonical Dev.app remains at 7fd00308 and was not replaced or relaunched.",
+    "scope": "Explicit photo reveal now reports openMessageContent only after successful preview decode; command is account/user/runtime/privacy bound. No real Telegram account, actual photo download, memory pressure, Developer ID signing, notarization, or release."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -567,7 +567,7 @@
     "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
     "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
   },
-  "next_action": "Continue from app-source 05cfe67130b6c796a2baad062393158101a99c08. The exact-source local serial suite passed 168/168 and GitHub macOS CI passed in run 38521289189. The existing canonical Dev.app is still at 7fd00308; rebuild that one app only after its normal Quit and positive process-absence check. Then verify accountless native photo capability behavior. Real login remains user-deferred; all-20 real-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public download remain open.",
+  "next_action": "Canonical Dev.app is still running at 7fd00308. Preserve it; after normal Quit and positive process-absence verification, rebuild the same canonical bundle from source 870b8946eb6441955e035084f099dcacef04a99b and run the accountless photo/lifecycle smoke. Do not create or launch a second app bundle. Real login remains user-deferred; 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public downloads remain open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -626,13 +626,13 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP20 photo download capability fail-closed",
-    "source_commit": "05cfe67130b6c796a2baad062393158101a99c08",
-    "local_focused_tests": "photoFileDownloadCapabilityFailsClosedAndPartialFilesStayUnopened PASS 1/1; full serial suite PASS 168/168 on exact source.",
-    "hosted_serial_suite": "GitHub macOS CI 38521289189 passed 168/168 on exact source 05cfe67130b6c796a2baad062393158101a99c08 in 0.940s.",
+    "id": "APP20 report explicitly opened photo content to TDLib",
+    "source_commit": "870b8946eb6441955e035084f099dcacef04a99b",
+    "local_focused_tests": "photoContentOpenIntentIsBoundToRuntimeAndPrivacyEpoch PASS 1/1; full serial suite PASS 169/169 in 0.456s. Isolated prior Keychain timing test passed 0.116s.",
+    "hosted_serial_suite": "GitHub macOS CI 38522612798 passed exact source 870b8946eb6441955e035084f099dcacef04a99b, 169/169.",
     "native_bundle_workflow": "Not rerun. Canonical Dev.app remains at 7fd00308; no new app bundle was created or launched.",
-    "implementation": "The preview-download path now fails closed: missing TDLib local.can_be_downloaded no longer means downloadable, and the AppKit action rechecks the current rendered variant capability immediately before sending downloadFile. Added a regression for missing/false/true capability and incomplete local files.",
-    "remaining": "APP20 remains partial: real Telegram photo interactions, native picker/viewer behavior, memory pressure and protected/paid/expiring content are not proven by synthetic tests. The canonical local Dev.app is still source 7fd00308 and must only be replaced after it is quit and absence is confirmed."
+    "implementation": "Explicit photo reveal now dispatches openMessageContent only after successful decode, bound to AccountUUID, verified Telegram identity, RuntimeGeneration, and PrivacyEpoch. Automatic history preview decode does not dispatch.",
+    "remaining": "APP20 remains partial: real Telegram account/photo, native viewer/picker acceptance, memory pressure, protected/paid/expiring media, and canonical Dev.app rebuild/smoke remain open."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",

@@ -1024,3 +1024,9 @@
 ## 2026-10-14 — Confirm the existing Git publication route
 
 - The authenticated GitHub connector confirmed the existing `AffPapa/NeTelegram` repository and push permission. `gh auth status` reported invalid stored tokens for both configured accounts, so neither CLI credential was used or changed. The already-configured Git credential helper successfully fetched and pushed the authorized `main` commits after approved network access resolved sandbox DNS restrictions. No new token was created. Exact metadata CI 38521890229 passed for the v179 checkpoint commit.
+
+## 2026-10-14 — Report explicit photo opens to TDLib
+
+- Source commit `870b8946eb6441955e035084f099dcacef04a99b` now sends TDLib `openMessageContent` only after the user explicitly reveals a photo and its preview decodes successfully. Automatic history previews do not send this command. The intent captures account, verified Telegram identity, runtime generation, and privacy epoch; lock, chat reset, deletion, and download-start failure clear pending intents.
+- Focused regression `photoContentOpenIntentIsBoundToRuntimeAndPrivacyEpoch` passed 1/1. One initial local full-suite run produced two transient Keychain concurrency timeout assertions; the isolated test passed in 0.116s, and explicit serial `swift test --no-parallel` passed 169/169 in 0.456s. Exact-source macOS CI [38522612798](https://github.com/AffPapa/NeTelegram/actions/runs/38522612798) passed.
+- No Dev.app rebuild/launch, real Telegram account/photo interaction, or Site deploy was performed. APP20 remains partial; existing Dev.app remains at `7fd00308` pending normal quit and confirmed process absence. Signed release and all real-account/20-runtime gates remain open.
