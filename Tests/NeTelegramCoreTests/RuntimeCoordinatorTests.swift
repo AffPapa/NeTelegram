@@ -4290,6 +4290,23 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
         .shouldAnnounce(after: phoneStep))
 }
 
+@Test func authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps() {
+    let cases: [(AuthorizationStep, String)] = [
+        (.phoneNumber, "Номер не принят Telegram. Проверьте код страны и номер."),
+        (.code, "Код не принят. Проверьте последнее сообщение с кодом и попробуйте снова."),
+        (.password, "Пароль двухэтапной проверки не принят. Попробуйте снова."),
+        (.emailAddress, "Адрес почты не принят. Проверьте его и попробуйте снова."),
+        (.emailCode, "Код из письма не принят. Проверьте последнее письмо и попробуйте снова."),
+        (.registration, "Не удалось завершить регистрацию. Проверьте имя и попробуйте снова."),
+    ]
+    for (step, expected) in cases {
+        #expect(AuthenticationFailureAnnouncement.message(for: step) == expected)
+    }
+    #expect(AuthenticationFailureAnnouncement.message(for: .qrConfirmation) == nil)
+    #expect(AuthenticationFailureAnnouncement.message(for: .ready) == nil)
+    #expect(AuthenticationFailureAnnouncement.message(for: .unknown) == nil)
+}
+
 @Test func forumTopicCatalogKeepsTypedIDsAndPlacesGeneralFirst() {
     let topics: [[String: Any]] = [
         ["info": ["forum_topic_id": 8, "name": "Работа"]],

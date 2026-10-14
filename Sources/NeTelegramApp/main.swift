@@ -3281,15 +3281,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
                 guard !lockState, target === runtime, target.account == pending.account else { return }
                 actionButton.isEnabled = true
                 qrButton.isEnabled = true
-                switch pending.step {
-                case "authorizationStateWaitPhoneNumber": setStatus("Номер не принят Telegram. Проверьте код страны и номер.")
-                case "authorizationStateWaitCode": setStatus("Код не принят. Проверьте последнее сообщение с кодом и попробуйте снова.")
-                case "authorizationStateWaitPassword": setStatus("Пароль двухэтапной проверки не принят. Попробуйте снова.")
-                case "authorizationStateWaitEmailAddress": setStatus("Адрес почты не принят. Проверьте его и попробуйте снова.")
-                case "authorizationStateWaitEmailCode": setStatus("Код из письма не принят. Проверьте последнее письмо и попробуйте снова.")
-                case "authorizationStateWaitRegistration": setStatus("Не удалось завершить регистрацию. Проверьте имя и попробуйте снова.")
-                default: setStatus("TDLib не принял шаг авторизации. Проверьте данные и попробуйте снова.")
-                }
+                announceAuthenticationFailure(for: pending.step)
                 return
             }
             if let extra = object["@extra"] as? String,
@@ -6790,6 +6782,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private func setStatus(_ value: String) {
         statusLabel?.stringValue = value
         chatStatusLabel?.stringValue = value
+    }
+
+    private func announceAuthenticationFailure(for tdlibStep: String) {
+        let step = AuthorizationStep(tdlibType: tdlibStep)
+        let message = AuthenticationFailureAnnouncement.message(for: step)
+            ?? "TDLib не принял шаг авторизации. Проверьте данные и попробуйте снова."
+        setStatus(message)
+        guard let announcementWindow = window else { return }
+        NSAccessibility.post(
+            element: announcementWindow,
+            notification: .announcementRequested,
+            userInfo: [
+                .announcement: message,
+                .priority: NSAccessibilityPriorityLevel.medium.rawValue,
+            ]
+        )
     }
 
     private func tdjsonLibraryURL() -> URL? {

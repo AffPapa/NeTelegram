@@ -89,6 +89,23 @@ public enum AuthorizationAnnouncement {
     }
 }
 
+/// Static, non-sensitive feedback for rejected authorization submissions.
+/// The input value and TDLib error payload are deliberately not included.
+public enum AuthenticationFailureAnnouncement {
+    public static func message(for step: AuthorizationStep) -> String? {
+        switch step {
+        case .phoneNumber: "Номер не принят Telegram. Проверьте код страны и номер."
+        case .code: "Код не принят. Проверьте последнее сообщение с кодом и попробуйте снова."
+        case .password: "Пароль двухэтапной проверки не принят. Попробуйте снова."
+        case .emailAddress: "Адрес почты не принят. Проверьте его и попробуйте снова."
+        case .emailCode: "Код из письма не принят. Проверьте последнее письмо и попробуйте снова."
+        case .registration: "Не удалось завершить регистрацию. Проверьте имя и попробуйте снова."
+        case .parameters, .qrConfirmation, .premiumPurchase, .ready, .loggingOut, .closing, .closed, .unknown:
+            nil
+        }
+    }
+}
+
 /// Suppresses repeated announcements from duplicate updates while allowing
 /// the same state to be announced after switching account or client generation.
 public struct AuthorizationAnnouncementContext: Hashable, Sendable {
