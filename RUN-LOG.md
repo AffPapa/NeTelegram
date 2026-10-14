@@ -1671,3 +1671,12 @@
 - Read-only `pgrep` positively found PID `81742` running the single canonical `/private/tmp/NeTelegram-Dev.app` with compact auth-preview flags. The process guard refusal is therefore expected; no app window was closed, no process was terminated, and the canonical bundle was not replaced.
 - Non-value Keychain lookup (`security find-generic-password -s org.affpapa.netelegram.telegram-api -a api-hash`, with no `-w`) returned `not_found`; no credential value was read. Leave the app open until the owner confirms the protected entry is saved or intentionally cancelled.
 - Exact-source app code, isolated build, Swift CI and pinned TDLib workflow remain verified at `9e0af7a`; the active local bundle is still the prior `291cd0a`. Local visual smoke for this source remains pending.
+
+
+## 2026-10-15 — DEV-PREVIEW-GUARD-01: prevent offline preview reuse as a login client
+
+- Finding: the only local NeTelegram process was running with `--ci-auth-layout-preview`. That mode skips profile restoration/connection observers and intentionally disables network login and QR. `open --args` cannot convert an already running macOS process into normal mode; the earlier run path did not detect this distinction.
+- Change: `Scripts/dev-app.sh` now compares requested preview flags to the active process before reusing an exact-source canonical bundle. It refuses a mode mismatch or unreadable process arguments. `DEV-WORKFLOW.md` now says preview screenshots cannot count as real login evidence.
+- Local verification: launch-mode tests passed 5/5; `bash -n Scripts/dev-app.sh` and Python compile passed. No process or app bundle was changed.
+- Hosted verification on `6160d1a8ecc344955b6dadc9351723ec458a7879`: [metadata tests](https://github.com/AffPapa/NeTelegram/actions/runs/38612755032) and [pinned TDLib/Dev.app workflow](https://github.com/AffPapa/NeTelegram/actions/runs/38612755038) passed.
+- Current boundary: local PID `81742` and app source `291cd0a` remain in auth preview; source `9e0af7a` is not installed locally. The app-specific Keychain item is `not_found`. No login, account data or secret was read.

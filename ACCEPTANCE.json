@@ -580,17 +580,17 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
+    "source_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
     "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
-    "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-clang-cache SWIFTPM_MODULECACHE_OVERRIDE=/private/tmp/netelegram-swift-module-cache swift build --target NeTelegramApp --scratch-path /private/tmp/netelegram-spm-chatrows-3eabf4b",
-    "local_result": "NeTelegramApp build passed in 10.05s. Initial sandbox attempt was denied writing ~/.cache/clang; the same build passed after caches were redirected to /private/tmp and build was authorized. No app bundle replacement or GUI launch occurred.",
-    "hosted_ci_run_id": 38611394780,
+    "local_command": "python3 -m unittest Tests.release.test_dev_app_launch_mode -v; bash -n Scripts/dev-app.sh; python3 -m py_compile Scripts/dev_app_launch_mode.py Tests/release/test_dev_app_launch_mode.py",
+    "local_result": "Five mode-boundary regressions passed; shell syntax and Python compilation passed. No local app launch or replacement occurred.",
+    "hosted_ci_run_id": 38612755032,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394780",
-    "native_workflow_run_id": 38611394887,
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755032",
+    "native_workflow_run_id": 38612755038,
     "native_workflow_status": "success",
-    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38611394887",
-    "scope": "AppKit source compile and exact-source CI/native bundle evidence only; local GUI, Telegram login and authenticated conversation behavior remain unverified."
+    "native_workflow_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755038",
+    "scope": "Workflow/mode-guard verification; no real login/account behavior or local GUI smoke."
   },
   "current_local_slice": {
     "id": "AUTH-UI-DESIGN-04",
@@ -675,7 +675,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Next: in the still-running canonical Dev.app, save the current API hash directly to Keychain or intentionally cancel the protected entry; then quit normally and verify PID 81742 is absent. Only then rebuild/reopen the same /private/tmp/NeTelegram-Dev.app once from 9e0af7a and visually verify incremental chat-row updates. Continue owner-operated one-account login/read/send/close smoke. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
+  "next_action": "The only running local NeTelegram process is an offline auth-layout preview (PID 81742, source 291cd0a); login/QR are intentionally disabled there. App API-hash Keychain lookup is not_found. Owner: save the intended app hash in the protected app dialog or cancel it, then quit the preview normally and tell me it is closed. I will launch the one canonical bundle in normal mode from app source 9e0af7a, verify no preview flags, then perform the owner-operated one-account login/read/send/close smoke. All-20 coverage, Developer ID/notarization and Telegram compatibility gates remain open; Site downloads stay disabled.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -927,5 +927,37 @@
     "coverage_limit": "Accountless visual/AX preview only. Real login, authenticated screens, VoiceOver speech, RTL/IME and real account/runtime behavior remain unverified.",
     "status": "partial"
   },
-  "verified_at": "2026-10-15"
+  "verified_at": "2026-10-15",
+  "latest_native_workflow_ci": {
+    "run_id": 38612755038,
+    "status": "success",
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755038",
+    "workflow_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
+    "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
+    "scope": "Pinned TDLib and isolated arm64 Dev.app assembly passed; the workflow validates the canonical launch script, not a local account login or local GUI."
+  },
+  "latest_workflow_safety_check": {
+    "date": "2026-10-15",
+    "repository_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
+    "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
+    "finding": "The single local process was launched with --ci-auth-layout-preview, which disables profile restore and connection observers and deliberately makes login/QR actions network-free. A macOS open/args request does not replace argv of an existing process.",
+    "change": "dev-app.sh now compares requested preview flags with the live process and fails closed on mode changes or unreadable process state; DEV-WORKFLOW.md separates offline previews from real login.",
+    "focused_tests": "5/5 Tests/release/test_dev_app_launch_mode.py; bash -n Scripts/dev-app.sh; py_compile passed.",
+    "metadata_ci": {
+      "run_id": 38612755032,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755032",
+      "workflow_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
+      "scope": "Metadata workflow passed, including five dev-app preview-mode helper regression tests."
+    },
+    "native_workflow_ci": {
+      "run_id": 38612755038,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38612755038",
+      "workflow_commit": "6160d1a8ecc344955b6dadc9351723ec458a7879",
+      "app_source_commit": "9e0af7a46c1904600cdfc8eeb1e3716239b7cb95",
+      "scope": "Pinned TDLib and isolated arm64 Dev.app assembly passed; the workflow validates the canonical launch script, not a local account login or local GUI."
+    },
+    "local_process": "PID 81742 remains running from /private/tmp/NeTelegram-Dev.app with the auth preview flags; no window, Keychain value, process, or bundle was modified."
+  }
 }
