@@ -3900,14 +3900,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let rightOrder = account.flatMap { chatOrderByAccount[$0]?[rhs.key] } ?? 0
             return leftOrder == rightOrder ? lhs.key > rhs.key : leftOrder > rightOrder
         }) {
-            let button = NSButton(title: "\(value.title)\n\(value.lastText)", target: self, action: #selector(openChatFromButton(_:)))
+            let isSelected = account.flatMap { selectedChatByAccount[$0] } == id
+            let button = NSButton(title: "", target: self, action: #selector(openChatFromButton(_:)))
             button.identifier = NSUserInterfaceItemIdentifier(String(id))
             button.alignment = .left
             button.isBordered = false
+            button.translatesAutoresizingMaskIntoConstraints = false
+            button.widthAnchor.constraint(equalTo: chatList.widthAnchor).isActive = true
             button.lineBreakMode = .byTruncatingTail
-            button.font = .systemFont(ofSize: 13)
+            button.wantsLayer = true
+            button.layer?.cornerRadius = 8
+            button.layer?.backgroundColor = (isSelected ? NSColor.selectedContentBackgroundColor : .clear).cgColor
+            let titleColor = isSelected ? NSColor.selectedControlTextColor : NSColor.labelColor
+            let snippetColor = isSelected ? NSColor.selectedControlTextColor.withAlphaComponent(0.82) : NSColor.secondaryLabelColor
+            let title = NSAttributedString(string: value.title, attributes: [
+                .font: NSFont.systemFont(ofSize: 13, weight: .semibold),
+                .foregroundColor: titleColor,
+            ])
+            let snippet = NSAttributedString(string: "\n\(value.lastText)", attributes: [
+                .font: NSFont.systemFont(ofSize: 12),
+                .foregroundColor: snippetColor,
+            ])
+            let rowTitle = NSMutableAttributedString(attributedString: title)
+            rowTitle.append(snippet)
+            button.attributedTitle = rowTitle
             button.frame.size.height = 52
-            button.setAccessibilityLabel("Открыть переписку: \(value.title). Последнее сообщение: \(value.lastText)")
+            button.setAccessibilityLabel("\(isSelected ? "Текущая переписка" : "Открыть переписку"): \(value.title). Последнее сообщение: \(value.lastText)")
             chatList.addArrangedSubview(button)
         }
     }
@@ -4063,6 +4081,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             try? runtime.send(["@type": "closeChat", "chat_id": previous])
         }
         selectedChatByAccount[runtime.account] = id
+        refreshChatList()
         topicPicker.isHidden = !forumChatsByAccount[runtime.account, default: []].contains(id)
         if forumChatsByAccount[runtime.account, default: []].contains(id),
            selectedForumTopicIDsByAccount[runtime.account]?[id] == nil,
