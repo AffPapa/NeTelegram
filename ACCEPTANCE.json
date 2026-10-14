@@ -484,26 +484,26 @@
     "native_dev_app_smoke": "https://github.com/AffPapa/NeTelegram/actions/runs/38495482965 successfully built and assembled pinned TDLib arm64 Dev.app for exact source; no launch, login, or real account smoke.",
     "metadata_ci": "https://github.com/AffPapa/NeTelegram/actions/runs/38496052252 passed metadata validation for checkpoint 31c2468.",
     "scope": "TDLib unknown/unregistered client route now terminates the shared receive channel after accepted-event drain, avoiding silent loss/fallback. Photo send rechecks the captured runtime and permissions after async staging. Synthetic tests only; real transport/send behavior remains unverified.",
-    "site_deployment": "Public Site v169 deployed as appgdep_6acedbaf4dd4819197f0e5816d5b03db from Site source 348ae0873fa32549b38d8134bce3b48ca7a58f4b; anonymous browser verified new bilingual APP16/APP17 entries. No app download."
+    "site_deployment": "Public Site v170 deployed from Site source 272e257fbe70e6d7de3fb19faff69f78c9cfcdca as appgdep_6acee10806988191b7212e17add857a3; anonymous cache-busted /devlog route verified the AUTH05 bilingual entry for app source fa80d5a. Downloads remain without an app binary."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 169,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_8753448357b48191b4935a4ce97e4e04",
-    "source_commit": "348ae0873fa32549b38d8134bce3b48ca7a58f4b",
-    "app_repository_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "deployment_id": "appgdep_6acedbaf4dd4819197f0e5816d5b03db",
+    "version": 170,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9497e7c9a8b481918d05937c8ee77735",
+    "source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
+    "app_repository_commit": "dde726e",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "deployment_id": "appgdep_6acee10806988191b7212e17add857a3",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-20261014-a455362.tar.gz",
-    "archive_local_sha256": "d4eb83c574fa30165e68a33018cc0799b91a47b3e1851639d6d3c22073ca89ac",
+    "archive_local_path": "/private/tmp/netelegram-site-20261014-fa80d5a.tar.gz",
+    "archive_local_sha256": "b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4",
     "archive_local_size_bytes": 189019,
-    "saved_archive_content_hash": "sha256:8f269a1cb3049efb4e4d111db0c309587f89123f16ef860e1cfc078da51b870b",
+    "saved_archive_content_hash": "sha256:fa75c32cdb9949dc2988d74dbb9865f5f9d45a6edc8ba5e8336ff0cc8226cc58",
     "saved_archive_size_bytes": 440320,
     "archive_file_count": 14,
-    "public_verification": "Anonymous in-app browser loaded /devlog/ and displayed both 2026-10-14 bilingual entries for exact app source a455362 with CI 38495482988 (162/162) and native assembly 38495482965. Download status remains no app release; no binary CTA added."
+    "public_verification": "Sites get_site confirms active public Site v170 and deployment succeeded. Anonymous HTTPS /devlog/?verify=fa80d5a returned 200 with the bilingual AUTH05 entry and exact app commit fa80d5a; accessibility tree showed the local/hosted CI caveat and native build links. Browser cache-busted route verified. Downloads page was not changed; no app download was added."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
@@ -533,7 +533,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "Publish this AUTH05 development milestone once to the existing public Site using the official source-helper flow, then choose the next bounded app slice. Keep using one canonical source commit and one Dev.app; run focused local tests, one full local suite only when hosted suite does not finish, and one exact-source native workflow. Do not repeat unchanged failed CI. Real user login remains deferred.",
+  "next_action": "Choose the next bounded implementation slice from the current acceptance gaps. Batch related source changes into one app commit; run targeted regressions, one exact-source native workflow, and use one full local suite only if the hosted suite stalls. Reuse the canonical Dev.app; do not repeat unchanged attempts. Real login remains deferred, and no 20-account, Developer ID/notarization, or Telegram compatibility PASS is claimed.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",

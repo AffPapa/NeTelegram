@@ -152,7 +152,7 @@
       "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
       "scope": "Pinned TDLib arm64 Dev.app build and assembly succeeded for exact source; did not launch app or prove account flows."
     },
-    "current_head_site_release_note": "Public Site v169 deployed from Site source 348ae0873fa32549b38d8134bce3b48ca7a58f4b. Anonymous browser verified bilingual APP16/APP17 devlog entries and exact CI/native links. No download binary is available.",
+    "current_head_site_release_note": "Public Site v170 verified anonymously at /devlog/?verify=fa80d5a; bilingual AUTH05 entry links exact app source fa80d5a, hosted CI 38497467214 (cancelled after five-minute limit), and native workflow 38497467210. No release download was added.",
     "privacy_lock_notification_cache": {
       "result": "PASS synthetic core tests; acceptance remains partial for native/real-account cases.",
       "commit": "be4707d2876c183fa5760f7264ee0fd51c740461",
@@ -185,26 +185,26 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 169,
-    "source_commit": "348ae0873fa32549b38d8134bce3b48ca7a58f4b",
-    "deployment_id": "appgdep_6acedbaf4dd4819197f0e5816d5b03db",
-    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_8753448357b48191b4935a4ce97e4e04",
+    "latest_version": 170,
+    "source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
+    "deployment_id": "appgdep_6acee10806988191b7212e17add857a3",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9497e7c9a8b481918d05937c8ee77735",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Anonymous in-app browser loaded /devlog/ and displayed both 2026-10-14 bilingual entries for exact app source a455362 with CI 38495482988 (162/162) and native assembly 38495482965. Download status remains no app release; no binary CTA added.",
-    "archive_local_path": "/private/tmp/netelegram-site-20261014-a455362.tar.gz",
-    "archive_local_sha256": "d4eb83c574fa30165e68a33018cc0799b91a47b3e1851639d6d3c22073ca89ac",
+    "public_route_verified": "Sites get_site confirms active public Site v170 and deployment succeeded. Anonymous HTTPS /devlog/?verify=fa80d5a returned 200 with the bilingual AUTH05 entry and exact app commit fa80d5a; accessibility tree showed the local/hosted CI caveat and native build links. Browser cache-busted route verified. Downloads page was not changed; no app download was added.",
+    "archive_local_path": "/private/tmp/netelegram-site-20261014-fa80d5a.tar.gz",
+    "archive_local_sha256": "b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4",
     "archive_local_size_bytes": 189019,
-    "saved_archive_content_hash": "sha256:8f269a1cb3049efb4e4d111db0c309587f89123f16ef860e1cfc078da51b870b",
+    "saved_archive_content_hash": "sha256:fa75c32cdb9949dc2988d74dbb9865f5f9d45a6edc8ba5e8336ff0cc8226cc58",
     "saved_archive_size_bytes": 440320,
     "saved_archive_file_count": 14,
-    "app_repository_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
+    "app_repository_commit": "dde726e",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
     "asset_cleanup": "No public app binary because no verified Developer ID signed/notarized release exists.",
     "app_ci_run_id": 38492400249,
     "native_app_run_id": 38492400259,
     "metadata_validation_run_id": 38492400278,
-    "description": "Public development Site v169 with exact-source APP16/APP17 milestones; no public app binary."
+    "description": "Public development Site v170 with bilingual AUTH05 country-search milestone; no public app binary."
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -216,7 +216,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Publish the AUTH05 bilingual country-search development entry once to the existing public Site v170, verify anonymous route and links, then proceed to the next bounded app slice. Keep one canonical source SHA and Dev.app; focused tests plus one full local suite only when hosted CI stalls; never repeat unchanged failed CI. Real login remains deferred.",
+  "next_action": "Continue the next bounded implementation slice from app source fa80d5a after choosing it against current acceptance gaps. For speed, batch related code into one source commit; run focused regression(s), exact-source native workflow once, and one full local suite only if hosted CI stalls. Reuse the single canonical Dev.app and skip unchanged builds/tests. Keep all real-account, 20-runtime, Developer ID/notarization and Telegram compatibility gates open; user login remains deferred.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -271,21 +271,21 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 169,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_8753448357b48191b4935a4ce97e4e04",
-    "source_commit": "348ae0873fa32549b38d8134bce3b48ca7a58f4b",
-    "app_repository_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "deployment_id": "appgdep_6acedbaf4dd4819197f0e5816d5b03db",
+    "version": 170,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9497e7c9a8b481918d05937c8ee77735",
+    "source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
+    "app_repository_commit": "dde726e",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "deployment_id": "appgdep_6acee10806988191b7212e17add857a3",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-20261014-a455362.tar.gz",
-    "archive_local_sha256": "d4eb83c574fa30165e68a33018cc0799b91a47b3e1851639d6d3c22073ca89ac",
+    "archive_local_path": "/private/tmp/netelegram-site-20261014-fa80d5a.tar.gz",
+    "archive_local_sha256": "b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4",
     "archive_local_size_bytes": 189019,
-    "saved_archive_content_hash": "sha256:8f269a1cb3049efb4e4d111db0c309587f89123f16ef860e1cfc078da51b870b",
+    "saved_archive_content_hash": "sha256:fa75c32cdb9949dc2988d74dbb9865f5f9d45a6edc8ba5e8336ff0cc8226cc58",
     "saved_archive_size_bytes": 440320,
     "archive_file_count": 14,
-    "public_verification": "Anonymous in-app browser loaded /devlog/ and displayed both 2026-10-14 bilingual entries for exact app source a455362 with CI 38495482988 (162/162) and native assembly 38495482965. Download status remains no app release; no binary CTA added."
+    "public_verification": "Sites get_site confirms active public Site v170 and deployment succeeded. Anonymous HTTPS /devlog/?verify=fa80d5a returned 200 with the bilingual AUTH05 entry and exact app commit fa80d5a; accessibility tree showed the local/hosted CI caveat and native build links. Browser cache-busted route verified. Downloads page was not changed; no app download was added."
   },
   "release_candidate_validation": {
     "status": "implemented_not_used_for_release",
@@ -315,21 +315,21 @@
   "current_site_checkpoint": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 169,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_8753448357b48191b4935a4ce97e4e04",
-    "source_commit": "348ae0873fa32549b38d8134bce3b48ca7a58f4b",
-    "app_repository_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "deployment_id": "appgdep_6acedbaf4dd4819197f0e5816d5b03db",
+    "version": 170,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_9497e7c9a8b481918d05937c8ee77735",
+    "source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
+    "app_repository_commit": "dde726e",
+    "app_source_commit": "fa80d5a5f77b1fecf583754f3fe5cf69209be75b",
+    "deployment_id": "appgdep_6acee10806988191b7212e17add857a3",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-20261014-a455362.tar.gz",
-    "archive_local_sha256": "d4eb83c574fa30165e68a33018cc0799b91a47b3e1851639d6d3c22073ca89ac",
+    "archive_local_path": "/private/tmp/netelegram-site-20261014-fa80d5a.tar.gz",
+    "archive_local_sha256": "b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4",
     "archive_local_size_bytes": 189019,
-    "saved_archive_content_hash": "sha256:8f269a1cb3049efb4e4d111db0c309587f89123f16ef860e1cfc078da51b870b",
+    "saved_archive_content_hash": "sha256:fa75c32cdb9949dc2988d74dbb9865f5f9d45a6edc8ba5e8336ff0cc8226cc58",
     "saved_archive_size_bytes": 440320,
     "archive_file_count": 14,
-    "public_verification": "Anonymous in-app browser loaded /devlog/ and displayed both 2026-10-14 bilingual entries for exact app source a455362 with CI 38495482988 (162/162) and native assembly 38495482965. Download status remains no app release; no binary CTA added."
+    "public_verification": "Sites get_site confirms active public Site v170 and deployment succeeded. Anonymous HTTPS /devlog/?verify=fa80d5a returned 200 with the bilingual AUTH05 entry and exact app commit fa80d5a; accessibility tree showed the local/hosted CI caveat and native build links. Browser cache-busted route verified. Downloads page was not changed; no app download was added."
   },
   "current_native_smoke": {
     "repository_head": "7d63518026eb17266cfb816d4af22189be859374",
@@ -419,6 +419,13 @@
     "native_build_run": 38497467210,
     "native_build_status": "success",
     "local_dev_app": "exact-source canonical bundle; CUA country search and select verified; no credentials",
-    "acceptance_status": "partial"
+    "acceptance_status": "partial",
+    "site_deployment": {
+      "version": 170,
+      "source_commit": "272e257fbe70e6d7de3fb19faff69f78c9cfcdca",
+      "deployment_id": "appgdep_6acee10806988191b7212e17add857a3",
+      "archive_sha256": "b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4",
+      "public": "Anonymous route verified with bilingual AUTH05 entry."
+    }
   }
 }

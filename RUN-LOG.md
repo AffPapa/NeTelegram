@@ -1,3 +1,10 @@
+## 2026-10-14 — AUTH05 development milestone published to Site v170
+
+- Existing public Site `appgprj_6acba85192e08191acdf7011928848cf` advanced from v169 to v170. Site source commit `272e257fbe70e6d7de3fb19faff69f78c9cfcdca`; saved version `appgprj_6acba85192e08191acdf7011928848cf~appgver_9497e7c9a8b481918d05937c8ee77735`; public deployment `appgdep_6acee10806988191b7212e17add857a3`.
+- Local archive: `/private/tmp/netelegram-site-20261014-fa80d5a.tar.gz`, SHA-256 `b72952526f130f624d4bd45504efb6545b72bbf598d22c02d3a198b3e40107c4`; Sites saved content hash `sha256:fa75c32cdb9949dc2988d74dbb9865f5f9d45a6edc8ba5e8336ff0cc8226cc58` (440320 bytes, 14 files).
+- `get_site` confirmed active/public v170 and successful deployment. Anonymous cache-busted HTTPS `/devlog/?verify=fa80d5a` and the accessibility tree showed the bilingual AUTH05 entry and its exact CI/native links. The first browser reload showed cached v169; a query-string refresh resolved it. Site downloads were not altered; no app binary is advertised.
+- App checkpoint before this deployment receipt: `dde726e` (app source `fa80d5a`). Site push used only the existing official Sites helper and temporary credential via hidden stdin; no credential was stored in the repository.
+
 ## 2026-10-14 — AUTH05 country search verified in the canonical Dev.app
 
 - App source commit: `fa80d5a5f77b1fecf583754f3fe5cf69209be75b`. Search now matches localized and English names, region codes, and calling codes; the currently selected country remains visible as a separate marked option while filtering. Selecting a result retains its exact region, including for shared `+1` calling codes.
