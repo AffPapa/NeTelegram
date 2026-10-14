@@ -76,11 +76,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38523286071,
+      "run_id": 38523639678,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523286071",
-      "workflow_commit": "6f38e06c67ec6b1dab49ae57f3f298c306128b03",
-      "scope": "Metadata validation passed for the exact Site v181 receipt checkpoint and consistency checks."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523639678",
+      "workflow_commit": "e14382b01cdfad79ad96ae12567c18a1c89849db",
+      "scope": "Exact checkpoint with canonical Dev.app hashes and lifecycle evidence passed metadata validation."
     }
   },
   "local_development_candidate": {
@@ -296,11 +296,11 @@
   "latest_site_source_commit": "a82cfec5bdc0fcc692fcaa31138bd034fd2a0554",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38523286071,
+    "run_id": 38523639678,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523286071",
-    "workflow_commit": "6f38e06c67ec6b1dab49ae57f3f298c306128b03",
-    "scope": "Metadata validation passed for the exact Site v181 receipt checkpoint and consistency checks."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38523639678",
+    "workflow_commit": "e14382b01cdfad79ad96ae12567c18a1c89849db",
+    "scope": "Exact checkpoint with canonical Dev.app hashes and lifecycle evidence passed metadata validation."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
