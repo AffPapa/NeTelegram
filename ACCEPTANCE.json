@@ -1,17 +1,17 @@
 {
   "schema_version": 2,
-  "status": "A11Y-ANNOUNCE-02 authentication failure announcements; serial suite 174/174 and exact-source CI pass; canonical arm64 Dev.app built once; Site v190 deployed. Actual VoiceOver speech and real login remain unverified.",
+  "status": "CORE-RUNTIME-01 route-fenced runtime status writes; serial suite 175/175, exact-source CI passed, canonical Dev.app rebuilt once and native auth window smoke passed. Site v190 still contains the prior A11Y milestone pending the next devlog deployment; real login and 20-account certification remain unverified.",
   "current_evidence": {
-    "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-    "local_suite": "PASS 174/174 using the standard serial Swift command with CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules and --disable-sandbox.",
-    "focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1.",
+    "app_source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+    "local_suite": "PASS 175/175 using the standard serial Swift command; no parallel test runner.",
+    "focused_test": "staleRuntimeStatusWriteCannotOverwriteNewGeneration PASS 1/1.",
     "hosted_ci": {
-      "run_id": 38543010984,
+      "run_id": 38544483927,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38543010984",
-      "workflow_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "scope": "Exact-source macOS CI passed for auth error accessibility behavior."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38544483927",
+      "workflow_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "app_source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "scope": "Exact-source macOS CI passed 175/175 serial Swift tests."
     },
     "native_build": {
       "status": "PASS_canonical_dev_bundle_build_and_auth_layout_preview",
@@ -22,17 +22,17 @@
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
-      "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+      "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "source_fingerprint_sha256": "bd4227bf6493eaac5bc600ebb036306120ff0518b271705b6f876b1f8b4ef108",
+      "executable_sha256": "34fbd71b8ddba3b18d9feb07ebf2c8cff600c8b2a800444aa21bab2b782e4e3c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
+      "build_info_sha256": "1a360ace838787905eb6d214cec8802d4d92a10baf2c8d054a40bfb46f166f24",
       "architecture": "arm64",
       "minimum_macos": "14.0",
-      "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
-      "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
-      "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login.",
-      "build_record_sha256": "6ca64d99e0629d9c59530339fd674352688ab3c667d38e9330a01497d44bd808"
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "One canonical arm64 Dev.app rebuilt from clean exact source and launched once. CUA title NeTelegram · dev 8d47568a; native accountless auth AX tree showed country selector, phone, Continue, QR and neutral status. No credentials or profile selected.",
+      "scope": "Native launch/window and auth screen presence only; no Telegram login, VoiceOver spoken-error, lifecycle reopen, or 20-account proof.",
+      "build_record_sha256": "7d4ea806b6c805d8d99200f8e030d0739c13a92a595b670b4ed3d592237675d8"
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -125,27 +125,28 @@
       "download_available": false
     },
     "latest_acceptance_slice": {
-      "id": "A11Y-ANNOUNCE-02 authentication failure announcements",
-      "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1",
-      "local_suite": "PASS 174/174 serial",
-      "hosted_ci": "GitHub macOS CI 38543010984 success for exact app-source SHA 0666ff8cb7a40ed5203847f9cfdea088cb4480fe.",
+      "id": "CORE-RUNTIME-01 route-fenced runtime status writes",
+      "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "local_focused_test": "staleRuntimeStatusWriteCannotOverwriteNewGeneration PASS 1/1",
+      "local_suite": "PASS 175/175 serial Swift tests.",
+      "hosted_ci": "GitHub macOS CI 38544483927 success for exact app-source SHA 8d47568a07bc327fc7c6999402002acfc136e4af; suite passed.",
       "native_bundle": {
         "path": "/private/tmp/NeTelegram-Dev.app",
         "support_root": "/private/tmp/netelegram-dev-support-clean",
-        "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-        "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
-        "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+        "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+        "source_fingerprint_sha256": "bd4227bf6493eaac5bc600ebb036306120ff0518b271705b6f876b1f8b4ef108",
+        "executable_sha256": "34fbd71b8ddba3b18d9feb07ebf2c8cff600c8b2a800444aa21bab2b782e4e3c",
         "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-        "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
+        "build_info_sha256": "1a360ace838787905eb6d214cec8802d4d92a10baf2c8d054a40bfb46f166f24",
         "architecture": "arm64",
         "minimum_macos": "14.0",
-        "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
-        "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
-        "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login."
+        "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+        "smoke": "One canonical arm64 Dev.app rebuilt from clean exact source and launched once. CUA title NeTelegram · dev 8d47568a; native accountless auth AX tree showed country selector, phone, Continue, QR and neutral status. No credentials or profile selected.",
+        "scope": "Native launch/window and auth screen presence only; no Telegram login, VoiceOver spoken-error, lifecycle reopen, or 20-account proof.",
+        "build_record_sha256": "7d4ea806b6c805d8d99200f8e030d0739c13a92a595b670b4ed3d592237675d8"
       },
-      "implementation": "Maps eligible auth submission failures to static localized announcements and posts NSAccessibility.announcementRequested at medium priority. Does not include raw server errors or entered values. Generic transient status updates remain unannounced.",
-      "remaining": "Actual VoiceOver speech and auth failure were not exercised; no real account login, 20-runtime coverage, or release readiness."
+      "implementation": "Runtime-owned state writes require an exact active RuntimeRoute (account, client ID and generation). Pre-client account-level failures are accepted only when no runtime route currently owns that account. Startup waiting/close/failure paths and identity-mismatch close status use route-fenced writes.",
+      "remaining": "Synthetic state transition coverage only; no interleaving was observed against 20 real TDLib clients. The Dev.app smoke verified native accountless launch/window, not a real account."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -590,17 +591,26 @@
       "required_for": "all releases",
       "status": "partial",
       "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial. The routine Dev.app script now defaults to a fresh isolated root; exact local smoke at checkpoint 3cba4c5 shows country +66, phone field, Continue, QR and neutral prompt without UUID profiles. No phone/code entered. Current app source fa80d5a5f77b1fecf583754f3fe5cf69209be75b adds bilingual country-name search and retains the selected region as a separate marked item while filtering. Focused search regression passed 1/1; exact-source local serial suite passed 163/163 in 0.426s on arm64e / Xcode 27.0 / Swift 6.4. Exact-source hosted macOS CI 38497467214 passed the runner probe but was cancelled at its five-minute job limit during the full suite; no hosted suite result is claimed. Pinned TDLib/arm64 Dev.app workflow 38497467210 passed. The one canonical local Dev.app at /private/tmp/NeTelegram-Dev.app was rebuilt from fa80d5a5f77b1fecf583754f3fe5cf69209be75b in 0.18s, ad-hoc codesign verification passed, and accessibility smoke searched 'Canada', found '🇨🇦 Канада +1', and selected it; current Thailand remains explicit when filtered. No phone, code, account, or session was entered. AUTH05 remains partial pending real auth and broader flow/accessibility coverage."
+    },
+    {
+      "id": "APP27",
+      "name": "Route-fenced runtime status writes",
+      "expected": "A runtime status update mutates account state only while its exact account/client/generation route remains active; account-level pre-client failures cannot overwrite a live route.",
+      "method": "Core route lifecycle regression plus production call-site audit and exact-source CI",
+      "required_for": "all-active account isolation",
+      "status": "passed",
+      "evidence": "RuntimeCoordinator.setState(_:from:) rejects missing/stale routes; account-level setState(_:for:) refuses writes while a route owns the account. Startup authorization, close, and identity-mismatch paths now use the exact route. staleRuntimeStatusWriteCannotOverwriteNewGeneration passed 1/1; serial suite 175/175; exact-source CI 38544483927 succeeded. Synthetic route transition only; this does not prove 20 real TDLib sessions."
     }
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-    "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+    "app_source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
     "local_command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules swift test --no-parallel --disable-sandbox",
-    "local_result": "PASS serial suite 174/174; focused authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1.",
-    "hosted_ci": "PASS exact-source macOS CI 38543010984: https://github.com/AffPapa/NeTelegram/actions/runs/38543010984",
-    "native_dev_app_smoke": "Canonical arm64 Dev.app built once from exact clean source. CUA confirmed accountless auth window. No real login or VoiceOver announcement interaction. Quit/process absence not claimed: CUA inventory no longer listed app, process guard could not prove absence.",
-    "scope": "AUTH04 static localized VoiceOver announcement support implemented; actual spoken output remains unverified."
+    "local_result": "Focused staleRuntimeStatusWriteCannotOverwriteNewGeneration PASS 1/1; full serial suite PASS 175/175.",
+    "hosted_ci": "PASS exact-source macOS CI 38544483927: https://github.com/AffPapa/NeTelegram/actions/runs/38544483927",
+    "native_dev_app_smoke": "One canonical arm64 Dev.app rebuilt from clean exact source and launched once. CUA title NeTelegram · dev 8d47568a; native accountless auth AX tree showed country selector, phone, Continue, QR and neutral status. No credentials or profile selected.",
+    "scope": "CORE-RUNTIME-01 status-write route/generation fencing."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -641,7 +651,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "CORE-RUNTIME-01: inspect the all-active account startup/recovery path against the v2.0 invariants; select one concrete production code gap, implement one vertical slice with a focused regression, run the standard serial suite and exact-source CI only if app code changes. Preserve the current canonical Dev.app until source changes. Do not re-use AUTHxx identifiers from acceptance cases for milestone labels. Real login remains user-deferred.",
+  "next_action": "CORE-RUNTIME-02: continue the all-active runtime invariant audit from app source 8d47568; select one independently verifiable P0/P1 gap. Do not rerun this suite/build or revisit route-fenced state writes. User Telegram login remains deferred; preserve current canonical Dev.app until app source changes.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -671,49 +681,51 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
+    "app_source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
     "branch": "main",
-    "working_tree": "clean app source; metadata checkpoint updates pending",
-    "local_tests": "Focused auth announcement test 1/1; serial suite 174/174.",
-    "hosted_validation": "Exact-source macOS CI 38543010984 passed.",
+    "working_tree": "clean app source; metadata checkpoint pending",
+    "local_tests": "Targeted test 1/1; full serial suite 175/175.",
+    "hosted_validation": "Exact-source CI 38544483927 success.",
     "native_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
-      "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+      "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "source_fingerprint_sha256": "bd4227bf6493eaac5bc600ebb036306120ff0518b271705b6f876b1f8b4ef108",
+      "executable_sha256": "34fbd71b8ddba3b18d9feb07ebf2c8cff600c8b2a800444aa21bab2b782e4e3c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
+      "build_info_sha256": "1a360ace838787905eb6d214cec8802d4d92a10baf2c8d054a40bfb46f166f24",
       "architecture": "arm64",
       "minimum_macos": "14.0",
-      "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
-      "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
-      "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login."
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "One canonical arm64 Dev.app rebuilt from clean exact source and launched once. CUA title NeTelegram · dev 8d47568a; native accountless auth AX tree showed country selector, phone, Continue, QR and neutral status. No credentials or profile selected.",
+      "scope": "Native launch/window and auth screen presence only; no Telegram login, VoiceOver spoken-error, lifecycle reopen, or 20-account proof.",
+      "build_record_sha256": "7d4ea806b6c805d8d99200f8e030d0739c13a92a595b670b4ed3d592237675d8"
     },
     "date": "2026-10-14"
   },
   "latest_acceptance_slice": {
-    "id": "A11Y-ANNOUNCE-02 authentication failure announcements",
-    "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-    "local_focused_test": "authenticationFailureAnnouncementsAreStaticAndLimitedToSubmittableSteps PASS 1/1",
-    "local_suite": "PASS 174/174 serial",
-    "hosted_ci": "GitHub macOS CI 38543010984 success for exact app-source SHA 0666ff8cb7a40ed5203847f9cfdea088cb4480fe.",
+    "id": "CORE-RUNTIME-01 route-fenced runtime status writes",
+    "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+    "local_focused_test": "staleRuntimeStatusWriteCannotOverwriteNewGeneration PASS 1/1",
+    "local_suite": "PASS 175/175 serial Swift tests.",
+    "hosted_ci": "GitHub macOS CI 38544483927 success for exact app-source SHA 8d47568a07bc327fc7c6999402002acfc136e4af; suite passed.",
     "native_bundle": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "0666ff8cb7a40ed5203847f9cfdea088cb4480fe",
-      "source_fingerprint_sha256": "13919d6b57172a026a05eef4029c8d2556b575a6b4a7f555d287be7da8bde307",
-      "executable_sha256": "0fc24ea776b9a9472c46f64242383d668f3a5833368ddaeb577cbf2c34c53148",
+      "source_commit": "8d47568a07bc327fc7c6999402002acfc136e4af",
+      "source_fingerprint_sha256": "bd4227bf6493eaac5bc600ebb036306120ff0518b271705b6f876b1f8b4ef108",
+      "executable_sha256": "34fbd71b8ddba3b18d9feb07ebf2c8cff600c8b2a800444aa21bab2b782e4e3c",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
-      "build_info_sha256": "e2336961de941fe4a83b07a20c544d26d81df346045c96083142a3ea5e9f2f50",
+      "build_info_sha256": "1a360ace838787905eb6d214cec8802d4d92a10baf2c8d054a40bfb46f166f24",
       "architecture": "arm64",
       "minimum_macos": "14.0",
-      "signature": "ad-hoc development only; strict codesign verification passed during canonical dev build",
-      "smoke": "CUA confirmed native accountless auth window and accessibility tree for exact source. No credentials entered. App later absent from CUA application inventory; process guard itself returned unable-to-prove under this permission environment, so no stronger quit/process claim is made.",
-      "scope": "Build from exact clean source and native auth UI presence only; VoiceOver speech/error event not exercised, no real login."
+      "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+      "smoke": "One canonical arm64 Dev.app rebuilt from clean exact source and launched once. CUA title NeTelegram · dev 8d47568a; native accountless auth AX tree showed country selector, phone, Continue, QR and neutral status. No credentials or profile selected.",
+      "scope": "Native launch/window and auth screen presence only; no Telegram login, VoiceOver spoken-error, lifecycle reopen, or 20-account proof.",
+      "build_record_sha256": "7d4ea806b6c805d8d99200f8e030d0739c13a92a595b670b4ed3d592237675d8"
     },
-    "implementation": "Maps eligible auth submission failures to static localized announcements and posts NSAccessibility.announcementRequested at medium priority. Does not include raw server errors or entered values. Generic transient status updates remain unannounced.",
-    "remaining": "Actual VoiceOver speech and auth failure were not exercised; no real account login, 20-runtime coverage, or release readiness."
+    "implementation": "Runtime-owned state writes require an exact active RuntimeRoute (account, client ID and generation). Pre-client account-level failures are accepted only when no runtime route currently owns that account. Startup waiting/close/failure paths and identity-mismatch close status use route-fenced writes.",
+    "remaining": "Synthetic state transition coverage only; no interleaving was observed against 20 real TDLib clients. The Dev.app smoke verified native accountless launch/window, not a real account."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
