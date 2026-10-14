@@ -1347,3 +1347,11 @@
 - Fresh CUA inventory shows NeTelegram Dev is still running. A read-only accessibility snapshot identifies a protected API hash settings dialog with a secure text field focused. The value was not read or copied.
 - This explains why the earlier graceful quit returned user-cancelled (-128). Do not dismiss the dialog, read the field, or retry quit. The owner must press Save to Keychain for the intended value or Cancel directly in the app.
 - The app-source candidate remains `632bf5514ffa2851a55665e95db5d17dae8fa1b7`; CI 38560168478 passed 179/179. Rebuild remains deferred until the dialog is resolved and the same app is closed.
+
+
+## 2026-10-14 — APP29c account-scoped logout failure status
+
+- Guarded the pre-confirmation logout-close status with the selected account and captured selection revision, preventing a late close from account B from overwriting the global status after the user switches to A.
+- Existing focused regression `delayedClosedAccountCleanupCannotOverrideNewerSelection` passed 1/1; SwiftPM compiled the AppKit and test targets. Exact-source macOS arm64 CI [38561302832](https://github.com/AffPapa/NeTelegram/actions/runs/38561302832) passed 179/179. This remains a policy/call-site check, not a native TDLib logout integration test.
+- Source `41b33783fdd8db9db47ed13f79214c4ee95c9f7c` is pushed to main. Read-only CUA confirms the canonical Dev.app remains open at the protected API hash dialog. The field value was not read; no rebuild or quit retry was attempted.
+- No signing identity or confirmed notary credentials; no app release or Site deployment.
