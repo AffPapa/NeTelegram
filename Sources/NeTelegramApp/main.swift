@@ -6915,7 +6915,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         case "authorizationStateWaitTdlibParameters":
             showAuthorizationProgress(title: "Подготавливаем вход", subtitle: "Настраиваю локальную базу аккаунта…")
         case "authorizationStateWaitPhoneNumber": showPhoneEntry()
-        case "authorizationStateWaitCode": showAuthInput("Введите код, полученный для этого входа.", placeholder: "Код", button: "Продолжить")
+        case "authorizationStateWaitCode": showAuthInput(
+            info["code_prompt"] as? String ?? "Введите код, полученный для этого входа.",
+            placeholder: "Код",
+            button: "Продолжить"
+        )
         case "authorizationStateWaitPassword": showAuthInput("Введите пароль двухэтапной проверки. Он не сохраняется.", placeholder: "Пароль двухэтапной проверки", button: "Продолжить")
         case "authorizationStateWaitEmailAddress": showEmailEntry()
         case "authorizationStateWaitEmailCode": showEmailCode(info)
@@ -7095,7 +7099,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         switch auth["@type"] as? String {
         case "authorizationStateWaitCode":
             let type = ((auth["code_info"] as? [String: Any])?["type"] as? [String: Any])?["@type"] as? String
-            return type.map { ["code_info": ["type": ["@type": $0]]] } ?? [:]
+            let phoneNumber = (auth["code_info"] as? [String: Any])?["phone_number"] as? String
+            return ["code_prompt": AuthenticationCodePrompt.message(codeType: type, phoneNumber: phoneNumber)]
         case "authorizationStateWaitPassword":
             return (auth["password_hint"] as? String).map { ["password_hint": $0] } ?? [:]
         case "authorizationStateWaitEmailCode":
