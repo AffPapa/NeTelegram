@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "App source ec2d91b passes 158/158 local and exact-source hosted tests. Canonical Dev.app was rebuilt and opened once from clean repo checkpoint e1fa509; the live window shows the current accountless phone/QR entry screen. Public development Site v165 is live; no signed/notarized release or download exists.",
-  "verified_at": "2026-10-14T07:01:00+07:00",
+  "phase": "Keychain blocking work is capped at two concurrent operations; local focused stall/bound regression and exact-source macOS suite, metadata, pinned-TDLib Dev.app lifecycle workflows pass. Canonical local Dev.app rebuilt once and AX-verified at exact source 4f7cb6f. No real login, authorized profile or account data used.",
+  "verified_at": "2026-10-14T07:00:00+07:00",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
     "change": "Add a SwiftPM build cache keyed by macOS, architecture, Swift/Xcode versions, Package.swift, and TDLIB.lock.json; run the deterministic publicDisplayNameMatchesRepositoryName probe before the existing serial suite to localize silent runner stalls.",
@@ -14,7 +14,7 @@
     "public_name": "NeTelegram",
     "repository_codename": "NeTelegram",
     "version": "0.0.0-dev",
-    "app_source_commit": "ec2d91b96dfed996d32d825bd03c1aabc3596c1a"
+    "app_source_commit": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c"
   },
   "source": {
     "repository": "https://github.com/AffPapa/NeTelegram",
@@ -247,7 +247,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Keep this exact Dev.app as the only running development instance. Real account login/read/send/logout requires the user to enter credentials in the app when ready; do not create or launch another bundle. Continue synthetic engineering slices and keep all-20 hardware, signing/notarization and Telegram compatibility gates open.",
+  "next_action": "Update the existing public Site devlog with this factual Keychain queue milestone and its test/CI evidence, then continue with one real-account login only when the user enters credentials in NeTelegram. Keep all-20 hardware/performance, physical Keychain, signing/notarization and Telegram compatibility gates open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -256,9 +256,9 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "ec2d91b96dfed996d32d825bd03c1aabc3596c1a",
-    "app_source_commit_authority": "ec2d91b96dfed996d32d825bd03c1aabc3596c1a",
-    "app_source_commit": "ec2d91b96dfed996d32d825bd03c1aabc3596c1a"
+    "repo_head_before_checkpoint": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
+    "app_source_commit_authority": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
+    "app_source_commit": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
@@ -352,17 +352,21 @@
     "archive_sha256": "c30c31060910e23290e6250ca4b7e9ce49686c3a5bbd73c690d031056323447d"
   },
   "current_native_smoke": {
-    "repository_head": "e1fa50933066273344e6544eb3fcf0a368d66ac5",
-    "app_source_commit": "ec2d91b96dfed996d32d825bd03c1aabc3596c1a",
+    "repository_head": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
+    "app_source_commit": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
     "bundle_id": "org.affpapa.netelegram.dev",
-    "source_fingerprint_sha256": "b237c73467dc5a9b1576182e679d67f0da51fd3f2323c9c2c2d0c2030f2457db",
+    "source_fingerprint_sha256": "0ba27cbc24782d7e8b44311b4d83cdb6efd660f64ff26c54961ba06b643f4603",
+    "executable_sha256": "acb986552bf2f1dcb1ed73c50ffce9900482a61dcc174baca687f739f9692c30",
+    "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700",
     "architecture": "arm64",
     "minimum_macos": "14.0",
-    "build_seconds": 9.33,
+    "build_seconds": 6.61,
+    "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "live_ui": "CUA confirmed title NeTelegram · dev e1fa5093, phone/QR entry and independent-client disclosure. No phone, OTP or Telegram account was entered.",
-    "scope": "One canonical Dev.app path; previous empty 7f95e03 instance exited before replacement. Not a login, send, account, all-20 or release test."
+    "live_ui": "CUA verified window title NeTelegram · dev 4f7cb6f2, country +66, phone, Continue and QR controls, disclosure; no credentials/profile entered.",
+    "support_root": "/private/tmp/netelegram-dev-support-clean",
+    "scope": "The only canonical local Dev.app was replaced after confirming the previous accountless process exited. Not a login/send, authorized account, 20-runtime, performance, Developer ID or notarization test."
   },
   "latest_workflow_trigger_validation": {
     "commit": "3dfc6f205c439a50890850fa96ad092731da5041",
@@ -379,5 +383,26 @@
     },
     "app_source_changed": false,
     "scope": "Workflow-only commit triggered native bundle/lifecycle smoke and metadata validation. No Swift unit suite was needed because app source and tests did not change. Existing local canonical Dev.app was not relaunched."
+  },
+  "latest_keychain_executor_verification": {
+    "source_commit": "4f7cb6f2448d6b153a0635a26e5153a69e2b4e8c",
+    "local_focused_test": "stalledKeychainOperationDoesNotBlockOtherAccountsAndRemainsBounded passed 1/1 under Xcode 27 / Swift 6.4; build 16.76s, test 0.111s.",
+    "macos_ci": {
+      "run_id": 38487262779,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38487262779"
+    },
+    "native_dev_app": {
+      "run_id": 38487262804,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38487262804"
+    },
+    "metadata": {
+      "run_id": 38487262753,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38487262753"
+    },
+    "implementation": "OperationQueue(maxConcurrentOperationCount: 2); one stalled SecItem no longer serially blocks every account key operation, and total blocking work stays bounded.",
+    "limits": "Synthetic executor test and hosted build/lifecycle pass only. No physical Keychain stall, real login, real multi-account sessions or 20-account performance certification."
   }
 }
