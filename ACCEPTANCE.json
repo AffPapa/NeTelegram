@@ -1,30 +1,32 @@
 {
   "schema_version": 2,
-  "status": "APP02 production restore cleanup fan-out passed focused synthetic coverage and exact-source hosted macOS CI 165/165 on e7cc4b3. Canonical Dev.app accountless smoke matches source. Public Site v172 deployed. Real login, 20 authorized runtimes, notarization and compatibility remain open.",
+  "status": "APP01 selection-race fix passed exact-source local and hosted synthetic suite 166/166 on 4dcddcc; canonical accountless Dev.app smoke matches. Site v173 is public. Real login, 20 authorized runtimes, Developer ID/notarization and Telegram compatibility remain open.",
   "current_evidence": {
-    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "local_suite": "PASS 165/165 exact-source serial Swift tests on Xcode 27 / Swift 6.4 / arm64e; focused APP02 cleanup fan-out regression PASS 1/1.",
-    "focused_test": "restoreCleanupFanoutDoesNotWaitForOneBlockedProfileBeforeQueueingOthers passed 1/1; one synthetic blocked cleanup and nineteen independently queued startup candidates.",
+    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "local_suite": "PASS 166/166 exact-source serial Swift suite on Xcode 27 / Swift 6.4 / arm64e; focused selection race regression PASS 1/1.",
+    "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1; prevents older background startup completion from stealing presentation after a newer user account selection. Synthetic presentation-policy test, not live AppKit switching.",
     "hosted_ci": {
-      "run_id": 38508018017,
+      "run_id": 38509465812,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508018017",
-      "scope": "Exact-source macOS CI for app source e7cc4b3; filtered probe 1/1 and complete serial suite 165/165."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38509465812",
+      "workflow_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "scope": "Exact-source macOS CI passed filtered probe 1/1 and complete serial Swift suite 166/166. A prior push-triggered run 38509423637 was cancelled; no second dispatch is needed."
     },
     "native_build": {
       "status": "success_local",
-      "scope": "One canonical arm64 Dev.app built from exact source e7cc4b3 in 5.29s; ad-hoc codesign verification passed."
+      "scope": "One canonical arm64 Dev.app built from exact source in 5.29s; ad-hoc codesign verification passed."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "source_fingerprint_sha256": "30dd7f4aba6c4f453a7b697c699199ccff1ed8ec55d4dc3d086c885ee8aba7f8",
-      "executable_sha256": "8847aff674738b94a758a77a21a5a876a0b258130fcab86b5d9505459f04bdeb",
+      "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "source_fingerprint_sha256": "6fcd6855fc47f2d7f34b9ae8e8a03af539f3ac6a6f0f85ee95f434c36a6713bb",
+      "executable_sha256": "bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "CUA confirmed exact title NeTelegram · dev e7cc4b3 and accountless login. No credentials or profiles."
+      "smoke": "CUA confirmed exact title NeTelegram · dev 4dcddccf and accountless login. No credentials or profiles."
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -50,21 +52,21 @@
     "latest_site_deployment": {
       "date": "2026-10-14",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-      "version": 172,
-      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d5d86670f6c8191a6ca277f156d8669",
-      "source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
-      "app_repository_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "deployment_id": "appgdep_6acefc4c79888191afe5b199682996a2",
+      "version": 173,
+      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_93476d1079d88191a1cb8dc8dae87ccd",
+      "source_commit": "c35fc6e7b0f48ce65bd25e063b280b95cba5e4a4",
+      "app_repository_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "deployment_id": "appgdep_6acf0056a80481919f9c93e679eeafa9",
       "url": "https://netelegram.iryadom.chatgpt.site",
       "audience": "public",
-      "archive_local_path": "/private/tmp/netelegram-site-app02-20261014.tar.gz",
-      "archive_local_sha256": "92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
-      "archive_local_size_bytes": 450560,
-      "saved_archive_content_hash": "sha256:92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+      "archive_local_path": "/private/tmp/netelegram-site-selection-fix-20261014.tar.gz",
+      "archive_local_sha256": "4b2c533f87ca301eeee6fff11abf851f56ee341306261e4b93024c72c49f63e1",
+      "archive_local_size_bytes": 191431,
+      "saved_archive_content_hash": "sha256:f5ba75ec742f4454400c8967bbdb1bbea3e3d62011636604ee0433f9a53b7431",
       "saved_archive_size_bytes": 450560,
-      "archive_file_count": null,
-      "public_verification": "Existing public Site deployment succeeded. Anonymous in-app browser loaded /devlog/ with title “Журнал разработки — NeTelegram”. No app binary/download is available; full page text and public feed MIME were not freshly verified in this check."
+      "archive_file_count": 14,
+      "public_verification": "Public deployment v173 is reported succeeded by the Sites deployment record. Anonymous browser loaded /devlog/ and showed the 4dcddcc milestone and CI 38509465812. /downloads and updater-feed MIME were not checked in this turn. No app binary/download exists."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -76,7 +78,7 @@
       "method": "native real accounts",
       "required_for": "stable",
       "status": "partial",
-      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial."
+      "evidence": "Synthetic Core composition test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges passed locally 1/1 on 2026-10-13 and exact-SHA macOS CI run 38412386934 succeeded for test commit 5879143cc420cb0047606d099aa49810a609060e. It composes restore planning, parallelism=2 scheduling, route registration before first request, a stalled profile, failed first request and fresh-generation retry, then routes all 20 client updates while selected account changes. This verifies Core contracts only: it does not invoke AppDelegate.restoreProfiles/openProfileWhileHoldingStartupPermit, real TDLib, real accounts, or same-Mac resource/performance behavior. APP01 remains partial. Current source 94740d3 also passes the focused synthetic test twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges under Xcode 27 / Swift 6.4; this still does not invoke AppDelegate restoreProfiles or real TDLib/accounts. Local test strengthening: `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` now uses the exact `AccountRestorePlanner.enqueueStartupProfiles` fan-out helper called by production `restoreProfiles()`, asserting all 20 profiles are synchronously queued before exercising the bounded scheduler, one stalled open, one failed first request, retry with a fresh generation, pre-request route registration, and A/B selection isolation. Focused local test passed 1/1 under arm64 / Xcode 27 / Swift 6.4; no real Telegram accounts or runtime were used. Exact-source hosted macOS suite passed 160/160 in run 38493619014 for test/checkpoint commit bb9b38f8abee386b83b9f7949b22b6cfcc985744; app-source commit remained 2d8a4e5964211c9fbd40136f5470da7d47266937. Current-source revalidation: exact app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c` passed the existing `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` test within hosted serial macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017), with full suite 165/165. This test calls the same synchronous `AccountRestorePlanner.enqueueStartupProfiles` helper used by production `restoreProfiles()` and composes the bounded scheduler and RuntimeCoordinator; it covers 20 synthetic profiles, a stalled open, one failed first request with fresh-generation retry, pre-request route registration, and selection-independent update routing. It does not run AppDelegate/TDLib against real accounts or measure same-Mac resources; APP01 remains partial. Latest source 4dcddccf fixes a related presentation race: the currently selected account retains the UI when another background profile finishes first. Focused policy regression and exact-source hosted suite passed (run 38509465812, 166/166); this remains synthetic and does not prove live AppKit selection, Telegram login, twenty authorized runtimes, or resource use."
     },
     {
       "id": "APP02",
@@ -513,33 +515,32 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "local_command": "swift test --no-parallel",
-    "local_result": "PASS: focused APP02 restore cleanup fan-out regression 1/1; full serial suite 165/165 on arm64e, Xcode 27 / Swift 6.4.",
-    "hosted_ci": "Exact-source run 38508018017 passed the filtered probe and all 165 tests.",
-    "native_dev_app_smoke": "One canonical app at exact source e7cc4b3 built in 5.29s; ad-hoc signature verified; CUA confirmed matching title and accountless sign-in. No credentials.",
-    "metadata_ci": "PASS exact checkpoint metadata run 38508667707 for commit 2ff390a.",
-    "scope": "Synthetic cleanup orchestration only. No real login, authorized accounts, real SecItem stall, 20-account coverage, Developer ID signing, or notarization."
+    "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "local_command": "focused Swift regression plus swift test --no-parallel",
+    "local_result": "PASS: focused selection-race regression 1/1; full serial suite 166/166 on arm64e, Xcode 27 / Swift 6.4.",
+    "hosted_ci": "Exact-source GitHub Actions run 38509465812 passed filtered probe and all 166 tests. Earlier push-triggered run 38509423637 was cancelled.",
+    "native_dev_app_smoke": "One canonical app at exact source 4dcddcc built in 5.29s; ad-hoc signature verified; CUA confirmed matching title and accountless sign-in. No credentials.",
+    "scope": "Synthetic policy and accountless UI only. No live AppKit account switching, real login, 20 authorized runtimes, Developer ID signing, or notarization."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 172,
-    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_3d5d86670f6c8191a6ca277f156d8669",
-    "source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
-    "app_repository_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-    "deployment_id": "appgdep_6acefc4c79888191afe5b199682996a2",
+    "version": 173,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_93476d1079d88191a1cb8dc8dae87ccd",
+    "source_commit": "c35fc6e7b0f48ce65bd25e063b280b95cba5e4a4",
+    "app_repository_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "deployment_id": "appgdep_6acf0056a80481919f9c93e679eeafa9",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-app02-20261014.tar.gz",
-    "archive_local_sha256": "92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
-    "archive_local_size_bytes": 450560,
-    "saved_archive_content_hash": "sha256:92b1515168051f7e7ae954a0b8ffbecd37ef0aa903ee0a9f96cd2c9e008dd920",
+    "archive_local_path": "/private/tmp/netelegram-site-selection-fix-20261014.tar.gz",
+    "archive_local_sha256": "4b2c533f87ca301eeee6fff11abf851f56ee341306261e4b93024c72c49f63e1",
+    "archive_local_size_bytes": 191431,
+    "saved_archive_content_hash": "sha256:f5ba75ec742f4454400c8967bbdb1bbea3e3d62011636604ee0433f9a53b7431",
     "saved_archive_size_bytes": 450560,
-    "archive_file_count": null,
-    "public_verification": "Existing public Site deployment succeeded. Anonymous in-app browser loaded /devlog/ with title “Журнал разработки — NeTelegram”. No app binary/download is available; full page text and public feed MIME were not freshly verified in this check."
+    "archive_file_count": 14,
+    "public_verification": "Public deployment v173 is reported succeeded by the Sites deployment record. Anonymous browser loaded /devlog/ and showed the 4dcddcc milestone and CI 38509465812. /downloads and updater-feed MIME were not checked in this turn. No app binary/download exists."
   },
   "latest_local_candidate": {
     "date": "2026-10-14",
@@ -569,7 +570,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "APP01 remains partial. The synthetic production-helper test and exact-source CI pass; do not repeat it unchanged. Advance the native production-path proof for all-active runtimes: add coverage at the AppKit orchestration boundary (or extract that boundary into an injectable core coordinator), then run one focused regression, one serial suite on changed source, and one exact-source hosted run. Real account login remains deferred; keep all claims limited to synthetic coverage until the user authenticates accounts.",
+  "next_action": "APP01 remains partial. The account-selection race now has a focused policy regression, but no authorized profiles were used. Next, extract/inject the AppKit restore and presentation boundary and test one stalled profile, one isolated failure/retry, and selection stability at that production boundary. Run focused and full hosted tests once for the resulting SHA; use the existing canonical Dev.app only if visible behavior changes. Real Telegram login remains deferred; keep all runtime/resource claims synthetic until real accounts and same-Mac measurements are available.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -598,12 +599,12 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
     "parent": "15cb17949aa7e09c885cf605ad47889b42a0309a",
     "branch": "main",
-    "working_tree": "source was clean at the exact app-source build; checkpoint/docs edits are tracked separately",
-    "local_tests": "Focused transient push regression 1/1; exact-source local serial Swift suite 164/164.",
-    "hosted_validation": "Exact-source CI 38505482508 cancelled after 4m24 with no Test run started event; not a PASS.",
+    "working_tree": "source clean at exact app-source build; checkpoint edits are documentation only",
+    "local_tests": "Focused regression 1/1; local serial Swift suite 166/166.",
+    "hosted_validation": "Exact-source run 38509465812 passed 166/166.",
     "dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
@@ -614,6 +615,25 @@
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
       "smoke": "CUA confirmed exact title NeTelegram · dev e7cc4b3 and accountless login. No credentials or profiles."
+    },
+    "date": "2026-10-14",
+    "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "native_app": {
+      "path": "/private/tmp/NeTelegram-Dev.app",
+      "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+      "architecture": "arm64",
+      "signature": "ad-hoc development only",
+      "executable_sha256": "bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d",
+      "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1"
     }
+  },
+  "latest_acceptance_slice": {
+    "id": "APP01",
+    "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
+    "local_focused_tests": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1; exact-source local serial Swift suite passed 166/166 on Xcode 27 / Swift 6.4.",
+    "hosted_serial_suite": "GitHub Actions macOS CI run 38509465812 passed the filtered probe and full serial suite 166/166 for exact app source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d. The automatic push-triggered run 38509423637 was cancelled; the single successful workflow_dispatch run is the accepted hosted evidence.",
+    "native_bundle_workflow": "One canonical local arm64 Dev.app built from exact source in 5.29s; ad-hoc signature verified. CUA showed matching app title and accountless login. Executable SHA-256 bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1.",
+    "implementation": "When a profile is selected during background startup, a different profile completing first no longer takes the window; the latest explicit selection controls presentation while other runtimes remain open.",
+    "remaining": "Focused regression tests a shared presentation policy, not live AppKit account switching. No real profile login, 20 authorized runtimes, or resource matrix. APP01 remains partial."
   }
 }

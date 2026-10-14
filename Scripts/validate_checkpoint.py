@@ -29,6 +29,9 @@ def validate_records(project: dict, acceptance: dict) -> None:
     site_checkpoint = project["current_site_checkpoint"]
     local_app = project["local_development_candidate"]
     bundle = evidence["local_dev_app"]
+    hosted_ci = evidence["hosted_ci"]
+    acceptance_site = acceptance["latest_site_deployment"]
+    acceptance_slice = acceptance["latest_acceptance_slice"]
     checks = [
         (project["product"]["app_source_commit"] == app_sha,
          "PROJECT-STATE.product.app_source_commit != ACCEPTANCE.current_evidence.app_source_commit"),
@@ -52,6 +55,17 @@ def validate_records(project: dict, acceptance: dict) -> None:
          "latest_site_source_commit is stale"),
         (project["latest_acceptance_slice"]["source_commit"] == app_sha,
          "latest_acceptance_slice is stale"),
+        (acceptance_slice["source_commit"] == app_sha,
+         "ACCEPTANCE.latest_acceptance_slice is stale"),
+        (hosted_ci["status"] == "success"
+         and hosted_ci["workflow_commit"] == app_sha
+         and hosted_ci["app_source_commit"] == app_sha,
+         "current hosted CI is not a successful exact-source run"),
+        (acceptance_site["version"] == deployment["version"]
+         and acceptance_site["project_id"] == deployment["project_id"]
+         and acceptance_site["source_commit"] == deployment["source_commit"]
+         and acceptance_site["deployment_id"] == deployment["deployment_id"],
+         "ACCEPTANCE Site deployment differs from PROJECT-STATE"),
     ]
     errors = [message for condition, message in checks if not condition]
     pending = project.get("pending_native_candidate")

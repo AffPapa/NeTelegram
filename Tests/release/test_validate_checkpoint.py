@@ -24,6 +24,9 @@ class ValidateCheckpointTests(unittest.TestCase):
         project["product"]["app_source_commit"] = current
         project["latest_acceptance_slice"]["source_commit"] = current
         acceptance["current_evidence"]["app_source_commit"] = current
+        acceptance["current_evidence"]["hosted_ci"]["workflow_commit"] = current
+        acceptance["current_evidence"]["hosted_ci"]["app_source_commit"] = current
+        acceptance["latest_acceptance_slice"]["source_commit"] = current
         acceptance["last_verification"]["app_source_commit"] = current
         project["pending_native_candidate"] = {
             "source_commit": current,
@@ -44,6 +47,22 @@ class ValidateCheckpointTests(unittest.TestCase):
         acceptance["next_action"] += " Do something else."
 
         with self.assertRaisesRegex(ValueError, "next_action"):
+            validate_records(project, acceptance)
+
+    def test_current_hosted_ci_must_cover_exact_app_source(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["current_evidence"]["hosted_ci"]["app_source_commit"] = "older-source"
+
+        with self.assertRaisesRegex(ValueError, "successful exact-source run"):
+            validate_records(project, acceptance)
+
+    def test_site_deployment_identity_must_match_both_checkpoints(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        acceptance["latest_site_deployment"]["version"] -= 1
+
+        with self.assertRaisesRegex(ValueError, "Site deployment differs"):
             validate_records(project, acceptance)
 
 
