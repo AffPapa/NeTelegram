@@ -970,3 +970,10 @@
 - Tightened metadata CI path filters so edits to `LICENSE` or `NOTICE` run the notice generator and release tests.
 - Verification: duplicate-kind test 1/1; release metadata suite 36/36 in 0.867s; checkpoint validation passed; SBOM/NOTICE generators produced valid outputs; `git diff --check` passed. Exact app-source CI 167/167 remains valid because no Swift source or app inputs changed; no native suite or Dev.app rebuild was repeated.
 - No release binary or user account was touched. Changes remain unpushed; no hosted CI or Site update is claimed for this dirty tree. Existing public Site v175 remains unchanged.
+
+## 2026-10-14 — Release validation milestone pushed and Site v176 published
+
+- App repository commit [`045ebb1`](https://github.com/AffPapa/NeTelegram/commit/045ebb12762794f3d5d8a5c14fa20be7f403328c) was pushed to `AffPapa/NeTelegram:main` via the existing Git credential helper. The first attempt hit sandbox DNS denial; the same push succeeded through approved network access without creating a token.
+- Exact commit metadata workflow [38518330268](https://github.com/AffPapa/NeTelegram/actions/runs/38518330268) succeeded. The 36/36 release-metadata tests passed locally in 0.867s. No Swift source changed, so no Swift suite or Dev.app rebuild was repeated.
+- Updated the existing public Site from v175 to v176 using source commit `c414e596b906c04a253d7de4184a0f9cb121f024`; deployment `appgdep_6acf17ae4dd481919d0ad778d0e5b4e5` succeeded at https://netelegram.iryadom.chatgpt.site. The saved archive SHA-256 is `754d0d22d4b4850a4cf7b9170288f738a5785a937eed8d223861c893245234a4`. Anonymous Playwright verified the new RU/EN devlog and exact commit/CI links. App repository `website/` mirror is synchronized in this checkpoint change.
+- No application download, release, signing, notarization, real account, or 20-runtime proof is claimed.
