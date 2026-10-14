@@ -1,21 +1,21 @@
 {
   "schema_version": 2,
-  "status": "APP22 safe composer Cmd+Return send: exact-source local serial suite 170/170 and GitHub macOS CI passed; canonical Dev.app lifecycle smoke passed. Native account interaction, real Telegram accounts, 20-runtime certification, Developer ID release, and compatibility gates remain incomplete.",
+  "status": "APP23 local profile origin explanation and fail-closed Keychain query guard: exact-source local serial suite 171/171 and GitHub macOS CI passed. Canonical Dev.app remains running from the prior source and awaits a safe rebuild; native auth and real-account/release gates remain incomplete.",
   "current_evidence": {
-    "app_source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-    "local_suite": "PASS 170/170 serial macOS Swift suite on arm64e / Xcode beta / Swift 6.4 in 0.457s; focused composer keyboard policy regression PASS 1/1.",
-    "focused_test": "Cmd+Return sends only when the composer is focused, unlocked, has no IME marked text, and current send state is enabled. Plain Return remains in the editor.",
+    "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+    "local_suite": "PASS 171/171 serial macOS Swift suite in 0.481s on arm64e / Xcode beta / Swift 6.4.",
+    "focused_test": "unfinishedAccountSelectionExplainsItsLocalOriginWithoutShowingUUID PASS 1/1; secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI PASS 1/1. Query guard configuration test only; no auth-required keychain item was exercised.",
     "hosted_ci": {
-      "run_id": 38524122936,
+      "run_id": 38526833332,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38524122936",
-      "workflow_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-      "app_source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-      "scope": "Exact-source macOS CI passed full serial Swift suite."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38526833332",
+      "workflow_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "scope": "Exact-source macOS CI passed full serial Swift suite 171/171."
     },
     "native_build": {
-      "status": "success_local",
-      "scope": "Canonical arm64 Dev.app rebuilt in place from exact app source 870b8946eb6441955e035084f099dcacef04a99b in 26.58s; BuildInfo source fingerprint matches; ad-hoc strict codesign verification passed. This is not a distribution signature."
+      "status": "pending_running_canonical_app",
+      "scope": "No bundle rebuild or launch: /private/tmp/NeTelegram-Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 with secure API hash configuration dialog open. Current source fc4485b174b61fb14a085fea67d41a2b2606ef2e awaits safe in-place rebuild after normal quit and process absence."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
@@ -26,7 +26,8 @@
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "signature": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical Dev.app rebuilt from exact APP22 source; focused/full local test and exact-source CI passed. No real account login or native chat send smoke."
+      "smoke": "Prior accountless lifecycle smoke applies to source 87c0c06560ac0986f7e004d6578b1e3b034c9244 only; current source fc4485b174b61fb14a085fea67d41a2b2606ef2e has not been rebuilt or smoke-tested.",
+      "pending_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e"
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -72,8 +73,20 @@
       "saved_archive_size_bytes": 471040,
       "saved_archive_file_count": 14
     },
-    "native_ui_smoke": "CUA opened the canonical bundle and confirmed NeTelegram · dev 7fd00308 with standard accountless phone/QR login. No credentials, sessions or profiles were imported. Login/read/send remain unverified.",
-    "tooling_friction": "The first launch check failed because pgrep could not access the process list. LaunchServices positive bundle identity confirms a running app, but an empty result in this restricted process namespace is not treated as proof of absence; the guard fails closed. SwiftPM manifest compilation tried a home module cache denied by sandbox; the dev script now stores Clang modules under /private/tmp and disables SwiftPM subprocess sandbox for this trusted local build. Focused process-check tests passed 6/6. CUA currently shows the app open; rebuilding remains blocked until a process check can prove it stopped."
+    "native_ui_smoke": "Historical accountless smoke at app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b; not evidence for current source. The canonical app is presently open at its secure API hash configuration dialog.",
+    "tooling_friction": "The first launch check failed because pgrep could not access the process list. LaunchServices positive bundle identity confirms a running app, but an empty result in this restricted process namespace is not treated as proof of absence; the guard fails closed. SwiftPM manifest compilation tried a home module cache denied by sandbox; the dev script now stores Clang modules under /private/tmp and disables SwiftPM subprocess sandbox for this trusted local build. Focused process-check tests passed 6/6. CUA currently shows the app open; rebuilding remains blocked until a process check can prove it stopped.",
+    "profile_picker_origin_test": {
+      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "test": "unfinishedAccountSelectionExplainsItsLocalOriginWithoutShowingUUID",
+      "result": "PASS 1/1",
+      "scope": "Policy test asserts a pending local login is explained and the local UUID is not shown. Native copy is pending safe rebuild."
+    },
+    "keychain_ui_guard_test": {
+      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "test": "secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI",
+      "result": "PASS 1/1",
+      "scope": "Asserts the query carries explicit fail-closed Security UI mode. No real auth-required keychain item was queried."
+    }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -282,7 +295,7 @@
       "method": "native fault cases",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "SecretsStore performs Security reads outside AppKit and the Swift cooperative executor. TelegramAPIHashReadiness bounds each waiter to 10 seconds and shares one in-flight Keychain lookup. Replacing the app hash invalidates old waiters/results and gates new reads for the full Keychain write, then resumes a fresh lookup after success or failure. Focused timeout/single-flight and replacement-race regressions pass; consolidated source 2d8a4e5 passed 160/160 serial local Swift tests under arm64 / Xcode 27 / Swift 6.4. This is synthetic coverage only: actual Keychain daemon stall/recovery and real account login remain unverified. The canonical Dev.app remains at source 752f684; exact-source hosted CI/native workflow await publication."
+      "evidence": "SecretsStore performs Security reads outside AppKit and the Swift cooperative executor. TelegramAPIHashReadiness bounds each waiter to 10 seconds and shares one in-flight Keychain lookup. Replacing the app hash invalidates old waiters/results and gates new reads for the full Keychain write, then resumes a fresh lookup after success or failure. Focused timeout/single-flight and replacement-race regressions pass; consolidated source 2d8a4e5 passed 160/160 serial local Swift tests under arm64 / Xcode 27 / Swift 6.4. This is synthetic coverage only: actual Keychain daemon stall/recovery and real account login remain unverified. The canonical Dev.app remains at source 752f684; exact-source hosted CI/native workflow await publication. Current source fc4485b174b61fb14a085fea67d41a2b2606ef2e: focused query-policy test passed 1/1 and exact-source macOS CI 38526833332 passed the 171/171 serial suite. This macOS runtime reports LAContext.interactionNotAllowed false after setting true, so the query also includes Security explicit fail-closed UI mode. This verifies configuration only; actual auth-required Keychain items and native unlock remain untested. APP23 stays partial."
     },
     {
       "id": "APP24",
@@ -521,13 +534,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-    "app_source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-    "local_command": "swift test --no-parallel",
-    "local_result": "PASS 170/170 in 0.457s; focused Cmd+Return policy PASS 1/1.",
-    "hosted_ci": "PASS exact-source GitHub macOS CI run 38524122936: https://github.com/AffPapa/NeTelegram/actions/runs/38524122936",
-    "native_dev_app_smoke": "Exact-source canonical Dev.app lifecycle smoke passed: one window, last-window close keeps process alive, LaunchServices reopen restores one window in the same PID, normal Cmd+Q exits. Accountless; no credentials.",
-    "scope": "Cmd+Return safety policy implemented. IME marked text, privacy lock, invalid focus and disabled send prevent shortcut; ordinary Return remains text editing. Exact-source canonical Dev.app last-window close/reopen/quit smoke passed for current app source 87c0c06; API hash configuration is offered through NSSecureTextField and Keychain but the UI field is awaiting user entry. No credential value is recorded."
+    "source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+    "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+    "local_command": "swift test --no-parallel --jobs 2 --scratch-path /private/tmp/netelegram-profile-label-check --disable-sandbox",
+    "local_result": "PASS 171/171 in 0.481s; focused local-origin and Keychain query tests each PASS 1/1. One initial run exposed interactionNotAllowed getter=false on this macOS runtime; the query now also carries explicit fail-closed Security UI mode.",
+    "hosted_ci": "PASS exact-source GitHub macOS CI run 38526833332: https://github.com/AffPapa/NeTelegram/actions/runs/38526833332",
+    "native_dev_app_smoke": "Not repeated for current source. The one canonical Dev.app is still running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 with the secure API hash dialog open; in-place rebuild waits for normal quit and confirmed process absence.",
+    "scope": "Profile-origin copy and Keychain query policy changed. This does not verify a real auth-required Keychain item, Telegram login, real account, or 20-runtime behavior."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -554,21 +567,20 @@
   },
   "latest_source_audit": {
     "date": "2026-10-14",
-    "app_source_commit": "a45536262185b13e2bb47703449f6d4c69a7bb3d",
-    "hosted_ci_run": 38495482988,
-    "native_bundle_run": 38495482965,
-    "result": "CI 162/162 and pinned TDLib assembly passed. Synthetic-only; not a login/release qualification."
+    "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+    "hosted_ci_run": 38526833332,
+    "result": "Local serial Swift suite 171/171 and exact-source macOS CI passed; no current-source native bundle build or real account behavior."
   },
   "latest_access_audit": {
     "date": "2026-10-14",
-    "source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+    "source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
     "app": "/private/tmp/NeTelegram-Dev.app",
-    "window_title": "NeTelegram · dev 7fd00308",
-    "method": "CUA native accessibility tree and screenshot; no controls activated",
-    "verified": "Default-size light appearance: login card centered; country search, country picker, phone input, status, Continue, and QR are visible. Accessibility names and help text identify the phone/country controls.",
-    "not_verified": "Minimum window size, dark appearance, contrast modes, code/2FA/QR/registration state geometry, VoiceOver interaction, and real login."
+    "window_title": "NeTelegram Dev secure API hash configuration dialog",
+    "method": "CUA accessibility tree only; secure field value not inspected and no control activated",
+    "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
+    "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "Await user entry of the Telegram app api_hash into the already-open NSSecureTextField in NeTelegram Dev; verify only success status, never inspect or record the value. Then continue the next native acceptance blocker without reading sessions from any other client. Current source 87c0c06560ac0986f7e004d6578b1e3b034c9244 has local serial 170/170, exact macOS CI 38524122936, Dev.app lifecycle smoke, and public Site v182. No real account login has been requested or performed. 20-account certification, Developer ID/notarization, Telegram compatibility gates, updater, and public installer remain open.",
+  "next_action": "After the user finishes or cancels the secure API hash dialog and NeTelegram Dev exits normally, confirm process absence and rebuild the one canonical Dev.app in place from fc4485b174b61fb14a085fea67d41a2b2606ef2e. Verify the pending-entry explanation in native UI and the current-source app fingerprint. Do not inspect the secure field value, import other Telegram sessions, or open another app bundle. Then proceed with user-driven auth and remaining real-account/runtime gates.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -626,13 +638,13 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP22 safe composer Cmd+Return send",
-    "source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
-    "local_focused_tests": "composerKeyboardSendRequiresSafeFocusedCommandReturn PASS 1/1; full serial suite PASS 170/170 in 0.457s on arm64e / Xcode beta / Swift 6.4.",
-    "hosted_serial_suite": "GitHub macOS CI 38524122936 passed exact source 87c0c06560ac0986f7e004d6578b1e3b034c9244.",
-    "native_bundle_workflow": "Canonical arm64 Dev.app built from exact source; strict ad-hoc codesign passed. Scripts/window-lifecycle-smoke.sh passed last-window close, LaunchServices reopen in the same PID, and normal Cmd+Q. Accountless; no Telegram login.",
-    "implementation": "Cmd+Return sends only from the focused composer when send is enabled, unlocked, and no IME marked text is active. Plain Return remains editor input.",
-    "remaining": "No logged-in account or native chat composer was available for real event-to-TDLib send verification. No real Telegram credentials entered."
+    "id": "APP23 local profile origin explanation and fail-closed Keychain query",
+    "source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+    "local_focused_tests": "unfinishedAccountSelectionExplainsItsLocalOriginWithoutShowingUUID PASS 1/1; secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI PASS 1/1; full serial suite PASS 171/171 in 0.481s on arm64e / Xcode beta / Swift 6.4.",
+    "hosted_serial_suite": "GitHub macOS CI 38526833332 passed exact source fc4485b174b61fb14a085fea67d41a2b2606ef2e.",
+    "native_bundle_workflow": "Not rebuilt or relaunched: canonical Dev.app remains open at its secure API hash configuration dialog on app source 87c0c06560ac0986f7e004d6578b1e3b034c9244. Rebuild the same bundle after normal quit and confirmed process absence.",
+    "implementation": "Unfinished profile selection now explains that it is a local NeTelegram entry and other-app sessions are not imported; UUIDs are never shown. Keychain reads keep LAContext and add an explicit fail-closed Security query mode because this macOS runtime did not reflect interactionNotAllowed=true in its getter.",
+    "remaining": "Native current-source UI smoke, actual Keychain auth-required item behavior, real login, authorized 20-runtime/resource coverage, notarization, updater and public downloads remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
