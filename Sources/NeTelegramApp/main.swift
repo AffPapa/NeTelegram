@@ -370,8 +370,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildWindow() {
-        let contentWidth: CGFloat = 920
-        let contentHeight: CGFloat = 660
+        let contentWidth: CGFloat = 760
+        let contentHeight: CGFloat = 600
         let content = NSView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
@@ -390,15 +390,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         mark.addSubview(markLabel)
 
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
-        loginHeading.font = .systemFont(ofSize: 23, weight: .semibold)
+        loginHeading.font = .systemFont(ofSize: 26, weight: .semibold)
         loginHeading.alignment = .center
         loginSubtitle = NSTextField(wrappingLabelWithString: "Введите номер телефона, чтобы войти в свой аккаунт.")
-        loginSubtitle.font = .systemFont(ofSize: 13)
+        loginSubtitle.font = .systemFont(ofSize: 14)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
         loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
-        loginDisclosure.font = .systemFont(ofSize: 11)
-        loginDisclosure.textColor = .tertiaryLabelColor
+        loginDisclosure.font = .systemFont(ofSize: 12)
+        loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
         loginDisclosure.alignment = .center
         loginDisclosure.setAccessibilityLabel("О приложении и локальных профилях")
@@ -436,7 +436,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .systemFont(ofSize: 17)
         phoneField.frame = .zero
-        phoneField.alignment = .center
+        phoneField.alignment = .left
         phoneField.setAccessibilityLabel("Номер телефона")
         phoneField.isHidden = false
         phoneField.delegate = self
@@ -503,7 +503,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         statusLabel = NSTextField(wrappingLabelWithString: "Подключаю экран входа…")
         statusLabel.font = .systemFont(ofSize: 12)
         statusLabel.textColor = .secondaryLabelColor
-        statusLabel.alignment = .center
+        statusLabel.alignment = .left
         statusLabel.setAccessibilityLabel("Статус авторизации")
 
         qrImageView = NSImageView(frame: .zero)
@@ -531,7 +531,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
-        authStack.spacing = 12
+        authStack.spacing = 10
+        authStack.setCustomSpacing(24, after: mark)
+        authStack.setCustomSpacing(6, after: loginHeading)
+        authStack.setCustomSpacing(16, after: loginSubtitle)
+        authStack.setCustomSpacing(18, after: loginDisclosure)
         authStack.translatesAutoresizingMaskIntoConstraints = false
         authCard = AuthenticationCardView(frame: .zero)
         authCard.translatesAutoresizingMaskIntoConstraints = false
@@ -550,13 +554,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         NSLayoutConstraint.activate([
             authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
             authCard.centerYAnchor.constraint(equalTo: content.centerYAnchor),
-            authCard.widthAnchor.constraint(equalToConstant: 480).withPriority(.defaultHigh),
+            authCard.widthAnchor.constraint(equalToConstant: 520).withPriority(.defaultHigh),
             authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
             authCard.heightAnchor.constraint(lessThanOrEqualTo: content.heightAnchor, constant: -48),
-            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 10),
-            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -10),
-            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 10),
-            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -10),
+            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 20),
+            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -20),
+            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 14),
+            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -14),
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
             authStack.leadingAnchor.constraint(equalTo: authScrollContent.leadingAnchor, constant: 4),
             authStack.trailingAnchor.constraint(equalTo: authScrollContent.trailingAnchor, constant: -4),
@@ -575,32 +579,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPickerStack.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh),
+            countryPickerStack.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh),
             countrySearchField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countrySearchField.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
+            countrySearchField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), countrySearchField.heightAnchor.constraint(equalToConstant: 30),
             countryPicker.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPicker.widthAnchor.constraint(equalToConstant: 300).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
+            countryPicker.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), countryPicker.heightAnchor.constraint(equalToConstant: 34),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
+            phoneField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 38),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            emailField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
+            emailField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 38),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            inputField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
+            inputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 38),
             secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            secureInputField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
+            secureInputField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 38),
             firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            firstNameField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
+            firstNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 38),
             lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            lastNameField.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
+            lastNameField.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 38),
             registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            registrationConsent.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            registrationConsent.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            statusLabel.widthAnchor.constraint(equalToConstant: 500).withPriority(.defaultHigh),
+            statusLabel.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            actionButton.widthAnchor.constraint(equalToConstant: 330).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
+            actionButton.widthAnchor.constraint(equalToConstant: 360).withPriority(.defaultHigh), actionButton.heightAnchor.constraint(equalToConstant: 38),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            qrButton.widthAnchor.constraint(equalToConstant: 280).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 28),
+            qrButton.widthAnchor.constraint(equalToConstant: 320).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 28),
         ])
 
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))
@@ -1468,10 +1472,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
            let callingCode = country.callingCodes.first {
             return "Выбрана страна \(country.name) (+\(callingCode)). Введите номер или полный номер с +."
         }
-        if let region = phoneCountrySelection.suggestedRegionCode,
-           let country = phoneCountries.first(where: { $0.code == region }),
-           let callingCode = country.callingCodes.first {
-            return "macOS предлагает \(country.name) (+\(callingCode)); страна ещё не выбрана. Выберите страну или введите полный номер, начиная с +."
+        if phoneCountrySelection.suggestedRegionCode != nil {
+            return "Выберите страну и введите номер. Международный номер можно ввести целиком, начиная с +."
         }
         return "Выберите страну и введите номер телефона или укажите полный номер с +."
     }

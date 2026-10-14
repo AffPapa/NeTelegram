@@ -1581,3 +1581,10 @@
 - Source: `5f414650a139bb62bdf12fd198495faf4b246f10` pushed once to `AffPapa/NeTelegram` main. Exact-source macOS CI run `38596948225` passed (https://github.com/AffPapa/NeTelegram/actions/runs/38596948225).
 - Native verification: one canonical arm64 Dev.app built from the clean source SHA; strict ad-hoc `codesign --verify --deep --strict` passed. CUA confirmed title `NeTelegram · dev 5f414650` and blank phone/QR form. No account credentials were used.
 - Limits: this is synthetic decoder coverage plus accountless UI smoke. Real Telegram photo behavior, one-account login/read/send, all-20 runtime, Developer ID/notarization, policy gates and public downloads remain unverified. Site unchanged.
+
+## 2026-10-14 — AUTH-UI-01 native login layout
+
+- Research: Apple HIG guidance reviewed for macOS ergonomics, window sizing, layout, color/accessibility, keyboard focus, and text fields. Official Telegram Desktop's Qt UI and Telegram iOS source were inspected as flow references only; no third-party UI code or assets copied.
+- Change: reduce the initial native window to 760×600 pt; use a single 360 pt control column with shared alignment, adjust spacing by hierarchy, align the phone field and status to the form edge, shorten the country-entry instruction, and use secondary semantic text color for the independence disclosure. Auth states and TDLib commands are unchanged.
+- Local verification: focused country-picker and phone-input tests passed 2/2. Visual QA and exact-source hosted CI are pending before rebuilding the canonical Dev.app.
+- Sources: Apple HIG https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/ and https://developer.apple.com/design/human-interface-guidelines/layout ; Apple accessibility https://developer.apple.com/design/human-interface-guidelines/accessibility ; official Telegram Desktop https://github.com/telegramdesktop/tdesktop and Telegram iOS https://github.com/TelegramMessenger/Telegram-iOS.
