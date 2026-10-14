@@ -62,7 +62,7 @@
 
     <section class="proof-bar" id="status" aria-label="Текущий статус проекта">
       <div><span class="proof-label">КОД</span><strong>Открыт</strong><a href="https://github.com/AffPapa/NeTelegram" aria-label="Исходный код на GitHub">↗</a></div>
-      <div><span class="proof-label">ПРИЛОЖЕНИЕ</span><strong>В разработке</strong><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38447978740" aria-label="Последний macOS CI">↗</a></div>
+      <div><span class="proof-label">ПРОВЕРКА ИСХОДНИКА</span><strong>CI current app source 4d6820d passed</strong><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38469520583" aria-label="Текущий macOS CI">↗</a></div>
       <div><span class="proof-label">ЗАГРУЗКИ</span><strong>Пока нет сборки</strong><a href="/downloads/" aria-label="Подробности о загрузках">↗</a></div>
     </section>
 
@@ -72,7 +72,7 @@
         <div><h2 id="focus-title">Мессенджер для Mac.<br>С понятными границами.</h2><p>Мы строим отдельный нативный интерфейс к облачным чатам. Вот на чём сосредоточена разработка — и где заканчиваются подтверждённые сегодня факты.</p></div>
       </div>
       <div class="focus-grid">
-        <article class="focus-card focus-card-native"><span class="focus-mark" aria-hidden="true">⌘</span><p class="state-label state-code">151 ТЕСТ ПРОШЁЛ В CI</p><h3>Нативная среда macOS</h3><p>Точный workflow commit прошёл macOS CI: все 151 теста и проверка JSON. Закреплённые TDLib и Apple Silicon Dev.app собраны отдельным workflow. Реальный вход не выполнялся.</p><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38447978740">Проверить последний CI <span aria-hidden="true">↗</span></a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38444116358">Сборка Dev.app <span aria-hidden="true">↗</span></a></article>
+        <article class="focus-card focus-card-native"><span class="focus-mark" aria-hidden="true">⌘</span><p class="state-label state-code">CI PASSED · APP SOURCE 752F684</p><h3>Нативная среда macOS</h3><p>App-source 752f684 прошёл serial Swift CI и сборку pinned TDLib с Dev.app lifecycle smoke. Единственная локальная Dev.app пересобрана и открыта один раз; AX показывает телефонный и QR-вход без введённых данных. В меню privacy lock теперь объясняет, что фоновая синхронизация продолжается. Сам переход lock/unlock отдельно визуально не проверен; реальный вход и 20 аккаунтов не тестировались.</p><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38489454775">Serial Swift CI <span aria-hidden="true">↗</span></a><a href="https://github.com/AffPapa/NeTelegram/actions/runs/38489454777">Dev.app smoke <span aria-hidden="true">↗</span></a><a href="https://github.com/AffPapa/NeTelegram/commit/752f6842855373061f3a5e8cafb2b164838cf417">Исходник 752f684 <span aria-hidden="true">↗</span></a></article>
         <article class="focus-card focus-card-data"><span class="focus-mark" aria-hidden="true">◫</span><p class="state-label state-detail">АРХИТЕКТУРНЫЙ ПРИНЦИП</p><h3>Данные профилей отдельно</h3><p>Для каждого аккаунта проектируются отдельные локальные данные. NeTelegram не импортирует сессии из других клиентов. Это описание проекта, а не проверка реального входа.</p><a href="/privacy/">Как устроена приватность <span aria-hidden="true">↗</span></a></article>
         <article class="focus-card focus-card-runtime"><span class="focus-mark" aria-hidden="true">↗</span><p class="state-label state-synthetic">ЦЕЛЬ · НЕ СЕРТИФИЦИРОВАНО</p><h3>Подключённые аккаунты работают в фоне</h3><p>Цель — одновременно обрабатывать обновления всех доступных профилей. Тест постановки 20 профилей в очередь синтетический; двадцать авторизованных аккаунтов и ресурсы Mac ещё не проверены.</p><a href="/features/">Все возможности и ограничения <span aria-hidden="true">↗</span></a></article>
       </div>
@@ -88,10 +88,7 @@
         <p class="section-kicker">ОТКРЫТАЯ РАЗРАБОТКА</p>
         <div><div class="journal-heading"><h2 id="journal-title">Что изменилось</h2><a href="/devlog/">Весь журнал <span aria-hidden="true">↗</span></a></div><p>Каждая запись указывает исходный код и проверки. Синтетические результаты не выдаются за настоящий пользовательский сценарий.</p></div>
       </div>
-      <article class="latest-entry">
-        <time datetime="2026-10-14"><span>14</span> ОКТЯБРЯ 2026</time>
-        <div><p class="journal-tag">ДИЗАЙН САЙТА</p><h3>Восемь страниц теперь используют одну дизайн-систему</h3><p>Общий шаблон и CSS задают навигацию, типографику, карточки и адаптивные состояния всех маршрутов. Статическая проверка подтвердила восемь страниц; в браузере проверены главная на desktop и все маршруты при ширине 375 px без горизонтального переполнения. Это обновление сайта, оно не меняет статус сборки приложения.</p><div class="journal-links"><a href="https://github.com/AffPapa/NeTelegram/tree/main/website">Исходники сайта ↗</a><a href="/devlog/">Журнал проверок ↗</a><a href="/downloads/">Статус загрузок ↗</a></div></div>
-      </article>
+      <article class="latest-entry"><time datetime="2026-10-14"><span>14</span> ОКТЯБРЯ 2026</time><div><p class="journal-tag">APP SOURCE · CI</p><h3>Версия Dev.app привязана к исходникам, privacy lock получил статус</h3><p>Для SHA 752f684 прошли полный serial Swift CI, pinned-TDLib Dev.app lifecycle smoke и metadata validation. Bundle переиспользуется только после проверки исходников, зависимостей, хешей и подписи; документы больше не создают фиктивную версию приложения. Реальный вход и 20-runtime coverage не проверены.</p><div class="journal-links"><a href="https://github.com/AffPapa/NeTelegram/commit/752f6842855373061f3a5e8cafb2b164838cf417">Исходник ↗</a><a href="/devlog/">Журнал проверок ↗</a><a href="/downloads/">Статус загрузок ↗</a></div></div></article>
     </section>
 
     <section class="independence-panel" aria-labelledby="independence-title">
