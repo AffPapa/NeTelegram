@@ -223,7 +223,7 @@
       "method": "fault+native Notification Center",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Privacy-barrier publication check plus account/chat/message cleanup remain in place. Active TDLib snapshots now re-enqueue eligible routes using generic content when locked and silent reconciliation when unlocked, with stale-target checks before scheduling (commit dd11b9f). Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Notification Center completion-order races and real-account close/reconcile remain unverified; status stays partial."
+      "evidence": "Privacy-barrier publication check plus account/chat/message cleanup remain in place. Active TDLib snapshots now re-enqueue eligible routes using generic content when locked and silent reconciliation when unlocked, with stale-target checks before scheduling (commit dd11b9f). Synthetic Swift suite passed 130/130; exact-source macOS CI 38388246897 and pinned TDLib/Dev.app workflow 38388246709 succeeded. Notification Center completion-order races and real-account close/reconcile remain unverified; status stays partial. Current app-source review at 477404afd89378affb9cc21eb6c0e32745cb5091 confirms the settings callback rechecks exact runtime object, notification route value, and active ID under PrivacyDispatchBarrier before scheduling; click handling rechecks current account identity/authorization; locked handoff revalidates current route, runtime generation, user ID and ready state after LocalAuthentication, and is cleared on account/message removal. Existing synthetic tests cover barrier serialization and stale/removed handoff; no native Notification Center completion-order or real-account close/reconcile proof."
     },
     {
       "id": "APP09",
@@ -669,7 +669,7 @@
     "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
     "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
   },
-  "next_action": "APP08: targeted source audit of late notification callbacks during runtime replacement and close. Look for a concrete stale-route or duplicate-delivery interleaving; reuse the existing notification privacy test evidence and add/run one focused regression only if code review finds an untested race. No full suite, Dev.app rebuild, or Site deployment.",
+  "next_action": "APP09: inspect dirty draft persistence on disk-full/Keychain/storage errors. Verify the in-memory dirty-state barrier cannot be overwritten by a later empty snapshot; add/run one focused fixture only if a concrete gap is missing. No app rebuild or Site deploy for storage-only evidence.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -816,10 +816,11 @@
     "app_code_commit": "477404afd89378affb9cc21eb6c0e32745cb5091",
     "cases": [
       "APP06",
-      "APP07"
+      "APP07",
+      "APP08"
     ],
-    "result": "No concrete source defect found in lock-gated reauth handling or notification route/reconcile ownership. Existing route, redaction, cleanup, and barrier checks remain synthetic; physical OS/account-scale validation is absent.",
+    "result": "No concrete source defect found in lock-gated reauth, notification reconciliation, or late notification publish/click/handoff paths. Existing tests remain synthetic; native/system/account-scale evidence is absent.",
     "tests_run": false,
-    "scope": "Read-only trace of restoreProfiles, routed authorization handling, per-runtime notification configuration, update/reconcile, notification delivery callback, lock barrier, and close cleanup."
+    "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   }
 }

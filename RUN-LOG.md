@@ -1239,3 +1239,9 @@
 - Read current app source `477404afd89378affb9cc21eb6c0e32745cb5091`. APP06: startup restoration and route-bound authorization-state reduction continue under lock; interactive auth presentation is gated until successful LocalAuthentication unlock. Other profile runtimes are not closed by a selected profile waiting for input. Real-profile reauth and multi-account operation remain unverified.
 - APP07: each verified runtime configures the TDLib notification API; macOS permission is requested once per process; account-namespaced IDs/routes, snapshot reconciliation, stale-route checks and delivery serialization under the privacy barrier were traced. Existing synthetic tests cover route, cleanup, privacy redaction and lock serialization. No native Notification Center or 20-account delivery claim is made.
 - No concrete source defect found; no code/tests/build/site deployment changed for this read-only review. APP06 and APP07 remain partial. Resume action advances to APP08 late-notification callback races.
+
+## 2026-10-14 — APP08 late notification callback audit
+
+- Read current app-source `477404afd89378affb9cc21eb6c0e32745cb5091`. The async system-permission callback checks runtime object identity, exact routed notification equality, and active ID under the shared PrivacyDispatchBarrier before scheduling. Click routing rechecks verified account identity and authorization; locked handoff validates route membership, runtime generation, Telegram user ID, and ready state after system unlock, and is cleared on account/message removal.
+- No concrete new source race found. Existing synthetic barrier and handoff tests apply; native Notification Center completion ordering and real-account close/reconcile remain unverified. No code/tests/build/site deploy changed for this review. APP08 remains partial.
+- Resume action moved to APP09 dirty-draft persistence under disk-full/storage failure.
