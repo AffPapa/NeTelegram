@@ -60,6 +60,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     private var reservedBytes = 0
     private var waitingAppends = 0
     private var closed = false
+    private var producerFinished = false
     private var allowFinalInFlightAppend = false
     private var finalInFlightAppendUsed = false
 
@@ -150,7 +151,7 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
     /// Returns nil after close and after every already accepted item is drained.
     public func take() -> BufferedTDLibUpdate? {
         condition.lock()
-        while readyLanes.isEmpty && !closed { condition.wait() }
+        while readyLanes.isEmpty && !producerFinished { condition.wait() }
         guard !readyLanes.isEmpty else {
             condition.unlock()
             return nil
@@ -210,6 +211,19 @@ public final class TDLibUpdateBuffer: @unchecked Sendable {
         condition.lock()
         closed = true
         allowFinalInFlightAppend = allowFinalInFlightAppend || allowInFlightReceive
+        if !allowFinalInFlightAppend { producerFinished = true }
+        condition.broadcast()
+        condition.unlock()
+    }
+
+    /// Marks the sole receive producer as exited. A prior close may still have
+    /// admitted the one TDLib result already in flight; reducers must not treat
+    /// an empty queue as EOF until that producer has returned from append.
+    public func finishInput() {
+        condition.lock()
+        closed = true
+        producerFinished = true
+        allowFinalInFlightAppend = false
         condition.broadcast()
         condition.unlock()
     }
@@ -332,6 +346,9 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
             },
             onFailure: { failure in
                 reportFailure(failure)
+            },
+            onExit: { [buffer] in
+                buffer.finishInput()
             }
         )
     }

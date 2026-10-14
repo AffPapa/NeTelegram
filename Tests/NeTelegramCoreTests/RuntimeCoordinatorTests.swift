@@ -2073,6 +2073,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(final?.json == inFlight)
     if let final { buffer.complete(final) }
     #expect(!buffer.append(Data("after-stop".utf8)))
+    buffer.finishInput()
     #expect(buffer.take() == nil)
     #expect(buffer.count == 0)
 }
@@ -2448,7 +2449,12 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(!finishReturned.get(), "The shared drain must wait for the stalled accepted callback")
 
     await stalledCallback.open()
-    #expect(await waitForTrue(finishReturned, timeout: .seconds(2)))
+    let drainCompleted = await waitForTrue(finishReturned, timeout: .seconds(2))
+    #expect(
+        drainCompleted,
+        "The receive drain must finish promptly after the stalled callback is released; workerExited=\(gateway.receiveWorkerHasExited), drainRequested=\(pipeline.isDrainRequested), bufferCount=\(pipeline.buffer.count), clientOneQueued=\(pipeline.buffer.queuedClientCount(for: ClientID(1))), queuedBytes=\(pipeline.buffer.queuedByteCount), blockedProducers=\(pipeline.buffer.blockedProducerCount), completed=\(completed.get())"
+    )
+    guard drainCompleted else { return }
     await drain.value
     #expect(completed.get().count == 21)
     #expect(Set(completed.get()) == Set((2...20).map { "\($0):1" } + ["1:1", "1:2"]))

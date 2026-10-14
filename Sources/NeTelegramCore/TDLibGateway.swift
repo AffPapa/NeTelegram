@@ -87,12 +87,17 @@ public final class TDLibGateway: @unchecked Sendable {
     public func startSingleReceiveWorker(
         timeoutSeconds: Double = 1,
         onUpdate: @escaping UpdateHandler,
-        onFailure: @escaping @Sendable (TDLibGatewayError) -> Void = { _ in }
+        onFailure: @escaping @Sendable (TDLibGatewayError) -> Void = { _ in },
+        onExit: @escaping @Sendable () -> Void = {}
     ) {
         stopLock.lock()
         precondition(receiveThread == nil, "TDLib permits exactly one concurrent td_receive worker")
         let worker = Thread { [weak self] in
-            guard let self else { return }
+            guard let self else {
+                onExit()
+                return
+            }
+            defer { onExit() }
             while !self.shouldStop {
                 self.receiveLock.lock()
                 let result = self.receivePoll(timeoutSeconds)
