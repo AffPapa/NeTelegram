@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP16 unchanged; final ZIP audit snapshot and shared validator fix locally verified (41/41 release tests); pending one metadata commit, exact CI, and public Site devlog. No actual signed/notarized app archive or downloadable release is claimed.",
+  "phase": "APP16 unchanged; final ZIP snapshot fix abdf226 passed metadata CI 38520311093, and existing public Site v178 records the bilingual milestone. No real signed/notarized app archive or downloadable release is claimed.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -188,25 +188,25 @@
     "title": "NeTelegram — разработка клиента для macOS",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "latest_version": 177,
-    "source_commit": "91b55f7c126a38ec45589a3df77a018f86507e13",
-    "deployment_id": "appgdep_6acf1a592a648191be4109bc1abe6290",
-    "saved_version_id": "appgprj_6acba85192e08191a694a5227663cf99",
+    "latest_version": 178,
+    "source_commit": "e1c1209264878e54ba4f9259c102dd52dc14e423",
+    "deployment_id": "appgdep_6acf1c9813788191b4e17f6f6ae951d6",
+    "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_c5fc8e2d98488191aebde7f7045bf3de",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Site v177 deployment appgdep_6acf1a592a648191be4109bc1abe6290 succeeded. Anonymous Playwright verified the bilingual final-ZIP tooling entry and exact app commit 428f49d / CI 38519326151 on /devlog/. /downloads/ still exposes no app files or download link and retains compatibility limitations. Eight static routes passed validation.",
-    "archive_local_path": "/private/tmp/netelegram-site-v177.tar.gz",
-    "archive_local_sha256": "497cd3962e664121dbb6fad1e1413c2d2fbdf44851efe8c2ffc982f3761b1464",
-    "archive_local_size_bytes": 193748,
-    "saved_archive_content_hash": "sha256:f6c8ffb77269af1a9c53e13abc460f808bc3faa778ae9b20ba96c878b58e8272",
+    "public_route_verified": "Public deployment succeeded. Anonymous Playwright verified the exact bilingual abdf226 tooling note and CI 38520311093 on /devlog/. /downloads/ still reports no installable build and exposes no download button; compatibility blockers remain stated.",
+    "archive_local_path": "/private/tmp/netelegram-site-v178.tar.gz",
+    "archive_local_sha256": "0f2bc60ba81cbe8e50449dbd5563edf0fe5ca6bc5657a93e0cf8dca6911d1c7c",
+    "archive_local_size_bytes": 194323,
+    "saved_archive_content_hash": "sha256:120e0e040a407d0e3eabf2bb52557c3a75d88085032fb3d3795bf979ae182126",
     "saved_archive_size_bytes": 460800,
     "saved_archive_file_count": 14,
-    "app_repository_commit": "428f49d8963a799c71fcf05ec4eb8fdfa31808ad",
+    "app_repository_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "asset_cleanup": "No public app binary because no verified Developer ID signed/notarized release exists.",
     "app_ci_run_id": 38514102824,
     "native_app_run_id": 38515770287,
-    "metadata_validation_run_id": 38518330268,
+    "metadata_validation_run_id": 38520311093,
     "description": "Public development Site v176: release validation and efficiency milestone; /downloads still has no release."
   },
   "open_gates": [
@@ -220,7 +220,7 @@
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."
   ],
-  "next_action": "Push one metadata-only commit, verify exact metadata CI, update existing Site v177 to v178 with factual devlog proof; then continue only at the next concrete app/runtime gate. Do not rebuild unchanged Swift source or Dev.app.",
+  "next_action": "Continue from app-source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b and the canonical open /private/tmp/NeTelegram-Dev.app without rebuilding unchanged source. The final ZIP snapshot fix is pushed, exact metadata CI passed, and public Site v178 is verified. Next runtime evidence is user-entered single-account login/read/send; 20-account certification is a separate later gate. Real signing/notarization, compatibility gates, updater, and public download readiness remain open.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -271,7 +271,7 @@
     "notary_credentials": "not found in notarytool Keychain metadata; no configured APPLE_/ASC_/NOTARY_ variable names",
     "result": "Suitable Developer ID identities were observed in repeated inventories, with one adjacent inconsistent zero-result query. No notarization credential, signing operation, or release was confirmed."
   },
-  "latest_site_source_commit": "91b55f7c126a38ec45589a3df77a018f86507e13",
+  "latest_site_source_commit": "e1c1209264878e54ba4f9259c102dd52dc14e423",
   "pending_publication": null,
   "latest_checkpoint_ci": {
     "run_id": 38519326151,
@@ -283,21 +283,21 @@
   "latest_site_deployment": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 177,
-    "version_id": "appgprj_6acba85192e08191a694a5227663cf99",
-    "source_commit": "91b55f7c126a38ec45589a3df77a018f86507e13",
-    "app_repository_commit": "428f49d8963a799c71fcf05ec4eb8fdfa31808ad",
+    "version": 178,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_c5fc8e2d98488191aebde7f7045bf3de",
+    "source_commit": "e1c1209264878e54ba4f9259c102dd52dc14e423",
+    "app_repository_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "deployment_id": "appgdep_6acf1a592a648191be4109bc1abe6290",
+    "deployment_id": "appgdep_6acf1c9813788191b4e17f6f6ae951d6",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-v177.tar.gz",
-    "archive_local_sha256": "497cd3962e664121dbb6fad1e1413c2d2fbdf44851efe8c2ffc982f3761b1464",
-    "archive_local_size_bytes": 193748,
-    "saved_archive_content_hash": "sha256:f6c8ffb77269af1a9c53e13abc460f808bc3faa778ae9b20ba96c878b58e8272",
+    "archive_local_path": "/private/tmp/netelegram-site-v178.tar.gz",
+    "archive_local_sha256": "0f2bc60ba81cbe8e50449dbd5563edf0fe5ca6bc5657a93e0cf8dca6911d1c7c",
+    "archive_local_size_bytes": 194323,
+    "saved_archive_content_hash": "sha256:120e0e040a407d0e3eabf2bb52557c3a75d88085032fb3d3795bf979ae182126",
     "saved_archive_size_bytes": 460800,
     "archive_file_count": 14,
-    "public_verification": "Deployment succeeded. Anonymous Playwright loaded /devlog/?verify=v177 and showed the bilingual 428f49d release-tooling entry, CI 38519326151 and exact limitations. /downloads/?verify=v177 remains without app binaries/download buttons and exposes current compatibility blockers. All 8 static routes validate."
+    "public_verification": "Public deployment succeeded. Anonymous Playwright verified the exact bilingual abdf226 tooling note and CI 38520311093 on /devlog/. /downloads/ still reports no installable build and exposes no download button; compatibility blockers remain stated."
   },
   "release_candidate_validation": {
     "status": "implemented_not_used_for_release",
@@ -327,21 +327,21 @@
   "current_site_checkpoint": {
     "date": "2026-10-14",
     "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-    "version": 177,
-    "version_id": "appgprj_6acba85192e08191a694a5227663cf99",
-    "source_commit": "91b55f7c126a38ec45589a3df77a018f86507e13",
-    "app_repository_commit": "428f49d8963a799c71fcf05ec4eb8fdfa31808ad",
+    "version": 178,
+    "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_c5fc8e2d98488191aebde7f7045bf3de",
+    "source_commit": "e1c1209264878e54ba4f9259c102dd52dc14e423",
+    "app_repository_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "deployment_id": "appgdep_6acf1a592a648191be4109bc1abe6290",
+    "deployment_id": "appgdep_6acf1c9813788191b4e17f6f6ae951d6",
     "url": "https://netelegram.iryadom.chatgpt.site",
     "audience": "public",
-    "archive_local_path": "/private/tmp/netelegram-site-v177.tar.gz",
-    "archive_local_sha256": "497cd3962e664121dbb6fad1e1413c2d2fbdf44851efe8c2ffc982f3761b1464",
-    "archive_local_size_bytes": 193748,
-    "saved_archive_content_hash": "sha256:f6c8ffb77269af1a9c53e13abc460f808bc3faa778ae9b20ba96c878b58e8272",
+    "archive_local_path": "/private/tmp/netelegram-site-v178.tar.gz",
+    "archive_local_sha256": "0f2bc60ba81cbe8e50449dbd5563edf0fe5ca6bc5657a93e0cf8dca6911d1c7c",
+    "archive_local_size_bytes": 194323,
+    "saved_archive_content_hash": "sha256:120e0e040a407d0e3eabf2bb52557c3a75d88085032fb3d3795bf979ae182126",
     "saved_archive_size_bytes": 460800,
     "archive_file_count": 14,
-    "public_verification": "Deployment succeeded. Anonymous Playwright loaded /devlog/?verify=v177 and showed the bilingual 428f49d release-tooling entry, CI 38519326151 and exact limitations. /downloads/?verify=v177 remains without app binaries/download buttons and exposes current compatibility blockers. All 8 static routes validate."
+    "public_verification": "Public deployment succeeded. Anonymous Playwright verified the exact bilingual abdf226 tooling note and CI 38520311093 on /devlog/. /downloads/ still reports no installable build and exposes no download button; compatibility blockers remain stated."
   },
   "current_native_smoke": {
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
@@ -540,10 +540,10 @@
   },
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
-    "base_commit": "5512333a12306984f3283c363c0adedf016f0f44",
+    "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
     "result": "Local release suite 41/41 in 1.803s; focused SBOM and candidate tests 26/26.",
     "checks": "Release ZIP is copied and hashed through one open file descriptor, checked for mutation during snapshot, then structure-validated and extracted from that same snapshot. SBOM candidate validation reuses the same archive structure checks. Regression tests cover replacement during audit and unsafe file/root entries.",
-    "hosted_ci": "pending push",
+    "hosted_ci": "PASS: https://github.com/AffPapa/NeTelegram/actions/runs/38520311093 for exact commit abdf2268fbbfdf052980d97cfd53e62ba285c45d.",
     "scope": "Release tooling only. No Swift/app input changes, native rebuild, user login, signing/notarization, or binary release. ZIP tests use fixtures; no real signed ZIP was available.",
     "release_readiness": "No app release. Real login/read/send, 20 authorized runtimes, actual Developer ID/notarization, Telegram compatibility gates, downloaded Gatekeeper install/reopen and updater smoke remain open."
   },
@@ -552,7 +552,14 @@
     "local_result": "Targeted 26/26; full release suite 41/41 in 1.803s; checkpoint validation, Python compile, CLI help, and git diff --check passed.",
     "app_source_changed": false,
     "native_rebuild": false,
-    "hosted_ci": "pending push",
-    "public_site": "pending exact CI; existing public Site v177 remains unchanged"
+    "hosted_ci": "PASS: https://github.com/AffPapa/NeTelegram/actions/runs/38520311093 for exact commit abdf2268fbbfdf052980d97cfd53e62ba285c45d.",
+    "public_site": "PASS: public Site v178 deployment appgdep_6acf1c9813788191b4e17f6f6ae951d6; anonymous Playwright confirmed devlog and no-download gate."
+  },
+  "latest_checkpoint_metadata": {
+    "run_id": 38520311093,
+    "status": "success",
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38520311093",
+    "workflow_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
+    "scope": "Exact commit metadata validation passed, including checkpoint consistency and the release metadata suite."
   }
 }
