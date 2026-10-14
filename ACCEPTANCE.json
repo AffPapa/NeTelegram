@@ -31,9 +31,9 @@
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
       "build_record_sha256": "ef05513128e7eb85aa5a4f5660cd55bd7f6c7348947178a37f07e4648d7cee2b",
       "smoke": "Built once from clean source 92b8ca3 and launched the canonical Dev.app in the explicit compact chat-shell preview. CUA verified the first-run workspace and honest empty state; no accounts, profiles, TDLib auth, or synthetic identities were loaded. Selected-row appearance could not be visually exercised without chat data.",
-      "scope": "Canonical bundle is prior source 92b8ca3; source 5f98842 is pending rebuild because the canonical process is running. No account login.",
+      "scope": "Installed canonical bundle is prior source 92b8ca3 and is currently running on the protected API hash setup dialog. Source 41b3378 is pending one in-place rebuild after owner resolves the dialog and closes the app. No real account login.",
       "pending_source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
-      "current_running_pid": 67677
+      "current_running_pid": null
     },
     "app02_stalled_profile_test": {
       "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
@@ -673,7 +673,7 @@
     "push": "success; verified on GitHub main",
     "focused_test": "delayedClosedAccountCleanupCannotOverrideNewerSelection PASS 1/1; AppKit and test targets compiled",
     "exact_source_ci": "PASS 179/179; run 38561302832",
-    "canonical_dev_app": "CUA confirms PID app running prior source 92b8ca3 with secure API hash field focused; value not read",
+    "canonical_dev_app": "CUA freshly confirms the app is running; Info.plist identifies its bundle source as 92b8ca3. Accessibility shows the protected API hash setup dialog. Field value not read or changed; CUA did not expose a PID.",
     "real_account": "not used"
   },
   "latest_site_deployment": {
@@ -708,14 +708,14 @@
   },
   "latest_access_audit": {
     "date": "2026-10-14",
-    "source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
+    "source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
     "app": "/private/tmp/NeTelegram-Dev.app",
-    "window_title": "NeTelegram Dev secure API hash configuration dialog",
-    "method": "CUA accessibility tree only; secure field value not inspected and no control activated",
-    "verified": "Canonical app is still running; UI exposes the intended NSSecureTextField, Save and Cancel controls.",
-    "not_verified": "Whether a value has been entered or saved, current-source profile-origin status, real login, and Telegram account behavior."
+    "window_title": "NeTelegram Dev — protected API hash setup dialog",
+    "method": "Fresh CUA app inventory and accessibility tree; secure field value not read; no control activated. Bundle commit independently checked from Info.plist.",
+    "verified": "Canonical app is running and its installed bundle source is 92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f. The secure API hash field and Save/Cancel controls are present.",
+    "not_verified": "Secure field contents or whether it matches the intended app credential; app API credential saved state; real Telegram login or account behavior; current process PID."
   },
-  "next_action": "The canonical Dev.app is open on its protected API hash save dialog. The value has not been read; the owner must save the intended app hash to Keychain or cancel directly in the app. Do not dismiss the dialog or retry quit. After the owner resolves the dialog and closes the app, build the canonical Dev.app once from source 41b3378 and run the short native auth smoke. Developer ID inventory remains 0; notarization credentials unverified; no public app release/download yet. Keep Site v194 unchanged.",
+  "next_action": "CUA freshly confirms the canonical Dev.app is running prior source 92b8ca3 on the protected API hash setup dialog; field value was not read or changed. The owner must save or cancel in the app, then close it. Build the same canonical bundle once from source 41b33783fdd8db9. Exact-source CI for that source is already recorded as 179/179; do not rerun unchanged tests. Fresh Developer ID inventory is 0; notarization credentials unverified; no public app release/download. Keep Site v194 unchanged.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -837,9 +837,9 @@
     "date": "2026-10-14",
     "status": "partial",
     "toolchain": "/Applications/Xcode-beta.app/Contents/Developer; notarytool 1.1.3 (42); Gatekeeper assessments enabled.",
-    "developer_id": "security find-identity -v -p codesigning reported 4 valid identities, including 2 Developer ID Application entries for team H6VGU2M6JD. This proves local signing identities are available; no release binary was signed.",
-    "notary_credentials": "Keychain lookup for service com.apple.gke.notary.tool returned absent or inaccessible. No profile name or credential value was read; no submission was attempted.",
-    "release_status": "No signed/notarized app release. The canonical Dev.app remains running as PID 79726 on source 87c0c06560ac0986f7e004d6578b1e3b034c9244; current source 7683cc6bace702b3376a08a9a2aaf4aaf881a691 awaits normal exit before in-place rebuild."
+    "developer_id": "Fresh `security find-identity -v -p codesigning` run on 2026-10-14 returned 0 valid identities. This supersedes the contradictory earlier inventory that reported 4; no identity is available for Developer ID signing at this check. Notary credentials remain unverified.",
+    "notary_credentials": "Prior keychain metadata lookup reported absent or inaccessible. Credentials were not read and no notarization submission was attempted.",
+    "release_status": "No signed/notarized app release. Fresh signing identity query returned 0. CUA confirms the one canonical Dev.app is running prior bundle source 92b8ca3 on its protected API hash setup dialog; process PID is not exposed by the current CUA view. Candidate source 41b3378 remains pending until the owner resolves the dialog and closes the app."
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",

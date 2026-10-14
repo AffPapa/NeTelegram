@@ -1355,3 +1355,10 @@
 - Existing focused regression `delayedClosedAccountCleanupCannotOverrideNewerSelection` passed 1/1; SwiftPM compiled the AppKit and test targets. Exact-source macOS arm64 CI [38561302832](https://github.com/AffPapa/NeTelegram/actions/runs/38561302832) passed 179/179. This remains a policy/call-site check, not a native TDLib logout integration test.
 - Source `41b33783fdd8db9db47ed13f79214c4ee95c9f7c` is pushed to main. Read-only CUA confirms the canonical Dev.app remains open at the protected API hash dialog. The field value was not read; no rebuild or quit retry was attempted.
 - No signing identity or confirmed notary credentials; no app release or Site deployment.
+
+
+## 2026-10-14 — Fresh candidate and signing preflight
+
+- Rechecked canonical repo: clean `main` at `eff7c82`; app-source commit remains `41b3378`. GitHub connector confirmed `eff7c82` exists in `AffPapa/NeTelegram`.
+- Fresh CUA confirms `/private/tmp/NeTelegram-Dev.app` is running from prior source `92b8ca3` on the protected API hash setup dialog. The secure value was not read or changed; no control was activated. The owner must resolve the dialog and close the app before the one in-place candidate build.
+- Fresh `security find-identity -v -p codesigning` returned 0 valid identities, superseding the conflicting old checkpoint that reported 4. No signing/notarization/release occurred. `gh run list` could not reach the GitHub API; no new workflow status is inferred. Existing exact-source CI evidence for `41b3378` remains 179/179.
