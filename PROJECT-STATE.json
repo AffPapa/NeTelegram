@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state verified, row appearance still awaits real chat data.",
+  "phase": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state and phone-login screen verified, row appearance awaits real chat data.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -334,7 +334,7 @@
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Synthetic APP12/APP13 tests cover 20 runtime sinks and per-account network setter recovery; native sleep/wake, real authorized sessions, all-active recovery, notifications, storage faults and performance matrix remain open.",
-    "Two Developer ID Application identities are available for team H6VGU2M6JD; notarytool profile is absent from the default Keychain (errSecItemNotFound). No signing or notarization candidate exists yet.",
+    "Fresh 2026-10-14 security find-identity returned 0 valid identities; Developer ID signing unavailable. Notarization credentials remain unverified.",
     "Telegram Terms §1.3/1.4: review basic functionality and behavior; the official page gives no exhaustive checklist, so compatibility remains unproven.",
     "Telegram title conflict: user requires NeTelegram; official API Terms §2.3 require “Unofficial” before “Telegram”. Do not rename silently; compatibility/stable-release claim remains open.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
@@ -391,16 +391,18 @@
     "Keep milestone receipt IDs in a separate namespace from acceptance requirement IDs; before naming a slice or next action, check existing case IDs to avoid reusing AUTHxx identifiers and making the checkpoint ambiguous.",
     "Do not reuse milestone IDs from the APPxx/AUTHxx acceptance catalogue; use a separate CORE-RUNTIME-xx milestone namespace and add a requirement receipt only when the invariant is independently scoped.",
     "2026-10-14 APP29b: a startup runtime auto-presented into an unselected window must be adopted as the selection intent; otherwise later logout cleanup can skip add-account presentation. Test both initial adoption and a newer selection. Before every rebuild, check the canonical app process; never create a competing Dev.app while it is running.",
-    "Before closing the Dev.app, inspect its current UI state read-only. A focused secure API-hash field is unsaved until the user presses the app’s Keychain save button; never read the field, click save, or retry a user-cancelled quit. Ask the user to save or cancel directly in the app, then resume with one canonical rebuild."
+    "Before closing the Dev.app, inspect its current UI state read-only. A focused secure API-hash field is unsaved until the user presses the app’s Keychain save button; never read the field, click save, or retry a user-cancelled quit. Ask the user to save or cancel directly in the app, then resume with one canonical rebuild.",
+    "Keep historical evidence append-only, but reconcile every active summary/projection from the newest verified checkpoint before resuming; stale status copied into an active field must be marked superseded or replaced, never presented beside current truth."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
-    "scope": "Fresh local Developer ID inventory; read-only CUA process and dialog check",
+    "scope": "Fresh local signing identity inventory and read-only CUA accessibility inspection.",
     "signing_identity_count": 0,
     "developer_id_application_identity_count": 0,
     "team_id": null,
     "notary_credentials": "Not re-read in this check; prior metadata lookup reported absent or inaccessible.",
-    "result": "security find-identity returned 0 valid identities. CUA shows NeTelegram Dev running on the protected API hash setup dialog; the field value was not read or changed. This supersedes the older conflicting 4-identity checkpoint."
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "result": "security find-identity returned 0 valid identities. CUA shows the canonical NeTelegram Dev phone-login screen with country picker/search, phone field, Continue, QR login and independence disclosure. No phone, credential or OTP was read or entered. This supersedes stale dialog/source descriptions."
   },
   "latest_site_source_commit": "664f3efdb8cd49952341fb0bdca03aaffdb1ba71",
   "pending_publication": null,
@@ -632,11 +634,11 @@
   },
   "latest_native_ui_review": {
     "date": "2026-10-14",
-    "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
-    "window_title": "NeTelegram · dev 7fd00308",
-    "method": "CUA native accessibility tree and screenshot",
-    "result": "First-run auth card is centered at default size in light appearance, and phone entry/country/Continue/QR controls are visible.",
-    "limits": "No resize, no alternate auth state, no dark appearance or VoiceOver interaction. Did not rebuild or replace the already open canonical Dev.app."
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
+    "window_title": "NeTelegram · dev 44c999de",
+    "method": "CUA native accessibility tree; no screenshot capture.",
+    "result": "Phone-login UI exposes country search/picker, phone entry, Continue, QR alternative and independent-client disclosure. No synthetic account/profile appears.",
+    "limits": "No real auth, real conversation row, resizing, dark appearance, or VoiceOver interaction verified."
   },
   "latest_release_artifact_guards": {
     "date": "2026-10-14",
@@ -707,9 +709,9 @@
     "date": "2026-10-14",
     "status": "partial",
     "toolchain": "/Applications/Xcode-beta.app/Contents/Developer; notarytool 1.1.3 (42); Gatekeeper assessments enabled.",
-    "developer_id": "Fresh `security find-identity -v -p codesigning` run on 2026-10-14 returned 0 valid identities. This supersedes the contradictory earlier inventory that reported 4; no identity is available for Developer ID signing at this check. Notary credentials remain unverified.",
-    "notary_credentials": "Prior keychain metadata lookup reported absent or inaccessible. Credentials were not read and no notarization submission was attempted.",
-    "release_status": "No signed/notarized app release. Fresh signing identity query returned 0. CUA confirms the one canonical Dev.app is running prior bundle source 92b8ca3 on its protected API hash setup dialog; process PID is not exposed by the current CUA view. Candidate source 41b3378 remains pending until the owner resolves the dialog and closes the app."
+    "developer_id": "Fresh security find-identity -v -p codesigning returned 0 valid identities on 2026-10-14. This supersedes earlier conflicting inventories; no identity is available for Developer ID signing at this check.",
+    "notary_credentials": "Prior Keychain metadata lookup reported absent or inaccessible. Credentials were not read and no notarization submission was attempted.",
+    "release_status": "No signed/notarized app release. Canonical Dev.app is running exact app source 44c999dee5c866f03272404e7d14965509fdefa6 and shows the phone authorization screen. The secure phone field was not read or changed; no real account was used. Site v194 has no application download."
   },
   "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state verified, row appearance still awaits real chat data.",
   "latest_design_research": {

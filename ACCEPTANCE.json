@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state verified, row appearance still awaits real chat data.",
+  "status": "CHATLIST01 native conversation row design — source 44c999d compiled, exact-source CI passed and canonical Dev.app launched from matching source; accountless empty state and phone-login screen verified, row appearance awaits real chat data.",
   "current_evidence": {
     "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
     "local_suite": "No local behavioral suite run for presentation-only slice. SwiftPM AppKit target build passed; exact-source GitHub macOS CI run 38563635904 passed.",
@@ -28,7 +28,7 @@
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical Dev.app rebuilt once from clean source 44c999d and launched with --ci-chat-shell-preview. CUA verified the empty accountless workspace; no profiles, Telegram accounts or credentials were loaded. Conversation rows are not visible in this empty-state smoke, so row styling still awaits real chat data.",
+      "smoke": "Canonical Dev.app source 44c999d was built once and launched. CUA verified the accountless workspace, then the phone-login UI; no profiles, Telegram accounts or credentials were loaded. Conversation rows remain unobserved without real chat data.",
       "scope": "Native launch/empty-state smoke only. This does not prove Telegram login, send/read, real 20 runtimes, performance, signing or release."
     },
     "app02_stalled_profile_test": {
@@ -475,7 +475,7 @@
       "method": "build/release tools",
       "required_for": "signed app releases",
       "status": "partial",
-      "evidence": "Read-only preflight on 2026-10-14: repeated identity inventory returned four valid signing identities, including two Developer ID Application identities for team H6VGU2M6JD; one adjacent query returned zero, so record the transient inconsistency. Notarytool Keychain service metadata lookup returned errSecItemNotFound; no APPLE_/ASC_/NOTARY_ environment variable names are configured. No signature, Accepted notarization, stapling, Gatekeeper install smoke or release assets exist; no release pass is claimed."
+      "evidence": "Read-only preflight on 2026-10-14: repeated identity inventory returned four valid signing identities, including two Developer ID Application identities for team H6VGU2M6JD; one adjacent query returned zero, so record the transient inconsistency. Notarytool Keychain service metadata lookup returned errSecItemNotFound; no APPLE_/ASC_/NOTARY_ environment variable names are configured. No signature, Accepted notarization, stapling, Gatekeeper install smoke or release assets exist; no release pass is claimed. Superseding current inventory: security find-identity returned 0 valid identities on 2026-10-14; no Developer ID identity is currently available. The earlier four-identity observation is historical and not release evidence."
     },
     {
       "id": "REL04",
@@ -684,8 +684,8 @@
     "parent_source_commit": "5239471ac621040b76aa1b44221824ffca942e73",
     "push": "success; exact origin/main verified",
     "local_build": "PASS AppKit SwiftPM target compile; git diff --check PASS",
-    "exact_source_ci": "not reported yet; old run 38561302832 is for prior source 41b3378 and does not apply",
-    "canonical_dev_app": "CUA confirms prior source 92b8ca3 remains running on protected API-hash dialog. Cmd+Q did not close it. No secret field contents observed or changed.",
+    "exact_source_ci": "PASS run 38563635904 for exact app-source SHA 44c999dee5c866f03272404e7d14965509fdefa6.",
+    "canonical_dev_app": "Running canonical /private/tmp/NeTelegram-Dev.app at source 44c999dee5c866f03272404e7d14965509fdefa6; CUA currently shows the phone-login screen. No secret field was read or changed.",
     "real_account": "not used",
     "native_smoke": "PASS one canonical build and native UI check for empty state plus login form. No real auth and no chat rows rendered.",
     "pending_native_candidate": null
@@ -722,12 +722,12 @@
   },
   "latest_access_audit": {
     "date": "2026-10-14",
-    "source_commit": "41b33783fdd8db9db47ed13f79214c4ee95c9f7c",
+    "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
     "app": "/private/tmp/NeTelegram-Dev.app",
-    "window_title": "NeTelegram Dev — protected API hash setup dialog",
-    "method": "Fresh CUA app inventory and accessibility tree; secure field value not read; no control activated. Bundle commit independently checked from Info.plist.",
-    "verified": "Canonical app is running and its installed bundle source is 92b8ca3f0393d8dff6bf4d56ef90e2ab94bab82f. The secure API hash field and Save/Cancel controls are present.",
-    "not_verified": "Secure field contents or whether it matches the intended app credential; app API credential saved state; real Telegram login or account behavior; current process PID."
+    "window_title": "NeTelegram · dev 44c999de",
+    "method": "Read-only CUA app inventory and accessibility tree; security identity count checked locally.",
+    "verified": "Canonical Dev.app phone-login screen and 0 valid code-signing identities. No phone, API credential, OTP or profile was read or entered.",
+    "not_verified": "Real Telegram authorization, chat-row rendering, read/send, Developer ID signing, notarization or distribution."
   },
   "next_action": "Use the canonical Dev.app at /private/tmp/NeTelegram-Dev.app for user-operated API credential setup and one authorized real test account; do not place secrets in chat. Verify login, read/send, close-window/reopen and render real conversation rows. Then continue remaining required vertical slices and real-runtime coverage. Developer ID inventory is 0 and notarization credentials are unverified; no app release/download. Keep Site v194 without a download button until signed public assets exist.",
   "latest_release_candidate_validation": {
@@ -795,7 +795,8 @@
       "app_source_commit": "44c999dee5c866f03272404e7d14965509fdefa6",
       "scope": "Exact-source GitHub macOS CI passed on this commit; the Apple Silicon Swift tests job completed successfully. No real-account or native UI smoke is included."
     },
-    "scope": "TDLib-backed native rows. Synthetic and real-account acceptance is unchanged; no real Telegram identities used."
+    "scope": "Native AppKit conversation rows use TDLib-backed title/preview/date/unread/mute fields and preserve TDLib ordering. Build, exact-source CI and accountless/login UI smoke passed; no real-account or conversation-row visual evidence yet.",
+    "native_smoke": "PASS canonical exact-source Dev.app empty state and phone-login screen; real Telegram account acceptance remains unverified and no conversation row was displayed."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
