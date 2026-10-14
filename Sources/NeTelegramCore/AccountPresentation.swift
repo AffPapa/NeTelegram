@@ -127,19 +127,6 @@ public struct AccountConversationSnapshot: Sendable, Equatable {
 /// server identity. Local AccountUUIDs are storage keys and must never leak
 /// into account pickers or window titles as if they were Telegram profiles.
 public enum AccountPresentation {
-    /// A late-finishing background startup must not steal the visible account
-    /// from a newer user selection. With no explicit selection, the first
-    /// restored runtime may supply the initial window.
-    public static func shouldPresentStartupRuntime(
-        account: AccountUUID,
-        explicitlySelected: Bool,
-        selectedAccountIntent: AccountUUID?,
-        hasPresentedRuntime: Bool
-    ) -> Bool {
-        if let selectedAccountIntent { return selectedAccountIntent == account }
-        return explicitlySelected || !hasPresentedRuntime
-    }
-
     /// A verified account normally clears its transient `ready` update after
     /// identity reconciliation. Restore its chat on unlock only when no newer
     /// authorization state superseded that identity state.

@@ -1,0 +1,22 @@
+/// Keeps account selection intent stable while profile runtimes finish opening
+/// asynchronously. The first restored runtime may initialize an empty window,
+/// but a late background startup cannot replace a newer user selection.
+@MainActor
+public final class AccountStartupPresentationCoordinator {
+    public private(set) var selectedAccountIntent: AccountUUID?
+
+    public init() {}
+
+    public func select(_ account: AccountUUID) {
+        selectedAccountIntent = account
+    }
+
+    public func shouldPresentStartupRuntime(
+        account: AccountUUID,
+        explicitlySelected: Bool,
+        hasPresentedRuntime: Bool
+    ) -> Bool {
+        if let selectedAccountIntent { return selectedAccountIntent == account }
+        return explicitlySelected || !hasPresentedRuntime
+    }
+}

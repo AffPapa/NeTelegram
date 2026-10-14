@@ -1671,39 +1671,38 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     }
 }
 
-@Test func lateBackgroundStartupCannotStealNewerAccountSelection() {
+@MainActor @Test func lateBackgroundStartupCannotStealNewerAccountSelection() {
     let first = AccountUUID()
     let second = AccountUUID()
     let third = AccountUUID()
+    let presentation = AccountStartupPresentationCoordinator()
 
-    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+    presentation.select(second)
+    #expect(!presentation.shouldPresentStartupRuntime(
         account: first,
         explicitlySelected: false,
-        selectedAccountIntent: second,
         hasPresentedRuntime: false
     ), "A finishing restore must leave the selected account's startup view in place")
-    #expect(AccountPresentation.shouldPresentStartupRuntime(
+    #expect(presentation.shouldPresentStartupRuntime(
         account: second,
         explicitlySelected: false,
-        selectedAccountIntent: second,
         hasPresentedRuntime: false
     ), "The account currently selected while starting becomes the visible runtime")
-    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+    presentation.select(third)
+    #expect(!presentation.shouldPresentStartupRuntime(
         account: first,
         explicitlySelected: true,
-        selectedAccountIntent: third,
         hasPresentedRuntime: true
     ), "An older explicit startup request cannot override a later account selection")
-    #expect(AccountPresentation.shouldPresentStartupRuntime(
+    let initialWindowPresentation = AccountStartupPresentationCoordinator()
+    #expect(initialWindowPresentation.shouldPresentStartupRuntime(
         account: first,
         explicitlySelected: false,
-        selectedAccountIntent: nil,
         hasPresentedRuntime: false
     ), "The first runtime may initialize the window when no account was selected")
-    #expect(!AccountPresentation.shouldPresentStartupRuntime(
+    #expect(!initialWindowPresentation.shouldPresentStartupRuntime(
         account: first,
         explicitlySelected: false,
-        selectedAccountIntent: nil,
         hasPresentedRuntime: true
     ), "A background startup cannot replace an already visible runtime")
 }

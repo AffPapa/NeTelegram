@@ -53,7 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     private var runtime: LocalAccountRuntime?
     /// Latest account the user asked to see, including one still starting.
     /// Background startup completion must not replace this selection.
-    private var selectedAccountIntent: AccountUUID?
+    private let accountStartupPresentation = AccountStartupPresentationCoordinator()
     private var gateway: TDLibGateway?
     private var updatePipeline: TDLibUpdatePipeline?
     private var tdlibReceiveFailed = false
@@ -1181,7 +1181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
         let index = accountPicker.indexOfSelectedItem
         guard accountPickerAccounts.indices.contains(index) else { return }
         let account = accountPickerAccounts[index]
-        selectedAccountIntent = account
+        accountStartupPresentation.select(account)
         if let profile = knownProfilesByAccount[account], profile.unverifiedRemovalPending == true {
             if let target = runtimesByAccount[account] {
                 if target.requestUnverifiedProfileRemoval() {
@@ -1218,7 +1218,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
     }
 
     private func presentRuntime(_ selected: LocalAccountRuntime) {
-        selectedAccountIntent = selected.account
+        accountStartupPresentation.select(selected.account)
         runtime = selected
         closedProfileToRetry = nil
         actionButton.target = self
@@ -2219,10 +2219,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             runtimesByClient[route.client.value] = runtime
             runtimesByAccount[profile.id] = runtime
             refreshStatusMenu()
-            let presentsThisRuntime = AccountPresentation.shouldPresentStartupRuntime(
+            let presentsThisRuntime = accountStartupPresentation.shouldPresentStartupRuntime(
                 account: profile.id,
                 explicitlySelected: select,
-                selectedAccountIntent: selectedAccountIntent,
                 hasPresentedRuntime: self.runtime != nil
             )
             if presentsThisRuntime { self.runtime = runtime }
