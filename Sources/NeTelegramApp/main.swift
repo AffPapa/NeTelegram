@@ -3785,11 +3785,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
               let result = searchResultByControlID[key],
               let target = runtimesByAccount[result.account], target.telegramUserID != nil else { return }
         if let conversation = result.conversation {
+            // Search results already carry TDLib's typed topic. Keep that exact
+            // selection when switching account/chat so history and drafts use
+            // the same conversation identity as the result.
             switch conversation.topic {
-            case .main, .forum: break
-            default:
-                setStatus("Найдено сообщение в типе темы, который пока не поддерживается интерфейсом.")
-                return
+            case .main:
+                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
+                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
+            case .forum(let topicID):
+                selectedConversationTopicsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
+                selectedForumTopicIDsByAccount[result.account, default: [:]][conversation.chatID] = topicID
+            case .thread, .directMessages, .savedMessages:
+                selectedConversationTopicsByAccount[result.account, default: [:]][conversation.chatID] = conversation.topic
+                selectedForumTopicIDsByAccount[result.account]?.removeValue(forKey: conversation.chatID)
             }
         }
         searchDebounceTask?.cancel()
@@ -3814,9 +3822,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             refreshChatList()
             displaySelectedConversation()
             return
-        }
-        if case .forum(let topicID) = conversation.topic {
-            selectedForumTopicIDsByAccount[result.account, default: [:]][conversation.chatID] = topicID
         }
         if let messageID = result.messageID {
             historyAnchorByConversation[conversation] = messageID
