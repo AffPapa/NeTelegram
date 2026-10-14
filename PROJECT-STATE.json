@@ -220,13 +220,13 @@
       "status": "Separate legacy checkout, preserved and divergent/dirty.",
       "handling": "Do not build, launch, reset, clean, stash or merge until a separate file-level reconciliation."
     },
-    "repo_head_before_checkpoint": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
+    "repo_head_before_checkpoint": "78650357b4fc5eefae1211a5758c90c685b92b54",
     "app_source_commit_authority": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "app_source_commit": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "repo_head": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
-    "origin_main": "aab6a4a2df950ae61de4d69b5f67a2b251e6d8a2",
+    "app_source_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
+    "repo_head": "78650357b4fc5eefae1211a5758c90c685b92b54",
+    "origin_main": "78650357b4fc5eefae1211a5758c90c685b92b54",
     "upstream": "origin/main",
-    "dirty_state": "checkpoint-only state update pending"
+    "dirty_state": "clean at snapshot; documentation checkpoint only; app-source identity remains e7cc4b3be3d51d199dd16c3e0991feb001eb905c"
   },
   "avoid_repeat_errors": [
     "Never call a previous binary or process current unless bundle build-info SHA and process path are independently verified; process inspection was blocked, so old ff3da44 candidate is not current dd11b9f.",
