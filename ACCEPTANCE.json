@@ -519,7 +519,7 @@
     "local_result": "PASS: focused APP02 restore cleanup fan-out regression 1/1; full serial suite 165/165 on arm64e, Xcode 27 / Swift 6.4.",
     "hosted_ci": "Exact-source run 38508018017 passed the filtered probe and all 165 tests.",
     "native_dev_app_smoke": "One canonical app at exact source e7cc4b3 built in 5.29s; ad-hoc signature verified; CUA confirmed matching title and accountless sign-in. No credentials.",
-    "metadata_ci": "Checkpoint metadata validation is pending after the docs-only commit.",
+    "metadata_ci": "PASS exact checkpoint metadata run 38508667707 for commit 2ff390a.",
     "scope": "Synthetic cleanup orchestration only. No real login, authorized accounts, real SecItem stall, 20-account coverage, Developer ID signing, or notarization."
   },
   "latest_site_deployment": {

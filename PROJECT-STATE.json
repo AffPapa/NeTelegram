@@ -51,11 +51,11 @@
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38508018017,
+      "run_id": 38508667707,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508018017",
-      "workflow_commit": "e7cc4b3be3d51d199dd16c3e0991feb001eb905c",
-      "scope": "This run validates app source e7cc4b3 and the complete serial Swift suite 165/165; checkpoint-only metadata validation for this documentation update is pending."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508667707",
+      "workflow_commit": "2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b",
+      "scope": "Metadata validation passed for exact checkpoint commit 2ff390a, including checkpoint consistency and release metadata tests."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,
@@ -159,11 +159,11 @@
       "scope": "Cached plaintext notification previews and locked incoming update previews are omitted while exact account/chat/topic/message routing is retained. This does not prove secure RAM erasure or native Notification Center behavior."
     },
     "latest_checkpoint_metadata": {
-      "run_id": 38496052252,
+      "run_id": 38508667707,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38496052252",
-      "workflow_commit": "31c24680c4a2366187f6f0be90eece07e05a8c41",
-      "scope": "Metadata validation passed for exact checkpoint 31c2468."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508667707",
+      "workflow_commit": "2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b",
+      "scope": "Metadata validation passed for exact checkpoint commit 2ff390a, including checkpoint consistency and release metadata tests."
     },
     "latest_native_bundle": {
       "result": "PASS",
@@ -263,11 +263,11 @@
   "latest_site_source_commit": "12d774c1523681d6cc948ba25c635393fefa3ee5",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38501473452,
+    "run_id": 38508667707,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38501473452",
-    "workflow_commit": "db1a69bec5415c5c00d4ad8feae829495f40c930",
-    "scope": "Last successful metadata validation before current pending checkpoint; current checkpoint JSON and 15 metadata tests have passed locally."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508667707",
+    "workflow_commit": "2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b",
+    "scope": "Metadata validation passed for exact checkpoint commit 2ff390a, including checkpoint consistency and release metadata tests."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
