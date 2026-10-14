@@ -1915,3 +1915,12 @@
 - Corrected the current Site checkpoint copy: public canonical `/downloads/` is NeTelegram, the old AffPapa Chat display came from a stale query URL, and no app download exists. Site v205 was not modified or redeployed.
 - Scope remains synthetic: zero real Telegram logins and zero certification of 20 live TDLib runtimes or their resource use. Developer ID/notarization, policy compatibility, updater, public app release/download, and real-account acceptance remain open. Next gate is one owner-operated login/read/send/logout using a fresh API hash entered only in the app; the value pasted in chat remains retired.
 - `Scripts/validate_checkpoint.py` and `git diff --check` passed after current app/bundle/Site pointers were reconciled.
+
+
+## 2026-10-15 — AUTH-FORM-APPLE-HIG-19
+
+- Research: current Apple macOS HIG for windows, layout, text entry, buttons and accessibility; GitHub AppKit `NSStackView` examples were reviewed as implementation references only. No UI framework, styles or source were copied.
+- Diagnosis: screenshot `dev 5f414650` was stale. In the current canonical app before the change (`dev 28316749`), the phone input column was 400 pt while the primary Continue button was 240 pt.
+- Change: aligned the primary button to the form's 400 pt width. Native AppKit styling, QR secondary action, keyboard behavior, accessibility, disabled-until-valid policy and auth logic remain unchanged. Source commit `e8bd672a8888b654f615cdc17d8c78523a9368c6`, pushed to `AffPapa/NeTelegram:main`.
+- Verification: Swift 6.4 `NeTelegramApp` target build and `git diff --check` passed. Exact-source macOS CI [38656376840](https://github.com/AffPapa/NeTelegram/actions/runs/38656376840) passed; pinned TDLib/Dev.app workflow [38656376900](https://github.com/AffPapa/NeTelegram/actions/runs/38656376900) passed. Rebuilt once at `/private/tmp/NeTelegram-Dev.app`; CUA screenshot confirms matching input/button widths and AX confirms empty phone, disabled Continue and unchanged auth options. Strict ad-hoc signature passed.
+- Limits: current native smoke was light appearance/accountless only. No login, Keychain value read, Telegram request, VoiceOver speech, IME/RTL, 20-real-account test, Developer ID or notarization. No app release. Public Site remains v205 and was not changed in this slice.
