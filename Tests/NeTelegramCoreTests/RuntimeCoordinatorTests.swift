@@ -4657,6 +4657,8 @@ private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
 }
 
 @Test func authorizationAnnouncementsAreStaticAndDeduplicatedByAccountGenerationAndStep() {
+    #expect(AuthorizationStep(tdlibType: "authorizationStateWaitOtherDeviceConfirmation") == .qrConfirmation)
+    #expect(AuthorizationAnnouncement.message(for: .qrConfirmation) == "Вход по QR: отсканируйте код в Telegram на телефоне для подтверждения.")
     let steps: [AuthorizationStep] = [
         .phoneNumber, .code, .password, .emailAddress, .emailCode, .registration, .qrConfirmation,
     ]

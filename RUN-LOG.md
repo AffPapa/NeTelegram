@@ -1595,3 +1595,10 @@
 - Change: added `AuthTextFieldKeyboardPolicy` and applied it to auth-field Return handling; non-Return commands and marked-text composition are left to AppKit. TDLib requests and the rest of the auth flow are unchanged.
 - Local verification: focused `authReturnDoesNotSubmitDuringMarkedIMEComposition` passed 1/1 using an isolated `/private/tmp` SwiftPM scratch/cache after the sandbox's default module cache was denied. Exact-source macOS CI and the canonical app smoke are pending.
 - Coverage: pure policy regression only; actual CJK IME interaction is not yet verified. No phone number, code, API hash, or account was used.
+
+## 2026-10-14 — AUTH-VOICEOVER-QR-01 announces QR confirmation
+
+- Finding: TDLib's `authorizationStateWaitOtherDeviceConfirmation` update uses a dedicated QR presentation branch that bypassed the shared authorization-step announcer. The QR image had an AX label, but the transition could be silent to VoiceOver.
+- Change: invoke the existing account/generation-deduplicated announcement after the QR screen is presented; add an explicit assertion for the TDLib QR-state mapping and static announcement.
+- Verification: pending focused authorization-announcement test, exact-source macOS CI, and one canonical Dev.app rebuild/accountless smoke. The actual spoken announcement with VoiceOver enabled is not yet verified.
+- No account or credentials used; source and Site identities remain separate.

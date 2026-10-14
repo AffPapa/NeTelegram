@@ -3278,6 +3278,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 setStatus("Проверяю серверную identity профиля…")
             case "authorizationStateWaitOtherDeviceConfirmation":
                 showQRConfirmation(auth)
+                announceAuthorizationStep(authType)
             case "authorizationStateLoggingOut", "authorizationStateClosing":
                 pendingAuthorizationType = nil
                 presentAuthorizationState(authType, info: auth)
