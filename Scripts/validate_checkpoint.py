@@ -44,6 +44,7 @@ def validate_records(project: dict, acceptance: dict) -> None:
         ) is not None
     )
     acceptance_site = acceptance["latest_site_deployment"]
+    nested_acceptance_site = evidence.get("latest_site_deployment")
     acceptance_slice = acceptance["latest_acceptance_slice"]
     checks = [
         (acceptance["status"].startswith(acceptance_slice["id"]),
@@ -81,6 +82,8 @@ def validate_records(project: dict, acceptance: dict) -> None:
          and acceptance_site["source_commit"] == deployment["source_commit"]
          and acceptance_site["deployment_id"] == deployment["deployment_id"],
          "ACCEPTANCE Site deployment differs from PROJECT-STATE"),
+        (nested_acceptance_site == acceptance_site,
+         "ACCEPTANCE.current_evidence.latest_site_deployment is stale"),
     ]
     errors = [message for condition, message in checks if not condition]
     pending = project.get("pending_native_candidate")
