@@ -35,8 +35,7 @@
       "repo": "AffPapa/NeTelegram",
       "git_transport_push": {
         "result": "success",
-        "commit": "bb9b38f8abee386b83b9f7949b22b6cfcc985744",
-        "app_source_commit": "2d8a4e5964211c9fbd40136f5470da7d47266937",
+        "commit": "c646b9ece3ae45a808bf39a2723098789829985f",
         "remote": "AffPapa/NeTelegram main",
         "method": "existing Git credential helper; authorized fast-forward push; no new credential"
       },
@@ -48,15 +47,15 @@
           "mrdumay-source (inactive)"
         ]
       },
-      "note": "App source and the documentation/site-mirror checkpoint were pushed to origin/main using the existing Git credential helper. The final pushed checkpoint commit is recorded in RUN-LOG.md. No token was created or printed."
+      "note": "Checkpoint c646b9e was pushed to origin/main and metadata validation 38514841734 passed. No new credential was created or printed."
     },
     "repo_head_policy": "At resume, inspect current app repo HEAD/status and live origin/main. Product code SHA, docs/checkpoint SHA, Dev.app bundle fingerprint, Site source SHA, saved version and deployment are separate identities; use each stored value only for its specific evidence.",
     "latest_checkpoint_ci": {
-      "run_id": 38508667707,
+      "run_id": 38514841734,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38508667707",
-      "workflow_commit": "2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b",
-      "scope": "Metadata validation passed for exact checkpoint commit 2ff390a, including checkpoint consistency and release metadata tests."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38514841734",
+      "workflow_commit": "c646b9ece3ae45a808bf39a2723098789829985f",
+      "scope": "Metadata validation passed for the checkpoint that records app CI 38514102824 and public Site v174."
     },
     "last_native_bundle_smoke": {
       "run_id": 38497467210,
@@ -105,7 +104,7 @@
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "current_head_native_smoke": "Exact app source 4dcddcc: canonical arm64 Dev.app built once in 5.29s; ad-hoc codesign verification passed. CUA confirmed exact source title and accountless login UI. No credentials or profiles.",
-    "publication": "Sites version 174 deployment succeeded. Anonymous in-app browser loaded /devlog/ and showed the new 7fd0030 shutdown fix, exact-source CI 38514102824 and 167/167 result. Site validator passed all 8 static routes, shared shell, navigation, canonical metadata, local links and assets. /downloads and updater-feed MIME were not rechecked; no app binary/download exists.",
+    "publication": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists.",
     "current_head_update_queue": "Exact-source macOS CI 38395900507 and pinned TDLib/Dev.app workflow 38395900428 passed for 6c6fff49d6c43746b3990de178b723d1eaf75172. C bridge rejects TDLib JSON above 16 MiB before copying; Swift queue fail-stops on a single item above byteCapacity. Real-account overload, Instruments, RSS and real 20-account burst remain unverified.",
     "github_page_copy": "README.md and README.ru.md carry detailed bilingual product descriptions, current feature/status limitations, natural RU/EN query phrasing, and explicit non-affiliation disclosure. GitHub About description is bilingual; homepage points to the existing Site; topics: telegram-client, macos, swift, appkit, tdlib, open-source. Search volumes/ranks are not measured.",
     "seo_keyword_research": "Live qualitative SERP wording: RU: неофициальный клиент Telegram для macOS; клиент Telegram для Mac; альтернативный клиент Telegram для Mac/macOS; приложение для Telegram на Mac. EN: unofficial Telegram client for macOS; Telegram client for Mac; alternative Telegram client for Mac/macOS; native macOS Telegram client; open-source Telegram client for Mac. No search volume/rank source was available.",
@@ -187,7 +186,7 @@
     "saved_version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_ff8218e6295c81919a51ca8f77a0660d",
     "public_application_download": false,
     "updater_feeds": "empty valid stable and alpha feeds",
-    "public_route_verified": "Sites version 174 deployment succeeded. Anonymous in-app browser loaded /devlog/ and showed the new 7fd0030 shutdown fix, exact-source CI 38514102824 and 167/167 result. Site validator passed all 8 static routes, shared shell, navigation, canonical metadata, local links and assets. /downloads and updater-feed MIME were not rechecked; no app binary/download exists.",
+    "public_route_verified": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists.",
     "archive_local_path": "/private/tmp/netelegram-site-v174.tar.gz",
     "archive_local_sha256": "d81a20b95c017f4d945d9671460bc5ba96442a50629b2e4cc9f537df9701cdda",
     "archive_local_size_bytes": 191917,
@@ -200,7 +199,7 @@
     "app_ci_run_id": 38514102824,
     "native_app_run_id": null,
     "metadata_validation_run_id": null,
-    "description": "Public development Site v174: factual TDLib receive-drain fix, exact-source CI 167/167; no app binary."
+    "description": "Public development Site v174: verified bilingual shutdown-drain log; /downloads honestly shows no release; no app binary."
   },
   "open_gates": [
     "API hash is not present in Keychain. The previously chat-exposed value must not be reused; the new app UI supports secure replacement, but storage has not been tested. Do not request or log the hash in chat.",
@@ -251,7 +250,8 @@
     "2026-10-14: A broad Site helper invocation from non-empty /private/tmp failed during reserved checkout prep; retrying in a fresh empty directory reached the exact blocker: DNS cannot resolve git.chatgpt-team.site. Preserve the existing Site and source; do not repeat identical helper attempts until provider DNS/network route changes.",
     "2026-10-14: PhotoPipeline uses NSCache, which may evict previews under memory pressure. Cache invalidation tests must inject a deterministic cache and assert only scoped behavior; do not treat an unrelated NSCache miss as a product regression.",
     "2026-10-14 APP07/CI: Exact-source run 38505482508 passed filtered runner probe and test-bundle compilation but emitted no Test run started during 4m24 in the full-suite step; cancelled with no hosted result. Local Xcode 27 / Swift 6.4 full suite passed 164/164. Do not rerun unchanged. Diagnose toolchain/runtime or split runner coverage first; distinguish probe PASS from suite startup.",
-    "2026-10-14 APP16 speed rule: one exact-source full suite is sufficient after targeted regression stress; do not rerun unchanged tests or dispatch a duplicate CI. Record app-source SHA, running Dev.app SHA, Site source SHA, saved Site version, deployment, and public route as separate identities. On Site updates use only the official helper checkout and exact save-then-deploy flow; never restart app build for a Site-only failure."
+    "2026-10-14 APP16 speed rule: one exact-source full suite is sufficient after targeted regression stress; do not rerun unchanged tests or dispatch a duplicate CI. Record app-source SHA, running Dev.app SHA, Site source SHA, saved Site version, deployment, and public route as separate identities. On Site updates use only the official helper checkout and exact save-then-deploy flow; never restart app build for a Site-only failure.",
+    "2026-10-14 publication proof: after Site v174 deployment, anonymous in-app checks confirmed both /devlog/ and /downloads/; /downloads correctly contains NO RELEASE with no download button. Do not recheck these routes or rerun app tests until their inputs or deployment changes."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
@@ -288,7 +288,7 @@
     "saved_archive_content_hash": "sha256:60f554092d6e85d20eb14e918da73cd8033da3f72328af99e0e2da2aaf160daf",
     "saved_archive_size_bytes": 450560,
     "archive_file_count": 14,
-    "public_verification": "Sites version 174 deployment succeeded. Anonymous in-app browser loaded /devlog/ and showed the new 7fd0030 shutdown fix, exact-source CI 38514102824 and 167/167 result. Site validator passed all 8 static routes, shared shell, navigation, canonical metadata, local links and assets. /downloads and updater-feed MIME were not rechecked; no app binary/download exists."
+    "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
   },
   "release_candidate_validation": {
     "status": "implemented_not_used_for_release",
@@ -332,7 +332,7 @@
     "saved_archive_content_hash": "sha256:60f554092d6e85d20eb14e918da73cd8033da3f72328af99e0e2da2aaf160daf",
     "saved_archive_size_bytes": 450560,
     "archive_file_count": 14,
-    "public_verification": "Sites version 174 deployment succeeded. Anonymous in-app browser loaded /devlog/ and showed the new 7fd0030 shutdown fix, exact-source CI 38514102824 and 167/167 result. Site validator passed all 8 static routes, shared shell, navigation, canonical metadata, local links and assets. /downloads and updater-feed MIME were not rechecked; no app binary/download exists."
+    "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
   },
   "current_native_smoke": {
     "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",

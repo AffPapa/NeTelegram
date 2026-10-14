@@ -541,7 +541,7 @@
     "saved_archive_content_hash": "sha256:60f554092d6e85d20eb14e918da73cd8033da3f72328af99e0e2da2aaf160daf",
     "saved_archive_size_bytes": 450560,
     "archive_file_count": 14,
-    "public_verification": "Sites version 174 deployment succeeded. Anonymous in-app browser loaded /devlog/ and showed the new 7fd0030 shutdown fix, exact-source CI 38514102824 and 167/167 result. Site validator passed all 8 static routes, shared shell, navigation, canonical metadata, local links and assets. /downloads and updater-feed MIME were not rechecked; no app binary/download exists."
+    "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
   },
   "latest_source_audit": {
     "date": "2026-10-14",
