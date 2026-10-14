@@ -41,7 +41,7 @@ private extension NSLayoutConstraint {
 }
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSplitViewDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSSearchFieldDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSplitViewDelegate, @preconcurrency UNUserNotificationCenterDelegate, NSTextViewDelegate, NSTextFieldDelegate, NSSearchFieldDelegate, NSComboBoxDelegate, NSControlTextEditingDelegate, @unchecked Sendable {
     private var window: NSWindow!
     private var statusItem: NSStatusItem!
     private var statusMenuItem: NSMenuItem!
@@ -56,11 +56,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var accountProfileHint: NSTextField!
     private var accountPickerAccounts: [AccountUUID] = []
     private var topicPicker: NSPopUpButton!
-    private var countryPicker: NSPopUpButton!
+    private var countryPicker: NSComboBox!
     private var countryPickerStack: NSStackView!
-    private var countryControlsStack: NSStackView!
     private var countryFieldLabel: NSTextField!
-    private var countrySearchField: NSSearchField!
     private var countrySuggestionLabel: NSTextField!
     private var countryPickerRegionCodes: [String?] = []
     private var phoneFieldLabel: NSTextField!
@@ -441,27 +439,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountProfileHint.maximumNumberOfLines = 2
         accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
 
-        countryPicker = NSPopUpButton(frame: .zero, pullsDown: false)
+        countryPicker = NSComboBox(frame: .zero)
+        countryPicker.placeholderString = "Выберите страну или введите код"
+        countryPicker.completes = false
+        countryPicker.hasVerticalScroller = true
+        countryPicker.numberOfVisibleItems = 8
         countryPicker.target = self
         countryPicker.action = #selector(selectCountry)
         countryPicker.setAccessibilityLabel("Страна и телефонный код")
-        countryPicker.setAccessibilityHelp("Регион macOS — только подсказка. Для местного номера выберите страну явно; полный номер с + принимается отдельно.")
-        countrySearchField = NSSearchField(frame: .zero)
-        countrySearchField.placeholderString = "Страна или код"
-        countrySearchField.setAccessibilityLabel("Поиск страны или телефонного кода")
-        countrySearchField.target = self
-        countrySearchField.action = #selector(searchCountries)
-        countrySearchField.delegate = self
-        countryFieldLabel = NSTextField(labelWithString: "Страна")
+        countryPicker.setAccessibilityHelp("Введите часть названия или телефонного кода, затем выберите страну из списка. Для местного номера выбор обязателен; полный номер можно ввести с плюсом.")
+        countryPicker.delegate = self
+        countryFieldLabel = NSTextField(labelWithString: "Страна:")
         countryFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
         countryFieldLabel.textColor = .labelColor
         countryFieldLabel.setAccessibilityLabel("Страна")
-        countryControlsStack = NSStackView(views: [countrySearchField, countryPicker])
-        countryControlsStack.orientation = .vertical
-        countryControlsStack.alignment = .leading
-        countryControlsStack.distribution = .fill
-        countryControlsStack.spacing = 8
-        countryPickerStack = NSStackView(views: [countryFieldLabel, countryControlsStack])
+        countryPickerStack = NSStackView(views: [countryFieldLabel, countryPicker])
         countryPickerStack.orientation = .vertical
         countryPickerStack.alignment = .leading
         countryPickerStack.distribution = .fill
@@ -474,7 +466,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countrySuggestionLabel.maximumNumberOfLines = 2
         countrySuggestionLabel.isHidden = true
         countrySuggestionLabel.setAccessibilityLabel("Можно выбрать страну для местного номера или ввести полный номер с плюсом")
-        phoneFieldLabel = NSTextField(labelWithString: "Номер телефона")
+        phoneFieldLabel = NSTextField(labelWithString: "Номер телефона:")
         phoneFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
         phoneFieldLabel.textColor = .labelColor
         phoneFieldLabel.alignment = .left
@@ -642,9 +634,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
-            countryControlsStack.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
-            countrySearchField.widthAnchor.constraint(equalTo: countryControlsStack.widthAnchor), countrySearchField.heightAnchor.constraint(equalToConstant: 34),
-            countryPicker.widthAnchor.constraint(equalTo: countryControlsStack.widthAnchor),
+            countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
@@ -7401,16 +7391,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     @objc private func selectCountry() {
         let index = countryPicker.indexOfSelectedItem
-        guard countryPickerRegionCodes.indices.contains(index) else { return }
-        guard let regionCode = countryPickerRegionCodes[index],
+        guard countryPickerRegionCodes.indices.contains(index),
+              let regionCode = countryPickerRegionCodes[index],
               let country = phoneCountries.first(where: { $0.code == regionCode }) else {
+            // Editing the combo box is a search query, not a country choice.
+            // Only a selected catalog row may authorize local-number parsing.
+            guard index >= 0 else { return }
             phoneCountrySelection.clearSelection()
             updateCountrySuggestion()
             setStatus(phoneNumberEntryPrompt())
             updatePhoneEntryActionAvailability()
             return
         }
+        let title = countryPickerText(for: country)
+        guard countryPicker.stringValue == title else { return }
         phoneCountrySelection.select(regionCode: country.code, callingCode: country.callingCodes[0])
+        countryPicker.stringValue = title
         updateCountrySuggestion()
         setStatus(phoneNumberEntryPrompt())
         updatePhoneEntryActionAvailability()
@@ -7422,10 +7418,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func controlTextDidChange(_ notification: Notification) {
-        guard let field = notification.object as? NSTextField else { return }
-        if field === countrySearchField {
+        if let editor = notification.object as? NSText,
+           editor === countryPicker.currentEditor() {
             searchCountries()
-        } else if field === phoneField {
+            return
+        }
+        guard let field = notification.object as? NSTextField else { return }
+        if field === phoneField {
             updatePhoneEntryActionAvailability()
         }
     }
@@ -7459,36 +7458,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {
+        let query = countryPicker.stringValue
         countryPicker.removeAllItems()
         let visibleCountries = CountryPickerSearch.filter(phoneCountries.map {
             CountryPickerSearchEntry(regionCode: $0.code, name: $0.name, callingCode: $0.callingCodes[0], alternateNames: $0.alternateNames)
-        }, query: countrySearchField.stringValue)
-        let visibleRegionCodes = Set(visibleCountries.map(\.regionCode))
-        countryPicker.addItem(withTitle: visibleCountries.isEmpty ? "Подходящих стран нет" : "Выберите страну…")
-        countryPickerRegionCodes = [nil]
-        if let preferredRegion,
-           !visibleRegionCodes.contains(preferredRegion),
-           let selectedCountry = phoneCountries.first(where: { $0.code == preferredRegion }) {
-            countryPicker.addItem(withTitle: "Текущая страна: \(selectedCountry.flag)  \(selectedCountry.name)  +\(selectedCountry.callingCodes[0])")
-            countryPickerRegionCodes.append(selectedCountry.code)
-        }
-        for country in phoneCountries where visibleRegionCodes.contains(country.code) {
-            countryPicker.addItem(withTitle: "\(country.flag)  \(country.name)  +\(country.callingCodes[0])")
-            countryPickerRegionCodes.append(country.code)
-        }
-        if let preferredRegion,
-           let visibleIndex = countryPickerRegionCodes.firstIndex(where: { $0 == preferredRegion }),
-           let country = phoneCountries.first(where: { $0.code == preferredRegion }) {
-            countryPicker.selectItem(at: visibleIndex)
-            if !preserveSelectionWhenFiltered {
-                phoneCountrySelection.select(regionCode: preferredRegion, callingCode: country.callingCodes[0])
-            }
+        }, query: query)
+        if visibleCountries.isEmpty {
+            countryPicker.addItem(withObjectValue: "Подходящих стран нет")
+            countryPickerRegionCodes = [nil]
         } else {
-            countryPicker.selectItem(at: 0)
-            if !preserveSelectionWhenFiltered {
-                phoneCountrySelection.clearSelection()
-            }
+            countryPickerRegionCodes = visibleCountries.map(\.regionCode)
+            countryPicker.addItems(withObjectValues: visibleCountries.compactMap { entry in
+                phoneCountries.first(where: { $0.code == entry.regionCode }).map(countryPickerText(for:))
+            })
         }
+        if preserveSelectionWhenFiltered {
+            // Keep the typed filter visible; arbitrary text never becomes a region.
+            countryPicker.stringValue = query
+        } else if let preferredRegion,
+                  let visibleIndex = countryPickerRegionCodes.firstIndex(where: { $0 == preferredRegion }),
+                  let country = phoneCountries.first(where: { $0.code == preferredRegion }) {
+            countryPicker.selectItem(at: visibleIndex)
+            countryPicker.stringValue = countryPickerText(for: country)
+            phoneCountrySelection.select(regionCode: preferredRegion, callingCode: country.callingCodes[0])
+        } else {
+            countryPicker.stringValue = query
+            phoneCountrySelection.clearSelection()
+        }
+    }
+
+    private func countryPickerText(for country: PhoneCountry) -> String {
+        "\(country.flag)  \(country.name)  +\(country.callingCodes[0])"
     }
 
     @objc private func beginQRLogin() {
