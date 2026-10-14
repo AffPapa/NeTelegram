@@ -1065,3 +1065,9 @@
 
 - Published the bilingual APP23 devlog entry for source `fc4485b174b61fb14a085fea67d41a2b2606ef2e` and exact-source macOS CI `38526833332`. Site source commit `6f5abe1d092e0a49abe64d83bf95bafea72563f3`; saved version `appgver_4f6aecf4f2c08191a8909f44ff72f890`; public deployment `appgdep_6acf2d5e5d88819183e2040eba051b4c` succeeded. Anonymous Playwright confirmed the entry and source/CI links on `/devlog/`, and confirmed `/downloads/` still has no app download. The 8-route validator passed. No Swift tests were rerun because app source did not change; the existing exact-source 171/171 and CI receipts remain applicable.
 - Workflow speed rule: Swift changes get one focused regression while debugging, then one final serial suite and one exact-source CI; metadata-only changes use checkpoint/metadata validation; rebuild the one canonical Dev.app only after its old process exits and its source fingerprint changes; rebuild pinned TDLib only when its pin/build inputs change. Real login, 20-account load, signing/notarization, and Gatekeeper remain separate acceptance gates.
+
+
+## 2026-10-14 — Current-source AppKit executable compile
+
+- The current app source `fc4485b174b61fb14a085fea67d41a2b2606ef2e` compiled as SwiftPM product `NeTelegram` in 5.01s using the existing canonical development build scratch cache. This fills the gap left by the Core-only test CI without rebuilding TDLib or replacing/opening a second Dev.app.
+- Build passed with SwiftPM cache-permission warnings and the existing macOS 11 deprecation warning for `kSecUseAuthenticationUIFail`. This is compile evidence only. The single canonical Dev.app still runs source `87c0c06560ac0986f7e004d6578b1e3b034c9244`; exact-source native bundle/UI smoke waits for its normal exit.

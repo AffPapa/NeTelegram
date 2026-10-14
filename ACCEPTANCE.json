@@ -14,8 +14,8 @@
       "scope": "Exact-source macOS CI passed full serial Swift suite 171/171."
     },
     "native_build": {
-      "status": "pending_running_canonical_app",
-      "scope": "No bundle rebuild or launch: /private/tmp/NeTelegram-Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 with secure API hash configuration dialog open. Current source fc4485b174b61fb14a085fea67d41a2b2606ef2e awaits safe in-place rebuild after normal quit and process absence."
+      "status": "swift_product_compile_pass_bundle_pending",
+      "scope": "No bundle rebuild or launch: /private/tmp/NeTelegram-Dev.app remains running from 87c0c06560ac0986f7e004d6578b1e3b034c9244 with secure API hash configuration dialog open. Current source fc4485b174b61fb14a085fea67d41a2b2606ef2e awaits safe in-place rebuild after normal quit and process absence. Current-source SwiftPM executable compilation passed in 5.01s using the canonical build scratch cache; canonical Dev.app remains on the previous source because its process is still running."
     },
     "local_dev_app": {
       "path": "/private/tmp/NeTelegram-Dev.app",
@@ -87,6 +87,15 @@
       "test": "secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI",
       "result": "PASS 1/1",
       "scope": "Asserts the query carries explicit fail-closed Security UI mode. No real auth-required keychain item was queried."
+    },
+    "appkit_product_compile": {
+      "status": "PASS",
+      "app_source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "product": "NeTelegram executable",
+      "elapsed_seconds": 5.01,
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-appkit-module-cache swift build --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-cli-work/.build/canonical-dev-build/swift --product NeTelegram --disable-sandbox",
+      "warnings": "Build succeeded with an existing macOS 11 deprecation warning for kSecUseAuthenticationUIFail and SwiftPM user-cache access warnings.",
+      "scope": "Compiles current AppKit executable source. It does not replace or launch canonical Dev.app, inspect the auth field, or prove UI/runtime/account behavior."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",

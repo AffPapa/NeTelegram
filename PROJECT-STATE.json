@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "APP23 local-profile origin explanation and fail-closed Keychain query guard implemented at fc4485b174b61fb14a085fea67d41a2b2606ef2e; local serial suite 171/171 and exact-source macOS CI passed. Canonical Dev.app remains open on secure API hash configuration from 87c0c06560ac0986f7e004d6578b1e3b034c9244; rebuild pending normal quit and process-absence confirmation.",
+  "phase": "APP23 local-profile origin explanation and fail-closed Keychain query guard implemented at fc4485b174b61fb14a085fea67d41a2b2606ef2e; local serial suite 171/171 and exact-source macOS CI passed. Current source also compiled the NeTelegram SwiftPM executable successfully in 5.01s; this does not rebuild the canonical bundle. Canonical Dev.app remains open on secure API hash configuration from 87c0c06560ac0986f7e004d6578b1e3b034c9244; rebuild pending normal quit and process-absence confirmation.",
   "verified_at": "2026-10-14",
   "ci_efficiency_change": {
     "workflow_path": ".github/workflows/ci.yml",
@@ -479,7 +479,15 @@
     "source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
     "running_bundle_source_commit": "87c0c06560ac0986f7e004d6578b1e3b034c9244",
     "status": "blocked_running_canonical_app",
-    "reason": "Canonical NeTelegram Dev.app is still running with the NSSecureTextField API hash configuration dialog open. Do not replace or relaunch it. After its normal exit and confirmed process absence, rebuild this same bundle in place once from the pending source and smoke the account-selection status copy."
+    "reason": "Canonical NeTelegram Dev.app is still running with the NSSecureTextField API hash configuration dialog open. Do not replace or relaunch it. After its normal exit and confirmed process absence, rebuild this same bundle in place once from the pending source and smoke the account-selection status copy.",
+    "swift_product_compile": {
+      "result": "PASS",
+      "product": "NeTelegram",
+      "source_commit": "fc4485b174b61fb14a085fea67d41a2b2606ef2e",
+      "elapsed_seconds": 5.01,
+      "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-appkit-module-cache swift build --package-path /private/tmp/netelegram-cli-work --scratch-path /private/tmp/netelegram-cli-work/.build/canonical-dev-build/swift --product NeTelegram --disable-sandbox",
+      "limitations": "Executable compiled only; no Dev.app bundle replacement, launch, native window inspection, or account interaction. Compiler emitted the existing macOS 11 deprecation warning for kSecUseAuthenticationUIFail; build succeeded."
+    }
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
