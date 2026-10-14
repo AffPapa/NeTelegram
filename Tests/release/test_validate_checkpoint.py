@@ -54,7 +54,38 @@ class ValidateCheckpointTests(unittest.TestCase):
         acceptance = copy.deepcopy(self.acceptance)
         acceptance["current_evidence"]["hosted_ci"]["app_source_commit"] = "older-source"
 
-        with self.assertRaisesRegex(ValueError, "successful exact-source run"):
+        with self.assertRaisesRegex(ValueError, "missing, stale, or an undiagnosed failure"):
+            validate_records(project, acceptance)
+
+    def test_exact_source_timeout_can_be_checkpointed_without_calling_it_a_pass(self):
+        project = copy.deepcopy(self.project)
+        acceptance = copy.deepcopy(self.acceptance)
+        current = "new-app-source"
+        running = project["local_development_candidate"]["application_source_commit"]
+        project["product"]["app_source_commit"] = current
+        project["latest_acceptance_slice"]["source_commit"] = current
+        project["pending_native_candidate"] = {
+            "source_commit": current,
+            "running_bundle_source_commit": running,
+            "status": "blocked_running_canonical_app",
+            "reason": "The canonical development app is still running.",
+        }
+        acceptance["current_evidence"]["app_source_commit"] = current
+        acceptance["current_evidence"]["hosted_ci"] = {
+            "run_id": 123,
+            "status": "failure",
+            "workflow_commit": current,
+            "app_source_commit": current,
+            "diagnosis": "The exact-source full-suite step timed out; local serial suite passed.",
+        }
+        acceptance["current_evidence"]["local_suite"] = "PASS 166/166 exact-source local serial suite."
+        acceptance["latest_acceptance_slice"]["source_commit"] = current
+        acceptance["last_verification"]["app_source_commit"] = current
+
+        validate_records(project, acceptance)
+
+        acceptance["current_evidence"]["hosted_ci"].pop("diagnosis")
+        with self.assertRaisesRegex(ValueError, "undiagnosed failure"):
             validate_records(project, acceptance)
 
     def test_site_deployment_identity_must_match_both_checkpoints(self):

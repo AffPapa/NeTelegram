@@ -880,3 +880,12 @@
 - Updated the shared next action to AppKit restore-boundary coverage; no app source, build, or Site deployment changed.
 
 - Resume-routing correction: canonical checkout remained `/private/tmp/netelegram-cli-work`, branch `main`; before this metadata snapshot, local HEAD and `origin/main` both matched `78650357b4fc5eefae1211a5758c90c685b92b54`, working tree clean. App-source identity remains `e7cc4b3be3d51d199dd16c3e0991feb001eb905c`; this checkpoint update does not change Swift code or Dev.app.
+
+## 2026-10-14 — APP01 startup presentation coordinator and bounded CI diagnosis
+
+- App-source commit `3f11a0e992b40ac4e905a177605008940f15cf95` moves selected-account intent and the startup presentation decision into `AccountStartupPresentationCoordinator`, used by AppDelegate and the regression test. The duplicate pure policy was removed. This is a narrow production seam; it does not mock TDLib or all of AppDelegate's async profile-start registry.
+- Focused regression passed 1/1. Full local serial suite passed 166/166 in 0.441s on arm64e / Xcode 27 / Swift 6.4. `Scripts/validate_checkpoint.py` and `git diff --check` passed before this checkpoint update.
+- Exact-source [macOS CI run 38510759384](https://github.com/AffPapa/NeTelegram/actions/runs/38510759384): filtered runner probe passed; full serial suite step timed out after its 2-minute cap. GitHub annotation included a macOS arm64 capacity notice. This is recorded as a timeout/failure; no hosted PASS is claimed. Raw job logs were not accessible through the authenticated CLI route. The previous exact-source run 38509465812 passed 166/166 on source `4dcddcc`, not this source.
+- The single canonical `/private/tmp/NeTelegram-Dev.app` remains at source `4dcddcc`. Desktop inventory reported NeTelegram Dev running; no rebuild or second bundle was made. One named AppKit account-selection smoke remains pending after the canonical process exits.
+- No Sites deployment, app release, login credentials, or Telegram profiles were used. Real account coverage and all-20 resource certification remain unverified.
+- Next: diagnose the full-suite runner/test-runner timeout before any retry; preserve the single canonical Dev.app identity, then rebuild that path once and run one named selection smoke. Current full implementation/release gates remain open.

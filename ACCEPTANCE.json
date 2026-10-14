@@ -1,17 +1,18 @@
 {
   "schema_version": 2,
-  "status": "APP01 selection-race fix passed exact-source local and hosted synthetic suite 166/166 on 4dcddcc; canonical accountless Dev.app smoke matches. Site v173 is public. Real login, 20 authorized runtimes, Developer ID/notarization and Telegram compatibility remain open.",
+  "status": "APP01 startup-presentation coordinator implemented on exact app source 3f11a0e. Focused and full local serial suite pass 166/166. Hosted exact-source run 38510759384 failed because the full-suite step timed out after 2 minutes; no hosted PASS claimed. Canonical Dev.app remains on 4dcddcc and has not been rebuilt or smoked for this source. Real login, 20 authorized runtime measurements, Developer ID/notarization, and Telegram compatibility remain open.",
   "current_evidence": {
-    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "local_suite": "PASS 166/166 exact-source serial Swift suite on Xcode 27 / Swift 6.4 / arm64e; focused selection race regression PASS 1/1.",
-    "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1; prevents older background startup completion from stealing presentation after a newer user account selection. Synthetic presentation-policy test, not live AppKit switching.",
+    "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+    "local_suite": "PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
+    "focused_test": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1 through the production AccountStartupPresentationCoordinator used by AppDelegate. This tests selection policy, not live AppKit switching.",
     "hosted_ci": {
-      "run_id": 38509465812,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38509465812",
-      "workflow_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "scope": "Exact-source macOS CI passed filtered probe 1/1 and complete serial Swift suite 166/166. A prior push-triggered run 38509423637 was cancelled; no second dispatch is needed."
+      "run_id": 38510759384,
+      "status": "failure",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38510759384",
+      "workflow_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+      "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+      "scope": "Runner probe passed; full serial suite step timed out after its 2-minute limit. GitHub annotation included a macOS arm64 capacity notice. This is not a test assertion failure; exact-source local full suite passed 166/166. Raw Actions logs were unavailable through the authenticated CLI route.",
+      "diagnosis": "The hosted full-suite step exceeded its workflow timeout; do not retry unchanged. Diagnose the runner/test-runner stall before another hosted run."
     },
     "native_build": {
       "status": "success_local",
@@ -515,13 +516,13 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "local_command": "focused Swift regression plus swift test --no-parallel",
-    "local_result": "PASS: focused selection-race regression 1/1; full serial suite 166/166 on arm64e, Xcode 27 / Swift 6.4.",
-    "hosted_ci": "Exact-source GitHub Actions run 38509465812 passed filtered probe and all 166 tests. Earlier push-triggered run 38509423637 was cancelled.",
-    "native_dev_app_smoke": "One canonical app at exact source 4dcddcc built in 5.29s; ad-hoc signature verified; CUA confirmed matching title and accountless sign-in. No credentials.",
-    "scope": "Synthetic policy and accountless UI only. No live AppKit account switching, real login, 20 authorized runtimes, Developer ID signing, or notarization."
+    "source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+    "app_source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+    "local_command": "swift test --filter lateBackgroundStartupCannotStealNewerAccountSelection; swift test --no-parallel",
+    "local_result": "PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
+    "hosted_ci": "Runner probe passed; full serial suite step timed out after its 2-minute limit. GitHub annotation included a macOS arm64 capacity notice. This is not a test assertion failure; exact-source local full suite passed 166/166. Raw Actions logs were unavailable through the authenticated CLI route. Run URL: https://github.com/AffPapa/NeTelegram/actions/runs/38510759384",
+    "native_dev_app_smoke": "Not run for this source. Canonical bundle remains at 4dcddcc; desktop inventory reported it running, so no second bundle was built or launched.",
+    "scope": "Core policy regression and full local synthetic suite only. No fresh Dev.app launch, live account switch, real login, 20 authorized sessions, Developer ID signing, notarization, or resource matrix."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -570,7 +571,7 @@
     "result": "GitHub source publication succeeded using existing Git transport. Do not create/login with replacement credentials unless a specific authorized operation is blocked.",
     "secrets": "No credential values are stored in checkpoints."
   },
-  "next_action": "APP01 remains partial. The account-selection race now has a focused policy regression, but no authorized profiles were used. Next, extract/inject the AppKit restore and presentation boundary and test one stalled profile, one isolated failure/retry, and selection stability at that production boundary. Run focused and full hosted tests once for the resulting SHA; use the existing canonical Dev.app only if visible behavior changes. Real Telegram login remains deferred; keep all runtime/resource claims synthetic until real accounts and same-Mac measurements are available.",
+  "next_action": "APP01 remains partial. Source 3f11a0e centralizes account startup presentation intent; local focused test and full serial suite pass, but exact-source macOS CI 38510759384 timed out in the full-suite step. Do not retry unchanged. Diagnose the hosted runner/test-runner timeout first. The canonical Dev.app is still at 4dcddcc and was reported running; rebuild only that same bundle path after it exits, then perform one named account-selection smoke. No real Telegram login, 20 authorized runtimes, Developer ID/notarization, or compatibility gates are complete.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "checkpoint_commit": "7104a87c909324a2e42a0ee080ef1523f4d1512f",
@@ -628,12 +629,12 @@
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP01",
-    "source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-    "local_focused_tests": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1; exact-source local serial Swift suite passed 166/166 on Xcode 27 / Swift 6.4.",
-    "hosted_serial_suite": "GitHub Actions macOS CI run 38509465812 passed the filtered probe and full serial suite 166/166 for exact app source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d. The automatic push-triggered run 38509423637 was cancelled; the single successful workflow_dispatch run is the accepted hosted evidence.",
-    "native_bundle_workflow": "One canonical local arm64 Dev.app built from exact source in 5.29s; ad-hoc signature verified. CUA showed matching app title and accountless login. Executable SHA-256 bc9e782f4d512a6514290912b4770704a29059434ef550c37a2da99a5d94d96d; TDJSON SHA-256 9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1.",
-    "implementation": "When a profile is selected during background startup, a different profile completing first no longer takes the window; the latest explicit selection controls presentation while other runtimes remain open.",
-    "remaining": "Focused regression tests a shared presentation policy, not live AppKit account switching. No real profile login, 20 authorized runtimes, or resource matrix. APP01 remains partial."
+    "id": "APP01 startup presentation coordinator",
+    "source_commit": "3f11a0e992b40ac4e905a177605008940f15cf95",
+    "local_focused_tests": "lateBackgroundStartupCannotStealNewerAccountSelection passed 1/1 through the production AccountStartupPresentationCoordinator used by AppDelegate. This tests selection policy, not live AppKit switching. PASS 166/166 exact-source local serial Swift suite in 0.441s on arm64e / Xcode 27 / Swift 6.4; focused coordinator regression PASS 1/1.",
+    "hosted_serial_suite": "GitHub Actions run 38510759384 for exact source 3f11a0e992b40ac4e905a177605008940f15cf95: filtered runner probe passed; full suite step timed out at 2 minutes. This is recorded as failure/timeout, not PASS. GitHub annotation noted macOS arm64 runner capacity constraints.",
+    "native_bundle_workflow": "Not run. The canonical /private/tmp/NeTelegram-Dev.app remains at source 4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d; desktop inventory reported NeTelegram Dev running, so no replacement bundle or second app identity was launched.",
+    "implementation": "Extracted account selection intent and startup presentation decision into one MainActor Core coordinator used by AppDelegate and the focused regression. Removed the duplicate pure policy so there is one production source of truth.",
+    "remaining": "No new Dev.app smoke, live account switch, real login, 20 authorized runtimes, or resource measurements. Hosted full-suite timeout remains unresolved. APP01 is partial."
   }
 }
