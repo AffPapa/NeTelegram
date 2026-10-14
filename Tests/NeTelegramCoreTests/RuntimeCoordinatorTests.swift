@@ -1473,6 +1473,21 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(await coordinator.state(for: account) == .closing)
 }
 
+@Test func asyncCallbackRouteOwnershipChangesAfterRuntimeReplacement() async throws {
+    let coordinator = RuntimeCoordinator()
+    let account = AccountUUID()
+    let oldRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(1), client: ClientID(193))
+    try await coordinator.registerBeforeFirstRequest(oldRoute)
+    #expect(await coordinator.isCurrent(oldRoute))
+
+    #expect(await coordinator.applyAuthorizationState("authorizationStateClosed", telegramUserID: nil, from: oldRoute))
+    let newRoute = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(194))
+    try await coordinator.registerBeforeFirstRequest(newRoute)
+
+    #expect(!(await coordinator.isCurrent(oldRoute)))
+    #expect(await coordinator.isCurrent(newRoute))
+}
+
 @Test func rejectedFirstRequestRemovesOnlyItsUninitializedRoute() async throws {
     let coordinator = RuntimeCoordinator()
     let account = AccountUUID()

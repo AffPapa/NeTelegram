@@ -2426,6 +2426,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, @pre
             let previousError = target.lastTDLibError
             let previousIdentityPersistenceFailure = target.identityPersistenceFailed
             await target.consume(object)
+            // consume may suspend while saving a verified identity. A close or
+            // replacement can happen during that await, so revalidate both the
+            // coordinator route and AppDelegate ownership before applying any
+            // UI, notification, or account-state side effects from this event.
+            guard target.route == update.route,
+                  runtimesByClient[update.route.client.value] === target,
+                  await runtimeCoordinator.isCurrent(update.route) else { return }
             if previousTelegramUserID != nil,
                target.telegramUserID == nil,
                !target.isLogoutRequested {

@@ -118,6 +118,13 @@ public actor RuntimeCoordinator {
 
     public func route(for client: ClientID) -> RuntimeRoute? { routes[client] }
 
+    /// Confirms that an asynchronous callback still belongs to the active
+    /// client/account/generation after it suspends. Callers must not use a
+    /// route checked before an `await` as proof that it is still current.
+    public func isCurrent(_ route: RuntimeRoute) -> Bool {
+        routes[route.client] == route
+    }
+
     /// Returns a fresh generation for each client opened in this process.
     public func nextGeneration(for account: AccountUUID) -> RuntimeGeneration {
         let next = (generationCounters[account] ?? 0) &+ 1
