@@ -480,7 +480,7 @@
       "method": "GitHub readback/download",
       "required_for": "all public releases",
       "status": "not_run",
-      "evidence": null
+      "evidence": "No real app release has been published. Validator source a20cce0 now supports sequential append-only asset and Site-delivery receipts bound to the same immutable manifest; the delivery receipt must reference the exact pre-Site asset receipt bytes. The targeted release validator suite passed 19/19 locally and exact-source metadata CI 38556741758 passed. This proves the receipt protocol tests only; GitHub asset readback and immutable-release enforcement remain not_run."
     },
     {
       "id": "REL06",

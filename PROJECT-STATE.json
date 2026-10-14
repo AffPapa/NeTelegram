@@ -425,7 +425,8 @@
     "validator": "Scripts/validate_release.py",
     "commands": [
       "python3 Scripts/validate_release.py candidate <manifest.json> --assets-dir <frozen-assets-dir>",
-      "python3 Scripts/validate_release.py receipt <manifest.json> <receipt.json>"
+      "python3 Scripts/validate_release.py receipt <manifest.json> <assets-receipt.json> --stage assets",
+      "python3 Scripts/validate_release.py receipt <manifest.json> <delivery-receipt.json> --stage delivery --asset-receipt <assets-receipt.json>"
     ],
     "local_tests": "36/36 release metadata tests passed; duplicate artifact kinds fail closed.",
     "scope": "Release metadata guard only; no app source change, native rebuild, real signing/notarization, upload, or Site deployment.",
@@ -742,5 +743,18 @@
       "Telegram/SourceFiles/history/view/history_view_list_widget.cpp",
       "Telegram/SourceFiles/history/view/controls/history_view_compose_controls.cpp"
     ]
+  },
+  "latest_receipt_pipeline_change": {
+    "date": "2026-10-14",
+    "source_commit": "a20cce0103006bedcd455499195998c127675dea",
+    "hosted_metadata_ci": {
+      "run_id": 38556741758,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38556741758",
+      "workflow_commit": "a20cce0103006bedcd455499195998c127675dea"
+    },
+    "local_targeted_tests": "Tests.release.test_validate_release: 19/19 passed.",
+    "design": "Append-only stage-1 asset receipt verifies public GitHub bytes and Gatekeeper/install checks before Sites deployment. Stage-2 delivery receipt verifies the deployed Site and references the exact stage-1 receipt bytes plus manifest hash. The immutable release manifest remains unchanged.",
+    "release_state": "Validator workflow only; no real release assets, GitHub release, Site deployment, or public download was created."
   }
 }
