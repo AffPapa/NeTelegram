@@ -51,7 +51,8 @@ validation and a deliberate continue action. Its UIKit implementation, assets,
 and styling are not copied into this native AppKit client.
 
 The exact-source macOS test workflow and pinned TDLib/Dev.app assembly passed
-for the vertical-rhythm and product-identity change. A native visual PASS is
+for source `78763f3`. The generated development bundle now uses `NeTelegram Dev`
+for both `CFBundleName` and `CFBundleDisplayName`, and the sign-in mark is N. A native visual PASS is
 still pending: the one canonical local Dev.app is running an older build with
 the protected API-hash setup dialog open. The screenshot tagged `dev 5f414650`
 is historical and is not evidence for the current source. The screenshot's

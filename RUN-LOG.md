@@ -1688,3 +1688,12 @@
 - Verification: exact-source tests [run 38614052499](https://github.com/AffPapa/NeTelegram/actions/runs/38614052499) and pinned native assembly [run 38614052536](https://github.com/AffPapa/NeTelegram/actions/runs/38614052536) passed. Local Swift invocation was blocked by sandbox `sandbox_apply: Operation not permitted`; not a test failure.
 - Visual status: no current-source local screenshot. The single canonical Dev.app still runs source `291cd0a` with its protected API-hash setup dialog open; its value was not read and the app was not replaced. Screenshot `dev 5f414650` is historical.
 - Next action: owner saves or cancels the protected dialog, quits that same app normally, then rebuild one canonical bundle and inspect the real resized screen. No release or Site download change.
+
+## 2026-10-15 — AUTH-LAYOUT-RHYTHM-06
+
+- Source `78763f3165bef89e98584b6ca6f43c84ebdd3258` aligns the sign-in N mark, UI/accessibility copy and generated development bundle name with the latest user instruction: NeTelegram. Dev bundle uses `CFBundleName` and `CFBundleDisplayName` `NeTelegram Dev`.
+- Apple HIG layout change keeps the form grouped as the window grows; no custom window chrome or fixed palette. Non-affiliation note is 13 pt with semantic secondary-label color.
+- Focused Python regressions passed 3/3. Exact-source CI [38615081039](https://github.com/AffPapa/NeTelegram/actions/runs/38615081039) and pinned native workflow [38615081338](https://github.com/AffPapa/NeTelegram/actions/runs/38615081338) passed. Metadata validation [38614774693](https://github.com/AffPapa/NeTelegram/actions/runs/38614774693) passed.
+- No current-source local screenshot: the only canonical Dev.app is still old source 291cd0a, with the protected API-hash dialog open. Its field was not read and its app was not replaced. Image `dev 5f414650` is historical.
+- Public title compatibility remains unresolved under Telegram API Terms §2.3; no public release or Site download was created. Real login, 20-runtime, signing/notarization and other compatibility gates remain open.
+- Next: owner saves or cancels the protected dialog and quits the same app; rebuild the single canonical bundle and inspect default/resized visual states.
