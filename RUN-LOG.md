@@ -872,3 +872,9 @@
 - Checkpoint now separates app source, Site source/version, hosted suite, local Dev.app and publication evidence. Real login remains deferred; actual SecItem stall, 20 authorized accounts, distribution, updater and Telegram compatibility remain unverified. Next is one APP01 production-path slice; no unchanged tests/builds should be repeated.
 
 - Checkpoint commit `2ff390a2324ab611d0a0d98dcbf606bcd1afaa2b` passed exact-commit metadata validation [38508667707](https://github.com/AffPapa/NeTelegram/actions/runs/38508667707). No additional app tests or build were run for this documentation receipt.
+
+### 2026-10-14 — APP01 exact-source evidence reconciliation
+
+- Acceptance now records that `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` passed within exact-source macOS CI [38508018017](https://github.com/AffPapa/NeTelegram/actions/runs/38508018017) for app source `e7cc4b3be3d51d199dd16c3e0991feb001eb905c`; the complete suite passed 165/165. The test uses the production `enqueueStartupProfiles` helper, bounded startup scheduler and RuntimeCoordinator with synthetic identities.
+- APP01 remains partial: this does not run the AppKit restore lifecycle, real TDLib sessions, twenty authorized accounts, or same-Mac resource measurements. The test was not rerun because its exact source and CI result are unchanged.
+- Updated the shared next action to AppKit restore-boundary coverage; no app source, build, or Site deployment changed.
