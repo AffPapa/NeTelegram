@@ -379,18 +379,30 @@ public final class TDLibUpdatePipeline: @unchecked Sendable {
     /// Call only after the receive worker has exited. This closes the FIFO,
     /// drains accepted updates in order, and waits until the reducer callback
     /// for the final update has completed.
-    public func finishInputAndDrain() {
+    private func beginDrainIfStarted() -> Bool? {
         lock.lock()
         guard started else {
             lock.unlock()
-            return
+            return nil
         }
         let shouldClose = !drainRequested
         drainRequested = true
         lock.unlock()
+        return shouldClose
+    }
 
+    public func finishInputAndDrain() async {
+        guard let shouldClose = beginDrainIfStarted() else { return }
         if shouldClose { buffer.close() }
-        reducerExited.wait()
+        // DispatchGroup.wait() is blocking work. Never occupy a Swift
+        // cooperative executor thread while waiting for async reducer
+        // callbacks, since those callbacks must run to release the group.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            DispatchQueue.global(qos: .userInitiated).async { [reducerExited] in
+                reducerExited.wait()
+                continuation.resume()
+            }
+        }
     }
 }
 

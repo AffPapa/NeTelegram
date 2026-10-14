@@ -2340,8 +2340,8 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(pipeline.buffer.count == 2, "The stalled callback and the one already-received final update remain accounted for")
     #expect(pipeline.buffer.admit(Data("{\"@client_id\":1,\"sequence\":3}".utf8)) == .stopped)
 
-    let drain = Task.detached {
-        pipeline.finishInputAndDrain()
+    let drain = Task {
+        await pipeline.finishInputAndDrain()
         finishReturned.set(true)
     }
     let drainDeadline = clock.now.advanced(by: .seconds(2))
@@ -3703,14 +3703,27 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
     #expect(pipeline.maxConcurrentDecodes == 2)
 }
 
+private final class DeterministicPhotoPreviewCache: PhotoPreviewCache {
+    private var values: [String: Data] = [:]
+
+    func data(forKey key: String) -> Data? { values[key] }
+    func insert(_ data: Data, forKey key: String, cost: Int) { values[key] = data }
+    func remove(forKey key: String) { values.removeValue(forKey: key) }
+}
+
 @Test func photoPipelinePurgesDeletedMessagePreviewWithoutEvictingOtherMessages() async {
     let account = AccountUUID()
     let decoderCalls = LockedTestValue(0)
     let completions = LockedTestValue(0)
-    let pipeline = PhotoPipeline(maxConcurrentDecodes: 1, maxQueuedDecodes: 2, decoder: { _, _ in
-        decoderCalls.set(decoderCalls.get() + 1)
-        return Data([0x31])
-    })
+    let pipeline = PhotoPipeline(
+        maxConcurrentDecodes: 1,
+        maxQueuedDecodes: 2,
+        cache: DeterministicPhotoPreviewCache(),
+        decoder: { _, _ in
+            decoderCalls.set(decoderCalls.get() + 1)
+            return Data([0x31])
+        }
+    )
     let url = URL(fileURLWithPath: "/unused-by-injected-decoder")
     let completion: @Sendable (PhotoPreviewToken, Data?) -> Void = { _, data in
         if data != nil { completions.set(completions.get() + 1) }
@@ -3718,16 +3731,19 @@ private func mainConversationFor(_ account: AccountUUID) -> ConversationKey {
 
     _ = pipeline.requestPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
     #expect(await waitForCount(completions, atLeast: 1, timeout: .seconds(2)))
+    #expect(decoderCalls.get() == 1, "The first message must be decoded once")
     _ = pipeline.requestPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
     #expect(await waitForCount(completions, atLeast: 2, timeout: .seconds(2)))
+    #expect(decoderCalls.get() == 2, "A different chat must have an independent preview cache entry")
+    #expect(pipeline.hasCachedPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64))
+    #expect(pipeline.hasCachedPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64))
 
     pipeline.removeCachedPreviews(for: account, chatID: 7, messageIDs: [10])
+    #expect(!pipeline.hasCachedPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64))
+    #expect(pipeline.hasCachedPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64), "Deleting chat 7 must preserve chat 8's cache entry")
     _ = pipeline.requestPreview(account: account, chatID: 7, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
     #expect(await waitForCount(completions, atLeast: 3, timeout: .seconds(2)))
-    _ = pipeline.requestPreview(account: account, chatID: 8, messageID: 10, fileID: 1, fileURL: url, maxPixelSize: 64, completion: completion)
-    #expect(await waitForCount(completions, atLeast: 4, timeout: .seconds(2)))
-
-    #expect(decoderCalls.get() == 3)
+    #expect(decoderCalls.get() == 3, "Deleting one chat's message must re-decode only that chat's preview")
 }
 
 @Test func photoPipelineDeletionPreventsLateDecodeFromRestoringExpiredPreview() async {

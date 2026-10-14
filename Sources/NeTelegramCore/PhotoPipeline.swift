@@ -13,12 +13,38 @@ private struct PhotoMessageKey: Hashable {
     let messageID: Int64
 }
 
+protocol PhotoPreviewCache: AnyObject {
+    func data(forKey key: String) -> Data?
+    func insert(_ data: Data, forKey key: String, cost: Int)
+    func remove(forKey key: String)
+}
+
+private final class SystemPhotoPreviewCache: PhotoPreviewCache {
+    private let storage = NSCache<NSString, NSData>()
+
+    init(costLimit: Int) {
+        storage.totalCostLimit = max(1, costLimit)
+    }
+
+    func data(forKey key: String) -> Data? {
+        storage.object(forKey: key as NSString).map(Data.init(referencing:))
+    }
+
+    func insert(_ data: Data, forKey key: String, cost: Int) {
+        storage.setObject(data as NSData, forKey: key as NSString, cost: cost)
+    }
+
+    func remove(forKey key: String) {
+        storage.removeObject(forKey: key as NSString)
+    }
+}
+
 /// Bounded, account-namespaced ImageIO previews. Download policy stays with
 /// the visible conversation UI; this pipeline only decodes explicitly requested
 /// local files and never walks TDLib's account directories.
 public final class PhotoPipeline: @unchecked Sendable {
     private let queue: OperationQueue
-    private let cache = NSCache<NSString, NSData>()
+    private let cache: any PhotoPreviewCache
     private let lock = NSLock()
     private let decoder: @Sendable (URL, Int) -> Data?
     private var operations: [UUID: Operation] = [:]
@@ -50,6 +76,7 @@ public final class PhotoPipeline: @unchecked Sendable {
         maxConcurrentDecodes: Int,
         maxQueuedDecodes: Int,
         cacheCostLimit: Int = 128 * 1024 * 1024,
+        cache: (any PhotoPreviewCache)? = nil,
         decoder: @escaping @Sendable (URL, Int) -> Data?
     ) {
         self.maxConcurrentDecodes = max(1, maxConcurrentDecodes)
@@ -58,11 +85,11 @@ public final class PhotoPipeline: @unchecked Sendable {
         let reservedForOtherAccounts = self.maxQueuedDecodes == 0 ? 0 : max(1, self.maxQueuedDecodes / 2)
         self.maxOutstandingDecodesPerAccount = max(1, totalDecodeLimit - reservedForOtherAccounts)
         self.decoder = decoder
+        self.cache = cache ?? SystemPhotoPreviewCache(costLimit: cacheCostLimit)
         queue = OperationQueue()
         queue.name = "NeTelegram.PhotoDecode"
         queue.qualityOfService = .userInitiated
         queue.maxConcurrentOperationCount = self.maxConcurrentDecodes
-        cache.totalCostLimit = max(1, cacheCostLimit)
     }
 
     @discardableResult
@@ -80,7 +107,7 @@ public final class PhotoPipeline: @unchecked Sendable {
         let cacheKey = key(account: account, chatID: chatID, messageID: messageID, fileID: fileID, fileURL: fileURL, maxPixelSize: pixelSize)
         let messageKey = PhotoMessageKey(account: account, chatID: chatID, messageID: messageID)
         lock.lock()
-        let cachedData = cache.object(forKey: cacheKey as NSString).map(Data.init(referencing:))
+        let cachedData = cache.data(forKey: cacheKey)
         if cachedData == nil,
            (queuedDecodeCount >= maxConcurrentDecodes + maxQueuedDecodes
                 || queuedDecodeCountByAccount[account, default: 0] >= maxOutstandingDecodesPerAccount) {
@@ -111,11 +138,11 @@ public final class PhotoPipeline: @unchecked Sendable {
                 if self.generationByAccount[account, default: 0] == requestGeneration,
                    self.generationByMessage[messageKey, default: 0] == requestMessageGeneration,
                    !operation.isCancelled {
-                    self.cache.setObject(data as NSData, forKey: cacheKey as NSString, cost: data.count)
+                    self.cache.insert(data, forKey: cacheKey, cost: data.count)
                     self.keysByAccount[account, default: []].insert(cacheKey)
                     if let keys = self.keysByAccount[account], keys.count > 2048 {
                         for staleKey in keys.prefix(keys.count - 2048) {
-                            self.cache.removeObject(forKey: staleKey as NSString)
+                            self.cache.remove(forKey: staleKey)
                             self.keysByAccount[account]?.remove(staleKey)
                         }
                     }
@@ -200,7 +227,7 @@ public final class PhotoPipeline: @unchecked Sendable {
         lock.lock()
         generationByAccount[account, default: 0] &+= 1
         let keys = keysByAccount.removeValue(forKey: account) ?? []
-        for key in keys { cache.removeObject(forKey: key as NSString) }
+        for key in keys { cache.remove(forKey: key) }
         lock.unlock()
     }
 
@@ -216,7 +243,7 @@ public final class PhotoPipeline: @unchecked Sendable {
         let prefixes = messageIDs.map { "\(account.id.uuidString.lowercased())/\(chatID)/\($0)/" }
         let keys = keysByAccount[account] ?? []
         for key in keys where prefixes.contains(where: { key.hasPrefix($0) }) {
-            cache.removeObject(forKey: key as NSString)
+            cache.remove(forKey: key)
             keysByAccount[account]?.remove(key)
         }
         if keysByAccount[account]?.isEmpty == true { keysByAccount.removeValue(forKey: account) }
@@ -238,6 +265,27 @@ public final class PhotoPipeline: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
         return queuedDecodeCountByAccount[account, default: 0]
+    }
+
+    func hasCachedPreview(
+        account: AccountUUID,
+        chatID: Int64,
+        messageID: Int64,
+        fileID: Int32,
+        fileURL: URL,
+        maxPixelSize: Int
+    ) -> Bool {
+        let cacheKey = key(
+            account: account,
+            chatID: chatID,
+            messageID: messageID,
+            fileID: fileID,
+            fileURL: fileURL,
+            maxPixelSize: max(1, maxPixelSize)
+        )
+        lock.lock()
+        defer { lock.unlock() }
+        return cache.data(forKey: cacheKey) != nil
     }
 
     public static func downsample(fileURL: URL, maxPixelSize: Int) -> Data? {
