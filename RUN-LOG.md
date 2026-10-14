@@ -1813,3 +1813,9 @@
 - Local verification: focused country search test passed 1/1 and compiled app; runtime ownership test passed 1/1 earlier in the candidate. `git diff --check` passed. The canonical `/private/tmp/NeTelegram-Dev.app` was rebuilt once from the exact clean source, strict ad-hoc signature passed, and active-window CUA/AX confirmed the new field label, phone focus, disabled Continue, country controls, and non-affiliation notice. No login, Telegram request, Keychain value, or account was used.
 - GitHub: exact-source macOS CI passed [38635457080](https://github.com/AffPapa/NeTelegram/actions/runs/38635457080); pinned TDLib/native workflow passed [38635457154](https://github.com/AffPapa/NeTelegram/actions/runs/38635457154). Commit pushed to `AffPapa/NeTelegram:main`.
 - Limits: accountless auth view only. Light appearance, spoken VoiceOver, IME/RTL, real login/chat, twenty real authorized runtimes and measurements, Developer ID/notarization, compatibility gates and public download remain unverified.
+
+## 2026-10-15 — KEYCHAIN-DATA-READ-DIAGNOSTIC
+
+- Reproduced the configured API-hash `SecItemCopyMatching` data-read stall in a separate, bounded 12-second probe using the app's service/account and noninteractive LAContext. A second variant with explicit UI-fail also timed out. Neither probe printed, copied, compared, or persisted the value; the existing Keychain item was not modified.
+- Control: the same query shape for a deliberately nonexistent service/account returned `errSecItemNotFound` (-25300) in 11 ms. Prior attributes-only lookup of the configured item returned `errSecSuccess` in 3 ms.
+- Interpretation: the delay is specific to retrieving data for the existing item, not a general slow Keychain lookup. Root cause is still unproven; this does not establish whether the canonical app can read the item. Do not delete/reset it or claim the value is missing. Owner-side recovery/authorization in the app is still needed before login.

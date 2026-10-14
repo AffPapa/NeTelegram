@@ -693,7 +693,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Next: resolve the existing Keychain data-read timeout with a bounded diagnostic, then run one owner-operated real-account login/read/send/logout in this canonical app. Do not use another client’s sessions or the retired API hash. Keep 20-account certification, compatibility gates, Developer ID/notarization, release and public downloads open until evidenced.",
+  "next_action": "Next: preserve the existing Keychain item and diagnose its access/authorization context from the canonical app when the owner is available; do not delete/reset it or reuse the retired chat-exposed hash. Then complete one owner-operated real-account login/read/send/logout. Keep twenty-account certification, compatibility gates, Developer ID/notarization, release, and public downloads open until evidenced.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -1064,5 +1064,16 @@
     "canonical_bundle_source": "709b7552a0198d04b496c1b983dc980855d04de8",
     "local_visual_status": "The live app was inspected by AX and screenshot; it is the 709b7552 bundle and has an empty phone field. The proposed 600x520 size is not in that running binary. Normal Quit was selected but the app remains running; Scripts/check-app-process.sh cannot prove process absence, so replacement is blocked.",
     "external_status": "Not committed, pushed, or run through hosted CI; no release or Site change."
+  },
+  "latest_keychain_diagnostic": {
+    "date": "2026-10-15",
+    "scope": "Read-only diagnostic of the configured API-hash Keychain item. The value was never printed, copied to a file, or compared outside the process.",
+    "exact_data_query": "SecItemCopyMatching for the configured service/account with LAContext.interactionNotAllowed=true, returnData=true, matchLimitOne timed out at 12 seconds in a standalone bounded probe; process was terminated by the timeout wrapper.",
+    "explicit_no_ui_variant": "The same item query using kSecUseAuthenticationUIFail also timed out at 12 seconds. Swift warned this option is deprecated; it was used only in the temporary diagnostic, not product code.",
+    "nonexistent_control": "The same query shape for a deliberately nonexistent service/account returned errSecItemNotFound (-25300) in 11 ms.",
+    "prior_attributes_only": "Attributes-only lookup of the configured service/account previously returned errSecSuccess (0) in 3 ms without requesting data.",
+    "interpretation": "The delay is specific to retrieving data for the existing item, not a general delay for all Keychain queries. This does not establish the root cause or prove whether the app process can read it. Do not delete, reset, or replace the existing item without successful recovery.",
+    "secret_value_observed_or_printed": false,
+    "item_modified": false
   }
 }
