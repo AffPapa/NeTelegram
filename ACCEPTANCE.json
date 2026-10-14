@@ -1,35 +1,35 @@
 {
   "schema_version": 2,
-  "status": "CORE-CLOSE-01 terminal TDLib close cleanup routing — focused Swift test PASS 1/1; exact-source macOS CI passed; canonical Dev.app rebuilt and AX verified at b55f3e2a; real account login remains unverified.",
+  "status": "AUTH05 first-run country suggestion copy — exact-source macOS CI PASS; canonical Dev.app ad530335 rebuilt and AX verified; real account login remains unverified.",
   "current_evidence": {
-    "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "local_suite": "PASS 1/1 terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime; SwiftPM compiled Core, AppKit and test targets. Initial sandbox run could not write the installed Xcode module cache; approved system-tool invocation passed.",
-    "focused_test": "terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime PASS 1/1; confirms terminal-close pass-through remains fenced by exact local generation ownership.",
+    "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+    "local_suite": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
+    "focused_test": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
     "hosted_ci": {
-      "run_id": 38578966487,
+      "run_id": 38580883608,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38578966487",
-      "workflow_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "scope": "Exact-source macOS CI passed for b55f3e2a93b592b0ec977d518c1913889081e2f2; terminal-close ownership regression and full configured suite verified. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
+      "workflow_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "scope": "Exact-source macOS CI passed for ad530335; the existing phone-country regression suite ran on this SHA. No real Telegram login."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
+      "application_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "50ac3aa45c40286b7bcc69ed3a625d0cab9c02b5f51c4eaf4e017edf01030542",
-      "executable_sha256": "3e07f334f679be7f31932be29c542c7ff44ce341209fa95e0e54510b34f8bef4",
+      "source_fingerprint_sha256": "fc6ceb24ce32b6d709ee0f750a9afff158097db884664da087a9803b4c83ceab",
+      "executable_sha256": "f039d55620849841a8fd0a4f5be913f815091c2581e2c244e6e6912e24f1e10f",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once from clean app source b55f3e2a93b592b0ec977d518c1913889081e2f2 in 5.64s. BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match; accountless phone/QR login visible. No credentials entered.",
-      "scope": "Exact-source native bundle and accountless login smoke only; no real account, chat/read/send, 20 real runtimes, Developer ID or notarization verified."
+      "smoke": "Canonical Dev.app rebuilt once from clean source ad530335 in 5.28s. BuildInfo, build record, CUA title and AX agree. AX shows placeholder country (not selected), macOS Thailand +66 only as suggestion, blank phone field, Continue and QR. No credentials entered.",
+      "scope": "Accountless first-run auth UI only; no Telegram login, chats, 20-runtime coverage, Developer ID, or notarization."
     },
     "latest_site_deployment": {
       "date": "2026-10-14",
@@ -55,7 +55,18 @@
       "saved_archive_size_bytes": 491520,
       "saved_archive_file_count": 14
     },
-    "scope": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected. Real Telegram auth, chat/read/send, 20 authorized runtimes and performance remain unverified."
+    "scope": "Locale initializes suggestedRegionCode only; selectedRegionCode and selectedCallingCode remain empty until explicit country selection. National input is rejected without selection; complete +international input remains accepted. Real authentication and all-20 account coverage remain unverified.",
+    "last_verification": {
+      "date": "2026-10-14",
+      "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "local_command": "No duplicate local test run for this AppKit status-copy-only follow-up.",
+      "local_result": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
+      "hosted_ci_run_id": 38580883608,
+      "hosted_ci_status": "success",
+      "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
+      "scope": "The locale is a suggestion only. Both first-run and empty-auth restore status now use the shared prompt that distinguishes suggested from explicitly selected country. Real authentication, chats, account scale, Developer ID and notarization remain unverified."
+    }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -498,7 +509,7 @@
       "method": "AppKit empty-catalogue UI + deterministic catalog/phone tests",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial. The routine Dev.app script now defaults to a fresh isolated root; exact local smoke at checkpoint 3cba4c5 shows country +66, phone field, Continue, QR and neutral prompt without UUID profiles. No phone/code entered. Current app source fa80d5a5f77b1fecf583754f3fe5cf69209be75b adds bilingual country-name search and retains the selected region as a separate marked item while filtering. Focused search regression passed 1/1; exact-source local serial suite passed 163/163 in 0.426s on arm64e / Xcode 27.0 / Swift 6.4. Exact-source hosted macOS CI 38497467214 passed the runner probe but was cancelled at its five-minute job limit during the full suite; no hosted suite result is claimed. Pinned TDLib/arm64 Dev.app workflow 38497467210 passed. The one canonical local Dev.app at /private/tmp/NeTelegram-Dev.app was rebuilt from fa80d5a5f77b1fecf583754f3fe5cf69209be75b in 0.18s, ad-hoc codesign verification passed, and accessibility smoke searched 'Canada', found '🇨🇦 Канада +1', and selected it; current Thailand remains explicit when filtered. No phone, code, account, or session was entered. AUTH05 remains partial pending real auth and broader flow/accessibility coverage."
+      "evidence": "Pinned 245-region bundled calling-code table from Google libphonenumber v9.0.41; exact source/license hashes and reproducible generator are recorded in COUNTRY-DATA.lock.json. Core serial suite passed 152/152 for catalog/phone-input source be58d83. Current AppKit ordering fix is source 94740d3: clean arm64 Dev.app built in 9.12s with ad-hoc signature verification; AX and screenshot show first-run country selector, locale-suggested Thailand +66, phone field, Continue and QR before entering any credentials. Empty profile catalogue shows the form before API hash lookup; pressing Continue/QR is the only path to profile creation, and credential lookup precedes catalogue.addProfile. No number, code, account, session, or profile created. Current-source full Swift suite compiled but was interrupted after a silent runner exceeded 60s; hosted CI 38466197778 cancelled during the test-runner phase at the configured five-minute job limit, with no test result; cancellation initiator unknown. Run 38464148650 for preceding source be58d83 timed out/cancelled; retry API denied 403. Public Site v153 needs update to correct the earlier not-yet-smoked note. On exact app source 94740d3, focused tests cancelledQueuedStartupDoesNotRunAfterItsPermitBecomesAvailable and twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges each pass locally under Xcode 27 / Swift 6.4. Full-suite status remains unverified. Exact checkpoint 43980cf0f654d7d0d38c71b5ec73154871c26400 was rebuilt into the one canonical Dev.app using a fresh, isolated support root; AX now verifies country +66, phone field, Continue, QR and neutral first-run status without a UUID profile, with no credentials entered. The previous default support root was preserved; saved-profile Keychain restore there remains partial. The routine Dev.app script now defaults to a fresh isolated root; exact local smoke at checkpoint 3cba4c5 shows country +66, phone field, Continue, QR and neutral prompt without UUID profiles. No phone/code entered. Current app source fa80d5a5f77b1fecf583754f3fe5cf69209be75b adds bilingual country-name search and retains the selected region as a separate marked item while filtering. Focused search regression passed 1/1; exact-source local serial suite passed 163/163 in 0.426s on arm64e / Xcode 27.0 / Swift 6.4. Exact-source hosted macOS CI 38497467214 passed the runner probe but was cancelled at its five-minute job limit during the full suite; no hosted suite result is claimed. Pinned TDLib/arm64 Dev.app workflow 38497467210 passed. The one canonical local Dev.app at /private/tmp/NeTelegram-Dev.app was rebuilt from fa80d5a5f77b1fecf583754f3fe5cf69209be75b in 0.18s, ad-hoc codesign verification passed, and accessibility smoke searched 'Canada', found '🇨🇦 Канада +1', and selected it; current Thailand remains explicit when filtered. No phone, code, account, or session was entered. AUTH05 remains partial pending real auth and broader flow/accessibility coverage. Current fix on 0885a9d801dde91a2c5e3538f1f580a2866e71b7: `PhoneCountrySelectionState` keeps the macOS region as a suggestion and the selected calling code empty until explicit user choice. Focused regression PASS 1/1; exact-source CI 38580132948 passed; canonical Dev.app 0885a9d8 AX confirms placeholder remains unselected, locale suggestion/accessibility help, explicit selection feedback, and full + international input. Screen restored without phone entry. Real auth and broader flow remain pending. Current follow-up ad530335: both first-run and empty-auth restore status use shared locale-suggestion copy; exact-source CI 38580883608 passed and the canonical Dev.app AX smoke shows unselected country and blank phone. No credentials entered."
     },
     {
       "id": "APP27",
@@ -540,45 +551,45 @@
   ],
   "last_verification": {
     "date": "2026-10-14",
-    "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "local_command": "swift test --no-parallel --filter terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime",
-    "local_result": "PASS 1/1 terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime; SwiftPM compiled Core, AppKit and test targets. Initial sandbox run could not write the installed Xcode module cache; approved system-tool invocation passed.",
-    "hosted_ci_run_id": 38578966487,
+    "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+    "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+    "local_command": "No duplicate local test run for this AppKit status-copy-only follow-up.",
+    "local_result": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
+    "hosted_ci_run_id": 38580883608,
     "hosted_ci_status": "success",
-    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38578966487",
-    "scope": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected. No real Telegram login/account integration."
+    "hosted_ci_url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
+    "scope": "The locale is a suggestion only. Both first-run and empty-auth restore status now use the shared prompt that distinguishes suggested from explicitly selected country. Real authentication, chats, account scale, Developer ID and notarization remain unverified."
   },
   "current_local_slice": {
-    "id": "CORE-CLOSE-01 terminal TDLib close cleanup routing",
-    "commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "parent_source_commit": "ae21665fae9e3d72b3bd1a22ca437e8cd59b0137",
+    "id": "AUTH05 locale suggestion versus explicit country selection",
+    "commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+    "parent_source_commit": "c2f13fc23653e6a913912e53b8b716ac3d2df599",
     "push": "success; pushed once to AffPapa/NeTelegram main",
-    "local_command": "swift test --no-parallel --filter terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime",
-    "local_result": "PASS 1/1 terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime; SwiftPM compiled Core, AppKit and test targets. Initial sandbox run could not write the installed Xcode module cache; approved system-tool invocation passed.",
+    "local_command": "swift test --no-parallel --filter macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin",
+    "local_result": "PASS 1/1 macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin; SwiftPM compiled NeTelegramCore, AppKit and test targets.",
     "exact_source_ci": {
-      "run_id": 38578966487,
+      "run_id": 38580132948,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38578966487",
-      "workflow_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "scope": "Exact-source macOS CI passed for b55f3e2a93b592b0ec977d518c1913889081e2f2; terminal-close ownership regression and full configured suite verified. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580132948",
+      "workflow_commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+      "app_source_commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+      "scope": "Exact-source macOS serial Swift suite passed for 0885a9d801dde91a2c5e3538f1f580a2866e71b7; locale suggestion/explicit country selection regression covered. No real Telegram login."
     },
-    "change": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected.",
-    "coverage_limit": "Exact-source native bundle and accountless login smoke only; no real account, chat/read/send, 20 real runtimes, Developer ID or notarization verified.",
+    "change": "Locale initializes suggestedRegionCode only; selectedRegionCode and selectedCallingCode remain empty until explicit country selection. National input is rejected without selection; complete +international input remains accepted.",
+    "coverage_limit": "Accountless native first-run UI and locale/country selection only; real authentication, chat/read/send, 20 authorized runtimes, Developer ID and notarization unverified.",
     "canonical_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "path": "/private/tmp/NeTelegram-Dev.app",
       "running": true,
-      "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "source_fingerprint_sha256": "50ac3aa45c40286b7bcc69ed3a625d0cab9c02b5f51c4eaf4e017edf01030542",
+      "source_commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+      "source_fingerprint_sha256": "67e5d51a1eaf5dfecb082e188c1c8ca2648c605f8a981a2fe6d8add2e0e22fe3",
       "distribution_ready": false,
-      "smoke": "Canonical arm64 Dev.app rebuilt once from clean app source b55f3e2a93b592b0ec977d518c1913889081e2f2 in 5.64s. BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match; accountless phone/QR login visible. No credentials entered."
+      "smoke": "Canonical arm64 Dev.app rebuilt once from clean app source 0885a9d801dde91a2c5e3538f1f580a2866e71b7 in 5.57s. BuildInfo and CUA title `NeTelegram · dev 0885a9d8` match. AX shows `Выберите страну…`, locale suggestion as status, accurate accessibility help, empty phone field and QR; explicit selection updates status, then screen restored to unselected state. No credentials entered."
     },
-    "real_account": "not tested; owner-operated login remains pending.",
+    "real_account": "not tested; owner-operated login remains deferred.",
     "site": "public v194; no download; unchanged.",
     "release": "No app release/assets; Developer ID and notarization gates remain open.",
-    "native_smoke": "PASS: exact source b55f3e2a93b592b0ec977d518c1913889081e2f2 launched from canonical Dev.app; BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match, accountless phone/QR login visible. No credentials entered."
+    "native_smoke": "PASS: exact source 0885a9d801dde91a2c5e3538f1f580a2866e71b7 launched in canonical Dev.app. AX confirms no auto-selected country, locale is described only as a suggestion, explicit selection shows its code, and the screen was restored to unselected state. No credentials entered."
   },
   "latest_site_deployment": {
     "date": "2026-10-14",
@@ -619,7 +630,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Next engineering slice: fix AUTH05 so macOS locale is shown only as a country suggestion and never authorizes national-number normalization; then owner-operated real first-account login remains required before real chat/read/send acceptance. Keep the canonical Dev.app at the recorded source; do not update the Site or publish a download before a signed/notarized release asset and public-byte receipt exist.",
+  "next_action": "Next: continue the next P0 runtime lifecycle gap from ACCEPTANCE, independently of owner-operated login. Real first-account login/chat-read-send and 20-account coverage remain pending by owner choice; do not request or enter credentials in chat. Keep Site v194 without a download until signed/notarized assets and public-byte verification exist.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -649,45 +660,45 @@
     "status": "validated locally and by hosted metadata CI; native bundle build intentionally skipped"
   },
   "current_local_candidate": {
-    "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
+    "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
     "branch": "main",
-    "working_tree": "clean at b55f3e2a93b592b0ec977d518c1913889081e2f2; pushed to origin/main.",
-    "local_tests": "PASS 1/1 terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime; SwiftPM compiled Core, AppKit and test targets. Initial sandbox run could not write the installed Xcode module cache; approved system-tool invocation passed.",
-    "hosted_validation": "Exact-source macOS CI 38578966487 passed.",
+    "working_tree": "clean at ad530335eb805dfa0ae3253e74d2231453e3dec8; pushed to origin/main.",
+    "local_tests": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
+    "hosted_validation": "Exact-source macOS CI 38580883608 passed.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
+      "application_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "50ac3aa45c40286b7bcc69ed3a625d0cab9c02b5f51c4eaf4e017edf01030542",
-      "executable_sha256": "3e07f334f679be7f31932be29c542c7ff44ce341209fa95e0e54510b34f8bef4",
+      "source_fingerprint_sha256": "fc6ceb24ce32b6d709ee0f750a9afff158097db884664da087a9803b4c83ceab",
+      "executable_sha256": "f039d55620849841a8fd0a4f5be913f815091c2581e2c244e6e6912e24f1e10f",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app rebuilt once from clean app source b55f3e2a93b592b0ec977d518c1913889081e2f2 in 5.64s. BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match; accountless phone/QR login visible. No credentials entered.",
-      "scope": "Exact-source native bundle and accountless login smoke only; no real account, chat/read/send, 20 real runtimes, Developer ID or notarization verified."
+      "smoke": "Canonical Dev.app rebuilt once from clean source ad530335 in 5.28s. BuildInfo, build record, CUA title and AX agree. AX shows placeholder country (not selected), macOS Thailand +66 only as suggestion, blank phone field, Continue and QR. No credentials entered.",
+      "scope": "Accountless first-run auth UI only; no Telegram login, chats, 20-runtime coverage, Developer ID, or notarization."
     },
-    "scope": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected. Real account authentication, message flow, 20 runtimes and distribution remain unverified."
+    "scope": "The locale is a suggestion only. Both first-run and empty-auth restore status now use the shared prompt that distinguishes suggested from explicitly selected country. Real authentication, chats, account scale, Developer ID and notarization remain unverified."
   },
   "latest_acceptance_slice": {
-    "id": "CORE-CLOSE-01 terminal TDLib close cleanup routing",
-    "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "local_focused_test": "terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime PASS 1/1.",
+    "id": "AUTH05 first-run country suggestion copy",
+    "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+    "local_focused_test": "Focused regression macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin passed 1/1 on parent source 0885a9d8. Not redundantly rerun for this AppKit copy-only follow-up; exact-source CI passed on ad530335.",
     "hosted_ci": {
-      "run_id": 38578966487,
+      "run_id": 38580883608,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38578966487",
-      "workflow_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-      "scope": "Exact-source macOS CI passed for b55f3e2a93b592b0ec977d518c1913889081e2f2; terminal-close ownership regression and full configured suite verified. No real Telegram account integration."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38580883608",
+      "workflow_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
+      "scope": "Exact-source macOS CI passed for ad530335; the existing phone-country regression suite ran on this SHA. No real Telegram login."
     },
-    "native_smoke": "PASS: exact source b55f3e2a93b592b0ec977d518c1913889081e2f2 launched from canonical Dev.app; BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match, accountless phone/QR login visible. No credentials entered.",
-    "scope": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected."
+    "native_smoke": "PASS: exact source ad530335 launched in the single canonical Dev.app. AX confirms country remains unselected, locale is explicitly only a suggestion, phone is empty, and QR is available. No credentials entered.",
+    "scope": "The locale is a suggestion only. Both first-run and empty-auth restore status now use the shared prompt that distinguishes suggested from explicitly selected country. Real authentication, chats, account scale, Developer ID and notarization remain unverified."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -750,13 +761,13 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-14",
-    "case": "CORE-CLOSE-01 terminal TDLib close cleanup routing",
-    "test_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "app_code_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
-    "test": "terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime",
+    "case": "AUTH05",
+    "test_commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+    "app_code_commit": "0885a9d801dde91a2c5e3538f1f580a2866e71b7",
+    "test": "macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin",
     "result": "PASS 1/1",
-    "command": "swift test --no-parallel --filter terminalClosedUpdatePassesOnlyForItsStillOwnedLocalRuntime",
-    "scope": "authorizationStateClosed now passes post-actor ownership validation only while the same local runtime still owns that exact route; cleanup and shutdown acknowledgement can run, while ordinary stale events and replaced generations remain rejected."
+    "command": "swift test --no-parallel --filter macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin",
+    "scope": "Locale initializes suggestedRegionCode only; selectedRegionCode and selectedCallingCode remain empty until explicit country selection. National input is rejected without selection; complete +international input remains accepted."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -770,22 +781,22 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "CORE-CLOSE-01 terminal TDLib close cleanup routing — focused Swift test PASS 1/1; exact-source macOS CI passed; canonical Dev.app rebuilt and AX verified at b55f3e2a; real account login remains unverified.",
+  "phase": "AUTH05 first-run country suggestion copy — exact-source macOS CI PASS; canonical Dev.app ad530335 rebuilt and AX verified; real account login remains unverified.",
   "latest_local_build": {
     "date": "2026-10-14",
-    "source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
+    "source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
     "command": "Scripts/dev-app.sh --launch",
-    "result": "PASS: canonical arm64 Dev.app rebuilt from clean b55f3e2a93b592b0ec977d518c1913889081e2f2; build 5.64s; fingerprint 50ac3aa45c40286b7bcc69ed3a625d0cab9c02b5f51c4eaf4e017edf01030542; ad-hoc codesign verify passed."
+    "result": "PASS: canonical arm64 Dev.app rebuilt from clean ad530335eb805dfa0ae3253e74d2231453e3dec8; build 5.28s; fingerprint fc6ceb24ce32b6d709ee0f750a9afff158097db884664da087a9803b4c83ceab; strict ad-hoc codesign verification passed."
   },
   "latest_native_smoke": {
     "date": "2026-10-14",
-    "app_source_commit": "b55f3e2a93b592b0ec977d518c1913889081e2f2",
+    "app_source_commit": "ad530335eb805dfa0ae3253e74d2231453e3dec8",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "50ac3aa45c40286b7bcc69ed3a625d0cab9c02b5f51c4eaf4e017edf01030542",
-    "executable_sha256": "3e07f334f679be7f31932be29c542c7ff44ce341209fa95e0e54510b34f8bef4",
+    "source_fingerprint_sha256": "fc6ceb24ce32b6d709ee0f750a9afff158097db884664da087a9803b4c83ceab",
+    "executable_sha256": "f039d55620849841a8fd0a4f5be913f815091c2581e2c244e6e6912e24f1e10f",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: exact source b55f3e2a93b592b0ec977d518c1913889081e2f2 launched from canonical Dev.app; BuildInfo and CUA title `NeTelegram · dev b55f3e2a` match, accountless phone/QR login visible. No credentials entered.",
-    "scope": "Exact-source native bundle and accountless login smoke only; no real account, chat/read/send, 20 real runtimes, Developer ID or notarization verified."
+    "result": "PASS: exact source ad530335 launched in the single canonical Dev.app. AX confirms country remains unselected, locale is explicitly only a suggestion, phone is empty, and QR is available. No credentials entered.",
+    "scope": "Accountless first-run auth UI only; no Telegram login, chats, 20-runtime coverage, Developer ID, or notarization."
   }
 }
