@@ -1398,3 +1398,8 @@
 - Rechecked the public Site `/downloads/` anonymously. It returns the existing development page with the explicit “Приложение для скачивания отсутствует” state and no link to a nonexistent artifact. Site remains v194 and was not changed.
 - Re-read the current primary Telegram API Terms: §2.3 conflicts with the requested public app title `NeTelegram`; §1.3/§1.4 basic compatibility remains open. §3.3 requires sponsored messages in channels; the pinned TDLib sponsored-media guide describes a separate fullscreen video-ad flow. The user declined the scoped video player and deferred channels/stable release if required. These gates remain unresolved; no stable compatibility is claimed.
 - Read-only restore-path audit found the 20-profile synthetic test already composes the same `AccountRestorePlanner` methods that production `restoreProfiles()` calls. No new test seam was added because it would duplicate coverage without exercising real Keychain/TDLib/20-account behavior. Owner-operated first login remains required; do not reuse the API hash previously pasted into chat.
+
+## 2026-10-14 — API configuration source check
+
+- Read `Sources/NeTelegramCore/TelegramApplicationIdentity.swift`: the compiled `api_id` is `37110989`, matching the owner-supplied ID. The hash is not in source; runtime loads it from the designated Keychain item. No Keychain item was read or queried in this check. The previously chat-exposed hash remains retired; if absent, enter a current value only through the app's secure settings UI.
+- No code or runtime behavior changed. Checkpoint JSON and diff validators only; no rebuild or app CI required.
