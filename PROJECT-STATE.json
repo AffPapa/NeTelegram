@@ -138,7 +138,7 @@
       "signing": "ad-hoc development only",
       "native_gui_smoke": "CUA confirmed exact source title and accountless sign-in; no credentials."
     },
-    "telegram_api_compatibility": "Primary Terms page rechecked 2026-10-14. Sign-in intro now explicitly states Telegram API/TDLib use and ecosystem membership with a no-affiliation statement. Terms §2.3 still conflicts with requested public title NeTelegram; §3.3 requires sponsored channel messages/video behavior, which user declined to add; channel access/stable release remain deferred. §§1.3/1.4 basic functionality review remains open. Pinned schema c15d3f5a5de6e3ba5839822c451152e5e18bb700 exposes sponsored video and timed video ad APIs.",
+    "telegram_api_compatibility": "Official Telegram API Terms rechecked 2026-10-14: §1.3 requires all basic features of the main Telegram apps to work correctly but supplies no exhaustive checklist here; §1.4 prohibits interference with basic behavior. This broad requirement remains an open compatibility review, not a PASS. §2.3 says the app title must not include “Telegram” unless preceded by “Unofficial”; user instructions require the product name NeTelegram, so public naming remains an explicit conflict and must not be silently changed. §3.3 requires sponsored messages for channel access; the official sponsored-messages API also requires a fullscreen video playback path with timed sponsored overlays when viewing channel videos. User declined a player, so channel access and stable release remain deferred. Primary sources: https://core.telegram.org/api/terms and https://core.telegram.org/api/sponsored-messages.",
     "last_native_bundle_smoke": {
       "run_id": 38495482965,
       "status": "success",
@@ -206,7 +206,8 @@
     "User login and real single-account read/send/logout smoke; user deferred entering credentials in NeTelegram.",
     "Synthetic APP12/APP13 tests cover 20 runtime sinks and per-account network setter recovery; native sleep/wake, real authorized sessions, all-active recovery, notifications, storage faults and performance matrix remain open.",
     "Two Developer ID Application identities are available for team H6VGU2M6JD; notarytool profile is absent from the default Keychain (errSecItemNotFound). No signing or notarization candidate exists yet.",
-    "Telegram minimum-functionality compatibility review.",
+    "Telegram Terms §1.3/1.4: review basic functionality and behavior; the official page gives no exhaustive checklist, so compatibility remains unproven.",
+    "Telegram title conflict: user requires NeTelegram; official API Terms §2.3 require “Unofficial” before “Telegram”. Do not rename silently; compatibility/stable-release claim remains open.",
     "Channel reading and stable release remain deferred because the user declined the required sponsored-video player.",
     "APP22 static auth-step announcements are tested; native VoiceOver, keyboard-only, RTL/IME, and real auth remain unverified.",
     "APP25 actual macOS Login Items registration persistence and removal have not been tested in a disposable user session."

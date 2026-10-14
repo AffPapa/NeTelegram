@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "APP01 startup-presentation coordinator implemented on exact app source 3f11a0e. Focused and full local serial suite pass 166/166. Hosted exact-source run 38510759384 failed because the full-suite step timed out after 2 minutes; no hosted PASS claimed. Canonical Dev.app remains on 4dcddcc and has not been rebuilt or smoked for this source. Real login, 20 authorized runtime measurements, Developer ID/notarization, and Telegram compatibility remain open.",
+  "status": "APP16 final TDLib receive-update drain fix is verified on app source 7fd003088e2593fc2b808f7903e8f8b96c6a1c9b: both focused shutdown tests passed 20/20 locally and hosted macOS CI 38514102824 passed 167/167. Public development Site v174 includes the factual bilingual devlog; anonymous /devlog/ and /downloads/ checks passed. Canonical Dev.app remains open at 4dcddcc and was not replaced. Real login, 20 authorized runtime certification, Developer ID notarization, and Telegram compatibility gates remain incomplete.",
   "current_evidence": {
     "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
     "local_suite": "PASS 167/167 exact-source macOS suite in 0.860s on GitHub Actions; the shutdown regression passed in 0.012s. Local arm64e / Xcode 27 / Swift 6.4 targeted stress: both receive-drain and final-delete buffer tests passed 20 repetitions each.",
@@ -53,21 +53,21 @@
     "latest_site_deployment": {
       "date": "2026-10-14",
       "project_id": "appgprj_6acba85192e08191acdf7011928848cf",
-      "version": 173,
-      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_93476d1079d88191a1cb8dc8dae87ccd",
-      "source_commit": "c35fc6e7b0f48ce65bd25e063b280b95cba5e4a4",
-      "app_repository_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "app_source_commit": "4dcddccf22d089cb2a95e76c2df6ac1fa5fde47d",
-      "deployment_id": "appgdep_6acf0056a80481919f9c93e679eeafa9",
+      "version": 174,
+      "version_id": "appgprj_6acba85192e08191acdf7011928848cf~appgver_ff8218e6295c81919a51ca8f77a0660d",
+      "source_commit": "93ec41836897aac6fd66ad3374790ef23c40d281",
+      "app_repository_commit": "927f420886efd5256c9182df24931a5e95d8c73f",
+      "app_source_commit": "7fd003088e2593fc2b808f7903e8f8b96c6a1c9b",
+      "deployment_id": "appgdep_6acf0d6864e88191b5061f877231e89b",
       "url": "https://netelegram.iryadom.chatgpt.site",
       "audience": "public",
-      "archive_local_path": "/private/tmp/netelegram-site-selection-fix-20261014.tar.gz",
-      "archive_local_sha256": "4b2c533f87ca301eeee6fff11abf851f56ee341306261e4b93024c72c49f63e1",
-      "archive_local_size_bytes": 191431,
-      "saved_archive_content_hash": "sha256:f5ba75ec742f4454400c8967bbdb1bbea3e3d62011636604ee0433f9a53b7431",
+      "archive_local_path": "/private/tmp/netelegram-site-v174.tar.gz",
+      "archive_local_sha256": "d81a20b95c017f4d945d9671460bc5ba96442a50629b2e4cc9f537df9701cdda",
+      "archive_local_size_bytes": 191917,
+      "saved_archive_content_hash": "sha256:60f554092d6e85d20eb14e918da73cd8033da3f72328af99e0e2da2aaf160daf",
       "saved_archive_size_bytes": 450560,
       "archive_file_count": 14,
-      "public_verification": "Public deployment v173 is reported succeeded by the Sites deployment record. Anonymous browser loaded /devlog/ and showed the 4dcddcc milestone and CI 38509465812. /downloads and updater-feed MIME were not checked in this turn. No app binary/download exists."
+      "public_verification": "Sites v174 deployment appgdep_6acf0d6864e88191b5061f877231e89b succeeded. Anonymous in-app browser loaded /devlog/ and confirmed the 7fd0030 entry and exact CI 38514102824 (167/167); /downloads showed NO RELEASE, no download button and the valid current compatibility-gate notice. Static validator passed all 8 routes, shell, navigation, canonical metadata, links and assets. Stable/alpha feed MIME not rechecked. No app binary/download exists."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
