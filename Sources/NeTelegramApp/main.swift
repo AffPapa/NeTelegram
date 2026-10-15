@@ -965,7 +965,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // form uses one readable measure; a decorative card is avoided so the
         // standard window and native controls define the visual hierarchy.
         window.minSize = NSSize(width: 520, height: 460)
-        window.maxSize = NSSize(width: 720, height: 620)
+        window.maxSize = NSSize(width: 720, height: 680)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
@@ -992,13 +992,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             changePhoneButton.isHidden = true
             changePhoneButton.isEnabled = false
             countrySuggestionButton.isHidden = true
-            window.minSize = NSSize(width: 560, height: 520)
-            window.maxSize = NSSize(width: 720, height: 640)
-            let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
-                ? NSSize(width: 560, height: 520)
-                : NSSize(width: 600, height: 560)
-            if window.contentView?.bounds.size != compactSize {
-                window.setContentSize(compactSize)
+            let minimumAuthSize = NSSize(width: 520, height: 460)
+            let maximumAuthSize = NSSize(width: 720, height: 680)
+            window.minSize = minimumAuthSize
+            window.maxSize = maximumAuthSize
+            if let size = window.contentView?.bounds.size,
+               size.width < minimumAuthSize.width || size.height < minimumAuthSize.height
+                || size.width > maximumAuthSize.width || size.height > maximumAuthSize.height {
+                // Keep the 560x500 first-run size and any user resize inside
+                // the auth range. Only returning from the larger chat window
+                // needs a reset to the compact default.
+                window.setContentSize(NSSize(width: 560, height: 500))
                 window.center()
             }
         } else {
