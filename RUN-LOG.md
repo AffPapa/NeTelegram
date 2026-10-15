@@ -2089,3 +2089,10 @@
 - Existing public Site `appgprj_6acba85192e08191acdf7011928848cf` source checkout opened with the official helper. Added the factual bilingual UI devlog entry; build and validation passed for all 8 static routes. Exact Site source commit: `3efd8d2f11dca041b596b5d07ed324f72e3dfe5b`.
 - Local archive `/private/tmp/netelegram-site-auth-region-clarity-20.tar`: SHA-256 `68c8a6d0d34df9832be0538dd25d7ff3fab1846fce448937fcfda7254e53a4a1`, 212,199 bytes. Saved public Site v212 as `appgprj_6acba85192e08191acdf7011928848cf~appgver_27444d9360908191b099890b3812532f`; Sites stored archive hash `sha256:06f71c585cb86712533fac6d7c33d442b0f286431b1f7438782b23edb66e707d`, 14 files / 542,720 bytes. Deployment `appgdep_6ad0aa5a405481919d3a8a10748d461a` succeeded at the existing URL.
 - System curl verified anonymous HTTPS GET `/devlog/` and `/downloads/`: both returned 200 `text/html`. The devlog contains entry `auth-region-clarity-20`, app commit `6490b8d`, and both CI links; Downloads still reports no app release. Python's TLS store failed certificate-chain validation; that client failure was recorded and not bypassed.
+
+
+## 2026-10-15 — APP28-POST-CONSUME-FRESH-ROUTE-01
+
+- Strengthened the deterministic APP28 race regression on test-only commit `9ad0d9b270fcb025e2706c74f4cd7f140940c24d`: the callback now blocks inside `consume`, the old runtime route is closed and replaced while suspended, then `consume` resumes and the production seam performs a fresh `RuntimeCoordinator.isCurrent` query before modeled side effects. The test passed 1/1.
+- Exact-source macOS CI [38720880143](https://github.com/AffPapa/NeTelegram/actions/runs/38720880143) passed. App-source files are unchanged from `6490b8d566c6648fcd6ec7d528d472d370475c39`; no canonical Dev.app rebuild was needed.
+- APP28 remains partial: deterministic seam coverage is not an authenticated AppDelegate/TDLib callback, actual identity-persistence integration, or 20-account proof. No credentials or login were used.

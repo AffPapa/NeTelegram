@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "phase": "AUTH-REGION-CLARITY-APPLE-HIG-20: current AppKit sign-in region hint explicitly identifies macOS provenance; exact-source CI, pinned native workflow and canonical accountless Dev.app evidence recorded. Real login and release gates remain open.",
-  "verified_at": "2026-10-15T10:27:49Z",
+  "phase": "APP28-POST-CONSUME-FRESH-ROUTE-01: deterministic test now replaces the runtime route while consume is suspended and verifies a fresh post-resume coordinator check; local test 1/1 and exact-source CI passed. Real AppDelegate/TDLib and 20-account behavior remain unverified.",
+  "verified_at": "2026-10-15T10:31:00Z",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
     "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
@@ -526,32 +526,23 @@
     "result": "The reuse guard keeps one canonical app and skips rebuilding docs/checkpoint-only commits when source, toolchain, dependency, support root, hashes, plist and signature match."
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-REGION-CLARITY-APPLE-HIG-20",
+    "id": "APP28-POST-CONSUME-FRESH-ROUTE-01",
     "date": "2026-10-15",
     "source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-    "test_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-    "research": "Reviewed current Apple HIG for macOS conventions, layout, semantic color, text fields, buttons, keyboard/accessibility; reviewed official Telegram Desktop intro_widget.cpp and intro_phone.cpp for interaction patterns only. Used native AppKit and no copied Telegram source/style.",
-    "finding": "The supplied image was stale (dev 5f414650); current source already uses a single searchable country/code control, aligned form column, native AppKit controls and semantic system colors. The remaining region suggestion could be read as an inferred/selected country.",
-    "change": "Changed the suggestion action to identify it as a macOS region hint and added accessibility help stating that macOS regional settings supply the suggestion and no country is selected automatically. Sign-in behavior is unchanged.",
-    "focused_test": "Full local serial Swift suite ran 211 tests: 210 passed; existing secretsStoreReadQueryDisallowsImplicitKeychainAuthenticationUI failed because the host LAContext interactionNotAllowed getter returned false after being set true. Direct credential-free probe reproduced the host behavior; no unrelated Keychain code changed. A prior parallel run was invalid for this blocking fake-Keychain suite; project workflow requires --no-parallel.",
+    "test_commit": "9ad0d9b270fcb025e2706c74f4cd7f140940c24d",
+    "finding": "The prior regression suspended after reading a stale route result, so it did not prove that ownership is re-read after the reducer resumes.",
+    "change": "Strengthened the deterministic RuntimeUpdateOwnership.consumeThenCheck regression: identity-persistence stand-in now suspends inside consume; the old route is closed and replaced while blocked; after resume, the coordinator is queried afresh and stale side effects remain absent.",
+    "focused_test": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime passed 1/1. The test holds consume suspended, replaces the registered route, resumes consume, then performs a fresh coordinator.isCurrent query and confirms no modeled side effects.",
     "hosted_ci": {
-      "run_id": 38719139533,
+      "run_id": 38720880143,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38719139533",
-      "workflow_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38720880143",
+      "workflow_commit": "9ad0d9b270fcb025e2706c74f4cd7f140940c24d",
       "app_source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-      "scope": "Exact-source macOS Swift CI for the AppKit region-suggestion copy/accessibility clarification."
+      "scope": "Exact-source macOS serial core suite on test-only commit; app source files are identical to 6490b8d."
     },
-    "native_workflow_ci": {
-      "run_id": 38719139650,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38719139650",
-      "workflow_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-      "app_source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact source; accountless app packaging only."
-    },
-    "native_smoke": "PASS: guarded canonical Dev.app built and launched once from exact clean source; BuildInfo/fingerprints and binary hashes match, strict ad-hoc signature passes, AX identifies exact current build. Region suggestion fallback itself was not displayed because country was already selected in observed state.",
-    "limits": "No real login or credentials entered. No dark/increased-contrast or spoken VoiceOver test, IME/RTL, authenticated UI, 20-runtime evidence, Developer ID/notarization, or public app download. Local suite has one host-specific LAContext property observation failure; exact-source hosted CI passed."
+    "native_smoke": "Not run: app source was unchanged and canonical Dev.app remains tied to app source 6490b8d. This test-only change does not alter the native bundle.",
+    "limits": "This proves the production ownership seam with a deterministic test gate, not an authenticated AppDelegate/TDLib callback, actual identity persistence, or 20-account lifecycle. APP28 remains partial."
   },
   "latest_auth05": {
     "app_source_commit": "0a7cbe627d253c5cb9751573b014145ee9f630d3",
@@ -689,7 +680,7 @@
     "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
-  "status": "AUTH-REGION-CLARITY-APPLE-HIG-20: current AppKit sign-in region hint explicitly identifies macOS provenance; exact-source CI, pinned native workflow and canonical accountless Dev.app evidence recorded. Real login and release gates remain open.",
+  "status": "APP28-POST-CONSUME-FRESH-ROUTE-01: deterministic test now replaces the runtime route while consume is suspended and verifies a fresh post-resume coordinator check; local test 1/1 and exact-source CI passed. Real AppDelegate/TDLib and 20-account behavior remain unverified.",
   "latest_design_research": {
     "date": "2026-10-15",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
