@@ -1,42 +1,42 @@
 {
   "schema_version": 2,
-  "status": "CHAT-LIST-MEMBERSHIP-02: Main chat rows now require a current chatListMain position; order=0 and snapshots without a main position remove stale membership. Focused tests, exact-source CI, pinned TDLib workflow, and canonical Dev.app smoke passed.",
+  "status": "CHAT-LIST-MEMBERSHIP-02: Главный список бесед фильтруется по текущим позициям chatListMain; order=0 удаляет чат. Две целевые проверки, точный macOS CI, workflow pinned TDLib и каноническая Dev.app сборка прошли.",
   "current_evidence": {
-    "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
+    "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
     "local_suite": "Swift 6.4 focused regressions `mainChatListPositionIndexTracksMembershipAndOrderZeroRemoval` and `mainChatListSnapshotWithoutMainPositionRemovesStaleMembership` passed 2/2. `git diff --check` passed.",
     "focused_test": "Swift 6.4 focused regressions `mainChatListPositionIndexTracksMembershipAndOrderZeroRemoval` and `mainChatListSnapshotWithoutMainPositionRemovesStaleMembership` passed 2/2. `git diff --check` passed.",
     "hosted_ci": {
-      "run_id": 38701021166,
+      "run_id": 38701411772,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701021166",
-      "workflow_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "scope": "Exact-source macOS Swift CI passed for main chat-list membership/order-zero regression."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701411772",
+      "workflow_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "scope": "Exact-source macOS Swift CI passed for main chat-list membership, archive-list isolation, and order-zero removal."
     },
     "native_workflow_ci": {
-      "run_id": 38701021235,
+      "run_id": 38701411710,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701021235",
-      "workflow_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "scope": "Pinned TDLib Apple Silicon Dev.app workflow passed for main chat-list membership change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701411710",
+      "workflow_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "scope": "Pinned TDLib Apple Silicon Dev.app build and verification passed for main chat-list membership change."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
+      "application_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "369cf1a8aa966f1c6279d947e93a3945c0ec5873ed7a9db4fe882a77a36bcea6",
-      "executable_sha256": "caf0d0c9c30077ca4c0dd1b6b138c8aaf600ddaa24ee5d71942b125868a830a5",
+      "source_fingerprint_sha256": "df055c700b33aff4cb988fdf4e78bb7d166314b0bea68356b01346733ff72096",
+      "executable_sha256": "b1f4a0999514831eaa691886092bb2625a0388bcfe50314a79f14f221dc89b60",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev a6f8106f and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request."
+      "smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev d5a5b508 and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request."
     },
     "latest_site_deployment": {
       "date": "2026-10-15",
@@ -585,7 +585,7 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
+    "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
     "summary": "AUTH-COUNTRY-SUGGESTION-01: AppKit sign-in now shows the macOS locale suggestion without silently choosing a country; focused phone policy test, exact-source CI, pinned TDLib workflow, and canonical Dev.app smoke passed. The canonical Dev.app BuildInfo, source fingerprint, and strict ad-hoc signature matched; no account login occurred. Site v208 remains public and has no application download."
   },
   "current_local_slice": {
@@ -655,7 +655,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "With the user entering credentials only in NeTelegram, verify a real single-account login and confirm main-list additions, reordering, archive/removal, and pagination; do not inspect Telegram sessions or reuse auth from another client.",
+  "next_action": "Когда пользователь будет готов, войти в тестовый аккаунт только через NeTelegram и проверить реальные элементы списка, archive/removal и pagination; не читать сессии других Telegram-клиентов.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -688,47 +688,47 @@
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
+      "application_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "369cf1a8aa966f1c6279d947e93a3945c0ec5873ed7a9db4fe882a77a36bcea6",
-      "executable_sha256": "caf0d0c9c30077ca4c0dd1b6b138c8aaf600ddaa24ee5d71942b125868a830a5",
+      "source_fingerprint_sha256": "df055c700b33aff4cb988fdf4e78bb7d166314b0bea68356b01346733ff72096",
+      "executable_sha256": "b1f4a0999514831eaa691886092bb2625a0388bcfe50314a79f14f221dc89b60",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev a6f8106f and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request."
+      "smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev d5a5b508 and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request."
     }
   },
   "latest_acceptance_slice": {
     "id": "CHAT-LIST-MEMBERSHIP-02",
     "date": "2026-10-15",
-    "source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-    "test_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-    "finding": "The main list rendered every cached chat row, even when TDLib no longer included it in chatListMain. Incremental updateChatPosition(order: 0) was retained as an ordinary position, and getChat snapshots without chatListMain could leave stale membership.",
-    "change": "Added a per-account MainChatListPositionIndex. The visible main chat list now filters to current positive chatListMain positions, sorts by TDLib order then chat ID, removes membership on order zero, and replaces stale membership when a chat snapshot has no main position. Chat metadata remains cached for other features.",
-    "focused_test": "Swift 6.4: `swift test --filter mainChatList` passed 2/2. `git diff --check` passed.",
+    "source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+    "test_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+    "finding": "The main list rendered cached chat rows even when TDLib removed them from chatListMain. The old position map retained order=0 and snapshots without a main-list position could leave stale membership.",
+    "change": "Added a per-account MainChatListPositionIndex. The main list filters to current positive chatListMain positions, sorts by TDLib order then chat ID, removes membership on order zero, replaces stale membership when a chat snapshot has no main position, and ignores updates for other list scopes. Chat metadata remains cached for other features.",
+    "focused_test": "Swift 6.4: `swift test --filter mainChatList` passed 2/2 (main order/reordering/removal, non-main scope isolation, stale snapshot membership). `git diff --check` passed.",
     "hosted_ci": {
-      "run_id": 38701021166,
+      "run_id": 38701411772,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701021166",
-      "workflow_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "scope": "Exact-source macOS Swift CI passed for main chat-list membership/order-zero regression."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701411772",
+      "workflow_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "scope": "Exact-source macOS Swift CI passed for main chat-list membership, archive-list isolation, and order-zero removal."
     },
     "native_workflow_ci": {
-      "run_id": 38701021235,
+      "run_id": 38701411710,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701021235",
-      "workflow_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-      "scope": "Pinned TDLib Apple Silicon Dev.app workflow passed for main chat-list membership change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38701411710",
+      "workflow_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+      "scope": "Pinned TDLib Apple Silicon Dev.app build and verification passed for main chat-list membership change."
     },
-    "native_smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev a6f8106f and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
-    "limits": "Pure policy tests and accountless native launch only. No owner-entered Telegram account was used; actual chat-list behavior/pagination and the 20-runtime matrix remain unverified. Developer ID signing, notarization, and stable release remain open."
+    "native_smoke": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev d5a5b508 and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
+    "limits": "Pure policy regressions and accountless native launch only. No owner-entered Telegram account was used; actual chat-list behavior/pagination and the 20-runtime matrix remain unverified. Developer ID signing, notarization, and stable release remain open."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -809,26 +809,26 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "CHAT-LIST-MEMBERSHIP-02: Main chat rows now require a current chatListMain position; order=0 and snapshots without a main position remove stale membership. Focused tests, exact-source CI, pinned TDLib workflow, and canonical Dev.app smoke passed.",
+  "phase": "CHAT-LIST-MEMBERSHIP-02: Главный список бесед фильтруется по текущим позициям chatListMain; order=0 удаляет чат. Две целевые проверки, точный macOS CI, workflow pinned TDLib и каноническая Dev.app сборка прошли.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
+    "source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
     "command": "Scripts/dev-app.sh --launch",
-    "result": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev a6f8106f and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
-    "source_fingerprint_sha256": "369cf1a8aa966f1c6279d947e93a3945c0ec5873ed7a9db4fe882a77a36bcea6",
-    "executable_sha256": "caf0d0c9c30077ca4c0dd1b6b138c8aaf600ddaa24ee5d71942b125868a830a5",
+    "result": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev d5a5b508 and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
+    "source_fingerprint_sha256": "df055c700b33aff4cb988fdf4e78bb7d166314b0bea68356b01346733ff72096",
+    "executable_sha256": "b1f4a0999514831eaa691886092bb2625a0388bcfe50314a79f14f221dc89b60",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700"
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "a6f8106f59cfcdf2052213e756e9d1111e13dc09",
-    "source_fingerprint_sha256": "369cf1a8aa966f1c6279d947e93a3945c0ec5873ed7a9db4fe882a77a36bcea6",
-    "executable_sha256": "caf0d0c9c30077ca4c0dd1b6b138c8aaf600ddaa24ee5d71942b125868a830a5",
+    "app_source_commit": "d5a5b508b7d4b140473d903a791f47952248443f",
+    "source_fingerprint_sha256": "df055c700b33aff4cb988fdf4e78bb7d166314b0bea68356b01346733ff72096",
+    "executable_sha256": "b1f4a0999514831eaa691886092bb2625a0388bcfe50314a79f14f221dc89b60",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev a6f8106f and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
+    "result": "PASS: canonical arm64 Dev.app rebuilt from exact clean source via Scripts/dev-app.sh --launch; BuildInfo source/fingerprint matched, strict ad-hoc signature verification passed. CUA/AX window title is NeTelegram · dev d5a5b508 and confirms normal accountless phone/QR sign-in. No phone, code, or Telegram request.",
     "scope": "Accountless native launch and AX identity only; no real login/chat behavior."
   },
   "current_ui_design_slice": {
