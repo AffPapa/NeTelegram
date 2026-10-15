@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "APP04-LIFECYCLE-CURRENT-23: current app source 35abba9 passed the pinned TDLib/AppKit process-window lifecycle smoke; real-account barriers and 20-runtime lifecycle remain open.",
-  "verified_at": "2026-10-15T10:03:28Z",
+  "verified_at": "2026-10-15T10:04:32Z",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
     "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
@@ -817,13 +817,13 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP26",
-    "receipt_id": "APP26-RUNTIME-CLOSE-GATE-02",
-    "test": "runtimeCommandGateOrdersAcceptedCommandsBeforeCloseAndRejectsLateDispatch; runtimeCommandGateReopensOnlyWhenCloseRequestWasRejected",
+    "case": "APP30",
+    "receipt_id": "APP30-CHAT-LIST-CURRENT-01",
+    "test": "chatListSnapshotCanReloadAfterPrivacyLockAndAfterRequestFailure; chatListPaginationWaitsForLoadedPageAndDoesNotLeakAcrossAccounts; staleChatListPageResponseCannotCompleteReplacementSnapshot",
     "checkpoint_commit": "ed45815dd21003f80016adf3015af933cf2552d1",
     "app_source_commit": "35abba9cb4924829bb02d20489b4c5f5c2854def",
-    "result": "PASS 2/2 focused Swift Testing cases. Accepted synchronous dispatch precedes close, late dispatch is rejected, and a synchronously rejected close reopens the gate.",
-    "limitation": "Deterministic gate tests only. No authenticated TDLib client, remote response-drain barrier, or multi-account quit was exercised."
+    "result": "PASS 3/3 focused Swift Testing cases. Reload/retry is available; pagination stays account-scoped; an old page response cannot complete a replacement snapshot.",
+    "limitation": "Synthetic policy only. No authenticated Telegram account, live conversation order, or 20-runtime behavior was exercised."
   },
   "latest_chat_list_pagination_slice": {
     "id": "CHAT-LIST-PAGINATION-03",
