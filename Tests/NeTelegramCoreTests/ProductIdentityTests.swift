@@ -4,8 +4,9 @@ import Testing
 
 struct ProductIdentityTests {
     @Test func productDisplayNameMatchesCurrentProductIdentity() {
-        #expect(ProductIdentity.displayName == "NeTelegram")
+        #expect(ProductIdentity.displayName == "NeTide")
         #expect(ProductIdentity.repositoryCodename == "NeTelegram")
+        #expect(!ProductIdentity.displayName.localizedCaseInsensitiveContains("telegram"))
     }
 
     @Test func accountStorageUsesOnlyTheApplicationsOwnSupportDirectory() {
@@ -21,6 +22,7 @@ struct ProductIdentityTests {
             isDevelopmentBuild: true
         )
 
+        // Keep the codename-based storage path stable across public branding changes.
         #expect(release.path == support.appendingPathComponent("NeTelegram", isDirectory: true).path)
         #expect(development.path.hasPrefix(support.appendingPathComponent("NeTelegram/Development", isDirectory: true).path))
         #expect(development != release)
