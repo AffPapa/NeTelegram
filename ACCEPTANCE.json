@@ -4,6 +4,9 @@
   "current_evidence": {
     "release_validator_update_archive_gate": {
       "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
+      "workflow_run_id": 38740754274,
+      "workflow_status": "success",
+      "workflow_commit": "88dc89e47206f425dad5e479e90194e19e878ccd",
       "local_focused_tests": "Tests.release.test_validate_release: 23/23 passed.",
       "scope": "Release candidates require a Sparkle update ZIP and candidate validation invokes the pinned Sparkle sign_update --verify against exact archive bytes. Unit tests use a deterministic verifier stub; they do not prove a real EdDSA signature.",
       "app_source_changed": false,

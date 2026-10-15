@@ -6,7 +6,13 @@
     "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
     "scope": "Release candidate validation requires Sparkle update ZIP and runs the pinned Sparkle sign_update --verify against its exact bytes; app source unchanged.",
     "focused_tests": "Tests.release.test_validate_release: 23/23 passed locally. Fixtures use a deterministic verifier stub and are not cryptographic release evidence.",
-    "hosted_ci": "Query the exact pushed commit after publication; do not reuse the prior metadata run for this source change.",
+    "hosted_ci": {
+      "run_id": 38740754274,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38740754274",
+      "workflow_commit": "88dc89e47206f425dad5e479e90194e19e878ccd",
+      "scope": "Metadata validation for the exact pushed release-validator signature-check implementation and checkpoint; the signed archive itself remains synthetic/unavailable."
+    },
     "app_release_created": false
   },
   "latest_api_hash_presence_check": {
@@ -109,11 +115,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38725890663,
+      "run_id": 38740754274,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725890663",
-      "workflow_commit": "c87ed6711d4e591dd6f3fec9bfcb163e2d7e3475",
-      "scope": "Metadata validation for the AUTH-APPLE-HIG-WINDOW-SIZE-02 checkpoint and Site v216 pointers."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38740754274",
+      "workflow_commit": "88dc89e47206f425dad5e479e90194e19e878ccd",
+      "scope": "Metadata validation for RELEASE-SPARKLE-CRYPTO-VERIFY-01 and current checkpoint."
     },
     "latest_exact_source_ci": {
       "run_id": 38734713139,
