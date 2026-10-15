@@ -969,10 +969,51 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 window.center()
             }
         }
-        guard visible else { return }
+        guard visible else {
+            window.contentView?.layoutSubtreeIfNeeded()
+            window.recalculateKeyViewLoop()
+            return
+        }
         Task { @MainActor [weak self] in
             await Task.yield()
-            self?.scrollAuthenticationCardToTop()
+            guard let self else { return }
+            self.scrollAuthenticationCardToTop()
+            self.refreshAuthenticationKeyViewLoop()
+        }
+    }
+
+    private func refreshAuthenticationKeyViewLoop() {
+        window.contentView?.layoutSubtreeIfNeeded()
+        window.recalculateKeyViewLoop()
+        installAuthenticationKeyViewLoop()
+    }
+
+    /// AppKit's automatic traversal did not include the borderless QR button
+    /// after controls were revealed dynamically inside the auth scroll view.
+    /// Build a loop from the controls visible in the current TDLib step so Tab
+    /// reaches each available action while hidden steps stay out of the chain.
+    private func installAuthenticationKeyViewLoop() {
+        var keyViews: [NSView] = []
+        if !registrationTermsScroll.isHidden, !registrationTermsTextView.isHidden {
+            keyViews.append(registrationTermsTextView)
+        }
+        if !countryPickerStack.isHidden, !countryPicker.isHidden {
+            keyViews.append(countryPicker)
+        }
+        if !phoneField.isHidden { keyViews.append(phoneField) }
+        if !emailField.isHidden { keyViews.append(emailField) }
+        if !inputField.isHidden { keyViews.append(inputField) }
+        if !secureInputField.isHidden { keyViews.append(secureInputField) }
+        if !firstNameField.isHidden { keyViews.append(firstNameField) }
+        if !lastNameField.isHidden { keyViews.append(lastNameField) }
+        if !registrationConsent.isHidden { keyViews.append(registrationConsent) }
+        if !actionButton.isHidden { keyViews.append(actionButton) }
+        if !qrButton.isHidden { keyViews.append(qrButton) }
+        if !changePhoneButton.isHidden { keyViews.append(changePhoneButton) }
+
+        guard !keyViews.isEmpty else { return }
+        for index in keyViews.indices {
+            keyViews[index].nextKeyView = keyViews[(index + 1) % keyViews.count]
         }
     }
 
@@ -3498,6 +3539,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     ? "Введите полный номер с + и кодом страны. Список стран пока недоступен."
                     : phoneNumberEntryPrompt()
             }
+            refreshAuthenticationKeyViewLoop()
         } else if let type = object["@type"] as? String, type == "updateNewChat",
                   let chat = object["chat"] as? [String: Any] {
             upsertChat(chat, for: target)
@@ -4991,13 +5033,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-        if control === phoneField,
-           commandSelector == #selector(NSResponder.insertTab(_:)),
-           !countryPickerStack.isHidden,
-           selectedCountryRegionCode == nil,
-           !phoneField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines).hasPrefix("+") {
-            return window?.makeFirstResponder(countryPicker) == true
-        }
         let isAuthenticationField = control === phoneField || control === emailField || control === inputField
             || control === secureInputField || control === firstNameField || control === lastNameField
         guard AuthTextFieldKeyboardPolicy.shouldSubmit(
