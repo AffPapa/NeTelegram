@@ -102,8 +102,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "status": "not run for docs-only checkpoint commit",
-      "scope": "Local checkpoint validator run; no second hosted metadata CI was triggered for checkpoint-only updates."
+      "run_id": 38725890663,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725890663",
+      "workflow_commit": "c87ed6711d4e591dd6f3fec9bfcb163e2d7e3475",
+      "scope": "Metadata validation for the AUTH-APPLE-HIG-WINDOW-SIZE-02 checkpoint and Site v216 pointers."
     },
     "latest_exact_source_ci": {
       "run_id": 38708407779,
@@ -383,8 +386,11 @@
   "latest_site_source_commit": "8d6abc928a71e94cc4e7f08a27bb50fb9137ab8e",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "status": "not run for docs-only checkpoint commit",
-    "scope": "Local checkpoint validator run; no redundant hosted metadata workflow."
+    "run_id": 38725890663,
+    "status": "success",
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725890663",
+    "workflow_commit": "c87ed6711d4e591dd6f3fec9bfcb163e2d7e3475",
+    "scope": "Metadata validation for the AUTH-APPLE-HIG-WINDOW-SIZE-02 checkpoint and Site v216 pointers."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
