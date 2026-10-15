@@ -8564,7 +8564,7 @@ private final class LocalAccountRuntime {
     }
 
     func send(_ request: [String: Any]) throws {
-        guard let route else { return }
+        guard let route else { throw CocoaError(.userCancelled) }
         let type = request["@type"] as? String
         guard !isUnverifiedProfileRemovalRequested || type == "close" else {
             throw CocoaError(.userCancelled)
