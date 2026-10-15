@@ -1002,8 +1002,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let maximumAuthSize = NSSize(width: 720, height: 680)
             window.minSize = minimumAuthSize
             window.maxSize = maximumAuthSize
-            if let size = window.contentView?.bounds.size,
-               size.width < minimumAuthSize.width || size.height < minimumAuthSize.height
+            let size = window.frame.size
+            if size.width < minimumAuthSize.width || size.height < minimumAuthSize.height
                 || size.width > maximumAuthSize.width || size.height > maximumAuthSize.height {
                 // Keep the 560x500 first-run size and any user resize inside
                 // the auth range. Only returning from the larger chat window
@@ -1016,7 +1016,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // Chat is the primary workspace and should use the space the
             // person chooses; only the narrow sign-in task has a maximum.
             window.maxSize = NSSize(width: 4096, height: 4096)
-            if let size = window.contentView?.bounds.size, size.width < 760 || size.height < 600 {
+            let size = window.frame.size
+            if size.width < 760 || size.height < 600 {
                 window.setContentSize(NSSize(width: 1060, height: 720))
                 window.center()
             }
@@ -8005,8 +8006,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func presentAuthenticationLayoutPreview(at index: Int) {
         let state = authLayoutPreviewStates[index]
-        let frameSize = window.frame.size
-        window.title = "\(ProductIdentity.displayName) · auth preview \(state) · \(Int(frameSize.width))×\(Int(frameSize.height))"
         switch state {
         case "phone":
             pendingAuthorizationType = "authorizationStateWaitPhoneNumber"
@@ -8028,6 +8027,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return
         }
         window.contentView?.layoutSubtreeIfNeeded()
+        let frameSize = window.frame.size
+        window.title = "\(ProductIdentity.displayName) · auth preview \(state) · \(Int(frameSize.width))×\(Int(frameSize.height))"
     }
 
     private var visibleApplicationWindowCount: Int {
