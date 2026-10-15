@@ -4024,9 +4024,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func reconcileNotifications(_ groups: [[String: Any]], for target: LocalAccountRuntime) {
-        let old = notificationIDsByAccount[target.account] ?? []
-        var next = Set<String>()
-        var routed: [String: RoutedTDLibNotification] = [:]
+        var candidates: [RoutedTDLibNotification] = []
+        var preserving = Set<String>()
         for group in groups {
             guard let groupID = (group["id"] as? NSNumber)?.int32Value,
                   let chatID = (group["chat_id"] as? NSNumber)?.int64Value else { continue }
@@ -4038,13 +4037,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         groupID: groupID,
                         notificationID: notificationID
                     )
-                    // An active snapshot can contain the same transient push
-                    // form as a live update. Retain its prior route/presentation
-                    // until TDLib supplies the downloaded NewMessage.
-                    if old.contains(identifier), let previous = notificationTargets[identifier] {
-                        next.insert(identifier)
-                        routed[identifier] = previous
-                    }
+                    preserving.insert(identifier)
                     continue
                 }
                 guard let value = TDLibNotificationRouter.route(
@@ -4054,20 +4047,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     notification: item,
                     isPrivacyLocked: lockState
                 ) else { continue }
-                next.insert(value.systemIdentifier)
-                routed[value.systemIdentifier] = value
+                candidates.append(value)
             }
         }
-        let removed = old.subtracting(next)
+        let removed = AccountNotificationCleanup.reconcile(
+            account: target.account,
+            candidates: candidates,
+            preserving: preserving,
+            identifiersByAccount: &notificationIDsByAccount,
+            targetsByIdentifier: &notificationTargets
+        )
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
-        notificationIDsByAccount[target.account] = next
-        notificationTargets = notificationTargets.filter { $0.value.account != target.account }
-        notificationTargets.merge(routed) { _, new in new }
         // Re-publish TDLib's current snapshot without replaying sounds. This
         // repairs missing OS requests after resume/reconciliation; delivery
         // rechecks the account generation, route membership, and privacy lock.
-        deliverNotifications(routed.values.map { ($0, target) }, isReconciliation: true)
+        let routed = (notificationIDsByAccount[target.account] ?? []).compactMap { notificationTargets[$0] }
+        deliverNotifications(routed.map { ($0, target) }, isReconciliation: true)
     }
 
     private func configureNotifications(for target: LocalAccountRuntime) {
@@ -4082,25 +4078,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func updateNotificationGroup(_ update: [String: Any], for target: LocalAccountRuntime) {
         guard let groupID = (update["notification_group_id"] as? NSNumber)?.int32Value,
               let chatID = (update["chat_id"] as? NSNumber)?.int64Value else { return }
-        var active = notificationIDsByAccount[target.account] ?? []
-        let removedIDs = Set((update["removed_notification_ids"] as? [NSNumber] ?? []).map { "netelegram.\(target.account.id.uuidString.lowercased()).\(groupID).\($0.int32Value)" })
-        active.subtract(removedIDs)
-        for identifier in removedIDs { notificationTargets.removeValue(forKey: identifier) }
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removedIDs))
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removedIDs))
-        for item in update["added_notifications"] as? [[String: Any]] ?? [] {
-            guard let value = TDLibNotificationRouter.route(
+        let added = (update["added_notifications"] as? [[String: Any]] ?? []).compactMap { item in
+            TDLibNotificationRouter.route(
                 account: target.account,
                 groupID: groupID,
                 groupChatID: chatID,
                 notification: item,
                 isPrivacyLocked: lockState
-            ) else { continue }
-            active.insert(value.systemIdentifier)
-            notificationTargets[value.systemIdentifier] = value
-            deliverNotification(value, for: target)
+            )
         }
-        notificationIDsByAccount[target.account] = active
+        let removedIDs = AccountNotificationCleanup.applyGroupUpdate(
+            account: target.account,
+            groupID: groupID,
+            removedNotificationIDs: Set((update["removed_notification_ids"] as? [NSNumber] ?? []).map(\.int32Value)),
+            added: added,
+            identifiersByAccount: &notificationIDsByAccount,
+            targetsByIdentifier: &notificationTargets
+        )
+        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removedIDs))
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removedIDs))
+        let accepted = added.filter {
+            notificationIDsByAccount[target.account]?.contains($0.systemIdentifier) == true
+                && notificationTargets[$0.systemIdentifier] == $0
+        }
+        deliverNotifications(accepted.map { ($0, target) })
     }
 
     private func updateNotification(_ update: [String: Any], for target: LocalAccountRuntime) {
@@ -4126,19 +4127,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // The content may have changed to an unsupported notification kind
             // (for example a call). Remove any old message preview and route;
             // never leave stale message text visible under the reused ID.
-            notificationTargets.removeValue(forKey: identifier)
-            var active = notificationIDsByAccount[target.account] ?? []
-            active.remove(identifier)
-            notificationIDsByAccount[target.account] = active
-            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])
-            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [identifier])
+            let removed = AccountNotificationCleanup.replace(
+                account: target.account,
+                identifier: identifier,
+                with: nil,
+                identifiersByAccount: &notificationIDsByAccount,
+                targetsByIdentifier: &notificationTargets
+            )
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
             return
         }
 
-        var active = notificationIDsByAccount[target.account] ?? []
-        active.insert(identifier)
-        notificationIDsByAccount[target.account] = active
-        notificationTargets[identifier] = routed
+        let removed = AccountNotificationCleanup.replace(
+            account: target.account,
+            identifier: identifier,
+            with: routed,
+            identifiersByAccount: &notificationIDsByAccount,
+            targetsByIdentifier: &notificationTargets
+        )
+        guard removed.isEmpty else {
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
+            return
+        }
         // Replacing content is a reconciliation of the same TDLib notification,
         // so refresh its text/route without replaying the notification sound.
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [identifier])

@@ -175,6 +175,109 @@ private final class RuntimeOwnershipProbe {}
     #expect(targetsByIdentifier[activeNotification.systemIdentifier] == activeNotification)
 }
 
+@Test func accountNotificationReconciliationPreservesOnlyCurrentAccountRoutes() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    func notification(_ account: AccountUUID, _ id: Int32, topic: ConversationTopicKey = .main) -> RoutedTDLibNotification {
+        RoutedTDLibNotification(
+            account: account,
+            groupID: 4,
+            notificationID: id,
+            conversation: ConversationKey(account: account, chatID: 90, topic: topic),
+            messageID: Int64(id),
+            date: 1,
+            isSilent: true,
+            showsPreview: true,
+            preview: "preview \(id)"
+        )
+    }
+    let staleA = notification(accountA, 1)
+    let transientA = notification(accountA, 2, topic: .forum(topicID: 12))
+    let orphanedA = notification(accountA, 3)
+    let activeB = notification(accountB, 1)
+    let currentA = notification(accountA, 4)
+    var identifiersByAccount = [
+        accountA: Set([staleA.systemIdentifier, transientA.systemIdentifier]),
+        accountB: Set([activeB.systemIdentifier]),
+    ]
+    var targets = Dictionary(uniqueKeysWithValues: [staleA, transientA, orphanedA, activeB].map { ($0.systemIdentifier, $0) })
+
+    let removed = AccountNotificationCleanup.reconcile(
+        account: accountA,
+        candidates: [currentA, activeB],
+        preserving: [transientA.systemIdentifier, activeB.systemIdentifier],
+        identifiersByAccount: &identifiersByAccount,
+        targetsByIdentifier: &targets
+    )
+
+    #expect(removed == [staleA.systemIdentifier, orphanedA.systemIdentifier])
+    #expect(identifiersByAccount[accountA] == [currentA.systemIdentifier, transientA.systemIdentifier])
+    #expect(identifiersByAccount[accountB] == [activeB.systemIdentifier])
+    #expect(targets[staleA.systemIdentifier] == nil)
+    #expect(targets[orphanedA.systemIdentifier] == nil)
+    #expect(targets[currentA.systemIdentifier] == currentA)
+    #expect(targets[transientA.systemIdentifier] == transientA)
+    #expect(targets[activeB.systemIdentifier] == activeB)
+    #expect(targets[transientA.systemIdentifier]?.conversation.topic == .forum(topicID: 12))
+}
+
+@Test func accountNotificationGroupDeltaAndReplacementAreAccountScoped() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    func notification(_ account: AccountUUID, group: Int32, id: Int32) -> RoutedTDLibNotification {
+        RoutedTDLibNotification(
+            account: account,
+            groupID: group,
+            notificationID: id,
+            conversation: ConversationKey(account: account, chatID: Int64(group)),
+            messageID: Int64(id),
+            date: 1,
+            isSilent: true,
+            showsPreview: true,
+            preview: "preview"
+        )
+    }
+    let oldA = notification(accountA, group: 7, id: 9)
+    let sameCounterB = notification(accountB, group: 7, id: 9)
+    let addedA = notification(accountA, group: 7, id: 10)
+    let wrongGroupA = notification(accountA, group: 8, id: 11)
+    var identifiersByAccount = [
+        accountA: Set([oldA.systemIdentifier]),
+        accountB: Set([sameCounterB.systemIdentifier]),
+    ]
+    var targets = [oldA.systemIdentifier: oldA, sameCounterB.systemIdentifier: sameCounterB]
+
+    let removed = AccountNotificationCleanup.applyGroupUpdate(
+        account: accountA,
+        groupID: 7,
+        removedNotificationIDs: [9],
+        added: [addedA, sameCounterB, wrongGroupA],
+        identifiersByAccount: &identifiersByAccount,
+        targetsByIdentifier: &targets
+    )
+
+    #expect(removed == [oldA.systemIdentifier])
+    #expect(identifiersByAccount[accountA] == [addedA.systemIdentifier])
+    #expect(identifiersByAccount[accountB] == [sameCounterB.systemIdentifier])
+    #expect(targets[oldA.systemIdentifier] == nil)
+    #expect(targets[addedA.systemIdentifier] == addedA)
+    #expect(targets[sameCounterB.systemIdentifier] == sameCounterB)
+    #expect(!identifiersByAccount[accountA, default: []].contains(wrongGroupA.systemIdentifier))
+    #expect(targets[wrongGroupA.systemIdentifier] == nil)
+
+    let stale = AccountNotificationCleanup.replace(
+        account: accountA,
+        identifier: addedA.systemIdentifier,
+        with: nil,
+        identifiersByAccount: &identifiersByAccount,
+        targetsByIdentifier: &targets
+    )
+    #expect(stale == [addedA.systemIdentifier])
+    #expect(identifiersByAccount[accountA] == [])
+    #expect(targets[addedA.systemIdentifier] == nil)
+    #expect(targets[sameCounterB.systemIdentifier] == sameCounterB)
+}
+
 @Test func accountNotificationCleanupRemovesOnlyExactDeletedMessages() {
     let accountA = AccountUUID()
     let accountB = AccountUUID()
