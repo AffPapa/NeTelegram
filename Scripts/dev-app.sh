@@ -138,9 +138,10 @@ PY
         echo "Reusing verified canonical bundle for exact clean source $DEV_COMMIT."
         echo "Build record: $BUILD_RECORD"
         if [[ "$MODE" == "launch" ]]; then
-            if running_pid="$(/usr/bin/pgrep -x NeTelegram 2>/dev/null)"; then
-                if [[ "$running_pid" == *$'\n'* ]]; then
-                    echo "Multiple NeTelegram processes are running; refusing to claim this launch changed the active app mode." >&2
+            if process_check_output="$("$ROOT_DIR/Scripts/check-app-process.sh" NeTelegram org.affpapa.netelegram.dev)"; then
+                running_pid="$(sed -n 's/.*(pid \([0-9][0-9]*\)).*/\1/p' <<< "$process_check_output")"
+                if [[ -z "$running_pid" ]]; then
+                    echo "Unable to identify the running Dev.app PID; refusing to change its launch mode." >&2
                     exit 1
                 fi
                 if ! running_command="$(/bin/ps -ww -p "$running_pid" -o command= 2>/dev/null)" || [[ -z "$running_command" ]]; then

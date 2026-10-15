@@ -42,18 +42,27 @@ class AppProcessCheckTests(unittest.TestCase):
                 check=False,
             )
 
-    def test_pgrep_running_is_authoritative(self):
-        result = self.run_check(0, pgrep_output="4242\\n4343")
+    def test_pgrep_running_is_bound_to_requested_bundle_id(self):
+        result = self.run_check(0, "running:4343", pgrep_output="4242\\n4343")
         self.assertEqual(result.returncode, 0)
-        self.assertIn("running process NeTelegram (pid 4242,4343)", result.stdout)
+        self.assertIn("running app NeTelegram (org.affpapa.netelegram.dev) (pid 4343)", result.stdout)
+
+    def test_other_bundle_with_same_executable_does_not_block_dev_build(self):
+        result = self.run_check(0, "other-only", pgrep_output="4242\\n4343")
+        self.assertEqual(result.returncode, 1)
+
+    def test_unknown_bundle_mapping_fails_closed(self):
+        result = self.run_check(0, "unknown", pgrep_output="4242")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("Unable to verify bundle identity", result.stderr)
 
     def test_pgrep_no_match_is_authoritative(self):
         self.assertEqual(self.run_check(1).returncode, 1)
 
     def test_launch_services_fallback_detects_running_app(self):
-        result = self.run_check(3, "running")
+        result = self.run_check(3, "running:4242")
         self.assertEqual(result.returncode, 0)
-        self.assertIn("running app NeTelegram (org.affpapa.netelegram.dev) detected by LaunchServices", result.stdout)
+        self.assertIn("running app NeTelegram (org.affpapa.netelegram.dev) (pid 4242) detected by LaunchServices", result.stdout)
 
     def test_launch_services_empty_result_fails_closed(self):
         result = self.run_check(3, "absent")

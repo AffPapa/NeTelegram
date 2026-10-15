@@ -13,9 +13,47 @@ SWIFT_BIN="${NETELEGRAM_PROCESS_SWIFT_BIN:-/usr/bin/swift}"
 MODULE_CACHE="${NETELEGRAM_PROCESS_SWIFT_CACHE:-/private/tmp/netelegram-process-check-swift-modules}"
 
 if running_pids="$("$PGREP_BIN" -x "$PROCESS_NAME" 2>/dev/null)"; then
-    running_pids="${running_pids//$'\n'/,}"
-    printf 'running process %s (pid %s)\n' "$PROCESS_NAME" "$running_pids"
-    exit 0
+    if [[ ! "$running_pids" =~ ^[0-9]+([[:space:]]+[0-9]+)*$ ]]; then
+        echo "Unable to verify process IDs for $PROCESS_NAME" >&2
+        exit 2
+    fi
+    swift_result="$(NETELEGRAM_PROCESS_BUNDLE_ID="$BUNDLE_ID" \
+        NETELEGRAM_PROCESS_PIDS="$running_pids" \
+        "$SWIFT_BIN" -module-cache-path "$MODULE_CACHE" -e '
+import AppKit
+import Foundation
+let expected = ProcessInfo.processInfo.environment["NETELEGRAM_PROCESS_BUNDLE_ID"]!
+let pids = ProcessInfo.processInfo.environment["NETELEGRAM_PROCESS_PIDS"]!
+    .split(whereSeparator: \.isWhitespace)
+    .compactMap { Int32($0) }
+guard !pids.isEmpty else { print("unknown"); exit(0) }
+for pid in pids {
+    guard let app = NSRunningApplication(processIdentifier: pid),
+          let bundleID = app.bundleIdentifier else {
+        print("unknown")
+        exit(0)
+    }
+    if bundleID == expected {
+        print("running:\(pid)")
+        exit(0)
+    }
+}
+print("other-only")
+' 2>/dev/null)" || exit 2
+    case "$swift_result" in
+        running:*)
+            running_pid="${swift_result#running:}"
+            [[ "$running_pid" =~ ^[0-9]+$ ]] || exit 2
+            printf 'running app %s (%s) (pid %s)\n' "$PROCESS_NAME" "$BUNDLE_ID" "$running_pid"
+            exit 0
+            ;;
+        other-only) exit 1 ;;
+        unknown)
+            echo "Unable to verify bundle identity for a $PROCESS_NAME process" >&2
+            exit 2
+            ;;
+        *) exit 2 ;;
+    esac
 else
     pgrep_status=$?
 fi
@@ -33,13 +71,15 @@ swift_result="$(NETELEGRAM_PROCESS_BUNDLE_ID="$BUNDLE_ID" \
 import AppKit
 let bundleID = ProcessInfo.processInfo.environment["NETELEGRAM_PROCESS_BUNDLE_ID"]!
 let running = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
-    .contains { !$0.isTerminated }
-print(running ? "running" : "absent")
+    .first { !$0.isTerminated }
+print(running.map { "running:\($0.processIdentifier)" } ?? "absent")
 ' 2>/dev/null)" || exit 2
 
 case "$swift_result" in
-    running)
-        printf 'running app %s (%s) detected by LaunchServices\n' "$PROCESS_NAME" "$BUNDLE_ID"
+    running:*)
+        running_pid="${swift_result#running:}"
+        [[ "$running_pid" =~ ^[0-9]+$ ]] || exit 2
+        printf 'running app %s (%s) (pid %s) detected by LaunchServices\n' "$PROCESS_NAME" "$BUNDLE_ID" "$running_pid"
         exit 0
         ;;
     absent)
