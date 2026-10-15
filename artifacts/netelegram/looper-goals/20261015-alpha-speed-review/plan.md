@@ -5,7 +5,7 @@
 - Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, clean, `HEAD=4da1e4f4c0c95aa58f1d0cd44d29bad0fafeea90`, origin `AffPapa/NeTelegram`.
 - App source: `75589091d7144e1d1ffe94b15bf38638df7d708d`; canonical Dev.app: `/private/tmp/NeTelegram-Dev.app`, `0.0.0-dev`, arm64, macOS 14, ad-hoc only. Not a distribution artifact.
 - Current Site: public v218, no app download, empty alpha/stable feeds.
-- Acceptance: 56 cases: 3 passed, 46 partial, 7 not run. Synthetic 20-profile tests are not real multi-account validation.
+- Acceptance: 56 cases: 3 passed, 46 partial, 7 not run. Synthetic 20-profile tests are not real multi-account validation. All available authorized accounts remaining active is a required product behavior at every release, not a stable-only feature.
 - Current blockers: owner-operated one-account login/read/send smoke not done; no notarization credential profile; no release assembler; no signed/notarized app or release assets. Developer ID identities exist, but no NeTide bundle has been signed.
 
 ## Why this took too long
@@ -52,5 +52,5 @@ Publish immutable GitHub alpha assets against the exact source commit; download 
 - **Next action:** owner completes the real one-account smoke in `/private/tmp/NeTelegram-Dev.app`. This is the only immediate product gate; no code change is justified before the observation.
 - **Release setup blocker:** notarization profile was absent in the latest checkpoint. After the smoke and source freeze, use the supported Apple credential setup path. Never ask for a password pasted in chat.
 - **Implementation gap:** there is no safe release assembler. Implement it only after smoke exposes any source fix and the alpha source SHA is frozen.
-- **Not required for alpha:** 20 real accounts/resource matrix; required for stable claims only.
+- **Coverage may remain partial for alpha:** 20 real authorized accounts and the 1/5/10/20 resource matrix are not required to make a narrow alpha claim, but all-active runtime behavior remains mandatory in the implementation. Do not ship an alpha that only keeps one selected plus a few background accounts; report exact real-account coverage and leave 20-account certification open until it is measured.
 - **Not complete:** this plan does not constitute a build, account smoke, notarization, release, Site update, or compatibility PASS.

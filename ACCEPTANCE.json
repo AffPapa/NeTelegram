@@ -2,6 +2,15 @@
   "schema_version": 2,
   "status": "CAPTURED-IDENTITY-DISPATCH-02: Bind TDLib read and photo-open checks to captured identity. Exact-source CI, pinned TDLib bundle, and canonical clean accountless app smoke passed. Real account behavior remains pending.",
   "current_evidence": {
+    "release_validator_update_archive_gate": {
+      "commit": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
+      "workflow_run_id": 38739904653,
+      "workflow_status": "success",
+      "local_focused_tests": "Tests.release.test_validate_release: 21/21 passed.",
+      "scope": "Release candidates now require a Sparkle update ZIP and matching manifest metadata. This does not build an app or prove a real EdDSA signature; the test fixture is synthetic.",
+      "app_source_changed": false,
+      "real_account_or_release_evidence": false
+    },
     "app_source_commit": "75589091d7144e1d1ffe94b15bf38638df7d708d",
     "local_suite": "Exact-source macOS Swift CI passed for 7558909; guarded canonical Dev.app rebuild and clean first-run AX smoke also passed locally. No owner credentials or login were used.",
     "focused_test": "No new focused unit test was added for the two AppDelegate-only argument bindings; exact-source Swift CI and pinned TDLib Dev.app assembly passed on 7558909.",

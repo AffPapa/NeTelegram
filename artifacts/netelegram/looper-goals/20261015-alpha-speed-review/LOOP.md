@@ -7,7 +7,7 @@ Deliver one trustworthy NeTide 0.1 alpha candidate from one frozen NeTelegram so
 ## Scope and exclusions
 
 - In scope: diagnose repeated workflow errors; keep one canonical checkout, one Dev.app and one release candidate; prove the shortest alpha-critical user path; publish exact verified bytes to GitHub, then update the existing Site once.
-- Stable-only: 20 real authorized runtimes and 1/5/10/20 resource matrix.
+- Product requirement at every release: every available authorized account keeps its runtime active; never reduce alpha to one selected account plus a small background subset. Alpha may state an exact incomplete real-account coverage honestly. The 20-real-account/1-5-10-20 resource certification remains open until measured; it is needed before any 20-account performance claim.
 - Deferred: channel access until sponsored-media obligations are met; no stable Telegram compatibility claim while §1.3/1.4 and §3.3 remain unresolved.
 - Never inspect/import sessions from another Telegram client or expose credentials. Owner performs login only in the app. Do not create a token or open a browser for routine GitHub work.
 

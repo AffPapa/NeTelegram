@@ -2,6 +2,14 @@
   "schema_version": 1,
   "phase": "CAPTURED-IDENTITY-DISPATCH-02: Bind TDLib read and photo-open checks to captured identity. Exact-source CI, pinned TDLib bundle, and canonical clean accountless app smoke passed. Real account behavior remains pending.",
   "verified_at": "2026-10-15",
+  "last_release_process_milestone": {
+    "commit": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
+    "workflow_run_id": 38739904653,
+    "workflow_status": "success",
+    "scope": "Release candidate validation now requires Sparkle update ZIP with manifest-bound signature/version/channel/minimum macOS metadata; app source unchanged.",
+    "focused_tests": "Tests.release.test_validate_release: 21/21 passed locally. The fixture signature is synthetic and is not cryptographic verification evidence.",
+    "app_release_created": false
+  },
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
     "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
@@ -125,10 +133,10 @@
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     },
     "latest_pushed_commit": {
-      "sha": "b9baafdb8fe7b66a9845bc53918e5cff350eda19",
+      "sha": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
       "branch": "main",
       "remote": "AffPapa/NeTelegram",
-      "method": "Current public origin/main checkpoint commit; metadata-only CI passed run 38737097983. App source SHA remains separately recorded as 7558909."
+      "method": "Current public origin/main release-validator and plan commit; metadata CI run 38739904653 passed. App source SHA remains separately recorded as 7558909."
     }
   },
   "local_development_candidate": {
