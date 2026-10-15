@@ -413,6 +413,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // use the same scroll container, while the window remains resizable.
         let contentWidth: CGFloat = 600
         let contentHeight: CGFloat = 560
+        let authFormColumnWidth: CGFloat = 400
+        let authPanelHorizontalInset: CGFloat = 16
+        let authStackHorizontalInset: CGFloat = 16
         let content = SystemWindowBackgroundView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
         content.autoresizingMask = [.width, .height]
         content.identifier = NSUserInterfaceItemIdentifier("rootContent")
@@ -635,13 +638,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
             authPanel.centerXAnchor.constraint(equalTo: authScrollContent.centerXAnchor),
             authPanel.centerYAnchor.constraint(equalTo: authScrollContent.centerYAnchor),
-            authPanel.widthAnchor.constraint(equalToConstant: 448).withPriority(.defaultHigh),
+            // One measured form column, with equal gutters between the panel,
+            // stack, and controls. This keeps fields, helper text, and the
+            // primary action aligned at both the default and minimum width.
+            authPanel.widthAnchor.constraint(
+                equalToConstant: authFormColumnWidth + 2 * (authPanelHorizontalInset + authStackHorizontalInset)
+            ).withPriority(.defaultHigh),
             authPanel.widthAnchor.constraint(lessThanOrEqualTo: authScrollContent.widthAnchor, constant: -32),
             authPanel.topAnchor.constraint(greaterThanOrEqualTo: authScrollContent.topAnchor, constant: 12),
             authPanel.bottomAnchor.constraint(lessThanOrEqualTo: authScrollContent.bottomAnchor, constant: -12),
             authPanel.heightAnchor.constraint(greaterThanOrEqualTo: authStack.heightAnchor, constant: 40),
-            authStack.leadingAnchor.constraint(equalTo: authPanel.leadingAnchor, constant: 20),
-            authStack.trailingAnchor.constraint(equalTo: authPanel.trailingAnchor, constant: -20),
+            authStack.leadingAnchor.constraint(equalTo: authPanel.leadingAnchor, constant: authPanelHorizontalInset),
+            authStack.trailingAnchor.constraint(equalTo: authPanel.trailingAnchor, constant: -authPanelHorizontalInset),
             authStack.topAnchor.constraint(equalTo: authPanel.topAnchor, constant: 20),
             authStack.bottomAnchor.constraint(equalTo: authPanel.bottomAnchor, constant: -20),
             // Keep the form as one compact group in tall windows. The previous
@@ -652,49 +660,49 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
             loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
-            loginHeading.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            loginHeading.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
-            loginSubtitle.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            loginSubtitle.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
-            loginDisclosure.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            loginDisclosure.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
             countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPickerStack.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            countryPickerStack.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             phoneFieldLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneFieldLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            phoneFieldLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
+            phoneField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            emailField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 40),
+            emailField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 40),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            inputField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 40),
+            inputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 40),
             secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            secureInputField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 40),
+            secureInputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 40),
             firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            firstNameField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 40),
+            firstNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 40),
             lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            lastNameField.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 40),
+            lastNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 40),
             registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationConsent.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
             statusLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            statusLabel.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            statusLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             actionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             // Align the primary action with the input column. A narrower
             // default button made the phone step look like two unrelated
             // layouts despite sharing the same form.
-            actionButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
+            actionButton.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             qrButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             qrButton.widthAnchor.constraint(equalToConstant: 240).withPriority(.defaultHigh), qrButton.heightAnchor.constraint(equalToConstant: 32),
             changePhoneButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            changePhoneButton.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh), changePhoneButton.heightAnchor.constraint(equalToConstant: 32),
+            changePhoneButton.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), changePhoneButton.heightAnchor.constraint(equalToConstant: 32),
         ])
 
         chatPane = NSView(frame: NSRect(x: 0, y: 0, width: 1060, height: 720))

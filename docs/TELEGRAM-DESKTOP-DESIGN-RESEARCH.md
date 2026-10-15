@@ -215,3 +215,38 @@ path. NeTelegram retains its own AppKit control system and account policy; no
 Telegram source, assets, or styling are copied. This research does not certify
 VoiceOver speech, IME/RTL, contrast variants, a real login, or authenticated
 screens; those remain explicit follow-up checks.
+
+## 2026-10-15 — sign-in column geometry correction
+
+The supplied screenshot title `dev 5f414650` does not identify the live
+canonical app. The open `/private/tmp/NeTelegram-Dev.app` reported
+`NeTelegram · dev e9302d12`. I captured the accountless screen before editing
+and compared it with the attachment so the review would not tune a different
+build from the one the user was seeing.
+
+Apple's current [Layout](https://developer.apple.com/design/human-interface-guidelines/layout),
+[macOS Windows](https://developer.apple.com/design/human-interface-guidelines/windows),
+[Text Fields](https://developer.apple.com/design/human-interface-guidelines/text-fields),
+[Entering Data](https://developer.apple.com/design/human-interface-guidelines/entering-data),
+[Writing](https://developer.apple.com/design/human-interface-guidelines/writing),
+and [Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
+guidance supports aligned controls, adaptive system windows, clear field
+labels/hints, action-oriented next steps, and keyboard/accessibility support.
+The official [Telegram Desktop phone-entry source](https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/intro/intro_phone.cpp)
+was reviewed only for its grouping of country, phone, primary action, and QR
+alternative. Its source and styling were not copied.
+
+The remaining concrete defect was a constraint mismatch: old panel/stack
+insets left 376 pt for input controls and 392 pt for headings, while their
+preferred width was 400 pt. Required maximum-width constraints silently
+overrode those preferences. `main.swift` now defines one 400 pt form column
+and derives the panel width and gutters so the country control, phone
+label/input, helper/status text, and primary action share that measure in the
+default and minimum-width window. Native AppKit controls, semantic system
+colors, focus rings, window chrome, authentication behavior, and the
+independent-client disclosure remain. This corrects geometry; it is not a
+redesign claim or an authenticated-screen/accessibility certification.
+
+The AppKit target builds on Xcode 27 / Swift 6.4. Next is one guarded rebuild
+of the canonical Dev.app, followed by exact-build phone-step and compact-window
+visual/accessibility inspection. No Telegram account or credential was used.
