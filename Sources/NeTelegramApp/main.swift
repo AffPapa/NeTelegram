@@ -5047,8 +5047,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 expectedTelegramUserID: userID,
                 runtimeGeneration: selected.generation,
                 privacyEpoch: epoch,
-                currentAccount: runtime?.account ?? AccountUUID(),
-                currentTelegramUserID: selected.telegramUserID ?? 0,
+                currentAccount: selected.account,
+                currentTelegramUserID: userID,
                 currentGeneration: selected.generation
             ) {
                 try selected.send(tdRequest)
