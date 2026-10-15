@@ -222,6 +222,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var networkTypeFanoutCoordinator = NetworkTypeFanoutCoordinator()
     private var currentTDLibNetworkType = "networkTypeNone"
     private var networkTypeUpdateTask: Task<Void, Never>?
+    private var networkTypeRetryTask: Task<Void, Never>?
+    private var networkTypeRetryRevision: UInt64?
+    private var networkTypeRetryAttempt = 0
     private var pendingProfileStorageWarnings = 0
     private var suppressDraftUpdate = false
     private var chatRowsByAccount: [AccountUUID: [Int64: ChatListRowData]] = [:]
@@ -308,6 +311,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     func applicationWillTerminate(_ notification: Notification) {
         networkTypeUpdateTask?.cancel()
+        networkTypeRetryTask?.cancel()
+        networkTypeRetryTask = nil
+        networkTypeRetryRevision = nil
+        networkTypeRetryAttempt = 0
         networkMonitor.cancel()
         if let authFocusNavigationEventMonitor {
             NSEvent.removeMonitor(authFocusNavigationEventMonitor)
@@ -1244,6 +1251,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func scheduleNetworkTypeUpdate(_ type: String, revision: UInt64, force: Bool = false) {
         guard networkTypeFanoutCoordinator.accept(revision: revision, force: force) else { return }
         networkTypeUpdateTask?.cancel()
+        networkTypeRetryTask?.cancel()
+        networkTypeRetryTask = nil
+        networkTypeRetryRevision = nil
+        networkTypeRetryAttempt = 0
         networkTypeUpdateTask = Task { @MainActor [weak self] in
             try? await Task.sleep(nanoseconds: 400_000_000)
             guard !Task.isCancelled, let self else { return }
@@ -1268,6 +1279,63 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 self.currentTDLibNetworkType = type
                 self.refreshAccountPicker()
                 self.refreshStatusMenu()
+                self.schedulePendingNetworkTypeRetry(type: type, revision: revision)
+            }
+        }
+    }
+
+    private func schedulePendingNetworkTypeRetry(type: String, revision: UInt64) {
+        guard !networkTypeFanoutCoordinator.pendingAccounts.isEmpty else {
+            networkTypeRetryTask?.cancel()
+            networkTypeRetryTask = nil
+            networkTypeRetryRevision = nil
+            networkTypeRetryAttempt = 0
+            return
+        }
+        if networkTypeRetryRevision == revision { return }
+        if networkTypeRetryRevision != nil { networkTypeRetryAttempt = 0 }
+        networkTypeRetryTask?.cancel()
+        networkTypeRetryTask = nil
+        networkTypeRetryRevision = revision
+        networkTypeRetryAttempt += 1
+        let delay = NetworkTypeRetryPolicy.delayNanoseconds(attempt: networkTypeRetryAttempt)
+        networkTypeRetryTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(nanoseconds: delay)
+            } catch {
+                if self?.networkTypeRetryRevision == revision {
+                    self?.networkTypeRetryTask = nil
+                    self?.networkTypeRetryRevision = nil
+                }
+                return
+            }
+            guard !Task.isCancelled, let self else { return }
+            guard self.networkTypeRetryRevision == revision else { return }
+            self.networkTypeRetryTask = nil
+            self.networkTypeRetryRevision = nil
+            guard self.networkTypeFanoutCoordinator.isLatest(revision) else { return }
+            let pending = Array(self.networkTypeFanoutCoordinator.pendingAccounts)
+            guard !pending.isEmpty else { return }
+            let applied = self.networkTypeFanoutCoordinator.applyIfCurrent(
+                type: type,
+                revision: revision,
+                accounts: pending
+            ) { account, requestedType in
+                guard let accountRuntime = self.runtimesByAccount[account] else { return true }
+                do {
+                    try accountRuntime.applyNetworkType(requestedType)
+                    return true
+                } catch {
+                    if accountRuntime === self.runtime {
+                        self.setStatus("TDLib пока не принял сетевое обновление этого аккаунта; повтор будет выполнен автоматически.")
+                    }
+                    return false
+                }
+            }
+            if applied {
+                self.refreshAccountPicker()
+                self.refreshStatusMenu()
+                self.schedulePendingNetworkTypeRetry(type: type, revision: revision)
             }
         }
     }
@@ -2821,6 +2889,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 if revision > 0 {
                     _ = networkTypeFanoutCoordinator.recordPending(
                         account: profile.id,
+                        type: currentTDLibNetworkType,
+                        revision: revision
+                    )
+                    schedulePendingNetworkTypeRetry(
                         type: currentTDLibNetworkType,
                         revision: revision
                     )

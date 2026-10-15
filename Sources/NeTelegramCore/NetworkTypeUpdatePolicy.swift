@@ -20,6 +20,16 @@ public enum NetworkTypeUpdatePolicy {
     }
 }
 
+/// Backoff for a runtime that temporarily rejects `setNetworkType`. The retry
+/// remains alive while the process is running, but never polls faster than a
+/// second or more often than once every 32 seconds.
+public enum NetworkTypeRetryPolicy {
+    public static func delayNanoseconds(attempt: Int) -> UInt64 {
+        let boundedAttempt = max(1, min(attempt, 6))
+        return UInt64(1 << (boundedAttempt - 1)) * 1_000_000_000
+    }
+}
+
 /// Produces unique IDs for callbacks from a serial network-monitor queue and
 /// main-actor wake reconciliation. The counter exposes no network details.
 public final class NetworkPathRevisionCounter: @unchecked Sendable {

@@ -2740,6 +2740,15 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(counter.next() == 3)
 }
 
+@Test func networkTypeRetryBackoffIsBoundedAndDoesNotBusyPoll() {
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 0) == 1_000_000_000)
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 1) == 1_000_000_000)
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 2) == 2_000_000_000)
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 6) == 32_000_000_000)
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 7) == 32_000_000_000)
+    #expect(NetworkTypeRetryPolicy.delayNanoseconds(attempt: 100) == 32_000_000_000)
+}
+
 @MainActor
 @Test func networkTypeFanoutReconcilesAllTwentyRuntimesAndRejectsStaleWork() {
     let accounts = (1...20).map { index in
@@ -2830,6 +2839,41 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(coordinator.pendingUpdate(for: failedAccount) == nil)
     #expect(applied[failedAccount] == ["networkTypeWiFi", "networkTypeMobile", "networkTypeOther"])
     #expect(applied.count == 20)
+}
+
+@MainActor
+@Test func networkTypeRetryTargetsOnlyPendingAccountsAndClearsRecoveredState() {
+    let accounts = (1...4).map { index in
+        AccountUUID(UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", index))!)
+    }
+    let failedAccount = accounts[2]
+    var coordinator = NetworkTypeFanoutCoordinator()
+    var attempts: [AccountUUID: Int] = [:]
+
+    let accepted = coordinator.accept(revision: 1)
+    #expect(accepted)
+    let firstFanoutApplied = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: accounts) { account, _ in
+        attempts[account, default: 0] += 1
+        return account != failedAccount
+    }
+    #expect(firstFanoutApplied)
+    #expect(coordinator.pendingAccounts == Set([failedAccount]))
+
+    let pending = Array(coordinator.pendingAccounts)
+    var retriedAccounts: [AccountUUID] = []
+    var retriedTypes: [String] = []
+    let retryApplied = coordinator.applyIfCurrent(type: "networkTypeWiFi", revision: 1, accounts: pending) { account, type in
+        retriedAccounts.append(account)
+        retriedTypes.append(type)
+        attempts[account, default: 0] += 1
+        return true
+    }
+    #expect(retryApplied)
+    #expect(retriedAccounts == [failedAccount])
+    #expect(retriedTypes == ["networkTypeWiFi"])
+    #expect(attempts[failedAccount] == 2)
+    #expect(attempts.filter { $0.key != failedAccount }.values.allSatisfy { $0 == 1 })
+    #expect(coordinator.pendingAccounts.isEmpty)
 }
 
 @Test func typingActionIsRateLimitedAndStoppedWhenComposerClears() {
