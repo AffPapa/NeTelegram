@@ -1486,13 +1486,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         unverifiedRemovalPending: true
     )
 
-    #expect(firstPending == "Вход NeTelegram 1 — ожидает номер")
-    #expect(secondPending == "Вход NeTelegram 2 — ожидает код")
+    #expect(firstPending == "Вход NeTide 1 — ожидает номер")
+    #expect(secondPending == "Вход NeTide 2 — ожидает код")
     #expect(verified == "Test User · аккаунт 3 — подключён")
     #expect(networkUpdatePending == "Test User · аккаунт 3 — подключён · ожидает обновление сети")
     #expect(closedBackgroundProfile == "Test User · аккаунт 3 — ошибка")
     #expect(logoutCleanup == "Test User · аккаунт 4 — очистка после выхода ожидает")
-    #expect(removalCleanup == "Вход NeTelegram 5 — удаление незавершённого входа ожидает")
+    #expect(removalCleanup == "Вход NeTide 5 — удаление незавершённого входа ожидает")
     #expect(!firstPending.contains("6BFF7C49"))
     #expect(!secondPending.contains("Unverified name"))
     #expect(AccountPresentation.pickerStatus(
@@ -1522,7 +1522,7 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         telegramUserID: nil,
         candidate: localUUID
     )
-    #expect(pending.contains("Локальный вход NeTelegram 2"))
+    #expect(pending.contains("Локальный вход NeTide 2"))
     #expect(pending.contains("запись создана в этом приложении"))
     #expect(pending.contains("Сессии других приложений не импортируются"))
     #expect(!pending.contains(localUUID))
@@ -3399,6 +3399,10 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(started.get().contains("1:1"))
     #expect(completed.get().contains("2:1"))
     #expect(!started.get().contains("1:2"))
+    // The callback records its completion immediately before the delivery
+    // scheduler releases the buffer's in-flight capacity. Wait for that
+    // accounting step instead of asserting against a scheduler race.
+    while buffer.count != 2 && clock.now < deadline { await Task.yield() }
     #expect(buffer.count == 2, "The blocked callback and its queued same-account event remain charged to the shared bound")
 
     await blockedFirstAccountEvent.open()
