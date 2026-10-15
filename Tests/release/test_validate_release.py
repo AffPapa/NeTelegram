@@ -140,6 +140,21 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
     return manifest_path, assets, manifest
 
 
+def validate_fixture_candidate(root: Path, manifest: Path, assets: Path) -> str:
+    """Use a deterministic verifier stub; it never claims a real Sparkle signature."""
+    verifier = root / "fixture-sign_update"
+    verifier.write_text(
+        "#!/bin/sh\n"
+        "[ \"$1\" = \"--verify\" ] || exit 20\n"
+        "[ -f \"$2\" ] || exit 21\n"
+        "[ \"$3\" = \"fixture-signature\" ] || exit 22\n"
+        "exit 0\n",
+        encoding="utf-8",
+    )
+    verifier.chmod(0o700)
+    return validate_candidate(manifest, assets, sparkle_sign_update=verifier)
+
+
 class CandidateValidationTests(unittest.TestCase):
     def test_public_title_uses_selected_name_without_telegram(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -147,7 +162,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["public_title"] = "NeTelegram"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "public_title may use Telegram only with the required Unofficial prefix"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_duplicate_artifact_kinds_are_rejected_even_with_distinct_filenames(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -163,7 +178,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"].append(duplicate)
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "kind must appear only once: app_zip"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_requires_reconciled_sbom_and_third_party_notices(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -171,7 +186,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "notice"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "must include app_zip, dmg, sbom, notice, and sparkle_update_zip"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_candidate_requires_a_sparkle_update_archive(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -179,7 +194,26 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "sparkle_update_zip"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "missing sparkle_update_zip"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
+
+    def test_candidate_cryptographically_verifies_sparkle_archive_signature(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            update = next(item for item in manifest["artifacts"] if item["kind"] == "sparkle_update_zip")
+            update["sparkle_ed_signature"] = "not-the-fixture-signature"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "Sparkle EdDSA signature verification failed"):
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
+
+    def test_candidate_fails_closed_when_sparkle_verifier_is_missing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, _ = valid_candidate(Path(temporary))
+            with self.assertRaisesRegex(ValidationError, "pinned Sparkle sign_update verifier is unavailable"):
+                validate_candidate(
+                    manifest_path,
+                    assets,
+                    sparkle_sign_update=Path(temporary) / "missing-sign_update",
+                )
 
     def test_sbom_binary_hashes_must_match_the_app_zip(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -194,7 +228,7 @@ class CandidateValidationTests(unittest.TestCase):
             sbom_artifact["sha256"] = hashlib.sha256(changed).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "SBOM TDLib hash does not match app_zip"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_source_only_sbom_cannot_be_published_as_a_release_sbom(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -209,7 +243,7 @@ class CandidateValidationTests(unittest.TestCase):
             artifact["sha256"] = hashlib.sha256(data).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "not reconciled with the signed notarized"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_sbom_must_bind_the_exact_final_archive_hash(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -225,7 +259,7 @@ class CandidateValidationTests(unittest.TestCase):
             sbom_artifact["sha256"] = hashlib.sha256(data).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "final app ZIP hash"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_release_asset_url_must_match_the_candidate_tag_and_filename(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -233,7 +267,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"][0]["url"] = "https://example.com/NeTelegram.zip"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "matching GitHub release"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_app_zip_parent_traversal_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -246,7 +280,7 @@ class CandidateValidationTests(unittest.TestCase):
             artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "parent-traversal"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_candidate_validator_reuses_single_app_root_and_special_file_guards(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -263,12 +297,12 @@ class CandidateValidationTests(unittest.TestCase):
             artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "archive structure is invalid: app ZIP contains an unsafe"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_valid_prerelease_checks_exact_asset_bytes_and_account_evidence(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, _ = valid_candidate(Path(temporary))
-            self.assertEqual(len(validate_candidate(manifest, assets)), 64)
+            self.assertEqual(len(validate_fixture_candidate(Path(temporary), manifest, assets)), 64)
 
     def test_template_is_not_publishable(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -282,14 +316,14 @@ class CandidateValidationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, _ = valid_candidate(Path(temporary), channel="stable", accounts=1)
             with self.assertRaisesRegex(ValidationError, "at least 20 real authorized"):
-                validate_candidate(manifest, assets)
+                validate_fixture_candidate(Path(temporary), manifest, assets)
 
     def test_mismatched_asset_bytes_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, data = valid_candidate(Path(temporary))
             (assets / "NeTelegram.zip").write_bytes(b"changed bytes")
             with self.assertRaisesRegex(ValidationError, "do not match"):
-                validate_candidate(manifest, assets)
+                validate_fixture_candidate(Path(temporary), manifest, assets)
 
     def test_missing_performance_matrix_levels_are_rejected_for_stable(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -297,7 +331,7 @@ class CandidateValidationTests(unittest.TestCase):
             data["account_coverage"]["performance_account_counts"] = [1, 5, 10]
             manifest.write_text(json.dumps(data), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "include 1, 5, 10, and 20"):
-                validate_candidate(manifest, assets)
+                validate_fixture_candidate(Path(temporary), manifest, assets)
 
     def test_stable_candidate_requires_real_twenty_account_matrix_and_compatibility(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -330,7 +364,7 @@ class CandidateValidationTests(unittest.TestCase):
             }
             manifest["test_evidence"][0]["accounts_tested"] = 20
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-            self.assertEqual(len(validate_candidate(manifest_path, assets)), 64)
+            self.assertEqual(len(validate_fixture_candidate(Path(temporary), manifest_path, assets)), 64)
 
     def test_sparkle_update_requires_complete_matching_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -339,7 +373,7 @@ class CandidateValidationTests(unittest.TestCase):
             del update["sparkle_ed_signature"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "sparkle_ed_signature"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_synthetic_tests_do_not_substitute_for_real_account_coverage(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -347,7 +381,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["test_evidence"][0]["kind"] = "synthetic_suite"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "real-account evidence must cover"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_secret_fields_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -355,7 +389,7 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["api_hash"] = "must-not-appear"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "Secret-bearing field"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_asset_path_cannot_escape_candidate_directory(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -363,13 +397,13 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"][0]["path"] = "../outside.zip"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "must stay inside"):
-                validate_candidate(manifest_path, assets)
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_staged_receipts_verify_assets_before_site_and_delivery_after(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             manifest_path, assets, manifest = valid_candidate(root)
-            digest = validate_candidate(manifest_path, assets)
+            digest = validate_fixture_candidate(Path(temporary), manifest_path, assets)
             assets_receipt = {
                 "record_status": "asset_publication_verified",
                 "manifest_sha256": digest,

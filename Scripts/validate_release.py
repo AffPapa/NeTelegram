@@ -7,7 +7,9 @@ import argparse
 from datetime import datetime
 import hashlib
 import json
+import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 from pathlib import PurePosixPath
@@ -97,7 +99,12 @@ def validate_evidence_list(value: object, field: str) -> None:
         raise ValidationError(f"{field} contains an empty or placeholder evidence reference")
 
 
-def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
+def validate_candidate(
+    manifest_path: Path,
+    assets_dir: Path,
+    *,
+    sparkle_sign_update: Path | None = None,
+) -> str:
     manifest = read_object(manifest_path)
     reject_secrets(manifest)
     if manifest.get("record_status") != "release_candidate":
@@ -316,6 +323,25 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                 raise ValidationError(f"{field}.update_channel must match manifest channel")
             if artifact["minimum_system_version"] != manifest["minimum_macos"]:
                 raise ValidationError(f"{field}.minimum_system_version must match manifest minimum_macos")
+            verifier = sparkle_sign_update or (
+                Path(__file__).resolve().parent.parent
+                / ".build/artifacts/sparkle/Sparkle/bin/sign_update"
+            )
+            if not verifier.is_file() or not os.access(verifier, os.X_OK):
+                raise ValidationError(
+                    "the pinned Sparkle sign_update verifier is unavailable; resolve the locked Sparkle package before candidate validation"
+                )
+            try:
+                signature_check = subprocess.run(
+                    [str(verifier), "--verify", str(candidate_path), artifact["sparkle_ed_signature"]],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+            except OSError as error:
+                raise ValidationError(f"could not run the pinned Sparkle signature verifier: {error}") from error
+            if signature_check.returncode:
+                raise ValidationError(f"{field} Sparkle EdDSA signature verification failed")
     if not REQUIRED_ARTIFACT_KINDS.issubset(kinds):
         missing = sorted(REQUIRED_ARTIFACT_KINDS - kinds)
         raise ValidationError(
@@ -458,6 +484,11 @@ def main() -> int:
     candidate = sub.add_parser("candidate", help="validate frozen candidate metadata and local asset bytes")
     candidate.add_argument("manifest", type=Path)
     candidate.add_argument("--assets-dir", required=True, type=Path)
+    candidate.add_argument(
+        "--sparkle-sign-update",
+        type=Path,
+        help="override the locked SwiftPM Sparkle sign_update tool path (for controlled release environments)",
+    )
     receipt = sub.add_parser("receipt", help="validate staged GitHub asset or post-Site delivery evidence")
     receipt.add_argument("manifest", type=Path)
     receipt.add_argument("receipt", type=Path)
@@ -466,7 +497,11 @@ def main() -> int:
     args = parser.parse_args()
     try:
         if args.command == "candidate":
-            digest = validate_candidate(args.manifest, args.assets_dir)
+            digest = validate_candidate(
+                args.manifest,
+                args.assets_dir,
+                sparkle_sign_update=args.sparkle_sign_update,
+            )
             print(f"PASS candidate manifest_sha256={digest}")
         else:
             digest = validate_receipt(
