@@ -2916,7 +2916,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard !Task.isCancelled, !closingForTermination else { return }
             let runtime = LocalAccountRuntime(account: profile.id, expectedTelegramUserID: profile.telegramUserID, paths: prepared.paths, databaseKey: prepared.databaseKey, appStateKey: prepared.appStateKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
             runtime.onDialogCatalogStateChanged = { [weak self, weak runtime] in
-                guard let self, let runtime, runtime === self.runtime, !self.lockState else { return }
+                guard let self, let runtime, !self.lockState else { return }
+                if runtime.needsDialogCatalogReload {
+                    runtime.loadAllDialogs(reload: true)
+                }
+                guard runtime === self.runtime else { return }
                 self.refreshChatList()
                 self.updateSelectedChatListStatus(for: runtime)
             }
@@ -8412,6 +8416,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 self.refreshStatusMenu()
                 for accountRuntime in self.runtimesByAccount.values {
                     self.hydratePrivateAppState(for: accountRuntime)
+                    accountRuntime.loadAllDialogs(reload: true)
                 }
                 DraftPrivacyCache.unlock(
                     presentationDrafts: &self.draftsByConversation,
@@ -8440,7 +8445,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                     authorizationState: self.pendingAuthorizationType
                    ) {
                     self.reloadPersistedDrafts(for: selected.account)
-                    selected.loadAllDialogs(reload: true)
+                    selected.loadAllDialogs()
                     self.showAuthenticatedChatUI()
                     self.refreshChatList()
                     self.displaySelectedConversation()
@@ -8620,10 +8625,13 @@ private final class LocalAccountRuntime {
     private var dialogCatalogLoadCoordinator = DialogCatalogLoadCoordinator()
     private var dialogCatalogRequest: DialogCatalogLoadCoordinator.Request?
     private var dialogCatalogRequestTimeoutTask: Task<Void, Never>?
+    private var dialogCatalogRequestInvalidated = false
+    private var dialogCatalogReloadRequired = false
     private var expiredDialogCatalogRequestExtras: [String] = []
     var onDialogCatalogStateChanged: (() -> Void)?
     private(set) var dialogCatalogLoadRevision: UInt64 = 0
     var dialogCatalogLoadState: DialogCatalogLoadCoordinator.State { dialogCatalogLoadCoordinator.state }
+    var needsDialogCatalogReload: Bool { dialogCatalogReloadRequired }
     private var didSendTDLibParameters = false
     fileprivate var initializationRequestWasQueued: Bool { didSendTDLibParameters }
     private(set) var authorizationState: String?
@@ -8721,9 +8729,17 @@ private final class LocalAccountRuntime {
 
     func loadAllDialogs(reload: Bool = false) {
         guard authorizationState == "authorizationStateReady", telegramUserID != nil else { return }
-        if reload {
-            guard dialogCatalogRequest == nil else { return }
+        if reload { dialogCatalogReloadRequired = true }
+        // TDLib has no cancellation for an in-flight loadChats request. Keep
+        // its routing token until the response or timeout drains, then restart
+        // from page one without overlapping catalog requests for this runtime.
+        guard dialogCatalogRequest == nil else {
+            if reload { dialogCatalogRequestInvalidated = true }
+            return
+        }
+        if dialogCatalogReloadRequired {
             dialogCatalogLoadCoordinator.invalidate()
+            dialogCatalogReloadRequired = false
         }
         guard let request = dialogCatalogLoadCoordinator.begin() else { return }
         sendDialogCatalogRequest(request)
@@ -8754,7 +8770,12 @@ private final class LocalAccountRuntime {
     }
 
     func invalidateMainChatSnapshot() {
-        dialogCatalogLoadCoordinator.invalidate()
+        dialogCatalogReloadRequired = true
+        if dialogCatalogRequest != nil {
+            dialogCatalogRequestInvalidated = true
+        } else {
+            dialogCatalogLoadCoordinator.invalidate()
+        }
     }
 
     func consume(_ object: [String: Any]) async {
@@ -8764,6 +8785,13 @@ private final class LocalAccountRuntime {
             dialogCatalogRequestTimeoutTask?.cancel()
             dialogCatalogRequestTimeoutTask = nil
             dialogCatalogRequest = nil
+            if dialogCatalogRequestInvalidated || dialogCatalogReloadRequired {
+                dialogCatalogRequestInvalidated = false
+                dialogCatalogLoadCoordinator.invalidate()
+                dialogCatalogLoadRevision &+= 1
+                onDialogCatalogStateChanged?()
+                return
+            }
             let outcome: DialogCatalogLoadCoordinator.Outcome
             if object["@type"] as? String == "ok" {
                 outcome = .pageLoaded
@@ -8934,7 +8962,12 @@ private final class LocalAccountRuntime {
         if expiredDialogCatalogRequestExtras.count > 16 {
             expiredDialogCatalogRequestExtras.removeFirst(expiredDialogCatalogRequestExtras.count - 16)
         }
-        _ = dialogCatalogLoadCoordinator.finish(request, outcome: .failed)
+        if dialogCatalogRequestInvalidated {
+            dialogCatalogRequestInvalidated = false
+            dialogCatalogLoadCoordinator.invalidate()
+        } else {
+            _ = dialogCatalogLoadCoordinator.finish(request, outcome: .failed)
+        }
         dialogCatalogLoadRevision &+= 1
         onDialogCatalogStateChanged?()
     }

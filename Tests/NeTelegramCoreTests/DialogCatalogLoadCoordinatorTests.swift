@@ -48,3 +48,17 @@ import Testing
     #expect(catalog.finish(.init(list: .main, requestID: request.requestID + 50, page: request.page), outcome: .pageLoaded) == nil)
     #expect(catalog.state == .loading(list: .main, page: 1))
 }
+
+@Test func dialogCatalogCanRestartAfterPrivacySnapshotInvalidatesAnInFlightPage() {
+    var catalog = DialogCatalogLoadCoordinator()
+    let staleRequest = catalog.begin()!
+
+    catalog.invalidate()
+
+    #expect(catalog.finish(staleRequest, outcome: .pageLoaded) == nil)
+    #expect(catalog.state == .needsLoad)
+    let replacement = catalog.begin()!
+    #expect(replacement.list == .main && replacement.page == 1)
+    #expect(catalog.finish(staleRequest, outcome: .noMoreChats) == nil)
+    #expect(catalog.state == .loading(list: .main, page: 1))
+}
