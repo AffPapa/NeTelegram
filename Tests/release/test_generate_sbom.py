@@ -38,7 +38,7 @@ class GenerateSBOMTests(unittest.TestCase):
     def test_bundle_audit_records_executable_hashes_after_release_gates(self):
         from Scripts.generate_sbom import build_bom
         with tempfile.TemporaryDirectory() as temporary:
-            app = Path(temporary) / "NeTelegram.app"
+            app = Path(temporary) / "NeTide.app"
             (app / "Contents/MacOS").mkdir(parents=True)
             (app / "Contents/Frameworks").mkdir(parents=True)
             (app / "Contents/Frameworks/Sparkle.framework/Versions/B").mkdir(parents=True)
@@ -82,12 +82,12 @@ class GenerateSBOMTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             archive_path = Path(temporary) / "safe.zip"
             with zipfile.ZipFile(archive_path, "w") as archive:
-                archive.writestr("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle", b"binary")
-                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Versions/Current")
+                archive.writestr("NeTide.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle", b"binary")
+                link = zipfile.ZipInfo("NeTide.app/Contents/Frameworks/Sparkle.framework/Versions/Current")
                 link.create_system = 3
                 link.external_attr = (stat.S_IFLNK | 0o777) << 16
                 archive.writestr(link, "B")
-                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Sparkle")
+                link = zipfile.ZipInfo("NeTide.app/Contents/Frameworks/Sparkle.framework/Sparkle")
                 link.create_system = 3
                 link.external_attr = (stat.S_IFLNK | 0o777) << 16
                 archive.writestr(link, "Versions/Current/Sparkle")
@@ -95,7 +95,7 @@ class GenerateSBOMTests(unittest.TestCase):
                 self.assertEqual(len(validate_release_archive(archive)), 3)
 
             with zipfile.ZipFile(archive_path, "w") as archive:
-                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/escape")
+                link = zipfile.ZipInfo("NeTide.app/Contents/Frameworks/escape")
                 link.create_system = 3
                 link.external_attr = (stat.S_IFLNK | 0o777) << 16
                 archive.writestr(link, "../../../../../../outside")
@@ -105,7 +105,7 @@ class GenerateSBOMTests(unittest.TestCase):
 
     def test_bundle_audit_requires_exact_expected_team_id(self):
         with tempfile.TemporaryDirectory() as temporary:
-            app = Path(temporary) / "NeTelegram.app"
+            app = Path(temporary) / "NeTide.app"
             (app / "Contents/MacOS").mkdir(parents=True)
             (app / "Contents/Frameworks").mkdir(parents=True)
             (app / "Contents/MacOS/NeTelegram").write_bytes(b"executable")
@@ -129,9 +129,9 @@ class GenerateSBOMTests(unittest.TestCase):
 
     def test_final_zip_audit_binds_exact_archive_and_rejects_unsafe_entries(self):
         with tempfile.TemporaryDirectory() as temporary:
-            archive_path = Path(temporary) / "NeTelegram.zip"
+            archive_path = Path(temporary) / "NeTide.zip"
             with zipfile.ZipFile(archive_path, "w") as archive:
-                archive.writestr("NeTelegram.app/Contents/Info.plist", b"plist")
+                archive.writestr("NeTide.app/Contents/Info.plist", b"plist")
             audit = {"executable_sha256": "x", "tdlib_sha256": "y", "team_id": "ABCDEFGHIJ"}
             with patch("Scripts.generate_sbom.sys.platform", "darwin"), \
                  patch("Scripts.generate_sbom.audit_release_bundle", return_value=audit) as bundle_audit:
@@ -146,15 +146,15 @@ class GenerateSBOMTests(unittest.TestCase):
 
     def test_final_zip_hash_and_audit_use_the_same_snapshot_if_source_changes(self):
         with tempfile.TemporaryDirectory() as temporary:
-            archive_path = Path(temporary) / "NeTelegram.zip"
+            archive_path = Path(temporary) / "NeTide.zip"
             with zipfile.ZipFile(archive_path, "w") as archive:
-                archive.writestr("NeTelegram.app/Contents/Info.plist", b"audited snapshot")
+                archive.writestr("NeTide.app/Contents/Info.plist", b"audited snapshot")
             expected_digest = hashlib.sha256(archive_path.read_bytes()).hexdigest()
             def audit_then_replace(bundle, _version, _commit, _team):
                 self.assertEqual((bundle / "Contents/Info.plist").read_bytes(), b"audited snapshot")
                 with zipfile.ZipFile(archive_path, "w") as changed:
-                    changed.writestr("NeTelegram.app/Contents/Info.plist", b"different final bytes")
-                    changed.writestr("NeTelegram.app/Contents/Resources/extra", b"changed")
+                    changed.writestr("NeTide.app/Contents/Info.plist", b"different final bytes")
+                    changed.writestr("NeTide.app/Contents/Resources/extra", b"changed")
                 return {"team_id": "ABCDEFGHIJ"}
             with patch("Scripts.generate_sbom.sys.platform", "darwin"), \
                  patch("Scripts.generate_sbom.audit_release_bundle", side_effect=audit_then_replace):

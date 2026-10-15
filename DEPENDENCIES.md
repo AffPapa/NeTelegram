@@ -20,7 +20,7 @@ Sparkle framework SHA-256 values to the final app ZIP:
 python3 Scripts/generate_sbom.py \
   --version 1.2.3 \
   --source-commit "$(git rev-parse HEAD)" \
-  --app-zip /absolute/path/release-assets/NeTelegram.zip \
+  --app-zip /absolute/path/release-assets/NeTide.zip \
   --expected-team-id H6VGU2M6JD \
   --output /absolute/path/release-assets/NeTelegram.cdx.json
 ```

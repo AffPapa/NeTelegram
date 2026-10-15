@@ -398,7 +398,7 @@ def validate_candidate(
             tdlib_binary = next((name for name in names if name.endswith(".app/Contents/Frameworks/libtdjson.dylib")), None)
             sparkle_binary = next((name for name in names if name.endswith(".app/Contents/Frameworks/Sparkle.framework/Sparkle")), None)
             if not executable or not tdlib_binary or not sparkle_binary:
-                raise ValidationError("app_zip must contain NeTelegram.app executable, libtdjson.dylib, and Sparkle.framework/Sparkle")
+                raise ValidationError("app_zip must contain NeTide.app executable, libtdjson.dylib, and Sparkle.framework/Sparkle")
             if hashlib.sha256(archive.read(executable)).hexdigest() != executable_digest:
                 raise ValidationError("SBOM app executable hash does not match app_zip bytes")
             if hashlib.sha256(archive.read(tdlib_binary)).hexdigest() != tdlib_digest:

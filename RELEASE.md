@@ -70,8 +70,8 @@ the app as the archive's sole top-level item:
 
 ```sh
 ditto -c -k --norsrc --keepParent \
-  "/absolute/path/NeTelegram.app" \
-  "/absolute/path/NeTelegram.zip"
+  "/absolute/path/NeTide.app" \
+  "/absolute/path/NeTide.zip"
 ```
 
 The `--norsrc` option avoids adding a top-level `__MACOSX` AppleDouble folder,

@@ -17,11 +17,11 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
     executable_bytes = b"fixture:NeTelegram executable"
     tdlib_bytes = b"fixture:libtdjson"
     sparkle_bytes = b"fixture:Sparkle"
-    app_archive = assets / "NeTelegram.zip"
+    app_archive = assets / "NeTide.zip"
     with zipfile.ZipFile(app_archive, "w") as archive:
-        archive.writestr("NeTelegram.app/Contents/MacOS/NeTelegram", executable_bytes)
-        archive.writestr("NeTelegram.app/Contents/Frameworks/libtdjson.dylib", tdlib_bytes)
-        archive.writestr("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Sparkle", sparkle_bytes)
+        archive.writestr("NeTide.app/Contents/MacOS/NeTelegram", executable_bytes)
+        archive.writestr("NeTide.app/Contents/Frameworks/libtdjson.dylib", tdlib_bytes)
+        archive.writestr("NeTide.app/Contents/Frameworks/Sparkle.framework/Sparkle", sparkle_bytes)
     sbom_path = assets / "NeTelegram.cdx.json"
     sbom_path.write_text(json.dumps({
         "bomFormat": "CycloneDX",
@@ -54,14 +54,14 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
             "verification_evidence": ["notary-log-sha256:123", "gatekeeper-smoke:456"],
         },
         {
-            "kind": "dmg", "filename": "NeTelegram.dmg", "path": "NeTelegram.dmg",
-            "url": "https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/NeTelegram.dmg",
-            "bytes": len(b"fixture:NeTelegram.dmg"), "sha256": hashlib.sha256(b"fixture:NeTelegram.dmg").hexdigest(),
+            "kind": "dmg", "filename": "NeTide.dmg", "path": "NeTide.dmg",
+            "url": "https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/NeTide.dmg",
+            "bytes": len(b"fixture:NeTide.dmg"), "sha256": hashlib.sha256(b"fixture:NeTide.dmg").hexdigest(),
             "signing_status": "passed", "notarization_status": "accepted_stapled", "gatekeeper_status": "passed",
             "verification_evidence": ["notary-log-sha256:123", "gatekeeper-smoke:456"],
         },
     ])
-    (assets / "NeTelegram.dmg").write_bytes(b"fixture:NeTelegram.dmg")
+    (assets / "NeTide.dmg").write_bytes(b"fixture:NeTide.dmg")
     update_path = assets / "NeTelegram-update.zip"
     update_bytes = b"fixture:signed Sparkle update archive"
     update_path.write_bytes(update_bytes)
@@ -176,9 +176,9 @@ class CandidateValidationTests(unittest.TestCase):
             duplicate = dict(manifest["artifacts"][0])
             duplicate["filename"] = "NeTelegram-copy.zip"
             duplicate["path"] = duplicate["filename"]
-            duplicate["url"] = duplicate["url"].removesuffix("NeTelegram.zip") + duplicate["filename"]
+            duplicate["url"] = duplicate["url"].removesuffix("NeTide.zip") + duplicate["filename"]
             duplicate_path = assets / duplicate["path"]
-            duplicate_path.write_bytes((assets / "NeTelegram.zip").read_bytes())
+            duplicate_path.write_bytes((assets / "NeTide.zip").read_bytes())
             duplicate["bytes"] = duplicate_path.stat().st_size
             duplicate["sha256"] = hashlib.sha256(duplicate_path.read_bytes()).hexdigest()
             manifest["artifacts"].append(duplicate)
@@ -278,7 +278,7 @@ class CandidateValidationTests(unittest.TestCase):
     def test_release_asset_url_must_match_the_candidate_tag_and_filename(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
-            manifest["artifacts"][0]["url"] = "https://example.com/NeTelegram.zip"
+            manifest["artifacts"][0]["url"] = "https://example.com/NeTide.zip"
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "matching GitHub release"):
                 validate_fixture_candidate(Path(temporary), manifest_path, assets)
@@ -286,7 +286,7 @@ class CandidateValidationTests(unittest.TestCase):
     def test_app_zip_parent_traversal_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
-            app = assets / "NeTelegram.zip"
+            app = assets / "NeTide.zip"
             with zipfile.ZipFile(app, "w") as archive:
                 archive.writestr("../outside.txt", b"unsafe")
             artifact = next(item for item in manifest["artifacts"] if item["kind"] == "app_zip")
@@ -299,12 +299,12 @@ class CandidateValidationTests(unittest.TestCase):
     def test_candidate_validator_reuses_single_app_root_and_special_file_guards(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
-            app = assets / "NeTelegram.zip"
-            symlink = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/unsafe")
+            app = assets / "NeTide.zip"
+            symlink = zipfile.ZipInfo("NeTide.app/Contents/Frameworks/unsafe")
             symlink.external_attr = (stat.S_IFLNK | 0o777) << 16
             with zipfile.ZipFile(app, "w") as archive:
-                archive.writestr("other/NeTelegram.app/Contents/MacOS/NeTelegram", b"x")
-                archive.writestr("other/NeTelegram.app/Contents/Frameworks/libtdjson.dylib", b"y")
+                archive.writestr("other/NeTide.app/Contents/MacOS/NeTelegram", b"x")
+                archive.writestr("other/NeTide.app/Contents/Frameworks/libtdjson.dylib", b"y")
                 archive.writestr(symlink, "../../../../outside")
             artifact = next(item for item in manifest["artifacts"] if item["kind"] == "app_zip")
             artifact["bytes"] = app.stat().st_size
@@ -335,7 +335,7 @@ class CandidateValidationTests(unittest.TestCase):
     def test_mismatched_asset_bytes_are_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest, assets, data = valid_candidate(Path(temporary))
-            (assets / "NeTelegram.zip").write_bytes(b"changed bytes")
+            (assets / "NeTide.zip").write_bytes(b"changed bytes")
             with self.assertRaisesRegex(ValidationError, "do not match"):
                 validate_fixture_candidate(Path(temporary), manifest, assets)
 

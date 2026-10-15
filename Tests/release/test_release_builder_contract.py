@@ -53,6 +53,8 @@ class ReleaseBuilderContractTests(unittest.TestCase):
     def test_release_assembly_is_separate_from_canonical_dev_app(self):
         source = SCRIPT.read_text(encoding="utf-8")
         self.assertNotIn("/private/tmp/NeTelegram-Dev.app", source)
+        self.assertIn('APP="$SCRATCH/NeTide.app"', source)
+        self.assertIn('ditto "$APP" "$DMG_ROOT/NeTide.app"', source)
         self.assertIn("NETELEGRAM_RELEASE_OUTPUT", source)
         self.assertIn("refusing to overwrite candidate bytes", source)
 

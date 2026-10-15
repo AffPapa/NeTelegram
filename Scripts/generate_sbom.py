@@ -65,7 +65,7 @@ def validate_release_archive(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
             if not target or "\\" in target or "\x00" in target or PurePosixPath(target).is_absolute():
                 raise SBOMError("app ZIP contains an unsafe symbolic link target")
             resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), target))
-            if not resolved.startswith("NeTelegram.app/"):
+            if not resolved.startswith("NeTide.app/"):
                 raise SBOMError("app ZIP contains an unsafe symbolic link that escapes the application bundle")
         total_size += item.file_size
         if total_size > 8 * 1024 * 1024 * 1024:
@@ -97,7 +97,7 @@ def validate_release_archive(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
             replacement = symlinks[prefix]
             suffix = "/".join(parts[index:])
             next_path = posixpath.normpath(posixpath.join(replacement, suffix)) if suffix else replacement
-            if not next_path.startswith("NeTelegram.app/"):
+            if not next_path.startswith("NeTide.app/"):
                 raise SBOMError("app ZIP symbolic link chain escapes the application bundle")
             return resolve_link_path(next_path, visited | {prefix})
         return path
@@ -107,8 +107,8 @@ def validate_release_archive(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
         if resolved not in normalized_names:
             raise SBOMError("app ZIP contains a broken symbolic link")
     roots = {PurePosixPath(name).parts[0] for name in names if PurePosixPath(name).parts}
-    if roots != {"NeTelegram.app"}:
-        raise SBOMError("app ZIP must contain exactly one NeTelegram.app root")
+    if roots != {"NeTide.app"}:
+        raise SBOMError("app ZIP must contain exactly one NeTide.app root")
     return entries
 
 
@@ -241,7 +241,7 @@ def audit_release_zip(app_zip: Path, version: str, source_commit: str,
                         with archive.open(item) as member, target.open("xb") as destination:
                             shutil.copyfileobj(member, destination, 1024 * 1024)
                         os.chmod(target, ((item.external_attr >> 16) & 0o777) or 0o644)
-                audit = audit_release_bundle(root / "NeTelegram.app", version, source_commit, expected_team_id)
+                audit = audit_release_bundle(root / "NeTide.app", version, source_commit, expected_team_id)
                 # Candidate validation later requires the public asset bytes to equal this snapshot.
                 audit["app_zip_sha256"] = digest.hexdigest()
     except SBOMError:
