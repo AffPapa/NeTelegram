@@ -1,43 +1,43 @@
 {
   "schema_version": 2,
-  "status": "AUTH-APPLE-HIG-WINDOW-SIZE-02: compact auth-window geometry now survives auth-state changes; exact-source CI, canonical Dev.app smoke, and public Site v216 verified. Real authentication and min-size resize remain unverified.",
+  "status": "AUTH-APPLE-HIG-CONTROL-DENSITY-03: Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
   "current_evidence": {
-    "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "local_suite": "Full local serial test suite was not rerun for this AppKit window-sizing change. Previous 210/211 result belongs to source 6490b8d and is historical.",
-    "focused_test": "Swift 6.4 AppKit build passed. One canonical Dev.app was built/launched once from clean source; embedded BuildInfo, source fingerprint, executable, TDJSON and Sparkle hashes match; strict ad-hoc signature verification passed. Native screenshot and AX confirmed compact default geometry, aligned country/phone fields, persistent labels, empty phone field, disabled Continue, and no overlap. Exact-source serial macOS CI passed (38725117924); pinned TDLib/Dev.app workflow passed (38725117928). A CUA drag did not change window bounds, so minimum-size behavior is not marked visually verified.",
+    "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "local_suite": "Full local unit suite not rerun for the field-sizing-only AppKit change; exact-source GitHub macOS CI passed for f54f5d3.",
+    "focused_test": "AppKit target compiled via the guarded canonical build (Swift 6.4). One clean source arm64 Dev.app built/launched once; embedded BuildInfo source/fingerprint and executable/TDJSON/Sparkle hashes were recorded; strict ad-hoc codesign verification passed. Fresh screenshot and AX confirmed matched field heights, persistent labels, focus ring, disabled Continue and no auth request. Full local unit suite was not rerun for this sizing-only change.",
     "hosted_ci": {
-      "run_id": 38725117924,
+      "run_id": 38726643265,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117924",
-      "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "scope": "Exact-source serial macOS Swift suite for preserving authorization-window size across auth-state transitions."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643265",
+      "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "scope": "Exact-source macOS CI after normalizing AppKit authorization fields to regular intrinsic sizing."
     },
     "native_workflow_ci": {
-      "run_id": 38725117928,
+      "run_id": 38726643187,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-      "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643187",
+      "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for the exact AppKit field-sizing change."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
+      "application_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "5ffec9e726a496d91f4796c3adf3ce384ca01dc1172e829c9db4d92ad6269cbc",
-      "executable_sha256": "3bfa5be7984eef7c3a9339e3847210bbd2ca3c070e7e37bc329c3e5a25fb3200",
+      "source_fingerprint_sha256": "78e1ad6d61b39f22cf2bd0876c6e7c708ac7452636f7f265cd57e467b3851e34",
+      "executable_sha256": "627278e1a874024fd4e1dfa809336aa4aad0963da19c808755f54c6ee77df96e",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: one canonical arm64 Dev.app was built/launched once from clean exact source 63d7968. BuildInfo source/fingerprint and executable, TDJSON, Sparkle hashes match; strict ad-hoc signature passed. Native visual and AX smoke confirmed the expected 560x500-point first-run content, aligned country/phone controls, persistent labels, empty number, disabled Continue, and no overlap. No credentials were entered and no Telegram request was made. CUA drag did not change window geometry; minimum-size behavior is not claimed as visually tested."
+      "smoke": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified."
     },
     "latest_site_deployment": {
       "date": "2026-10-15",
@@ -102,7 +102,7 @@
       },
       "limits": "Synthetic persistence/failure-injection and CI only. Physical disk-full, actual app quit with a real draft, real Telegram login/accounts, and 20 active runtimes were not tested. The running canonical Dev.app was not rebuilt because this slice changed persistence code only; it remains built from 6490b8d."
     },
-    "current_dev_app_note": "Canonical Dev.app currently runs exact app source 63d7968; clean source and strict ad-hoc signature verified. Accountless auth screen only; no credentials or Telegram request.",
+    "current_dev_app_note": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
     "pending_native_candidate": null
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -626,8 +626,8 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "summary": "Swift 6.4 AppKit build passed. One canonical Dev.app was built/launched once from clean source; embedded BuildInfo, source fingerprint, executable, TDJSON and Sparkle hashes match; strict ad-hoc signature verification passed. Native screenshot and AX confirmed compact default geometry, aligned country/phone fields, persistent labels, empty phone field, disabled Continue, and no overlap. Exact-source serial macOS CI passed (38725117924); pinned TDLib/Dev.app workflow passed (38725117928). A CUA drag did not change window bounds, so minimum-size behavior is not marked visually verified. Public Site v216 deployed and four anonymous routes verified."
+    "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "summary": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified."
   },
   "current_local_slice": {
     "id": "AUTH-APPLE-HIG-WINDOW-SIZE-02",
@@ -703,7 +703,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Continue the next product-critical accountless app slice on the canonical source. Keep one Dev.app and reuse exact-SHA checks; do not revisit auth-window design unless a concrete new failure appears. Real login remains deferred until the user enters credentials. Keep active-runtime coverage, real accounts, signing/notarization, Telegram compatibility gates, and final release open.",
+  "next_action": "Continue the next product-critical native slice from this exact checkpoint. Preserve one canonical Dev.app and reuse exact-SHA workflows. Owner-operated real login remains deferred. Keep runtime-20 coverage, signed distribution, notarization, Telegram compatibility gates, and final release open.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -736,47 +736,47 @@
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
+      "application_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "5ffec9e726a496d91f4796c3adf3ce384ca01dc1172e829c9db4d92ad6269cbc",
-      "executable_sha256": "3bfa5be7984eef7c3a9339e3847210bbd2ca3c070e7e37bc329c3e5a25fb3200",
+      "source_fingerprint_sha256": "78e1ad6d61b39f22cf2bd0876c6e7c708ac7452636f7f265cd57e467b3851e34",
+      "executable_sha256": "627278e1a874024fd4e1dfa809336aa4aad0963da19c808755f54c6ee77df96e",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: one canonical arm64 Dev.app was built/launched once from clean exact source 63d7968. BuildInfo source/fingerprint and executable, TDJSON, Sparkle hashes match; strict ad-hoc signature passed. Native visual and AX smoke confirmed the expected 560x500-point first-run content, aligned country/phone controls, persistent labels, empty number, disabled Continue, and no overlap. No credentials were entered and no Telegram request was made. CUA drag did not change window geometry; minimum-size behavior is not claimed as visually tested."
+      "smoke": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified."
     },
     "pending_native_candidate": null
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-APPLE-HIG-WINDOW-SIZE-02",
+    "id": "AUTH-APPLE-HIG-CONTROL-DENSITY-03",
     "date": "2026-10-15",
-    "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "test_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "finding": "buildWindow configured a 560x500 first-run content size, but setAuthCardVisible unconditionally changed the window to 600x560 on each authorization step and did not preserve a user resize.",
-    "change": "Auth-state now keeps the existing window size inside its configured 520x460 minimum and 720x680 maximum. The first-run 560x500 content size is preserved; only sizes outside the auth range are reset to the compact default, such as returning from the larger chat shell. The country/phone row and authentication behavior are unchanged.",
-    "focused_tests": "Swift 6.4 AppKit build passed. One canonical Dev.app was built/launched once from clean source; embedded BuildInfo, source fingerprint, executable, TDJSON and Sparkle hashes match; strict ad-hoc signature verification passed. Native screenshot and AX confirmed compact default geometry, aligned country/phone fields, persistent labels, empty phone field, disabled Continue, and no overlap. Exact-source serial macOS CI passed (38725117924); pinned TDLib/Dev.app workflow passed (38725117928). A CUA drag did not change window bounds, so minimum-size behavior is not marked visually verified.",
+    "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "test_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "finding": "The live sign-in screenshot showed adjacent country and phone controls with mismatched visual heights: the phone text field was hard-constrained to 36 pt while AppKit drew NSComboBox at its native size; other hidden auth fields were also forced to 40 pt.",
+    "change": "All sign-in text fields and the country combo now share NSControl.ControlSize.regular and use intrinsic heights. Existing widths, labels, validation, country suggestion policy, authorization routing, and system semantic colors are unchanged. Added docs/APPLE-MACOS-DESIGN.md as the concise HIG/source review contract.",
+    "focused_tests": "AppKit target compiled via the guarded canonical build (Swift 6.4). One clean source arm64 Dev.app built/launched once; embedded BuildInfo source/fingerprint and executable/TDJSON/Sparkle hashes were recorded; strict ad-hoc codesign verification passed. Fresh screenshot and AX confirmed matched field heights, persistent labels, focus ring, disabled Continue and no auth request. Full local unit suite was not rerun for this sizing-only change.",
     "hosted_ci": [
       {
-        "run_id": 38725117924,
+        "run_id": 38726643265,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117924",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Exact-source serial macOS Swift suite for preserving authorization-window size across auth-state transitions."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643265",
+        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "scope": "Exact-source macOS CI after normalizing AppKit authorization fields to regular intrinsic sizing."
       },
       {
-        "run_id": 38725117928,
+        "run_id": 38726643187,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643187",
+        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for the exact AppKit field-sizing change."
       }
     ],
     "site": {
@@ -785,7 +785,7 @@
       "deployment_id": "appgdep_6ad0b4f0facc8191ae460574bdca18c5",
       "url": "https://netelegram.iryadom.chatgpt.site"
     },
-    "limits": "No phone, code, or Telegram request was used. Minimum-size resize, dark/increased-contrast variants, VoiceOver speech, IME/RTL, real login, signed distribution, and 20-account operation remain unverified. This is a development build, not a public app release."
+    "limits": "Minimum-window resize, light appearance, increased contrast, spoken VoiceOver, IME/RTL, real login and authenticated views remain unverified. This is a development build, not a signed release."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -876,14 +876,14 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH-APPLE-HIG-WINDOW-SIZE-02: compact auth-window geometry now survives auth-state changes; exact-source CI, canonical Dev.app smoke, and public Site v216 verified. Real authentication and min-size resize remain unverified.",
+  "phase": "AUTH-APPLE-HIG-CONTROL-DENSITY-03: Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
+    "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
     "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules Scripts/dev-app.sh --launch",
-    "result": "PASS: guarded canonical arm64 Dev.app built/launched once from clean exact source; BuildInfo hashes and strict ad-hoc signature passed.",
-    "source_fingerprint_sha256": "5ffec9e726a496d91f4796c3adf3ce384ca01dc1172e829c9db4d92ad6269cbc",
-    "executable_sha256": "3bfa5be7984eef7c3a9339e3847210bbd2ca3c070e7e37bc329c3e5a25fb3200",
+    "result": "PASS: guarded canonical arm64 Dev.app built/launched once from clean exact source; BuildInfo hashes and strict ad-hoc signature verified.",
+    "source_fingerprint_sha256": "78e1ad6d61b39f22cf2bd0876c6e7c708ac7452636f7f265cd57e467b3851e34",
+    "executable_sha256": "627278e1a874024fd4e1dfa809336aa4aad0963da19c808755f54c6ee77df96e",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
     "swift_version": "Apple Swift 6.4",
@@ -891,55 +891,55 @@
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
+    "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "5ffec9e726a496d91f4796c3adf3ce384ca01dc1172e829c9db4d92ad6269cbc",
-    "executable_sha256": "3bfa5be7984eef7c3a9339e3847210bbd2ca3c070e7e37bc329c3e5a25fb3200",
+    "source_fingerprint_sha256": "78e1ad6d61b39f22cf2bd0876c6e7c708ac7452636f7f265cd57e467b3851e34",
+    "executable_sha256": "627278e1a874024fd4e1dfa809336aa4aad0963da19c808755f54c6ee77df96e",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: one canonical arm64 Dev.app was built/launched once from clean exact source 63d7968. BuildInfo source/fingerprint and executable, TDJSON, Sparkle hashes match; strict ad-hoc signature passed. Native visual and AX smoke confirmed the expected 560x500-point first-run content, aligned country/phone controls, persistent labels, empty number, disabled Continue, and no overlap. No credentials were entered and no Telegram request was made. CUA drag did not change window geometry; minimum-size behavior is not claimed as visually tested.",
-    "scope": "Default auth-window size and current AppKit authorization screen, exact artifact identity, and accountless startup only.",
+    "result": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
+    "scope": "One canonical Dev.app only; fresh screenshot and AX matched BuildInfo. No Telegram credentials or requests. Resize drag had no effect and min-size behavior is unverified.",
     "exact_source_ci": {
-      "run_id": 38725117924,
+      "run_id": 38726643265,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117924",
-      "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "scope": "Exact-source serial macOS Swift suite for preserving authorization-window size across auth-state transitions."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643265",
+      "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "scope": "Exact-source macOS CI after normalizing AppKit authorization fields to regular intrinsic sizing."
     },
     "native_workflow_ci": {
-      "run_id": 38725117928,
+      "run_id": 38726643187,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-      "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643187",
+      "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for the exact AppKit field-sizing change."
     }
   },
   "current_ui_design_slice": {
-    "id": "AUTH-APPLE-HIG-WINDOW-SIZE-02",
+    "id": "AUTH-APPLE-HIG-CONTROL-DENSITY-03",
     "date": "2026-10-15",
-    "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "test_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "finding": "buildWindow configured a 560x500 first-run content size, but setAuthCardVisible unconditionally changed the window to 600x560 on each authorization step and did not preserve a user resize.",
-    "change": "Auth-state now keeps the existing window size inside its configured 520x460 minimum and 720x680 maximum. The first-run 560x500 content size is preserved; only sizes outside the auth range are reset to the compact default, such as returning from the larger chat shell. The country/phone row and authentication behavior are unchanged.",
-    "focused_tests": "Swift 6.4 AppKit build passed. One canonical Dev.app was built/launched once from clean source; embedded BuildInfo, source fingerprint, executable, TDJSON and Sparkle hashes match; strict ad-hoc signature verification passed. Native screenshot and AX confirmed compact default geometry, aligned country/phone fields, persistent labels, empty phone field, disabled Continue, and no overlap. Exact-source serial macOS CI passed (38725117924); pinned TDLib/Dev.app workflow passed (38725117928). A CUA drag did not change window bounds, so minimum-size behavior is not marked visually verified.",
+    "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "test_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "finding": "The live sign-in screenshot showed adjacent country and phone controls with mismatched visual heights: the phone text field was hard-constrained to 36 pt while AppKit drew NSComboBox at its native size; other hidden auth fields were also forced to 40 pt.",
+    "change": "All sign-in text fields and the country combo now share NSControl.ControlSize.regular and use intrinsic heights. Existing widths, labels, validation, country suggestion policy, authorization routing, and system semantic colors are unchanged. Added docs/APPLE-MACOS-DESIGN.md as the concise HIG/source review contract.",
+    "focused_tests": "AppKit target compiled via the guarded canonical build (Swift 6.4). One clean source arm64 Dev.app built/launched once; embedded BuildInfo source/fingerprint and executable/TDJSON/Sparkle hashes were recorded; strict ad-hoc codesign verification passed. Fresh screenshot and AX confirmed matched field heights, persistent labels, focus ring, disabled Continue and no auth request. Full local unit suite was not rerun for this sizing-only change.",
     "hosted_ci": [
       {
-        "run_id": 38725117924,
+        "run_id": 38726643265,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117924",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Exact-source serial macOS Swift suite for preserving authorization-window size across auth-state transitions."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643265",
+        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "scope": "Exact-source macOS CI after normalizing AppKit authorization fields to regular intrinsic sizing."
       },
       {
-        "run_id": 38725117928,
+        "run_id": 38726643187,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643187",
+        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for the exact AppKit field-sizing change."
       }
     ],
     "site": {
@@ -948,9 +948,10 @@
       "deployment_id": "appgdep_6ad0b4f0facc8191ae460574bdca18c5",
       "url": "https://netelegram.iryadom.chatgpt.site"
     },
-    "limits": "No phone, code, or Telegram request was used. Minimum-size resize, dark/increased-contrast variants, VoiceOver speech, IME/RTL, real login, signed distribution, and 20-account operation remain unverified. This is a development build, not a public app release."
+    "limits": "Minimum-window resize, light appearance, increased contrast, spoken VoiceOver, IME/RTL, real login and authenticated views remain unverified. This is a development build, not a signed release.",
+    "research": "Reviewed current Apple HIG layout, windows, text fields, color, Dark Mode and accessibility; inspected official Telegram for macOS and Telegram Desktop GitHub repositories for structure and provenance only. No Telegram source, assets, or GPL code copied. See docs/APPLE-MACOS-DESIGN.md."
   },
-  "verified_at": "2026-10-15T10:31:00Z",
+  "verified_at": "2026-10-15",
   "latest_native_workflow_ci": {
     "run_id": 38725117928,
     "status": "success",
