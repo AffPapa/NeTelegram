@@ -2202,3 +2202,10 @@
 
 - `runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain` passed 1/1 on current app-source `7558909` at checkpoint `4c0c31f`. It proves the core coordinator waits for all 20 expected synthetic client closures, rejects unknown/duplicate acknowledgements, and only then permits the shared receiver drain.
 - No real TDLib account or AppKit multi-account quit was exercised; APP15 remains partial. No app code changed or rebuild was needed.
+
+## 2026-10-15 — RELEASE-SPARKLE-ARCHIVE-REQUIRED-01
+
+- The release manifest validator previously allowed an alpha candidate with only `app_zip`, `dmg`, `sbom`, and `notice`, despite the required Sparkle updater contract. `Scripts/validate_release.py` now requires `sparkle_update_zip` for every release candidate and rejects a missing archive. The existing complete metadata checks still bind its signature/version/channel/minimum macOS to the manifest.
+- Updated the manifest fixture to include a signed-update metadata record and added a missing-update rejection case. Targeted `python3 -m unittest Tests.release.test_validate_release`: 21/21 passed; `py_compile` and `git diff --check` passed.
+- Scope: release metadata validator and its Python tests only. No app source/build, account login, signing, notarization, GitHub release, or Site deployment was performed. Fixture signature is synthetic and does not prove a real Sparkle EdDSA signature.
+- The alpha speed-review artifacts under `artifacts/netelegram/looper-goals/20261015-alpha-speed-review/` preserve the evidence-based root-cause analysis and next delivery sequence. Current exact blockers remain one owner-operated real-account smoke and an available notary credential profile; the Dev bundle is not a release candidate.

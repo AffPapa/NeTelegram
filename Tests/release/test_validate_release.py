@@ -62,6 +62,26 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
         },
     ])
     (assets / "NeTelegram.dmg").write_bytes(b"fixture:NeTelegram.dmg")
+    update_path = assets / "NeTelegram-update.zip"
+    update_bytes = b"fixture:signed Sparkle update archive"
+    update_path.write_bytes(update_bytes)
+    artifacts.append({
+        "kind": "sparkle_update_zip",
+        "filename": update_path.name,
+        "path": update_path.name,
+        "url": f"https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/{update_path.name}",
+        "bytes": len(update_bytes),
+        "sha256": hashlib.sha256(update_bytes).hexdigest(),
+        "signing_status": "passed",
+        "notarization_status": "accepted_stapled",
+        "gatekeeper_status": "passed",
+        "verification_evidence": ["sparkle-signature-verified", "gatekeeper-smoke:456"],
+        "sparkle_ed_signature": "fixture-signature",
+        "sparkle_version": "2.10.0",
+        "sparkle_short_version": "1.2.3",
+        "update_channel": channel,
+        "minimum_system_version": "14.0",
+    })
     for kind, path in (("sbom", sbom_path), ("notice", notice_path)):
         data = path.read_bytes()
         artifacts.append({
@@ -150,7 +170,15 @@ class CandidateValidationTests(unittest.TestCase):
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
             manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "notice"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
-            with self.assertRaisesRegex(ValidationError, "must include app_zip, dmg, sbom, and notice"):
+            with self.assertRaisesRegex(ValidationError, "must include app_zip, dmg, sbom, notice, and sparkle_update_zip"):
+                validate_candidate(manifest_path, assets)
+
+    def test_candidate_requires_a_sparkle_update_archive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "sparkle_update_zip"]
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "missing sparkle_update_zip"):
                 validate_candidate(manifest_path, assets)
 
     def test_sbom_binary_hashes_must_match_the_app_zip(self):
@@ -307,21 +335,8 @@ class CandidateValidationTests(unittest.TestCase):
     def test_sparkle_update_requires_complete_matching_metadata(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
-            update = assets / "NeTelegram-update.zip"
-            payload = b"update fixture"
-            update.write_bytes(payload)
-            manifest["artifacts"].append({
-                "kind": "sparkle_update_zip",
-                "filename": update.name,
-                "path": update.name,
-                "url": "https://github.com/AffPapa/NeTelegram/releases/download/v1.2.3/NeTelegram-update.zip",
-                "bytes": len(payload),
-                "sha256": hashlib.sha256(payload).hexdigest(),
-                "signing_status": "passed",
-                "notarization_status": "accepted_stapled",
-                "gatekeeper_status": "passed",
-                "verification_evidence": ["sparkle-signature-verified"],
-            })
+            update = next(item for item in manifest["artifacts"] if item["kind"] == "sparkle_update_zip")
+            del update["sparkle_ed_signature"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "sparkle_ed_signature"):
                 validate_candidate(manifest_path, assets)

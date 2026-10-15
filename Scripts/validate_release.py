@@ -33,8 +33,8 @@ REQUIRED_ARTIFACT_FIELDS = (
     "kind", "filename", "path", "url", "sha256",
 )
 SIGNED_ARTIFACT_KINDS = {"app_zip", "dmg", "sparkle_update_zip"}
-REQUIRED_ARTIFACT_KINDS = {"app_zip", "dmg", "sbom", "notice"}
-ALLOWED_ARTIFACT_KINDS = REQUIRED_ARTIFACT_KINDS | {"sparkle_update_zip"}
+REQUIRED_ARTIFACT_KINDS = {"app_zip", "dmg", "sbom", "notice", "sparkle_update_zip"}
+ALLOWED_ARTIFACT_KINDS = REQUIRED_ARTIFACT_KINDS
 FORBIDDEN_SECRET_KEYS = {
     "api_hash", "api_secret", "access_token", "bearer_token", "private_key",
     "signing_key", "sparkle_private_key", "notary_password", "password",
@@ -318,7 +318,9 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                 raise ValidationError(f"{field}.minimum_system_version must match manifest minimum_macos")
     if not REQUIRED_ARTIFACT_KINDS.issubset(kinds):
         missing = sorted(REQUIRED_ARTIFACT_KINDS - kinds)
-        raise ValidationError(f"artifacts must include app_zip, dmg, sbom, and notice; missing {', '.join(missing)}")
+        raise ValidationError(
+            f"artifacts must include app_zip, dmg, sbom, notice, and sparkle_update_zip; missing {', '.join(missing)}"
+        )
 
     sbom_item = next(item for item in artifacts if item["kind"] == "sbom")
     sbom = read_object(assets_dir / sbom_item["path"])
