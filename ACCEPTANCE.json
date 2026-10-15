@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "AUTH-APPLE-HIG-CONTROL-DENSITY-03: Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
+  "status": "APP09-DRAFT-QUIT-STORAGE-COMPOSITION-01: Added one focused synthetic regression composing encrypted account draft storage with the multi-account quit barrier under partial failure. Swift focused test 1/1 and exact-source macOS CI run 38727854037 passed. App source remains f54f5d3 and canonical Dev.app was not rebuilt. Physical disk exhaustion and owner-operated native quit/recovery remain unverified.",
   "current_evidence": {
     "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
     "local_suite": "Full local unit suite not rerun for the field-sizing-only AppKit change; exact-source GitHub macOS CI passed for f54f5d3.",
@@ -190,7 +190,7 @@
       "method": "storage fault injection",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "A deterministic encrypted-draft storage fault test injects replacement failure after a prior durable save; it verifies persistence error and byte-for-byte preservation/reload of the prior draft. The existing locked-draft quit snapshot test also passes. Exact-source local Swift suite passes 126/126. Actual OS disk exhaustion, native app dirty-state recovery UI, and quit-barrier behavior under disk-full remain unverified. Focused regression on source 62ee54349c8c63ada7d98981ec6d960b03e935e2 passed 1/1: TDLib-acknowledged text is removed from locked dirty recovery by exact value; a newer draft and an unrelated unsaved draft remain. Canonical arm64 Dev.app rebuilt from the same clean source, strict ad-hoc signature verified, and accountless CUA smoke passed. Native integration of actual disk-full and quit barrier still not demonstrated. Current-checkpoint verification on 2026-10-15: focused tests `encryptedDraftStoreKeepsLastDurableCopyWhenDiskWriteFails` and `dirtyDraftRecoveryRemainsInQuitSnapshotAfterLockClearsPresentationCache` both passed on canonical checkout HEAD `ed45815dd21003f80016adf3015af933cf2552d1`; the tested draft implementation and test files are unchanged from app-source `35abba9cb4924829bb02d20489b4c5f5c2854def`. The first failure was an inaccessible default Clang module-cache path; rerunning with `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules` built successfully. This confirms two deterministic core paths only; native AppDelegate quit-barrier under actual disk exhaustion and OS-level recovery remain unverified."
+      "evidence": "A deterministic encrypted-draft storage fault test injects replacement failure after a prior durable save; it verifies persistence error and byte-for-byte preservation/reload of the prior draft. The existing locked-draft quit snapshot test also passes. Exact-source local Swift suite passes 126/126. Actual OS disk exhaustion, native app dirty-state recovery UI, and quit-barrier behavior under disk-full remain unverified. Focused regression on source 62ee54349c8c63ada7d98981ec6d960b03e935e2 passed 1/1: TDLib-acknowledged text is removed from locked dirty recovery by exact value; a newer draft and an unrelated unsaved draft remain. Canonical arm64 Dev.app rebuilt from the same clean source, strict ad-hoc signature verified, and accountless CUA smoke passed. Native integration of actual disk-full and quit barrier still not demonstrated. Current-checkpoint verification on 2026-10-15: focused tests `encryptedDraftStoreKeepsLastDurableCopyWhenDiskWriteFails` and `dirtyDraftRecoveryRemainsInQuitSnapshotAfterLockClearsPresentationCache` both passed on canonical checkout HEAD `ed45815dd21003f80016adf3015af933cf2552d1`; the tested draft implementation and test files are unchanged from app-source `35abba9cb4924829bb02d20489b4c5f5c2854def`. The first failure was an inaccessible default Clang module-cache path; rerunning with `CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules` built successfully. This confirms two deterministic core paths only; native AppDelegate quit-barrier under actual disk exhaustion and OS-level recovery remain unverified. Focused composition regression on 2026-10-15 passed 1/1: deterministic account order successfully persisted the first account, injected atomic replacement failure for the second, returned blocked without attempting the third, retained dirty state for failed/unattempted accounts, and confirmed byte-authenticated old encrypted snapshots for the failed/unattempted stores while first account loaded its new snapshot. App source and canonical Dev.app were unchanged; hosted exact-SHA CI pending. Physical disk exhaustion and native quit-path remain unverified. On 2026-10-15, focused composition regression `draftQuitPersistenceBarrierPreservesDurableCopiesAcrossPartialDiskFailure` passed 1/1 and exact-source macOS CI [38727854037](https://github.com/AffPapa/NeTelegram/actions/runs/38727854037) passed for test-only commit 6a6d57b; app source remains f54f5d3. The test verified successful first save, injected second-account atomic replacement failure, blocked quit, no third-account attempt, retained failed/unattempted dirty state, and readable prior encrypted snapshots. Physical disk exhaustion and native quit-path remain unverified."
     },
     {
       "id": "APP10",
@@ -627,41 +627,27 @@
   "last_verification": {
     "date": "2026-10-15",
     "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-    "summary": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified."
+    "summary": "Added one focused APP09 composition regression. Swift 6.4 exact focused test passed 1/1 on arm64; exact-source macOS CI run 38727854037 passed on test-only commit 6a6d57b. The test composes encrypted account draft stores with the quit barrier under injected replacement failure. App source and canonical Dev.app remain unchanged at f54f5d3; no login."
   },
   "current_local_slice": {
-    "id": "AUTH-APPLE-HIG-WINDOW-SIZE-02",
+    "id": "APP09-DRAFT-QUIT-STORAGE-COMPOSITION-01",
     "date": "2026-10-15",
-    "source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "test_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "finding": "buildWindow configured a 560x500 first-run content size, but setAuthCardVisible unconditionally changed the window to 600x560 on each authorization step and did not preserve a user resize.",
-    "change": "Auth-state now keeps the existing window size inside its configured 520x460 minimum and 720x680 maximum. The first-run 560x500 content size is preserved; only sizes outside the auth range are reset to the compact default, such as returning from the larger chat shell. The country/phone row and authentication behavior are unchanged.",
-    "focused_tests": "Swift 6.4 AppKit build passed. One canonical Dev.app was built/launched once from clean source; embedded BuildInfo, source fingerprint, executable, TDJSON and Sparkle hashes match; strict ad-hoc signature verification passed. Native screenshot and AX confirmed compact default geometry, aligned country/phone fields, persistent labels, empty phone field, disabled Continue, and no overlap. Exact-source serial macOS CI passed (38725117924); pinned TDLib/Dev.app workflow passed (38725117928). A CUA drag did not change window bounds, so minimum-size behavior is not marked visually verified.",
+    "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+    "test_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
+    "finding": "APP09 separately covered atomic encrypted-file replacement and the deterministic multi-account quit barrier, but lacked one regression combining both layers under a partial disk-write failure.",
+    "change": "Added one focused integration regression with three account-scoped encrypted stores. It proves a successful earlier account is durably updated, the failing account keeps its previous encrypted file, quit remains blocked, and later dirty accounts remain untouched and dirty.",
+    "focused_tests": "swift test --no-parallel --filter draftQuitPersistenceBarrierPreservesDurableCopiesAcrossPartialDiskFailure passed 1/1 on arm64 / Swift 6.4. The test used synthetic account IDs, temporary directories, and an injected atomic-replace failure; no Telegram credentials, sessions, or network were used.",
     "hosted_ci": [
       {
-        "run_id": 38725117924,
+        "run_id": 38727854037,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117924",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Exact-source serial macOS Swift suite for preserving authorization-window size across auth-state transitions."
-      },
-      {
-        "run_id": 38725117928,
-        "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-        "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38727854037",
+        "workflow_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
+        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "scope": "Exact-source macOS Apple Silicon Swift test workflow for a test-only APP09 partial disk-failure composition regression; no app source changed."
       }
     ],
-    "site": {
-      "version": 216,
-      "source_commit": "8d6abc928a71e94cc4e7f08a27bb50fb9137ab8e",
-      "deployment_id": "appgdep_6ad0b4f0facc8191ae460574bdca18c5",
-      "url": "https://netelegram.iryadom.chatgpt.site"
-    },
-    "limits": "No phone, code, or Telegram request was used. Minimum-size resize, dark/increased-contrast variants, VoiceOver speech, IME/RTL, real login, signed distribution, and 20-account operation remain unverified. This is a development build, not a public app release."
+    "remaining": "APP09 remains partial: physical disk exhaustion and owner-operated native quit/recovery are not claimed. No application source changed, so canonical Dev.app source remains f54f5d3 and was not rebuilt."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -754,38 +740,24 @@
     "pending_native_candidate": null
   },
   "latest_acceptance_slice": {
-    "id": "AUTH-APPLE-HIG-CONTROL-DENSITY-03",
+    "id": "APP09-DRAFT-QUIT-STORAGE-COMPOSITION-01",
     "date": "2026-10-15",
     "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-    "test_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-    "finding": "The live sign-in screenshot showed adjacent country and phone controls with mismatched visual heights: the phone text field was hard-constrained to 36 pt while AppKit drew NSComboBox at its native size; other hidden auth fields were also forced to 40 pt.",
-    "change": "All sign-in text fields and the country combo now share NSControl.ControlSize.regular and use intrinsic heights. Existing widths, labels, validation, country suggestion policy, authorization routing, and system semantic colors are unchanged. Added docs/APPLE-MACOS-DESIGN.md as the concise HIG/source review contract.",
-    "focused_tests": "AppKit target compiled via the guarded canonical build (Swift 6.4). One clean source arm64 Dev.app built/launched once; embedded BuildInfo source/fingerprint and executable/TDJSON/Sparkle hashes were recorded; strict ad-hoc codesign verification passed. Fresh screenshot and AX confirmed matched field heights, persistent labels, focus ring, disabled Continue and no auth request. Full local unit suite was not rerun for this sizing-only change.",
+    "test_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
+    "finding": "APP09 separately covered atomic encrypted-file replacement and the deterministic multi-account quit barrier, but lacked one regression combining both layers under a partial disk-write failure.",
+    "change": "Added one focused integration regression with three account-scoped encrypted stores. It proves a successful earlier account is durably updated, the failing account keeps its previous encrypted file, quit remains blocked, and later dirty accounts remain untouched and dirty.",
+    "focused_tests": "swift test --no-parallel --filter draftQuitPersistenceBarrierPreservesDurableCopiesAcrossPartialDiskFailure passed 1/1 on arm64 / Swift 6.4. The test used synthetic account IDs, temporary directories, and an injected atomic-replace failure; no Telegram credentials, sessions, or network were used.",
     "hosted_ci": [
       {
-        "run_id": 38726643265,
+        "run_id": 38727854037,
         "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643265",
-        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38727854037",
+        "workflow_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
         "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-        "scope": "Exact-source macOS CI after normalizing AppKit authorization fields to regular intrinsic sizing."
-      },
-      {
-        "run_id": 38726643187,
-        "status": "success",
-        "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38726643187",
-        "workflow_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-        "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
-        "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for the exact AppKit field-sizing change."
+        "scope": "Exact-source macOS Apple Silicon Swift test workflow for a test-only APP09 partial disk-failure composition regression; no app source changed."
       }
     ],
-    "site": {
-      "version": 216,
-      "source_commit": "8d6abc928a71e94cc4e7f08a27bb50fb9137ab8e",
-      "deployment_id": "appgdep_6ad0b4f0facc8191ae460574bdca18c5",
-      "url": "https://netelegram.iryadom.chatgpt.site"
-    },
-    "limits": "Minimum-window resize, light appearance, increased contrast, spoken VoiceOver, IME/RTL, real login and authenticated views remain unverified. This is a development build, not a signed release."
+    "remaining": "APP09 remains partial: physical disk exhaustion and owner-operated native quit/recovery are not claimed. No application source changed, so canonical Dev.app source remains f54f5d3 and was not rebuilt."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -849,20 +821,19 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP28",
-    "receipt_id": "APP28-POST-CONSUME-FRESH-ROUTE-01",
-    "source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-    "test_commit": "9ad0d9b270fcb025e2706c74f4cd7f140940c24d",
-    "test": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app28-scratch --no-parallel --filter callbackAfterSuspendedIdentityPersistenceCannotApplyToReplacementRuntime passed 1/1. The test holds consume suspended, replaces the registered route, resumes consume, then performs a fresh coordinator.isCurrent query and confirms no modeled side effects.",
+    "case": "APP09",
+    "receipt_id": "APP09-DRAFT-QUIT-STORAGE-COMPOSITION-01",
+    "test": "draftQuitPersistenceBarrierPreservesDurableCopiesAcrossPartialDiskFailure",
+    "result": "PASS 1/1 focused Swift Testing case on arm64 / Swift 6.4; exact-source macOS CI run 38727854037 passed for test-only commit 6a6d57b.",
     "hosted_ci": {
-      "run_id": 38720880143,
+      "run_id": 38727854037,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38720880143",
-      "workflow_commit": "9ad0d9b270fcb025e2706c74f4cd7f140940c24d",
-      "app_source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
-      "scope": "Exact-source macOS serial core suite on test-only commit; app source files are identical to 6490b8d."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38727854037",
+      "workflow_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
+      "app_source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
+      "scope": "Exact-source macOS Apple Silicon Swift test workflow for a test-only APP09 partial disk-failure composition regression; no app source changed."
     },
-    "result": "PASS for deterministic production seam regression; APP28 remains partial pending authorized-account and physical AppDelegate/TDLib lifecycle coverage."
+    "limitation": "Synthetic fault injection only; physical OS disk-full, native AppDelegate quit/recovery and owner-authenticated accounts remain unverified. APP09 remains partial."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -876,7 +847,7 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "AUTH-APPLE-HIG-CONTROL-DENSITY-03: Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
+  "phase": "APP09-DRAFT-QUIT-STORAGE-COMPOSITION-01: Added one focused synthetic regression composing encrypted account draft storage with the multi-account quit barrier under partial failure. Swift focused test 1/1 and exact-source macOS CI run 38727854037 passed. App source remains f54f5d3 and canonical Dev.app was not rebuilt. Physical disk exhaustion and owner-operated native quit/recovery remain unverified.",
   "latest_local_build": {
     "date": "2026-10-15",
     "source_commit": "f54f5d3be6a292ebbad43acfae996bea465f241f",
