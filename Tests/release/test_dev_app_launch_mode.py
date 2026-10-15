@@ -47,6 +47,13 @@ class DevAppLaunchModeTests(unittest.TestCase):
         )
         self.assertIn("different UI preview", mismatch or "")
 
+    def test_minimum_auth_preview_appearance_is_part_of_launch_identity(self) -> None:
+        mismatch = MODULE.launch_mode_mismatch(
+            ["--ci-auth-layout-preview", "--ci-auth-layout-preview-minimum", "--ci-appearance-light"],
+            "/private/tmp/NeTelegram-Dev.app/Contents/MacOS/NeTelegram --ci-auth-layout-preview --ci-auth-layout-preview-minimum --ci-appearance-dark",
+        )
+        self.assertIn("different UI preview", mismatch or "")
+
     def test_malformed_running_command_fails_closed(self) -> None:
         mismatch = MODULE.launch_mode_mismatch([], '"unterminated')
         self.assertIn("cannot read", mismatch or "")

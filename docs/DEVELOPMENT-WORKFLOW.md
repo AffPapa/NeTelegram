@@ -37,10 +37,11 @@ The script is read-only and prints each matching run's ID, workflow, status, con
 To inspect all five authorization states at the minimum supported window size, launch the canonical offline preview:
 
 ```sh
-Scripts/dev-app.sh --launch-auth-layout-preview-minimum
+Scripts/dev-app.sh --launch-auth-layout-preview-minimum-dark
+Scripts/dev-app.sh --launch-auth-layout-preview-minimum-light
 ```
 
-The window title reports the actual AppKit frame size. Press Command-Option-0 to cycle phone, code, password, QR, and registration. This preview skips profile restoration and networking; it proves layout and accessibility-tree structure only, not Telegram authentication or account behavior. Exit the preview before launching the normal client or rebuilding.
+The window title reports the actual AppKit frame size. Press Command-Option-0 to cycle phone, code, password, QR, and registration. These per-process appearance overrides do not change macOS settings. The preview skips profile restoration and networking; it proves layout and accessibility-tree structure only, not Telegram authentication or account behavior. Exit the preview before launching the normal client or rebuilding.
 
 ## Release writes
 

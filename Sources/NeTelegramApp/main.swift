@@ -280,6 +280,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 #if DEBUG
         if CommandLine.arguments.contains("--ci-appearance-dark") {
             NSApp.appearance = NSAppearance(named: .darkAqua)
+        } else if CommandLine.arguments.contains("--ci-appearance-light") {
+            NSApp.appearance = NSAppearance(named: .aqua)
         }
 #endif
         buildMainMenu()

@@ -16,6 +16,7 @@ PREVIEW_FLAGS = frozenset({
     "--ci-chat-shell-preview",
     "--ci-chat-shell-preview-compact",
     "--ci-appearance-dark",
+    "--ci-appearance-light",
 })
 
 
