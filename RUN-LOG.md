@@ -2197,3 +2197,8 @@
 
 - Focused test `twentyProfileRestoreStartupRegistrationSurvivesStallFailureRetryAndSelectionChanges` passed 1/1 on current app-source `7558909` at checkpoint `072cee9` (arm64 / Swift 6.4). It covers 20 synthetic profiles, startup parallelism 2, stalled-open isolation, failed first request with fresh-generation retry, pre-request routing, and selection-independent updates.
 - The sandbox denied SwiftPM's first build while applying its build sandbox; the same command succeeded through the authorized local test route. Source and canonical Dev.app were unchanged. This is not evidence for 20 live TDLib sessions, real login, or resource performance; APP01 remains partial.
+
+## 2026-10-15 — APP15 current-source 20-client quit barrier
+
+- `runtimeShutdownCoordinatorWaitsForAllTwentyClientsAndReceiverDrain` passed 1/1 on current app-source `7558909` at checkpoint `4c0c31f`. It proves the core coordinator waits for all 20 expected synthetic client closures, rejects unknown/duplicate acknowledgements, and only then permits the shared receiver drain.
+- No real TDLib account or AppKit multi-account quit was exercised; APP15 remains partial. No app code changed or rebuild was needed.
