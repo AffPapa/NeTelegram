@@ -689,7 +689,7 @@
     "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
     "recommended_next_step": "Continue independent app implementation. Real first-account login needs owner-entered fresh API hash through the secure in-app field and phone/code in the app; all-20 runtime acceptance remains separate."
   },
-  "status": "APP12-NETWORK-RETRY-01: TDLib setNetworkType failures now retry only pending accounts with capped exponential backoff; exact-source macOS CI, pinned TDLib app workflow, focused tests and canonical accountless Dev.app smoke passed. Real network/sleep-wake/20-account evidence remains open. Public Site v210 devlog updated; no app download exists.",
+  "status": "AUTH-REGION-CLARITY-APPLE-HIG-20: current AppKit sign-in region hint explicitly identifies macOS provenance; exact-source CI, pinned native workflow and canonical accountless Dev.app evidence recorded. Real login and release gates remain open.",
   "latest_design_research": {
     "date": "2026-10-15",
     "upstream_repository": "https://github.com/telegramdesktop/tdesktop",
