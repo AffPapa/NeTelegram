@@ -465,6 +465,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
 
         countryPicker = NSComboBox(frame: .zero)
+        countryPicker.controlSize = .regular
         countryPicker.placeholderString = "Выберите страну"
         countryPicker.completes = false
         countryPicker.hasVerticalScroller = true
@@ -499,6 +500,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         phoneFieldLabel.setAccessibilityLabel("Номер телефона")
         phoneFieldLabel.isHidden = true
         phoneField = NSTextField(string: "")
+        phoneField.controlSize = .regular
         phoneField.placeholderString = "+код страны и номер"
         phoneField.font = .preferredFont(forTextStyle: .body)
         phoneField.frame = .zero
@@ -518,6 +520,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         numberEntryRow.spacing = 12
 
         emailField = NSTextField(string: "")
+        emailField.controlSize = .regular
         emailField.placeholderString = "Электронная почта"
         emailField.font = .preferredFont(forTextStyle: .body)
         emailField.alignment = .left
@@ -526,12 +529,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         emailField.delegate = self
 
         firstNameField = NSTextField(string: "")
+        firstNameField.controlSize = .regular
         firstNameField.placeholderString = "Имя"
         firstNameField.font = .preferredFont(forTextStyle: .body)
         firstNameField.setAccessibilityLabel("Имя для регистрации")
         firstNameField.isHidden = true
         firstNameField.delegate = self
         lastNameField = NSTextField(string: "")
+        lastNameField.controlSize = .regular
         lastNameField.placeholderString = "Фамилия (необязательно)"
         lastNameField.font = .preferredFont(forTextStyle: .body)
         lastNameField.setAccessibilityLabel("Фамилия для регистрации, необязательно")
@@ -560,6 +565,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         registrationTermsScroll.isHidden = true
 
         inputField = NSTextField(string: "")
+        inputField.controlSize = .regular
         inputField.placeholderString = "Код из Telegram"
         inputField.font = .systemFont(ofSize: 17)
         inputField.frame = .zero
@@ -568,6 +574,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         inputField.isHidden = true
         inputField.delegate = self
         secureInputField = NSSecureTextField(string: "")
+        secureInputField.controlSize = .regular
         secureInputField.placeholderString = "Пароль двухэтапной проверки"
         secureInputField.font = .systemFont(ofSize: 17)
         secureInputField.frame = .zero
@@ -685,21 +692,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             numberEntryRow.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
-            countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionButton.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             phoneFieldLabel.widthAnchor.constraint(equalTo: phoneEntryStack.widthAnchor),
-            phoneField.widthAnchor.constraint(equalTo: phoneEntryStack.widthAnchor), phoneField.heightAnchor.constraint(equalToConstant: 36),
+            phoneField.widthAnchor.constraint(equalTo: phoneEntryStack.widthAnchor),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            emailField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 40),
+            emailField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            inputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), inputField.heightAnchor.constraint(equalToConstant: 40),
+            inputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             secureInputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            secureInputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), secureInputField.heightAnchor.constraint(equalToConstant: 40),
+            secureInputField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             firstNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            firstNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), firstNameField.heightAnchor.constraint(equalToConstant: 40),
+            firstNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             lastNameField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            lastNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), lastNameField.heightAnchor.constraint(equalToConstant: 40),
+            lastNameField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             registrationConsent.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationConsent.widthAnchor.constraint(equalToConstant: 420).withPriority(.defaultHigh),
             qrImageView.widthAnchor.constraint(equalToConstant: 180), qrImageView.heightAnchor.constraint(equalToConstant: 180),
