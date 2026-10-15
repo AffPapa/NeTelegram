@@ -7643,7 +7643,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countrySuggestionLabel.stringValue = ""
             return
         }
-        countrySuggestionLabel.stringValue = "Местный номер — после выбора страны; полный — с +."
+        if let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
+           let country = phoneCountries.first(where: { $0.code == suggestedRegion }),
+           let callingCode = country.callingCodes.first {
+            countrySuggestionLabel.stringValue = "Регион Mac предлагает: \(country.name) (+\(callingCode)). Выберите страну или введите полный номер с +."
+        } else {
+            countrySuggestionLabel.stringValue = "Выберите страну для местного номера или введите полный номер с +."
+        }
+        countrySuggestionLabel.setAccessibilityLabel(countrySuggestionLabel.stringValue)
         countrySuggestionLabel.isHidden = false
     }
 
