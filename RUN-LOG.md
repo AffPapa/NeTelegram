@@ -1935,3 +1935,22 @@
 
 - Read-only native review used the already-running canonical `/private/tmp/NeTelegram-Dev.app`, identified by window title `NeTelegram · dev e8bd672a`; no rebuild or account data access occurred. The login form was visually checked in both light and dark macOS appearance. Labels, country control, empty-input disabled action, QR action, affiliation note, and the matching field/action widths remained visible and legible.
 - macOS Appearance was restored to the pre-check Automatic setting and System Settings returned to its original General pane. A pointer-based attempt to resize the app did not reach the NeTelegram window; no resize result is claimed. The source minimum is 560×520 pt, but visual minimum-size coverage remains open, as do formal contrast measurement, high-contrast mode, VoiceOver speech, IME/RTL, later auth steps, and real login. AUTH03 stays partial.
+
+
+## 2026-10-15 — AUTH-KEYBOARD-FOCUS-20
+
+- Research basis: Apple HIG guidance for keyboard navigation, focus, accessibility and native macOS layout; AppKit key-view traversal behavior. Existing native AppKit controls and system appearance were retained; no Telegram implementation or external UI style was copied.
+- Diagnosis: the phone field's delegate intercepted Tab and returned focus to the country selector, which trapped forward navigation before the QR action. AppKit automatic key-view recalculation did not include the dynamically revealed QR button.
+- Change: removed the special Tab interception; visible auth controls now form a key-view cycle, refreshed after auth-step presentation and after the asynchronous country list response. Source commit `584500497f03af5103c97db1a413c84d6f5b0ce1`, pushed to `AffPapa/NeTelegram:main`.
+- Verification: Swift 6.4 app target build passed; `git diff --check` passed. Rebuilt the single canonical `/private/tmp/NeTelegram-Dev.app` through `Scripts/dev-app.sh --launch` from the exact clean commit; strict ad-hoc signature passed. Native CUA/AX verified Tab phone→QR→country→phone and Shift+Tab phone→country; screenshot confirms aligned inputs/action, QR path, disclosure, and disabled Continue for an empty phone. No account or credentials entered and no Telegram request occurred.
+- CI: not verified for this SHA. GitHub connector returned no commit statuses; `gh auth status` reported existing credentials invalid. No new login or token was attempted.
+- Limits: accountless phone-step only. Later authorization-step focus order, VoiceOver speech, minimum-size window, formal contrast, IME/RTL, real login, and twenty-account behavior remain unverified.
+
+
+## 2026-10-15 — AUTH-KEYBOARD-FOCUS-20
+
+- Research basis: Apple HIG guidance for keyboard navigation, focus, accessibility and native macOS layout; AppKit key-view traversal behavior. Existing native AppKit controls and system appearance were retained; no Telegram implementation or external UI style was copied.
+- Diagnosis: the phone field's delegate intercepted Tab and returned focus to the country selector, which trapped forward navigation before the QR action. AppKit automatic key-view recalculation did not include the dynamically revealed QR button.
+- Change: removed the special Tab interception; visible auth controls now form a key-view cycle, refreshed after auth-step presentation and after the asynchronous country list response. Source commit `584500497f03af5103c97db1a413c84d6f5b0ce1`, pushed to `AffPapa/NeTelegram:main`.
+- Verification: Swift 6.4 app target build passed; `git diff --check` passed. Exact-source macOS CI [38693309659](https://github.com/AffPapa/NeTelegram/actions/runs/38693309659) and pinned TDLib app workflow [38693309609](https://github.com/AffPapa/NeTelegram/actions/runs/38693309609) passed. Rebuilt the single canonical `/private/tmp/NeTelegram-Dev.app` through `Scripts/dev-app.sh --launch` from the exact clean commit; strict ad-hoc signature passed. Native CUA/AX verified Tab phone→QR→country→phone and Shift+Tab phone→country; screenshot confirms aligned inputs/action, QR path, disclosure, and disabled Continue for an empty phone. No account or credentials entered and no Telegram request occurred.
+- Limits: accountless phone-step only. Later authorization-step focus order, VoiceOver speech, minimum-size window, formal contrast, IME/RTL, real login, and twenty-account behavior remain unverified.
