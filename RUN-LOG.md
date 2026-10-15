@@ -2096,3 +2096,10 @@
 - Strengthened the deterministic APP28 race regression on test-only commit `9ad0d9b270fcb025e2706c74f4cd7f140940c24d`: the callback now blocks inside `consume`, the old runtime route is closed and replaced while suspended, then `consume` resumes and the production seam performs a fresh `RuntimeCoordinator.isCurrent` query before modeled side effects. The test passed 1/1.
 - Exact-source macOS CI [38720880143](https://github.com/AffPapa/NeTelegram/actions/runs/38720880143) passed. App-source files are unchanged from `6490b8d566c6648fcd6ec7d528d472d370475c39`; no canonical Dev.app rebuild was needed.
 - APP28 remains partial: deterministic seam coverage is not an authenticated AppDelegate/TDLib callback, actual identity-persistence integration, or 20-account proof. No credentials or login were used.
+
+
+## 2026-10-15 — SITE-APP28-POST-CONSUME-ROUTE-01
+
+- Official Sites helper pushed exact source commit `f4ea216433890bb7510880a01b9693c8399347f9`; static build and all 8 route validations passed. Site v213 saved as `appgprj_6acba85192e08191acdf7011928848cf~appgver_240f72331bac8191b366647947fcb5e1`, provider archive `sha256:d84e7923a663000d1bfc1dac62b7d20b216281b0f76c99b40c3689a04db6077b` (552,960 bytes, 14 files). Local archive `/private/tmp/netelegram-site-app28-route-01.tar`: SHA-256 `116c710693ea70e849856d99e782e68595d556f9dcb2b42636f9f4e56fe8c35d`, 212,826 bytes.
+- Public deployment `appgdep_6ad0ac580ae881919bc8429fc3f5f73f6` succeeded at `https://netelegram.iryadom.chatgpt.site`. Anonymous system curl verified `/devlog/` and `/downloads/` as HTTP 200 `text/html`; devlog includes `app28-post-consume-route-01` and CI run `38720880143`. Downloads truthfully indicates development and no released app.
+- No app rebuild was done: APP28 was test-only and canonical app source is unchanged.
