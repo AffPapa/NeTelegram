@@ -1781,6 +1781,30 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(retryAfterLeavingEndRequested)
 }
 
+@Test func mainChatListPositionIndexTracksMembershipAndOrderZeroRemoval() {
+    var index = MainChatListPositionIndex()
+    index.replaceSnapshot(chatID: 10, mainListOrder: 900)
+    index.replaceSnapshot(chatID: 20, mainListOrder: 500)
+    #expect(index.order(for: 10) == 900)
+    #expect(index.chatIDs == [10, 20])
+
+    // An archived-list event must not mutate main-list membership.
+    index.applyMainListUpdate(chatID: 10, order: 700)
+    #expect(index.order(for: 10) == 700)
+
+    // TDLib order zero means removal from this list.
+    index.applyMainListUpdate(chatID: 10, order: 0)
+    #expect(index.order(for: 10) == nil)
+    #expect(index.chatIDs == [20])
+}
+
+@Test func mainChatListSnapshotWithoutMainPositionRemovesStaleMembership() {
+    var index = MainChatListPositionIndex()
+    index.replaceSnapshot(chatID: 42, mainListOrder: 123)
+    index.replaceSnapshot(chatID: 42, mainListOrder: nil)
+    #expect(index.order(for: 42) == nil)
+}
+
 @Test func restorePlanIncludesAllTwentyAuthorizedProfilesAndStartupQueueDrains() async {
     let profiles = (1...20).map { n in
         AccountProfile(

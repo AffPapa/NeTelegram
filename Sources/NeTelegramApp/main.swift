@@ -241,7 +241,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var pendingProfileStorageWarnings = 0
     private var suppressDraftUpdate = false
     private var chatRowsByAccount: [AccountUUID: [Int64: ChatListRowData]] = [:]
-    private var chatOrderByAccount: [AccountUUID: [Int64: UInt64]] = [:]
+    private var mainChatListPositionsByAccount: [AccountUUID: MainChatListPositionIndex] = [:]
     private var selectedChatByAccount: [AccountUUID: Int64] = [:]
     private var messagesByConversation: [ConversationKey: [[String: Any]]] = [:]
     private var pendingHistoryRequests = ConversationHistoryRequestRegistry()
@@ -2223,7 +2223,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         outgoingPhotoManifestStoresByAccount.removeValue(forKey: account)
         unavailableOutgoingPhotoManifestAccounts.remove(account)
         chatRowsByAccount.removeValue(forKey: account)
-        chatOrderByAccount.removeValue(forKey: account)
+        mainChatListPositionsByAccount.removeValue(forKey: account)
         selectedChatByAccount.removeValue(forKey: account)
         messagesByConversation = messagesByConversation.filter { $0.key.account != account }
         replyTargetsByConversation = replyTargetsByConversation.filter { $0.key.account != account }
@@ -3096,7 +3096,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(notificationIDs))
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(notificationIDs))
         chatRowsByAccount.removeValue(forKey: account)
-        chatOrderByAccount.removeValue(forKey: account)
+        mainChatListPositionsByAccount.removeValue(forKey: account)
         messagesByConversation = messagesByConversation.filter { $0.key.account != account }
         replyTargetsByConversation = replyTargetsByConversation.filter { $0.key.account != account }
         selectedChatByAccount.removeValue(forKey: account)
@@ -3698,7 +3698,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard !lockState else { return }
             if (position["list"] as? [String: Any])?["@type"] as? String == "chatListMain",
                let order = (position["order"] as? NSNumber)?.uint64Value {
-                chatOrderByAccount[target.account, default: [:]][chatID] = order
+                mainChatListPositionsByAccount[target.account, default: MainChatListPositionIndex()]
+                    .applyMainListUpdate(chatID: chatID, order: order)
             }
             if target === runtime { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateNewMessage",
@@ -4302,11 +4303,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             unreadCount: max(0, (chat["unread_count"] as? NSNumber)?.intValue ?? 0),
             isMuted: !inheritsMute && ((notificationSettings?["mute_for"] as? NSNumber)?.intValue ?? 0) > 0
         )
-        if let positions = chat["positions"] as? [[String: Any]],
-           let main = positions.first(where: { ($0["list"] as? [String: Any])?["@type"] as? String == "chatListMain" }),
-           let order = (main["order"] as? NSNumber)?.uint64Value {
-            chatOrderByAccount[target.account, default: [:]][id] = order
+        let positions = chat["positions"] as? [[String: Any]] ?? []
+        let mainPosition = positions.first {
+            ($0["list"] as? [String: Any])?["@type"] as? String == "chatListMain"
         }
+        let mainOrder = mainPosition.flatMap { ($0["order"] as? NSNumber)?.uint64Value }
+        mainChatListPositionsByAccount[target.account, default: MainChatListPositionIndex()]
+            .replaceSnapshot(chatID: id, mainListOrder: mainOrder)
         let chatType = chat["type"] as? [String: Any]
         let isForum = chatType? ["@type"] as? String == "chatTypeSupergroup"
             && (chatType? ["is_forum"] as? Bool ?? false)
@@ -4400,11 +4403,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return
         }
         let account = runtime?.account
-        let rows = (runtime.flatMap { chatRowsByAccount[$0.account] } ?? [:]).sorted(by: { lhs, rhs in
-            let leftOrder = account.flatMap { chatOrderByAccount[$0]?[lhs.key] } ?? 0
-            let rightOrder = account.flatMap { chatOrderByAccount[$0]?[rhs.key] } ?? 0
-            return leftOrder == rightOrder ? lhs.key > rhs.key : leftOrder > rightOrder
-        })
+        let positions = account.flatMap { mainChatListPositionsByAccount[$0] } ?? MainChatListPositionIndex()
+        let rows = (runtime.flatMap { chatRowsByAccount[$0.account] } ?? [:])
+            .compactMap { chatID, row -> (key: Int64, value: ChatListRowData, order: UInt64)? in
+                guard let order = positions.order(for: chatID) else { return nil }
+                return (chatID, row, order)
+            }
+            .sorted { lhs, rhs in
+                lhs.order == rhs.order ? lhs.key > rhs.key : lhs.order > rhs.order
+            }
+            .map { (key: $0.key, value: $0.value) }
         let loadState = runtime?.mainChatListLoadState ?? .needsLoad
         guard !rows.isEmpty else {
             clearStack(chatList)
@@ -7998,7 +8006,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         actionButton.isEnabled = false
         chatPane.isHidden = true
         chatRowsByAccount.removeAll()
-        chatOrderByAccount.removeAll()
+        mainChatListPositionsByAccount.removeAll()
         messagesByConversation.removeAll()
         replyTargetsByConversation.removeAll()
         replyStatusLabel.stringValue = ""
