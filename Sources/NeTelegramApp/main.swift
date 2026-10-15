@@ -7742,8 +7742,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             return
         }
 
-        countrySuggestionButton.title = "Использовать \(country.name) (+\(callingCode))"
+        countrySuggestionButton.title = "Выбрать \(country.name) (+\(callingCode)) — подсказка macOS"
         countrySuggestionButton.setAccessibilityLabel(countrySuggestionButton.title)
+        countrySuggestionButton.setAccessibilityHelp("Подсказка берётся из региональных настроек macOS. Страна не выбирается автоматически.")
         countrySuggestionButton.isHidden = false
     }
 
