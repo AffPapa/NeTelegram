@@ -7225,7 +7225,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         _ = try intent.dispatch(
                             through: self.privacyDispatchBarrier,
                             currentAccount: accountRuntime.account,
-                            currentTelegramUserID: accountRuntime.telegramUserID ?? 0,
+                            currentTelegramUserID: intent.expectedTelegramUserID,
                             currentGeneration: accountRuntime.generation
                         ) {
                             try accountRuntime.send([
