@@ -1212,5 +1212,15 @@
     "date": "2026-10-15",
     "app_source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
     "summary": "UI follow-up clarifies that a region hint comes from macOS and is not an automatic country selection. Exact-source CI and pinned TDLib native workflow passed; guarded canonical Dev.app built/launched once with matching receipt and strict ad-hoc signature. Local serial suite 210/211; one host LAContext getter expectation mismatch remains. No real login or release proof."
+  },
+  "latest_ui_screenshot_reconciliation": {
+    "date": "2026-10-15",
+    "provided_screenshot_window_title": "NeTelegram · dev 5f414650",
+    "canonical_running_window_title": "NeTelegram · dev 6490b8d5",
+    "canonical_app_path": "/private/tmp/NeTelegram-Dev.app",
+    "inspection": "Fresh CUA accessibility tree and screenshot of the already-running canonical process. Current phone sign-in view has one searchable country/code combo box, one phone field, aligned primary action, QR action, and factual independent-client disclosure.",
+    "decision": "Provided image is from an older app source/build and does not describe the current candidate. Do not edit/rebuild based on its duplicate country controls; compare screenshot title, BuildInfo, source SHA, and current screenshot before the next UI change.",
+    "source_commit": "6490b8d566c6648fcd6ec7d528d472d370475c39",
+    "source_change": "none"
   }
 }

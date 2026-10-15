@@ -2103,3 +2103,10 @@
 - Official Sites helper pushed exact source commit `f4ea216433890bb7510880a01b9693c8399347f9`; static build and all 8 route validations passed. Site v213 saved as `appgprj_6acba85192e08191acdf7011928848cf~appgver_240f72331bac8191b366647947fcb5e1`, provider archive `sha256:d84e7923a663000d1bfc1dac62b7d20b216281b0f76c99b40c3689a04db6077b` (552,960 bytes, 14 files). Local archive `/private/tmp/netelegram-site-app28-route-01.tar`: SHA-256 `116c710693ea70e849856d99e782e68595d556f9dcb2b42636f9f4e56fe8c35d`, 212,826 bytes.
 - Public deployment `appgdep_6ad0ac580ae881919bc8429fc3f5f73f6` succeeded at `https://netelegram.iryadom.chatgpt.site`. Anonymous system curl verified `/devlog/` and `/downloads/` as HTTP 200 `text/html`; devlog includes `app28-post-consume-route-01` and CI run `38720880143`. Downloads truthfully indicates development and no released app.
 - No app rebuild was done: APP28 was test-only and canonical app source is unchanged.
+
+
+## 2026-10-15 — UI-SCREENSHOT-CURRENT-BUILD-RECONCILIATION-01
+
+- Compared the supplied screenshot title (`NeTelegram · dev 5f414650`) against the already-running canonical `/private/tmp/NeTelegram-Dev.app`. Fresh CUA showed window/build marker `NeTelegram · dev 6490b8d5`, source `6490b8d566c6648fcd6ec7d528d472d370475c39`.
+- Current AX and screenshot show one native searchable country/code combo box, one phone field, a shared aligned form column, primary/QR actions, and the independent-client disclosure. The two country controls in the attachment belong to the older build.
+- No source change or app rebuild was warranted. Before future UI edits, reconcile supplied window title/build marker, exact source SHA, and a fresh canonical screenshot; stale screenshot evidence must not trigger repeat implementation.
