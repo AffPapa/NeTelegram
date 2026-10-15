@@ -31,8 +31,9 @@ public struct AccountProfile: Codable, Sendable, Equatable, Identifiable {
     }
 }
 
-public enum AccountCatalogueError: Error, Equatable {
+public enum AccountCatalogueError: Error, Equatable, Sendable {
     case duplicateAccount
+    case identityAlreadyConnected(AccountUUID)
     case accountNotFound
     case identityMismatch
     case verifiedProfileCannotBeRemoved
@@ -129,6 +130,9 @@ public actor AccountCatalogue {
     public func associateVerifiedIdentity(_ userID: Int64, displayName: String? = nil, with account: AccountUUID) throws {
         guard let index = profiles.firstIndex(where: { $0.id == account }) else {
             throw AccountCatalogueError.accountNotFound
+        }
+        if let existing = profiles.first(where: { $0.id != account && $0.telegramUserID == userID }) {
+            throw AccountCatalogueError.identityAlreadyConnected(existing.id)
         }
         if let existingUserID = profiles[index].telegramUserID, existingUserID != userID {
             throw AccountCatalogueError.identityMismatch

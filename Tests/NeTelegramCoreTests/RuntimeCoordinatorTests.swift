@@ -1972,34 +1972,6 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(state.state == .loaded)
 }
 
-@Test func chatListPaginationWaitsForLoadedPageAndDoesNotLeakAcrossAccounts() {
-    var policy = ChatListPaginationPolicy()
-    let accountA = AccountUUID()
-    let accountB = AccountUUID()
-
-    let loadingPageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loading)
-    #expect(!loadingPageRequested)
-    let firstPageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
-    #expect(firstPageRequested)
-    let duplicatePageRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
-    #expect(!duplicatePageRequested)
-
-    // Selecting another account at the bottom can request its own page; A's
-    // in-flight/recent trigger must not suppress it.
-    let accountBPageRequested = policy.shouldRequestPage(account: accountB, isNearEnd: true, loadState: .loaded)
-    #expect(accountBPageRequested)
-    // Completion alone must not cascade another page while the viewport is
-    // still at the end. The user must leave the end and reach it again; the
-    // visible "Load more" button is also available when content is too short
-    // to scroll away from the end.
-    let completionDidNotCascade = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
-    #expect(!completionDidNotCascade)
-
-    _ = policy.shouldRequestPage(account: accountA, isNearEnd: false, loadState: .loaded)
-    let retryAfterLeavingEndRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
-    #expect(retryAfterLeavingEndRequested)
-}
-
 @Test func mainChatListPositionIndexTracksMembershipAndOrderZeroRemoval() {
     var index = MainChatListPositionIndex()
     index.replaceSnapshot(chatID: 10, mainListOrder: 900)
@@ -2007,7 +1979,11 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(index.order(for: 10) == 900)
     #expect(index.chatIDs == [10, 20])
 
-    // An archived-list event must not mutate main-list membership.
+    index.applyUpdate(chatID: 30, scope: .archive, order: 800)
+    index.applyUpdate(chatID: 10, scope: .folder(7), order: 750)
+    #expect(index.order(for: 30, scope: .archive) == 800)
+    #expect(index.order(for: 10, scope: .folder(7)) == 750)
+    // A custom folder position must not mutate main-list membership.
     index.applyUpdate(chatID: 10, scope: .other, order: 700)
     #expect(index.order(for: 10) == 900)
     index.applyUpdate(chatID: 10, scope: .main, order: 700)
@@ -3997,6 +3973,41 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     let sameIdentityUpdate = await catalogue.allProfiles()
     #expect(sameIdentityUpdate.first?.telegramUserID == 123456789)
     #expect(sameIdentityUpdate.first?.displayName == "Updated Name")
+}
+
+@Test func accountCatalogueRejectsTheSameTelegramIdentityAcrossProfilesAtomically() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+    let first = AccountUUID()
+    let second = AccountUUID()
+    let catalogue = try AccountCatalogue(rootURL: root)
+    _ = try await catalogue.addProfile(id: first)
+    _ = try await catalogue.addProfile(id: second)
+
+    let outcomes = await withTaskGroup(of: String.self, returning: [String].self) { group in
+        for account in [first, second] {
+            group.addTask {
+                do {
+                    try await catalogue.associateVerifiedIdentity(123456789, with: account)
+                    return "linked"
+                } catch AccountCatalogueError.identityAlreadyConnected(_) {
+                    return "already-connected"
+                } catch {
+                    return "unexpected-error"
+                }
+            }
+        }
+        var values: [String] = []
+        for await value in group { values.append(value) }
+        return values
+    }
+
+    #expect(outcomes.filter { $0 == "linked" }.count == 1)
+    #expect(outcomes.filter { $0 == "already-connected" }.count == 1)
+    #expect(outcomes.allSatisfy { $0 != "unexpected-error" })
+    let profiles = await catalogue.allProfiles()
+    #expect(profiles.filter { $0.telegramUserID == 123456789 }.count == 1)
+    #expect(profiles.filter { $0.telegramUserID == nil }.count == 1)
 }
 
 @Test func accountCatalogueRemovesOnlyTheExpectedLoggedOutIdentity() async throws {
