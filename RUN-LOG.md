@@ -1962,3 +1962,12 @@
 - In the visible app, invoked only the separate “Разрешить доступ к сохранённому API hash…” menu action. The app reported that access to the saved value was confirmed and that its value remained in Keychain. The value was not displayed/copied; phone remained empty, Continue remained disabled, and no Telegram authorization request started. This supersedes the earlier standalone Keychain data-query timeout as evidence for the normal explicit in-app permission path, while preserving the separate unresolved restored-support-root observation.
 - Corrected the checkpoint description of `SecretsStore`: source uses a bounded `OperationQueue` with up to two concurrent operations and non-interactive `LAContext`, not a serial DispatchQueue. No Keychain item was changed or deleted.
 - Next: continue independent source/runtime audit; real account login/read/send/logout remains deferred until the owner chooses to enter account details in the app.
+
+
+## 2026-10-15 — AUTH-PANEL-HIG-21
+
+- Research: Apple HIG Layout, Text Fields and Accessibility; TelegramSwift phone-auth sequence read as a reference only. No third-party client code or styling copied.
+- Change: AppKit sign-in content now sits on a rounded semantic-color panel; authorization policy and input/action behavior are unchanged. App source `42a4e63450ff6c381f6d27119ef5facea2729276`.
+- Verification: Swift 6.4 app target build, exact-source macOS CI run 38694629718, pinned TDLib/Dev.app run 38694629709, strict ad-hoc signature, normal accountless Dev.app launch and AX/light screenshot passed. Light and compact dark previews showed all controls. No credentials or Telegram request used.
+- Publication: bilingual devlog milestone is public at Site v207; deployment `appgdep_6ad07825ea4481918b6bf62305a5ea9c`, Site source `9f6d44f154a30af5639cc189fa7fb16835dbd930`. Fresh anonymous `/devlog/` fetch contains `auth-panel-hig-21`; `/downloads/` has no application binary.
+- Limits: real login, later auth states, spoken VoiceOver, IME/RTL, measured contrast, twenty real runtimes, Developer ID/notarization and public app downloads remain unverified.
