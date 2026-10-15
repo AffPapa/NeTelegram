@@ -2032,3 +2032,10 @@
 - Updated only the existing public Site devlog with a factual RU/EN note linked to app source `304be32bc0cafda1438a2a93c3545871639f4948`, macOS CI `38708407779`, and pinned-TDLib app workflow `38708407813`. Downloads, changelog, update feeds, and release assets were not changed.
 - Official Sites helper pushed source `7645721cfc16d57679233f78a92125f52e0b2e79`; static build and 8-route validation passed. Public Site v211 saved archive provider hash `sha256:45e523770fbdb2cf9e6ff013b513a6596bc1301b6361903ddd36f212a87ff85a`, 542,720 bytes / 14 files; local archive SHA-256 `74c9e47dba32e97b8f2c02bb2f04e6fb9a3574bdf89ffcaf6949287375af2575`. Deployment `appgdep_6ad09600c7608191bc50377e3283aa7a` succeeded at the existing public URL. Anonymous HTTPS `/devlog/` returned 200 `text/html` and contained the entry ID, source SHA, CI links, and verification limits.
 - No app release or download was published. Dark appearance, spoken VoiceOver, actual sign-in, and 20-account coverage remain open.
+
+
+## 2026-10-15 — APP13-NO-SLEEP-ASSERTION-01
+
+- Verified the live canonical `/private/tmp/NeTelegram-Dev.app` process (PID 33812) by AX title, bundle Info.plist, embedded BuildInfo and internal build record: all identify app source `304be32bc0cafda1438a2a93c3545871639f4948`; fingerprint and executable SHA-256 match. `codesign --verify --deep --strict` passed.
+- Read `pmset -g assertions`: no power assertion owned by NeTelegram was present. This only checks that the observed app process did not hold a listed sleep-prevention assertion at that instant. No sleep/wake cycle, real Telegram session recovery, duplicate send/notification behavior, or all-20 hardware runtime was tested. APP13 remains partial.
+- Diagnostic correction: `/private/tmp/NeTelegram-Dev.build.json` was an unrelated stale temporary receipt; the authoritative record is the checkout-local `.build/canonical-dev-build/NeTelegram-Dev.build.json`, which matches the canonical bundle and running AX build title. No app was closed or rebuilt.

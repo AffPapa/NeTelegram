@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "AUTH-FORM-GRID-21: the native sign-in column now has one measured width; exact-source CI and standard/compact canonical Dev.app visual checks passed. Real authentication, multi-account coverage, dark/VoiceOver review, and release gates remain open.",
-  "verified_at": "2026-10-15T09:00:29Z",
+  "verified_at": "2026-10-15T09:03:00Z",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
     "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
@@ -808,10 +808,10 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP12-NETWORK-RETRY-01",
-    "receipt_id": "APP12-NETWORK-RETRY-01",
-    "test": "Three focused Swift retry/fanout regressions passed; AppKit target compiled; exact-source macOS CI 38704558270 and pinned TDLib workflow 38704558263 passed.",
-    "result": "Canonical Dev.app rebuilt from e9302d1, strict ad-hoc signature verified, and AX confirmed exact build on accountless sign-in. Live network/20-account behavior remains unverified."
+    "case": "APP13-SLEEP-ASSERTION-01",
+    "receipt_id": "APP13-SLEEP-ASSERTION-01",
+    "test": "Read-only native process/build identity and `pmset -g assertions` inspection. Canonical app PID 33812 had AX title `NeTelegram · dev 304be32b`; bundle Info.plist and embedded BuildInfo both identify app source 304be32bc0cafda1438a2a93c3545871639f4948; internal canonical build record matched source fingerprint and executable SHA-256; strict ad-hoc codesign verification passed.",
+    "result": "No power assertion owned by NeTelegram appeared in the system assertion listing. This confirms the observed process is not holding a named sleep-prevention assertion at the time of inspection. No actual sleep/wake cycle was initiated; no authorized Telegram accounts were active or exercised. APP13 remains partial."
   },
   "latest_chat_list_pagination_slice": {
     "id": "CHAT-LIST-PAGINATION-03",

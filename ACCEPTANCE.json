@@ -188,7 +188,7 @@
       "method": "native hardware",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Exact-source app commit ec2d91b96dfed996d32d825bd03c1aabc3596c1a: local serial Swift suite 158/158 and exact-SHA GitHub Actions run 38485519098 passed 158/158. Synthetic tests fan out wake/path updates to 20 runtime sinks and inject one account setter failure; the failed account keeps only the latest pending state and recovers without retrying other accounts or changing RuntimeGeneration. Physical Mac sleep/wake, real sessions, server-side duplicate sends/notifications and all-20 hardware recovery remain unverified; status stays partial."
+      "evidence": "Exact-source app commit ec2d91b96dfed996d32d825bd03c1aabc3596c1a: local serial Swift suite 158/158 and exact-SHA GitHub Actions run 38485519098 passed 158/158. Synthetic tests fan out wake/path updates to 20 runtime sinks and inject one account setter failure; the failed account keeps only the latest pending state and recovers without retrying other accounts or changing RuntimeGeneration. Physical Mac sleep/wake, real sessions, server-side duplicate sends/notifications and all-20 hardware recovery remain unverified; status stays partial. Current exact-source accountless native inspection on 2026-10-15: canonical process PID 33812 had AX title, Info.plist, embedded BuildInfo and verified internal build record agreeing on app source 304be32bc0cafda1438a2a93c3545871639f4948; no NeTelegram-owned power assertion appeared in `pmset -g assertions`. This is evidence only that the app did not hold a listed sleep-prevention assertion at that moment. No physical sleep/wake cycle or real-account recovery was exercised; APP13 remains partial."
     },
     {
       "id": "APP14",
@@ -794,10 +794,10 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP12-NETWORK-RETRY-01",
-    "receipt_id": "APP12-NETWORK-RETRY-01",
-    "test": "Three focused Swift retry/fanout regressions passed; AppKit target compiled; exact-source macOS CI 38704558270 and pinned TDLib workflow 38704558263 passed.",
-    "result": "Canonical Dev.app rebuilt from e9302d1, strict ad-hoc signature verified, and AX confirmed exact build on accountless sign-in. Live network/20-account behavior remains unverified."
+    "case": "APP13-SLEEP-ASSERTION-01",
+    "receipt_id": "APP13-SLEEP-ASSERTION-01",
+    "test": "Read-only native process/build identity and `pmset -g assertions` inspection. Canonical app PID 33812 had AX title `NeTelegram · dev 304be32b`; bundle Info.plist and embedded BuildInfo both identify app source 304be32bc0cafda1438a2a93c3545871639f4948; internal canonical build record matched source fingerprint and executable SHA-256; strict ad-hoc codesign verification passed.",
+    "result": "No power assertion owned by NeTelegram appeared in the system assertion listing. This confirms the observed process is not holding a named sleep-prevention assertion at the time of inspection. No actual sleep/wake cycle was initiated; no authorized Telegram accounts were active or exercised. APP13 remains partial."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
