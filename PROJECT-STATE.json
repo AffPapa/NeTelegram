@@ -1294,5 +1294,11 @@
     "test_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
     "workflow_run_id": 38727854037,
     "result": "PASS; exact head SHA returned macOS CI completed/success. Script syntax and exact-SHA API query verified. No browser, OAuth flow, token creation, or token output was used."
+  },
+  "latest_github_cli_credential_check": {
+    "date": "2026-10-15",
+    "method": "Scripts/with-gh-git-credential.sh obtains existing Git credential only through stdin from the configured helper, validates the GitHub API account, and supplies GH_TOKEN only to the gh child process; no token is written or printed.",
+    "authenticated_account": "AffPapa",
+    "verification": "Read-only `api repos/AffPapa/NeTelegram --jq .full_name` returned AffPapa/NeTelegram. The standalone public Actions REST script remains the preferred routine CI status path and requires no credential. No gh login or new token was created."
   }
 }

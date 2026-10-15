@@ -14,6 +14,14 @@ git push origin main
 
 Git transport uses the configured system credential helper. Do not start `gh auth login` just because the GitHub CLI reports a separate account token as invalid; Git transport, GitHub API access, and Sites access have separate credentials.
 
+For authenticated GitHub CLI operations, use the existing helper without persisting a new CLI token:
+
+```sh
+Scripts/with-gh-git-credential.sh api repos/AffPapa/NeTelegram
+```
+
+The wrapper reads the already configured credential via `git credential fill`, checks the authenticated API owner is `AffPapa`, passes it only through the child process environment, and fails closed on missing or unexpected credentials. Never run `gh auth login` or create another token to repair a stale CLI-specific credential when this route works.
+
 ## Read Actions status without a browser
 
 The repository is public, so CI status is available from GitHub's unauthenticated REST API. Pass the full source or test commit SHA:
@@ -26,4 +34,4 @@ The script is read-only and prints each matching run's ID, workflow, status, con
 
 ## Release writes
 
-Creating releases or uploading assets requires a working write-capable API credential and completed signing, notarization, Gatekeeper, and compatibility gates. Check those gates independently. Do not create or broaden a token to work around a read-only CI lookup.
+Use the authenticated CLI wrapper for GitHub release operations only after confirming that the existing helper credential has the required repository permissions. Creating releases or uploading assets also requires completed signing, notarization, Gatekeeper, and compatibility gates. Check those gates independently. Do not create or broaden a token to work around a read-only CI lookup.
