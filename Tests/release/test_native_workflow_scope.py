@@ -51,6 +51,11 @@ class NativeWorkflowScopeTests(unittest.TestCase):
         self.assertIn("<key>CFBundleDisplayName</key><string>NeTelegram Dev</string>", script)
         self.assertNotIn("AffPapa Chat Dev", script)
 
+    def test_sparkle_framework_comes_from_swiftpm_build_products(self):
+        script = DEV_APP_SCRIPT.read_text(encoding="utf-8")
+        self.assertIn('SPARKLE_FRAMEWORK="$SWIFT_BIN_PATH/Sparkle.framework"', script)
+        self.assertNotIn('.build/artifacts/Sparkle/', script)
+
 
 if __name__ == "__main__":
     unittest.main()

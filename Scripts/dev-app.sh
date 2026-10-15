@@ -59,7 +59,6 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
-SPARKLE_FRAMEWORK="$ROOT_DIR/.build/artifacts/Sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 # Reuse only a byte-for-byte verified bundle for this exact clean source
 # commit, source fingerprint, toolchain, pinned TDLib, support root and build.
 # This check is deliberately before the process guard: an already-running
@@ -180,6 +179,7 @@ mkdir -p "$SWIFT_MODULE_CACHE"
 SWIFT_BIN_PATH="$(CLANG_MODULE_CACHE_PATH="$SWIFT_MODULE_CACHE" swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --disable-sandbox --show-bin-path)"
 CLANG_MODULE_CACHE_PATH="$SWIFT_MODULE_CACHE" swift build --package-path "$ROOT_DIR" --scratch-path "$BUILD_ROOT/swift" --disable-sandbox
 BUILT_EXECUTABLE="$SWIFT_BIN_PATH/NeTelegram"
+SPARKLE_FRAMEWORK="$SWIFT_BIN_PATH/Sparkle.framework"
 if [[ ! -x "$BUILT_EXECUTABLE" ]]; then
     # SwiftPM has changed the executable output layout across toolchain
     # releases. Prefer `--show-bin-path`, then search this exact scratch path.
