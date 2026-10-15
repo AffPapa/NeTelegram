@@ -3,11 +3,9 @@
   "status": "CAPTURED-IDENTITY-DISPATCH-02: Bind TDLib read and photo-open checks to captured identity. Exact-source CI, pinned TDLib bundle, and canonical clean accountless app smoke passed. Real account behavior remains pending.",
   "current_evidence": {
     "release_validator_update_archive_gate": {
-      "commit": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
-      "workflow_run_id": 38739904653,
-      "workflow_status": "success",
-      "local_focused_tests": "Tests.release.test_validate_release: 21/21 passed.",
-      "scope": "Release candidates now require a Sparkle update ZIP and matching manifest metadata. This does not build an app or prove a real EdDSA signature; the test fixture is synthetic.",
+      "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
+      "local_focused_tests": "Tests.release.test_validate_release: 23/23 passed.",
+      "scope": "Release candidates require a Sparkle update ZIP and candidate validation invokes the pinned Sparkle sign_update --verify against exact archive bytes. Unit tests use a deterministic verifier stub; they do not prove a real EdDSA signature.",
       "app_source_changed": false,
       "real_account_or_release_evidence": false
     },

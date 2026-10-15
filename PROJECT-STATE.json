@@ -3,11 +3,10 @@
   "phase": "CAPTURED-IDENTITY-DISPATCH-02: Bind TDLib read and photo-open checks to captured identity. Exact-source CI, pinned TDLib bundle, and canonical clean accountless app smoke passed. Real account behavior remains pending.",
   "verified_at": "2026-10-15",
   "last_release_process_milestone": {
-    "commit": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
-    "workflow_run_id": 38739904653,
-    "workflow_status": "success",
-    "scope": "Release candidate validation now requires Sparkle update ZIP with manifest-bound signature/version/channel/minimum macOS metadata; app source unchanged.",
-    "focused_tests": "Tests.release.test_validate_release: 21/21 passed locally. The fixture signature is synthetic and is not cryptographic verification evidence.",
+    "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
+    "scope": "Release candidate validation requires Sparkle update ZIP and runs the pinned Sparkle sign_update --verify against its exact bytes; app source unchanged.",
+    "focused_tests": "Tests.release.test_validate_release: 23/23 passed locally. Fixtures use a deterministic verifier stub and are not cryptographic release evidence.",
+    "hosted_ci": "Query the exact pushed commit after publication; do not reuse the prior metadata run for this source change.",
     "app_release_created": false
   },
   "latest_api_hash_presence_check": {
@@ -133,10 +132,10 @@
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     },
     "latest_pushed_commit": {
-      "sha": "fe111c97dc6314aa18c8b71fe22ee24f76558549",
+      "sha": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
       "branch": "main",
       "remote": "AffPapa/NeTelegram",
-      "method": "Current public origin/main release-validator and plan commit; metadata CI run 38739904653 passed. App source SHA remains separately recorded as 7558909."
+      "method": "Latest release-validator implementation commit on origin/main; checkpoint-only commit may follow. Exact metadata CI must be checked after push. App source SHA remains separately recorded as 7558909."
     }
   },
   "local_development_candidate": {
