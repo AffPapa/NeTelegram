@@ -2224,3 +2224,8 @@
 - Targeted `python3 -m unittest Tests.release.test_validate_release`: 24/24 passed. `python3 -m json.tool release-manifest.template.json`, `python3 -m py_compile Scripts/validate_release.py Tests/release/test_validate_release.py`, and `git diff --check` passed.
 - Scope is release metadata validation only. No app source/build, account login, signing, notarization, GitHub release, or Site deployment was performed. Fixture signatures are not cryptographic release evidence.
 - GitHub fetch through sandbox DNS failed (`Could not resolve host: github.com`); the same fetch succeeded through the approved existing Git credential/network route, confirming `origin/main` was still `3dded76542cdc8fc9f2be68daf989cc3f39deed1` before this change. No browser or new credential was used.
+
+## 2026-10-15 — RELEASE-MANIFEST-SPARKLE-CONTRACT-02 publication receipt
+
+- Source/tooling commit `d47555d6f62a0c60227a42db099961df4c57f593` was pushed once to `AffPapa/NeTelegram` main using the existing Git credential helper. Exact GitHub Metadata validation run `38741886157` completed successfully for that SHA.
+- Public unauthenticated GitHub Releases API returned zero existing releases at verification time; no tag or binary assets were created. This change does not alter the app-source SHA, Dev.app, Site, account data, or release signing state.

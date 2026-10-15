@@ -3,15 +3,15 @@
   "phase": "CAPTURED-IDENTITY-DISPATCH-02: Bind TDLib read and photo-open checks to captured identity. Exact-source CI, pinned TDLib bundle, and canonical clean accountless app smoke passed. Real account behavior remains pending.",
   "verified_at": "2026-10-15",
   "last_release_process_milestone": {
-    "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
-    "scope": "Release candidate validation requires Sparkle update ZIP and runs the pinned Sparkle sign_update --verify against its exact bytes; app source unchanged.",
-    "focused_tests": "Tests.release.test_validate_release: 23/23 passed locally. Fixtures use a deterministic verifier stub and are not cryptographic release evidence.",
+    "commit": "d47555d6f62a0c60227a42db099961df4c57f593",
+    "scope": "Candidate validator now requires artifact_contract.required_kinds to enumerate every mandatory asset exactly once, including sparkle_update_zip; template and regression fixture agree. App source unchanged.",
+    "focused_tests": "Tests.release.test_validate_release: 24/24 passed locally. JSON parse, py_compile, and git diff --check passed. Deterministic test verifier only; no actual archive signature was tested.",
     "hosted_ci": {
-      "run_id": 38740754274,
+      "run_id": 38741886157,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38740754274",
-      "workflow_commit": "88dc89e47206f425dad5e479e90194e19e878ccd",
-      "scope": "Metadata validation for the exact pushed release-validator signature-check implementation and checkpoint; the signed archive itself remains synthetic/unavailable."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38741886157",
+      "workflow_commit": "d47555d6f62a0c60227a42db099961df4c57f593",
+      "scope": "Metadata validation for release manifest required_kinds contract; no app source/build or real asset signature evidence."
     },
     "app_release_created": false
   },
@@ -115,11 +115,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38740754274,
+      "run_id": 38741886157,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38740754274",
-      "workflow_commit": "88dc89e47206f425dad5e479e90194e19e878ccd",
-      "scope": "Metadata validation for RELEASE-SPARKLE-CRYPTO-VERIFY-01 and current checkpoint."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38741886157",
+      "workflow_commit": "d47555d6f62a0c60227a42db099961df4c57f593",
+      "scope": "Metadata validation for release manifest required_kinds contract; no app source/build or real asset signature evidence."
     },
     "latest_exact_source_ci": {
       "run_id": 38734713139,
@@ -138,10 +138,10 @@
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     },
     "latest_pushed_commit": {
-      "sha": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
+      "sha": "d47555d6f62a0c60227a42db099961df4c57f593",
       "branch": "main",
       "remote": "AffPapa/NeTelegram",
-      "method": "Latest release-validator implementation commit on origin/main; checkpoint-only commit may follow. Exact metadata CI must be checked after push. App source SHA remains separately recorded as 7558909."
+      "method": "Existing configured Git credential helper; commit pushed once after fetching origin/main. Exact metadata workflow 38741886157 passed. App source SHA remains separately recorded as 7558909."
     }
   },
   "local_development_candidate": {
