@@ -5729,25 +5729,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func flushDirtyDraftsBeforeQuit() -> Bool {
-        for account in dirtyDraftAccounts {
+        var pendingAccounts = dirtyDraftAccounts
+        let outcome = DraftQuitPersistenceBarrier.flush(dirtyAccounts: &pendingAccounts) { account in
             guard !unavailableDraftAccounts.contains(account), let store = draftStoresByAccount[account] else {
-                setStatus("Выход остановлен: не удалось подтвердить сохранность черновика.")
-                return false
+                throw DraftQuitPersistenceBarrier.PersistenceError.unavailable
             }
-            do {
-                let durableSnapshot = DraftPrivacyCache.draftsForPersistence(
-                    account: account,
-                    presentationDrafts: draftsByConversation,
-                    lockedDirtyDrafts: lockedDirtyDraftRecovery
-                )
-                try store.save(durableSnapshot)
-                dirtyDraftAccounts.remove(account)
-            } catch {
-                setStatus("Выход остановлен: черновик не удалось сохранить на диск.")
-                return false
-            }
+            let durableSnapshot = DraftPrivacyCache.draftsForPersistence(
+                account: account,
+                presentationDrafts: draftsByConversation,
+                lockedDirtyDrafts: lockedDirtyDraftRecovery
+            )
+            try store.save(durableSnapshot)
         }
-        return true
+        dirtyDraftAccounts = pendingAccounts
+        switch outcome {
+        case .complete:
+            return true
+        case .blocked(let account):
+            if unavailableDraftAccounts.contains(account) || draftStoresByAccount[account] == nil {
+                setStatus("Выход остановлен: не удалось подтвердить сохранность черновика.")
+            } else {
+                setStatus("Выход остановлен: черновик не удалось сохранить на диск.")
+            }
+            return false
+        }
     }
 
     private func reloadPersistedDrafts(for account: AccountUUID) {

@@ -463,6 +463,40 @@ private final class RuntimeOwnershipProbe {}
     ) == [conversation: "last unsaved copy"])
 }
 
+@Test func draftQuitPersistenceBarrierRetainsFailedAndUnattemptedAccounts() {
+    enum InjectedFailure: Error { case diskFull }
+
+    let first = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000001")!)
+    let failing = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000002")!)
+    let unattempted = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000003")!)
+    var dirtyAccounts: Set<AccountUUID> = [unattempted, failing, first]
+    var attempted: [AccountUUID] = []
+
+    let outcome = DraftQuitPersistenceBarrier.flush(dirtyAccounts: &dirtyAccounts) { account in
+        attempted.append(account)
+        if account == failing { throw InjectedFailure.diskFull }
+    }
+
+    #expect(outcome == .blocked(account: failing))
+    #expect(attempted == [first, failing])
+    #expect(dirtyAccounts == [failing, unattempted])
+}
+
+@Test func draftQuitPersistenceBarrierClearsOnlySuccessfullyPersistedAccounts() {
+    let first = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000011")!)
+    let second = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000012")!)
+    var dirtyAccounts: Set<AccountUUID> = [second, first]
+    var persisted: [AccountUUID] = []
+
+    let outcome = DraftQuitPersistenceBarrier.flush(dirtyAccounts: &dirtyAccounts) { account in
+        persisted.append(account)
+    }
+
+    #expect(outcome == .complete)
+    #expect(persisted == [first, second])
+    #expect(dirtyAccounts.isEmpty)
+}
+
 @Test func acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery() {
     let account = AccountUUID()
     let sentConversation = ConversationKey(account: account, chatID: 30)
