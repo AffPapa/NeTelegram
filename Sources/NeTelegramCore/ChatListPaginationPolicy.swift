@@ -19,7 +19,4 @@ public struct ChatListPaginationPolicy: Sendable, Equatable {
         return true
     }
 
-    public mutating func pageDidComplete(for account: AccountUUID) {
-        triggeredAccounts.remove(account)
-    }
 }

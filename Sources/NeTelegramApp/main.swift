@@ -2982,12 +2982,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 }
             ) else { return }
             if target.mainChatLoadRevision != previousMainChatLoadRevision {
-                chatListPaginationPolicy.pageDidComplete(for: target.account)
                 if target === runtime, !lockState {
                     refreshChatList()
-                    if target.mainChatListLoadState == .loaded {
-                        DispatchQueue.main.async { [weak self] in self?.evaluateChatListPagination() }
-                    }
                 }
             }
             if previousTelegramUserID != nil,
@@ -4489,9 +4485,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         switch loadState {
         case .loading:
             addChatListState("Загружаю ещё переписки…")
+        case .loaded:
+            addChatListState("Загрузить следующие переписки", allowsRetry: true, retryTitle: "Загрузить ещё")
         case .failed:
             addChatListState("Не удалось загрузить следующие переписки", allowsRetry: true)
-        case .needsLoad, .loaded, .exhausted:
+        case .needsLoad, .exhausted:
             break
         }
     }

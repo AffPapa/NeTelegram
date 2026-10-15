@@ -1772,9 +1772,12 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     // in-flight/recent trigger must not suppress it.
     let accountBPageRequested = policy.shouldRequestPage(account: accountB, isNearEnd: true, loadState: .loaded)
     #expect(accountBPageRequested)
-    policy.pageDidComplete(for: accountA)
-    let accountAContinuationRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
-    #expect(accountAContinuationRequested)
+    // Completion alone must not cascade another page while the viewport is
+    // still at the end. The user must leave the end and reach it again; the
+    // visible "Load more" button is also available when content is too short
+    // to scroll away from the end.
+    let completionDidNotCascade = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
+    #expect(!completionDidNotCascade)
 
     _ = policy.shouldRequestPage(account: accountA, isNearEnd: false, loadState: .loaded)
     let retryAfterLeavingEndRequested = policy.shouldRequestPage(account: accountA, isNearEnd: true, loadState: .loaded)
