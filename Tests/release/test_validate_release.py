@@ -133,7 +133,10 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
             "sponsored_media_3_3": "deferred",
             "basic_functionality_1_3_1_4": "open",
         },
-        "artifact_contract": {"private_key_included": False},
+        "artifact_contract": {
+            "private_key_included": False,
+            "required_kinds": ["app_zip", "dmg", "sbom", "notice", "sparkle_update_zip"],
+        },
     }
     manifest_path = root / "release.json"
     manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -194,6 +197,14 @@ class CandidateValidationTests(unittest.TestCase):
             manifest["artifacts"] = [item for item in manifest["artifacts"] if item["kind"] != "sparkle_update_zip"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "missing sparkle_update_zip"):
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
+
+    def test_manifest_contract_must_declare_every_required_release_asset(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            manifest["artifact_contract"]["required_kinds"].remove("sparkle_update_zip")
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "artifact_contract.required_kinds"):
                 validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_candidate_cryptographically_verifies_sparkle_archive_signature(self):

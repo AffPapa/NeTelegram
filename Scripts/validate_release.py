@@ -121,6 +121,12 @@ def validate_candidate(
     contract = manifest.get("artifact_contract")
     if not isinstance(contract, dict) or contract.get("private_key_included") is not False:
         raise ValidationError("artifact_contract.private_key_included must remain false")
+    declared_required_kinds = contract.get("required_kinds")
+    if (not isinstance(declared_required_kinds, list)
+            or any(not isinstance(kind, str) for kind in declared_required_kinds)
+            or set(declared_required_kinds) != REQUIRED_ARTIFACT_KINDS
+            or len(declared_required_kinds) != len(REQUIRED_ARTIFACT_KINDS)):
+        raise ValidationError("artifact_contract.required_kinds must list every required release asset exactly once")
     for field in REQUIRED_MANIFEST_FIELDS:
         require_text(manifest, field)
     for field in ("changes", "known_limitations"):

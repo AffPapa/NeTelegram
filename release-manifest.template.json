@@ -35,7 +35,8 @@
       "app_zip",
       "dmg",
       "sbom",
-      "notice"
+      "notice",
+      "sparkle_update_zip"
     ],
     "all": [
       "kind",

@@ -2,11 +2,11 @@
 
 ## Pinned state at review
 
-- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, clean, `HEAD=4da1e4f4c0c95aa58f1d0cd44d29bad0fafeea90`, origin `AffPapa/NeTelegram`.
+- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, origin `AffPapa/NeTelegram`; latest verified checkpoint `HEAD=3dded76542cdc8fc9f2be68daf989cc3f39deed1`. At this review, the working tree is intentionally dirty with one release-contract consistency slice in `Scripts/validate_release.py`, its focused test, and `release-manifest.template.json`; do not call it a clean candidate.
 - App source: `75589091d7144e1d1ffe94b15bf38638df7d708d`; canonical Dev.app: `/private/tmp/NeTelegram-Dev.app`, `0.0.0-dev`, arm64, macOS 14, ad-hoc only. Not a distribution artifact.
 - Current Site: public v218, no app download, empty alpha/stable feeds.
 - Acceptance: 56 cases: 3 passed, 46 partial, 7 not run. Synthetic 20-profile tests are not real multi-account validation. All available authorized accounts remaining active is a required product behavior at every release, not a stable-only feature.
-- Current blockers: owner-operated one-account login/read/send smoke not done; no notarization credential profile; no release assembler; no signed/notarized app or release assets. Developer ID identities exist, but no NeTide bundle has been signed.
+- Current blockers: owner-operated one-account login/read/send smoke not done; latest checkpoint reports no notarization credential profile; no safe release assembler; no signed/notarized app or release assets. Developer ID identities exist, but no NeTide distribution bundle has been signed. Latest metadata CI evidence is run `38741015422` for checkpoint commit `3dded76`; the current uncommitted local contract change has not been pushed or covered by CI.
 
 ## Why this took too long
 
@@ -28,6 +28,9 @@
 - Freeze a source SHA before release work. Separate release builder and scratch/output from destructive `Scripts/dev-app.sh`; no ad-hoc Dev.app signing as distribution proof.
 - Do not update the existing Site again until verified GitHub assets are available; then update downloads/changelog/manifest together in one Site save/deploy.
 - Keep a compact top-level “current truth” in checkpoint; append history in RUN-LOG. Mark stale projections superseded rather than adding another ambiguous latest field.
+- Never act on a plan's pinned identity without rechecking it. Refresh `HEAD`, dirty paths, app-source SHA, running BuildInfo/PID, Site version, and public release inventory at the start; update this plan when any pointer changes.
+- Existing Site v218 is not the release path. Freeze Site work until verified GitHub assets exist, then make one manifest-driven deployment.
+- For the current Sparkle contract slice, focused `python3 -m unittest Tests.release.test_validate_release` passed 24/24 locally; JSON parsing, `py_compile`, and `git diff --check` passed. This is metadata-tool validation only, not CI, a cryptographic signature, a native build, or a release.
 
 ## 0.1 alpha delivery sequence
 
@@ -49,7 +52,8 @@ Publish immutable GitHub alpha assets against the exact source commit; download 
 
 ## Gate status / exact next action
 
-- **Next action:** owner completes the real one-account smoke in `/private/tmp/NeTelegram-Dev.app`. This is the only immediate product gate; no code change is justified before the observation.
+- **Next user action:** owner completes the real one-account smoke in `/private/tmp/NeTelegram-Dev.app`: enter credentials only in the app, confirm chat list, read one chat, send one approved test message, quit/reopen and confirm the same identity returns. No credentials or message content should be sent in chat. This is the highest-value product gate; only a reproduced P0 justifies an app fix.
+- **Current engineering action:** finish the already-started release-contract slice by appending evidence to `RUN-LOG.md`, synchronizing checkpoint metadata, validating the checkpoint, and pushing the source/checkpoint change once through the existing Git credential route. Then reuse the exact resulting metadata CI; do not rebuild the app because this does not touch app source.
 - **Release setup blocker:** notarization profile was absent in the latest checkpoint. After the smoke and source freeze, use the supported Apple credential setup path. Never ask for a password pasted in chat.
 - **Implementation gap:** there is no safe release assembler. Implement it only after smoke exposes any source fix and the alpha source SHA is frozen.
 - **Coverage may remain partial for alpha:** 20 real authorized accounts and the 1/5/10/20 resource matrix are not required to make a narrow alpha claim, but all-active runtime behavior remains mandatory in the implementation. Do not ship an alpha that only keeps one selected plus a few background accounts; report exact real-account coverage and leave 20-account certification open until it is measured.

@@ -2217,3 +2217,10 @@
 - Added tests for verifier invocation and rejection of a mismatched signature. Focused release candidate validator suite passed 22/22. This is the first source slice after checkpoint commit `3e70769`; its commit and exact hosted metadata run will be recorded after push.
 - Tests use a deterministic shell stub and do not constitute cryptographic evidence. No real update archive, key access, app build, signing, notarization, release, or Site update occurred.
 - Source commit `9eefbe7906e152e10f2f72af6ff4e12531dbf29b` was included in public checkpoint commit `88dc89e47206f425dad5e479e90194e19e878ccd`; GitHub metadata validation run `38740754274` passed for that exact checkpoint SHA.
+
+## 2026-10-15 — RELEASE-MANIFEST-SPARKLE-CONTRACT-02
+
+- Closed the manifest/validator mismatch: candidate validation now requires `artifact_contract.required_kinds` to enumerate the full required asset set exactly once, including `sparkle_update_zip`; the canonical manifest template and deterministic fixture declare the same set. Regression test rejects a template that omits Sparkle.
+- Targeted `python3 -m unittest Tests.release.test_validate_release`: 24/24 passed. `python3 -m json.tool release-manifest.template.json`, `python3 -m py_compile Scripts/validate_release.py Tests/release/test_validate_release.py`, and `git diff --check` passed.
+- Scope is release metadata validation only. No app source/build, account login, signing, notarization, GitHub release, or Site deployment was performed. Fixture signatures are not cryptographic release evidence.
+- GitHub fetch through sandbox DNS failed (`Could not resolve host: github.com`); the same fetch succeeded through the approved existing Git credential/network route, confirming `origin/main` was still `3dded76542cdc8fc9f2be68daf989cc3f39deed1` before this change. No browser or new credential was used.
