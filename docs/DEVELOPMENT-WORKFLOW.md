@@ -32,6 +32,16 @@ Scripts/github-ci-status.sh "$(git rev-parse HEAD)"
 
 The script is read-only and prints each matching run's ID, workflow, status, conclusion, exact head SHA, and URL. An empty result means no run was found; it is not a pass. Use the URL only as a shareable reference; opening the GitHub UI is not part of routine development or verification.
 
+## Accountless authorization layout smoke
+
+To inspect all five authorization states at the minimum supported window size, launch the canonical offline preview:
+
+```sh
+Scripts/dev-app.sh --launch-auth-layout-preview-minimum
+```
+
+The window title reports the actual AppKit frame size. Press Command-Option-0 to cycle phone, code, password, QR, and registration. This preview skips profile restoration and networking; it proves layout and accessibility-tree structure only, not Telegram authentication or account behavior. Exit the preview before launching the normal client or rebuilding.
+
 ## Release writes
 
 Use the authenticated CLI wrapper for GitHub release operations only after confirming that the existing helper credential has the required repository permissions. Creating releases or uploading assets also requires completed signing, notarization, Gatekeeper, and compatibility gates. Check those gates independently. Do not create or broaden a token to work around a read-only CI lookup.

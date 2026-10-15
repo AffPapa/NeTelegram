@@ -47,6 +47,9 @@ elif [[ "${1:-}" == "--launch-auth-layout-preview" ]]; then
 elif [[ "${1:-}" == "--launch-auth-layout-preview-compact" ]]; then
     MODE="launch"
     LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-auth-layout-preview-compact)
+elif [[ "${1:-}" == "--launch-auth-layout-preview-minimum" ]]; then
+    MODE="launch"
+    LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-auth-layout-preview-minimum)
 elif [[ "${1:-}" == "--launch-auth-layout-preview-dark" ]]; then
     MODE="launch"
     LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-appearance-dark)
@@ -54,7 +57,7 @@ elif [[ "${1:-}" == "--launch-auth-layout-preview-compact-dark" ]]; then
     MODE="launch"
     LAUNCH_ARGS+=(--ci-auth-layout-preview --ci-auth-layout-preview-compact --ci-appearance-dark)
 elif [[ $# -gt 0 ]]; then
-    echo "Usage: $0 [--launch|--launch-chat-shell-preview[-compact]|--launch-auth-layout-preview[-compact][-dark]]" >&2
+    echo "Usage: $0 [--launch|--launch-chat-shell-preview[-compact]|--launch-auth-layout-preview[-compact][-dark]|--launch-auth-layout-preview-minimum]" >&2
     exit 2
 fi
 
@@ -141,7 +144,7 @@ PY
                 requested_preview_flags=()
                 for argument in "${LAUNCH_ARGS[@]}"; do
                     case "$argument" in
-                        --ci-auth-layout-preview|--ci-auth-layout-preview-compact|--ci-chat-shell-preview|--ci-chat-shell-preview-compact|--ci-appearance-dark)
+                        --ci-auth-layout-preview|--ci-auth-layout-preview-compact|--ci-auth-layout-preview-minimum|--ci-chat-shell-preview|--ci-chat-shell-preview-compact|--ci-appearance-dark)
                             requested_preview_flags+=("$argument")
                             ;;
                     esac

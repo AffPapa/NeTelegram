@@ -7984,9 +7984,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         window.setFrame(
             NSRect(
                 origin: window.frame.origin,
-                size: CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
-                    ? NSSize(width: 620, height: 640)
-                    : NSSize(width: 640, height: 680)
+                size: CommandLine.arguments.contains("--ci-auth-layout-preview-minimum")
+                    ? NSSize(width: 520, height: 460)
+                    : CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
+                        ? NSSize(width: 620, height: 640)
+                        : NSSize(width: 640, height: 680)
             ),
             display: true
         )
@@ -8003,7 +8005,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func presentAuthenticationLayoutPreview(at index: Int) {
         let state = authLayoutPreviewStates[index]
-        window.title = "\(ProductIdentity.displayName) · auth preview \(state)"
+        let frameSize = window.frame.size
+        window.title = "\(ProductIdentity.displayName) · auth preview \(state) · \(Int(frameSize.width))×\(Int(frameSize.height))"
         switch state {
         case "phone":
             pendingAuthorizationType = "authorizationStateWaitPhoneNumber"

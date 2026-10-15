@@ -12,6 +12,7 @@ from collections.abc import Sequence
 PREVIEW_FLAGS = frozenset({
     "--ci-auth-layout-preview",
     "--ci-auth-layout-preview-compact",
+    "--ci-auth-layout-preview-minimum",
     "--ci-chat-shell-preview",
     "--ci-chat-shell-preview-compact",
     "--ci-appearance-dark",
