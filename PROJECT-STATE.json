@@ -386,7 +386,8 @@
     "Swift Testing #expect autoclosures cannot contain mutating value-type calls; assign the result first, then assert. Resolve AppKit optional scroller and numeric type mismatches before rebuilding.",
     "Use one source SHA for the focused tests, GitHub CI, and Dev.app. Close only NeTelegram through its own menu; use fresh CUA app inventory plus the exact process guard before replacing the bundle. If sandboxed pgrep cannot inspect processes, request the narrow read-only system process check instead of retrying builds or bypassing the guard.",
     "Resolve product naming from the latest chronological direct user decision; keep local app identity separate from public Terms compatibility. Never flip a name based on an older answer, and do not call the public title gate cleared by a disclaimer.",
-    "For public GitHub repository status/Actions lookups, use Scripts/github-ci-status.sh (unauthenticated REST API, exact full SHA); do not open browser tabs or start gh login. Keep the configured Git credential helper for git push, and treat GH CLI write/release auth as a separate gate that must be proven before creating any token."
+    "For public GitHub repository status/Actions lookups, use Scripts/github-ci-status.sh (unauthenticated REST API, exact full SHA); do not open browser tabs or start gh login. Keep the configured Git credential helper for git push, and treat GH CLI write/release auth as a separate gate that must be proven before creating any token.",
+    "Contract tests that assert a policy rejection must reach that policy on every CI platform; order policy guards before host/toolchain guards when this is safe, and test on the actual metadata runner OS."
   ],
   "latest_access_audit": {
     "date": "2026-10-14",
@@ -1336,5 +1337,17 @@
     ],
     "alpha_scope": "At least one real account; 20-account matrix remains stable/future coverage. Do not claim channel access or full Terms compatibility; §1.3/1.4 and §3.3 remain open/deferred.",
     "no_repeat": "Do not rerun successful 7558909 CI, rebuild unchanged app source, redesign auth from an unmatched screenshot, or deploy Site until verified assets exist. Inspect fresh BuildInfo/screenshot SHA before visual edits."
+  },
+  "latest_ci_failure_diagnosis": {
+    "date": "2026-10-15",
+    "commit_under_test": "d437ac92820c536c91ee105824f34cd0e32882b1",
+    "workflow_run_id": 38743940093,
+    "job_id": 116452512259,
+    "failed_step": "Validate checked-in JSON",
+    "actual_failure": "test_stable_candidate_is_rejected_before_network_or_output expected stable remains gated but received release distribution requires macOS",
+    "root_cause": "The contract test ran on Ubuntu, while the builder checked host OS before rejecting the stable channel. Local macOS run masked this platform-order dependency.",
+    "fix_in_working_tree": "Moved channel policy validation before Darwin/arm64 host guards so the stable-only policy is deterministic across platforms.",
+    "focused_local_validation": "Tests.release.test_release_builder_contract: 7/7 passed; bash -n and git diff --check passed.",
+    "publication_state": "Fix not yet committed or pushed; exact metadata CI for the fix remains pending."
   }
 }

@@ -41,11 +41,11 @@ for name in NETELEGRAM_RELEASE_VERSION NETELEGRAM_RELEASE_BUILD NETELEGRAM_RELEA
   NETELEGRAM_DEVELOPER_IDENTITY NETELEGRAM_DEVELOPER_TEAM_ID NETELEGRAM_NOTARY_PROFILE \
   NETELEGRAM_SPARKLE_PUBLIC_ED_KEY NETELEGRAM_RELEASE_OUTPUT; do require_env "$name"; done
 
-[[ "$(uname -s)" == "Darwin" ]] || fail "release distribution requires macOS"
-[[ "$(uname -m)" == "arm64" ]] || fail "the first release target is Apple Silicon arm64"
 [[ "$NETELEGRAM_RELEASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || fail "version must be released SemVer without a prerelease suffix"
 [[ "$NETELEGRAM_RELEASE_BUILD" =~ ^[1-9][0-9]*$ ]] || fail "build must be a positive integer"
 [[ "$NETELEGRAM_RELEASE_CHANNEL" == "alpha" ]] || fail "this candidate builder currently permits alpha only; stable remains gated by compatibility and 20-account evidence"
+[[ "$(uname -s)" == "Darwin" ]] || fail "release distribution requires macOS"
+[[ "$(uname -m)" == "arm64" ]] || fail "the first release target is Apple Silicon arm64"
 [[ "$NETELEGRAM_DEVELOPER_TEAM_ID" =~ ^[A-Z0-9]{10}$ ]] || fail "Team ID must be ten uppercase letters/digits"
 
 PUBLIC_KEY_BYTES="$(printf '%s' "$NETELEGRAM_SPARKLE_PUBLIC_ED_KEY" | /usr/bin/base64 -D 2>/dev/null | /usr/bin/wc -c | tr -d ' ')"

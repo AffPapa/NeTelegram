@@ -2,7 +2,7 @@
 
 ## Pinned state at review
 
-- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, origin `AffPapa/NeTelegram`; release-tooling commit `d47555d6f62a0c60227a42db099961df4c57f593`; checkpoint commit before this reconciliation was `5324b97e859c9fadc47545ed159fbf8efa21bfc7`. The app source is separately pinned at `75589091d7144e1d1ffe94b15bf38638df7d708d`; verify the new checkpoint SHA at resume.
+- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, origin `AffPapa/NeTelegram`; at the start of this audit HEAD was `d437ac92820c536c91ee105824f34cd0e32882b1` and the tree was clean apart from Python cache files produced by the preceding test run (removed). A focused cross-platform CI contract fix is now in the working tree; re-pin full HEAD/dirty state after its commit. App source remains separately pinned at `75589091d7144e1d1ffe94b15bf38638df7d708d`.
 - App source: `75589091d7144e1d1ffe94b15bf38638df7d708d`; canonical Dev.app: `/private/tmp/NeTelegram-Dev.app`, `0.0.0-dev`, arm64, macOS 14, ad-hoc only. Not a distribution artifact.
 - Current Site: public v218, no app download, empty alpha/stable feeds.
 - Acceptance: 56 cases: 3 passed, 46 partial, 7 not run. Synthetic 20-profile tests are not real multi-account validation. All available authorized accounts remaining active is a required product behavior at every release, not a stable-only feature.
@@ -13,7 +13,7 @@
 1. The highest-value proof (one real login and a message round trip) was deferred while Core architecture, synthetic 20-profile coverage, and authentication UI polish expanded.
 2. Work sometimes followed a stale app/screenshot/checkpoint identity. The app source SHA, running PID/build, repo checkpoint, Site source, saved Site version, and deployment were conflated.
 3. The Site received repeated development-log releases before a binary existed; those deployments did not advance the GitHub download gate.
-4. Environment failures (sandbox DNS, SwiftPM sandbox, wrong helper route, Sparkle artifact path casing) were sometimes repeated before classifying product vs harness vs environment and choosing the supported route.
+4. Environment and harness failures (sandbox DNS, SwiftPM sandbox, wrong helper route, Sparkle artifact path casing) were sometimes repeated before classifying product vs harness vs environment and choosing the supported route. A fresh confirmed example: metadata CI run `38743940093` failed because a stable-channel test on Ubuntu hit the macOS guard first; a local Mac test had masked the test's platform dependency. The failing assertion is now understood and the policy guard ordering is corrected locally.
 5. Checkpoint summaries accumulated contradictory “latest” facts (brand, Keychain, Site, CI). The append-only evidence was good, but projections needed reconciliation before each turn.
 6. Tests for synthetic profiles/close barriers increased design confidence but were repeatedly too easy to treat as progress toward real Telegram sessions, which they do not prove.
 
@@ -22,10 +22,11 @@
 - Begin each turn with one current checkpoint and verify checkout/HEAD/dirty state, app source SHA, app PID/BuildInfo, Site version and external release state as separate identities.
 - Keep one canonical checkout and one Dev.app. Never rebuild for a Site-only failure; never launch preview builds as the app under test.
 - Use one alpha acceptance path: real login → chats load → read → send → close/reopen. If owner input is pending, stop adding synthetic coverage unrelated to the reproduced blocker.
-- For every defect: evidence → cause class (product/harness/setup/environment) → one narrow change → one focused check. Reuse passing checks when relevant inputs match. Diagnose after one identical failure.
+- For every defect: capture the exact failing assertion/step and log → classify (product/test contract/setup/network/permissions/environment) → make one narrow change → run one focused check. Reuse passing checks for matching inputs. After two identical failures, diagnose before another retry. Contract tests must be deterministic on the runner OS and must reach the policy being tested before host-specific guards when safe.
 - UI edits require fresh screenshot + title + BuildInfo/source SHA + PID. No screenshot-driven work from stale captures.
 - Freeze UI and feature scope after alpha P0s. Telegram Desktop is a reference for interaction hierarchy, but recreate patterns in AppKit; do not copy GPL implementation/assets into this MIT codebase.
 - Freeze a source SHA before release work. Separate release builder and scratch/output from destructive `Scripts/dev-app.sh`; no ad-hoc Dev.app signing as distribution proof.
+- Do not copy Telegram Desktop code or artwork into the MIT app: upstream is Qt/C++ and GPL-3.0 with an OpenSSL linking exception. Its useful reference is component composition and interaction hierarchy (dialog list + history, explicit selection/unread states, persistent composer); implement these ideas with native AppKit controls and retain NeTide branding.
 - Do not update the existing Site again until verified GitHub assets are available; then update downloads/changelog/manifest together in one Site save/deploy.
 - Keep a compact top-level “current truth” in checkpoint; append history in RUN-LOG. Mark stale projections superseded rather than adding another ambiguous latest field.
 - Never act on a plan's pinned identity without rechecking it. Refresh `HEAD`, dirty paths, app-source SHA, running BuildInfo/PID, Site version, and public release inventory at the start; update this plan when any pointer changes.
@@ -53,7 +54,7 @@ Publish immutable GitHub alpha assets against the exact source commit; download 
 ## Gate status / exact next action
 
 - **Next user action:** owner completes the real one-account smoke in `/private/tmp/NeTelegram-Dev.app`: enter credentials only in the app, confirm chat list, read one chat, send one approved test message, quit/reopen and confirm the same identity returns. No credentials or message content should be sent in chat. This is the highest-value product gate; only a reproduced P0 justifies an app fix.
-- **Current engineering action:** complete the release-contract bookkeeping (checkpoint metadata refresh and its validator), then proceed to the owner-operated login/read/send/reopen smoke. Do not rebuild the app because this metadata slice does not touch app source.
+- **Current engineering action:** commit/push the narrow release-builder guard-order fix and checkpoint, then inspect its exact metadata workflow log once. This is tooling-only; do not rebuild the app. Next product gate remains owner-operated login/read/send/reopen on the canonical Dev.app.
 - **Release setup blocker:** notarization profile was absent in the latest checkpoint. After the smoke and source freeze, use the supported Apple credential setup path. Never ask for a password pasted in chat.
 - **Release assembly:** `Scripts/build-release-candidate.sh` is implemented as a separate fail-closed path and has local contract coverage. It still needs an available notarytool Keychain profile, a configured Sparkle public key, and an accessible Sparkle private key; it has not built or signed an artifact. Run it only from a clean exact published source SHA after owner smoke/P0 freeze.
 - **Coverage may remain partial for alpha:** 20 real authorized accounts and the 1/5/10/20 resource matrix are not required to make a narrow alpha claim, but all-active runtime behavior remains mandatory in the implementation. Do not ship an alpha that only keeps one selected plus a few background accounts; report exact real-account coverage and leave 20-account certification open until it is measured.
