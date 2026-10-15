@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "phase": "ALPHA-CHANNEL-ACCESS-01: Enforce the deferred-channel decision in production alpha without stopping any active account runtime. Exact-source Swift CI and pinned native build passed; local canonical bundle and real-account smoke remain gated.",
+  "phase": "ALPHA-CHANNEL-ACCESS-01 / RELEASE-SPARKLE-KEY-01: update signing is pinned to a dedicated login-Keychain account and candidate validation uses the same identity. Candidate signing remains gated on a notary profile and owner-operated real-account smoke.",
   "verified_at": "2026-10-15",
   "last_release_process_milestone": {
     "commit": "d47555d6f62a0c60227a42db099961df4c57f593",
@@ -73,23 +73,22 @@
     },
     "published_application_releases": [],
     "github_access": {
-      "verified_at": "2026-10-14",
+      "verified_at": "2026-10-15",
       "repo": "AffPapa/NeTelegram",
       "repository_permissions": "GitHub connector verified repository exists and reported admin/maintain/pull/push/triage for the connected account.",
       "git_transport_push": {
         "result": "success",
         "commits": [
-          "05cfe67130b6c796a2baad062393158101a99c08",
-          "2ca2fa448ab6ca79233f4a8463d015407f3eabd8",
-          "4a21ab708fcc0115550cdef73597e23ba9d1d7ef"
+          "5195d680a41abdd597039193737340ed03bc7e75",
+          "2c0fda7e76ae754992f48bad9aa223fef7088fb6"
         ],
         "remote": "AffPapa/NeTelegram main",
-        "method": "Existing configured Git credential helper; approved network access resolved sandbox DNS denial. No new credential was created."
+        "method": "Existing macOS login-Keychain credential selected by per-command osxkeychain override. No secret was printed, saved, or rotated."
       },
       "gh_cli": {
         "version": "2.88.1",
-        "status": "Both stored gh accounts (AffPapa and mrdumay-source) reported invalid tokens; gh was not used for the pushes.",
-        "action": "No login, new token, logout, or credential reset."
+        "status": "Direct stored gh auth accounts remain separate; the project wrapper now supplies the authenticated account-scoped Git Keychain credential in memory.",
+        "action": "No browser login, new token, logout, or credential reset. The wrapper confirms account AffPapa before forwarding gh commands."
       },
       "latest_checkpoint_metadata_ci": {
         "run_id": 38525055679,
@@ -115,11 +114,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38744977573,
+      "run_id": 38750589846,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38744977573",
-      "workflow_commit": "65bb8ecdcccb709073e2cc1685e2a6906883d505",
-      "scope": "Exact metadata workflow passed, including checkpoint validation and all 72 release tests after the cross-platform stable-channel guard-order fix."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38750589846",
+      "workflow_commit": "2c0fda7e76ae754992f48bad9aa223fef7088fb6",
+      "scope": "Exact metadata workflow passed: checkpoint validation, JSON/SBOM/NOTICE validation, and release metadata test suite."
     },
     "latest_exact_source_ci": {
       "run_id": 38734713139,
@@ -138,10 +137,10 @@
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     },
     "latest_pushed_commit": {
-      "sha": "d47555d6f62a0c60227a42db099961df4c57f593",
+      "sha": "2c0fda7e76ae754992f48bad9aa223fef7088fb6",
       "branch": "main",
       "remote": "AffPapa/NeTelegram",
-      "method": "Existing configured Git credential helper; commit pushed once after fetching origin/main. Exact metadata workflow 38741886157 passed. App source SHA remains separately recorded as 7558909."
+      "method": "Pushed using the existing login-Keychain credential with per-command credential.helper=osxkeychain. No new token or browser login."
     }
   },
   "local_development_candidate": {
@@ -326,7 +325,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Release next gate: preflight the separate alpha candidate using already configured Apple notary and Sparkle credentials. Do not rebuild the canonical Dev.app until the process guard proves replacement is safe. Owner-operated one-account login/read/send/reopen remains pending and is required before a downloadable alpha.",
+  "next_action": "The source, release builder and updater key account are now pinned. Next release gate is a valid notarytool Keychain profile; owner-operated one-account login/read/send/logout/reopen is also still pending. Do not rebuild Dev.app or create public downloads before these gates and candidate validation pass.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -702,14 +701,15 @@
     "date": "2026-10-15",
     "status": "blocked_before_signed_candidate",
     "toolchain": "/Applications/Xcode-beta.app; current Dev.app is arm64/macOS 14 baseline and ad-hoc signed only.",
-    "developer_id": "Current read-only check on 2026-10-15 returned four valid code-signing identities, including two Developer ID Application identities for Team H6VGU2M6JD. Developer ID signing is available in this macOS account; this is not evidence that a NeTelegram release bundle has been signed. The Keychain attributes-only query for `com.apple.gke.notary.tool` returned errSecItemNotFound (-25300), and no APPLE_/ASC_/NOTARY_ variable names are configured. No notarized candidate, Accepted submission, stapling, Gatekeeper install smoke, or release assets exist.",
-    "notary_credentials": "Attributes-only Keychain query for com.apple.gke.notary.tool returned errSecItemNotFound (-25300); no APPLE_/ASC_/NOTARY_ variable names are configured. No credential value was requested or read. Notarization remains blocked.",
+    "developer_id": "Approved read-only Keychain identity query returned four valid identities, including two Developer ID Application identities for Team H6VGU2M6JD. This permits signing but no NeTide release bundle has been signed.",
+    "notary_credentials": "The latest saved attributes-only Keychain check reported no com.apple.gke.notary.tool item; no APPLE_/ASC_/NOTARY_ environment variable names or App Store Connect private-key files were found. No notary profile has been configured or read in this turn. Notarization remains blocked.",
     "api_credentials": "The app-context Keychain access flow at app source 584500497f03af5103c97db1a413c84d6f5b0ce1 reported access confirmed, retained the value in Keychain, and did not start login; the secret was neither displayed nor modified. A separate standalone return-data query timed out, so do not repeat that probe or delete/reset the item. Do not ask for a new hash unless the app’s explicit protected access action reports it unavailable.",
     "telegram_compatibility": "The later explicit user choice is public product title NeTide; NeTelegram remains repository/internal codename. The §2.3 title-word issue is not triggered by NeTide, but this does not establish trademark clearance or overall API Terms compatibility. §1.3/1.4 basic-functionality review remains open. §3.3 sponsored-media requirements remain unresolved; channel access and stable compatibility remain deferred because the user declined a sponsored-video player.",
-    "github": "Previously published checkpoint commit d9d62cfc745709f7618483bf4b2edc2fdb35c422 passed Metadata CI run 38742966742. The app source remains 75589091d7144e1d1ffe94b15bf38638df7d708d with exact-source macOS CI 38736741715 and pinned TDLib bundle CI 38736741714. The unauthenticated public Releases API returned zero releases on 2026-10-15. A new release-builder slice is being prepared after this verified checkpoint; verify current HEAD and its CI before release work.",
+    "github": "Public repository main is 2c0fda7e76ae754992f48bad9aa223fef7088fb6. Exact metadata workflow 38750589846 passed. Public Releases API still reports zero app releases.",
     "site": "Public Site v218 is active at https://netelegram.iryadom.chatgpt.site. Saved/deployed version appgprj_6acba85192e08191acdf7011928848cf~appgver_d3244e15b1e48191a36811befa334861; source d657eda9bada5ee6a530ae4b03f8ebbc04d9c068; deployment appgdep_6ad0bfa310548191a901c6a3530c00ab. Anonymous routes and XML feeds returned expected status/MIME. No application download or populated updater feed is published; Site source references app source 19485772224ab09558a6ef0764ae9b3ebcb5ea4a.",
-    "release_assets": "Separate `Scripts/build-release-candidate.sh` now assembles/signs/notarizes alpha app ZIP/DMG and Sparkle update ZIP without touching Dev.app. Contract tests and release validator passed 31/31 locally. It has not run because the current checkpoint has no notarytool Keychain profile; Sparkle private-key availability and production public-key configuration are also unverified. No candidate assets were created.",
-    "recommended_next_step": "Continue independent app implementation. The stored API hash previously passed the app’s explicit Keychain-access check; owner should enter phone/code in the app when ready, and only re-enter the API hash if the protected in-app access action reports it unavailable. All-20 runtime acceptance remains separate."
+    "release_assets": "No release candidate or app assets exist. Builder remains blocked because no usable notarytool Keychain profile was found and the owner-operated real-account login/read/send/reopen smoke is deferred. Developer ID identities and Sparkle signing are now available/configured, but no NeTide bundle has been signed, notarized, stapled, Gatekeeper-tested, or published.",
+    "recommended_next_step": "When a valid notarytool profile is available in the login Keychain, run the alpha preflight from this exact clean main SHA. Separately, complete one owner-operated real Telegram account login/read/send/logout/reopen smoke when the user chooses to enter credentials. Then build and validate one candidate; do not create a Site download before a verified GitHub release.",
+    "sparkle_key": "Pinned Sparkle 2.10.0 key created under account netide-updates; public key is checked into UPDATER-CONFIG.json. A real temporary-file sign/verify smoke passed; no private seed was exported. Builder and candidate validator now use that account."
   },
   "status": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01: Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes. Exact-source macOS and pinned-TDLib workflows passed; one canonical arm64 Dev.app and light/dark accountless auth previews were verified. Real authentication and accessibility speech remain partial.",
   "latest_design_research": {
@@ -1383,5 +1383,19 @@
     "real_account_login": false,
     "release_asset_created": false,
     "site_changed": false
+  },
+  "latest_sparkle_key_setup": {
+    "date": "2026-10-15",
+    "source_commit": "2c0fda7e76ae754992f48bad9aa223fef7088fb6",
+    "sparkle_version": "2.10.0",
+    "keychain_account": "netide-updates",
+    "public_config": "UPDATER-CONFIG.json (public key and account only)",
+    "public_key_sha256": "7df0df1f879fbec08e08cbf49b661f5bdde3a06aa6bd4d0308dc706714cfed65",
+    "private_key": "Generated/read by pinned Sparkle tool in the login Keychain. No export or seed output.",
+    "real_tool_smoke": "Pinned sign_update signed and verified a temporary non-user test archive using the Keychain account; passed.",
+    "builder_and_validator": "Builder sources public config, verifies the Keychain public key match, signs/verifies with the project account, and emits complete Sparkle metadata. Candidate validator restricts account syntax and uses the declared account.",
+    "local_release_tests": "78/78 passed; shell syntax, JSON, YAML parse, checkpoint validation, and diff check passed.",
+    "hosted_metadata_ci_run_id": 38750589846,
+    "release_candidate_created": false
   }
 }

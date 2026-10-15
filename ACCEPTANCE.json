@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "status": "ALPHA-CHANNEL-ACCESS-01: Enforce the deferred-channel decision in production alpha without stopping any active account runtime. Exact-source Swift CI and pinned native build passed; local canonical bundle and real-account smoke remain gated.",
+  "status": "ALPHA-CHANNEL-ACCESS-01 / RELEASE-SPARKLE-KEY-01: update signing is pinned to a dedicated login-Keychain account and candidate validation uses the same identity. Candidate signing remains gated on a notary profile and owner-operated real-account smoke.",
   "current_evidence": {
     "release_validator_update_archive_gate": {
       "commit": "9eefbe7906e152e10f2f72af6ff4e12531dbf29b",
@@ -140,6 +140,30 @@
       "real_account_login": false,
       "release_asset_created": false,
       "site_changed": false
+    },
+    "release_key_setup": {
+      "date": "2026-10-15",
+      "source_commit": "2c0fda7e76ae754992f48bad9aa223fef7088fb6",
+      "sparkle_version": "2.10.0",
+      "keychain_account": "netide-updates",
+      "public_config": "UPDATER-CONFIG.json (public key and account only)",
+      "public_key_sha256": "7df0df1f879fbec08e08cbf49b661f5bdde3a06aa6bd4d0308dc706714cfed65",
+      "private_key": "Generated/read by pinned Sparkle tool in the login Keychain. No export or seed output.",
+      "real_tool_smoke": "Pinned sign_update signed and verified a temporary non-user test archive using the Keychain account; passed.",
+      "builder_and_validator": "Builder sources public config, verifies the Keychain public key match, signs/verifies with the project account, and emits complete Sparkle metadata. Candidate validator restricts account syntax and uses the declared account.",
+      "local_release_tests": "78/78 passed; shell syntax, JSON, YAML parse, checkpoint validation, and diff check passed.",
+      "hosted_metadata_ci_run_id": 38750589846,
+      "release_candidate_created": false
+    },
+    "release_tooling_ci": {
+      "commit": "2c0fda7e76ae754992f48bad9aa223fef7088fb6",
+      "workflow_run_id": 38750589846,
+      "workflow_status": "success",
+      "local_release_suite": "78/78 passed",
+      "scope": "Project-specific Sparkle Keychain account, public-key match, signing/verification routing, updater artifact metadata, and key-account validation. Synthetic validator fixtures are not a release signature.",
+      "app_source_changed": false,
+      "candidate_created": false,
+      "real_account_or_notarization_evidence": false
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -453,7 +477,7 @@
       "method": "build/release tools",
       "required_for": "signed app releases",
       "status": "partial",
-      "evidence": "Read-only preflight on 2026-10-14: repeated identity inventory returned four valid signing identities, including two Developer ID Application identities for team H6VGU2M6JD; one adjacent query returned zero, so record the transient inconsistency. Notarytool Keychain service metadata lookup returned errSecItemNotFound; no APPLE_/ASC_/NOTARY_ environment variable names are configured. No signature, Accepted notarization, stapling, Gatekeeper install smoke or release assets exist; no release pass is claimed. Superseding current inventory: security find-identity returned 0 valid identities on 2026-10-14; no Developer ID identity is currently available. The earlier four-identity observation is historical and not release evidence. Separate candidate builder `Scripts/build-release-candidate.sh` now requires clean published main, exact Developer ID/team, notary profile, public Sparkle key, new external output path, and alpha-only mode; it performs inside-out Hardened Runtime signing, Accepted+logs, stapling, Gatekeeper assessment, final ZIP/DMG, EdDSA archive verification, SBOM and NOTICE. Contract tests and candidate validator passed 31/31 locally; exact macOS signing/notarization execution was not run because no notary profile is configured. Status remains partial."
+      "evidence": "Current approved Keychain identity inventory returned four valid identities, including two Developer ID Application identities for Team H6VGU2M6JD. No NeTide release bundle has been signed. Pinned Sparkle 2.10.0 EdDSA key is stored under login-Keychain account netide-updates; public config UPDATER-CONFIG.json contains only the public key/account. Real temporary-file sign/verify passed; local release metadata suite 78/78 and exact metadata CI 38750589846 passed. The latest saved attributes-only notary profile query found no profile; no Accepted notarization, stapling, Gatekeeper install, or release assets exist. Status remains partial."
     },
     {
       "id": "REL04",
@@ -480,7 +504,7 @@
       "method": "native updater",
       "required_for": "updates",
       "status": "not_run",
-      "evidence": "Source policy exists: ReleaseUpdateConfiguration enables only alpha/stable on production bundle org.affpapa.netelegram, requires the exact HTTPS feed, a valid 32-byte base64 SUPublicEDKey, and SUVerifyUpdateBeforeExtraction; automatic checks/install are disabled. Unit tests cover this configuration policy. No production app bundle embeds these fields, no release public key is configured in the repository, no signed update archive or public appcast exists, and no real update smoke ran. Integration remains not_run. The new builder requires a public EdDSA key in the release plist and signs/verifies the exact final update ZIP with Sparkle. No private-key access, generated signature, production bundle, appcast deployment, or update smoke has been exercised."
+      "evidence": "Sparkle configuration and candidate metadata are now bound to keychain account netide-updates; actual temporary archive sign/verify passed. This does not verify the updater installed, fetched a public appcast, or applied a notarized update; those remain not run."
     },
     {
       "id": "SITE01",
@@ -741,7 +765,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Release next gate: preflight the separate alpha candidate using already configured Apple notary and Sparkle credentials. Do not rebuild the canonical Dev.app until the process guard proves replacement is safe. Owner-operated one-account login/read/send/reopen remains pending and is required before a downloadable alpha.",
+  "next_action": "The source, release builder and updater key account are now pinned. Next release gate is a valid notarytool Keychain profile; owner-operated one-account login/read/send/logout/reopen is also still pending. Do not rebuild Dev.app or create public downloads before these gates and candidate validation pass.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
