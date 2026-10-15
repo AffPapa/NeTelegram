@@ -45,10 +45,10 @@ class NativeWorkflowScopeTests(unittest.TestCase):
     def test_manual_native_bundle_gate_remains_available(self):
         self.assertIn("  workflow_dispatch:", WORKFLOW.read_text(encoding="utf-8"))
 
-    def test_development_bundle_uses_ne_telegram_product_name(self):
+    def test_development_bundle_uses_selected_public_product_name(self):
         script = DEV_APP_SCRIPT.read_text(encoding="utf-8")
-        self.assertIn("<key>CFBundleName</key><string>NeTelegram Dev</string>", script)
-        self.assertIn("<key>CFBundleDisplayName</key><string>NeTelegram Dev</string>", script)
+        self.assertIn("<key>CFBundleName</key><string>NeTide Dev</string>", script)
+        self.assertIn("<key>CFBundleDisplayName</key><string>NeTide Dev</string>", script)
         self.assertNotIn("AffPapa Chat Dev", script)
 
     def test_sparkle_framework_comes_from_swiftpm_build_products(self):
