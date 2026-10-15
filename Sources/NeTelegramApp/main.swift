@@ -145,6 +145,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var chatPane: NSView!
     private var sidebarPane: NSView!
     private var conversationPane: NSView!
+    private var conversationComposer: NSStackView!
+    private var conversationEmptyState: NSStackView!
+    private var messageScrollBottomToComposer: NSLayoutConstraint!
+    private var messageScrollBottomToPane: NSLayoutConstraint!
     private var chatWorkspaceSplit: NSSplitView!
     private var chatListScroll: NSScrollView!
     private var chatListPaginationPolicy = ChatListPaginationPolicy()
@@ -889,13 +893,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         photoSendButton.widthAnchor.constraint(equalToConstant: 72).isActive = true
         sendButton.widthAnchor.constraint(equalToConstant: 92).isActive = true
         composerScroll.heightAnchor.constraint(equalToConstant: 72).isActive = true
-        let conversationComposer = NSStackView(views: [replyRow, composerRow])
+        conversationComposer = NSStackView(views: [replyRow, composerRow])
         conversationComposer.orientation = .vertical
         conversationComposer.alignment = .width
         conversationComposer.spacing = 4
         conversationComposer.translatesAutoresizingMaskIntoConstraints = false
+
+        let emptyTitle = NSTextField(labelWithString: "Выберите переписку")
+        emptyTitle.font = .systemFont(ofSize: 17, weight: .semibold)
+        emptyTitle.alignment = .center
+        let emptyDetail = NSTextField(wrappingLabelWithString: "Ваши чаты появятся здесь. Переключайте аккаунты в списке слева.")
+        emptyDetail.font = .systemFont(ofSize: 13)
+        emptyDetail.textColor = .secondaryLabelColor
+        emptyDetail.alignment = .center
+        let emptyState = NSStackView(views: [emptyTitle, emptyDetail])
+        emptyState.orientation = .vertical
+        emptyState.alignment = .centerX
+        emptyState.spacing = 8
+        emptyState.translatesAutoresizingMaskIntoConstraints = false
+        conversationEmptyState = emptyState
+        conversationEmptyState.setAccessibilityElement(true)
+        conversationEmptyState.setAccessibilityLabel("Выберите переписку. Ваши чаты появятся здесь.")
+        conversationEmptyState.setAccessibilityRole(.group)
+        conversationEmptyState.isHidden = false
         conversationPane.addSubview(conversationHeader)
+        conversationPane.addSubview(conversationEmptyState)
         conversationPane.addSubview(conversationComposer)
+        messageScrollBottomToComposer = messageScroll.bottomAnchor.constraint(equalTo: conversationComposer.topAnchor)
+        messageScrollBottomToPane = messageScroll.bottomAnchor.constraint(equalTo: conversationPane.bottomAnchor, constant: -10)
         NSLayoutConstraint.activate([
             conversationHeader.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor),
             conversationHeader.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor),
@@ -916,7 +941,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             messageScroll.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor),
             messageScroll.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor),
             messageScroll.topAnchor.constraint(equalTo: conversationHeader.bottomAnchor),
-            messageScroll.bottomAnchor.constraint(equalTo: conversationComposer.topAnchor),
+            messageScrollBottomToComposer,
+            conversationEmptyState.centerXAnchor.constraint(equalTo: messageScroll.centerXAnchor),
+            conversationEmptyState.centerYAnchor.constraint(equalTo: messageScroll.centerYAnchor),
+            conversationEmptyState.widthAnchor.constraint(lessThanOrEqualTo: messageScroll.widthAnchor, constant: -48),
             conversationComposer.leadingAnchor.constraint(equalTo: conversationPane.leadingAnchor, constant: 12),
             conversationComposer.trailingAnchor.constraint(equalTo: conversationPane.trailingAnchor, constant: -12),
             conversationComposer.bottomAnchor.constraint(equalTo: conversationPane.bottomAnchor, constant: -10),
@@ -946,6 +974,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             sidebarPane.widthAnchor.constraint(lessThanOrEqualToConstant: 360),
             conversationPane.widthAnchor.constraint(greaterThanOrEqualToConstant: 360),
         ])
+        messageScrollBottomToPane.isActive = false
+        setConversationComposerVisible(false)
         content.addSubview(chatPane)
 
         lockedView = SystemWindowBackgroundView(frame: content.bounds)
@@ -1156,6 +1186,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         ) else { return }
         selected.loadMainChats(nextPage: true)
         refreshChatList()
+        updateSelectedChatListStatus(for: selected)
     }
 
     func windowWillClose(_ notification: Notification) {
@@ -1938,6 +1969,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             selected.loadMainChats()
             showAuthenticatedChatUI()
             refreshChatList()
+            updateSelectedChatListStatus(for: selected)
             // selectAccount closed the previous account's visible chat. Restore
             // this account through the same TDLib openChat path so the restored
             // UI and TDLib's displayed-chat state cannot diverge.
@@ -1946,6 +1978,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             selected.loadMainChats()
             showAuthenticatedChatUI()
             refreshChatList()
+            updateSelectedChatListStatus(for: selected)
             displaySelectedConversation()
             refreshComposerState()
         case .authorization:
@@ -2216,31 +2249,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         runtime = nil
         pendingAuthorizationType = nil
         pendingInitialAuthorizationAction = nil
-        chatPane.isHidden = true
-        setAuthCardVisible(true)
-        registrationTermsScroll.isHidden = true
-        countryPickerStack.isHidden = true
-        setPhoneFieldVisible(false)
-        emailField.isHidden = true
-        inputField.isHidden = true
-        secureInputField.isHidden = true
-        firstNameField.isHidden = true
-        lastNameField.isHidden = true
-        registrationConsent.isHidden = true
-        qrImageView.isHidden = true
-        qrButton.isHidden = true
-        actionButton.isHidden = true
-        phoneField.stringValue = ""
-        emailField.stringValue = ""
-        inputField.stringValue = ""
-        secureInputField.stringValue = ""
-        firstNameField.stringValue = ""
-        lastNameField.stringValue = ""
+        // Keep the account picker visible while a cold profile opens. The
+        // previous runtime remains alive and can be selected immediately.
+        setAuthCardVisible(false)
+        chatPane.isHidden = false
+        conversationTitleLabel.stringValue = "Открываю сохранённый аккаунт…"
+        setConversationComposerVisible(false)
+        clearStack(messageList)
+        refreshComposerState()
+        clearStack(chatList)
+        addChatListState("Открываю сохранённый аккаунт…")
         let accountNumber = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
-        loginHeading.stringValue = "Вход NeTide \(accountNumber)"
-        loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные другого аккаунта скрыты."
-        statusLabel.stringValue = "Открываю вход \(accountNumber)…"
-        window.title = identifiedWindowTitle(ProductIdentity.displayName)
+        chatStatusLabel.stringValue = "Аккаунт \(accountNumber) · загрузка. Можно выбрать другой аккаунт слева."
+        window.title = identifiedWindowTitle("Аккаунт \(accountNumber) — \(ProductIdentity.displayName)")
     }
 
     private func finishLogoutProfile(_ target: LocalAccountRuntime, expectedTelegramUserID: Int64) async -> Bool {
@@ -2889,6 +2910,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             let generation = await runtimeCoordinator.nextGeneration(for: profile.id)
             guard !Task.isCancelled, !closingForTermination else { return }
             let runtime = LocalAccountRuntime(account: profile.id, expectedTelegramUserID: profile.telegramUserID, paths: prepared.paths, databaseKey: prepared.databaseKey, appStateKey: prepared.appStateKey, apiHash: apiHash, gateway: gateway, catalogue: catalogue, generation: generation)
+            runtime.onMainChatRequestTimedOut = { [weak self, weak runtime] in
+                guard let self, let runtime, runtime === self.runtime, !self.lockState else { return }
+                self.refreshChatList()
+                self.updateSelectedChatListStatus(for: runtime)
+            }
             startupRuntime = runtime
             let startupOutcome = try await ProfileRuntimeStartupSequence.execute(
                 createRoute: { try runtime.registerRoute() },
@@ -3079,6 +3105,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 setStatus("TDLib update после маршрутизации оказался некорректным JSON; профиль не переназначен.")
                 return
             }
+            if let extra = object["@extra"] as? String,
+               target.consumeExpiredMainChatRequest(extra) {
+                return
+            }
             let previousAuthorizationState = target.authorizationState
             let previousTelegramUserID = target.telegramUserID
             let previousDisplayName = target.displayName
@@ -3105,6 +3135,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             if target.mainChatLoadRevision != previousMainChatLoadRevision {
                 if target === runtime, !lockState {
                     refreshChatList()
+                    updateSelectedChatListStatus(for: target)
                 }
             }
             if previousTelegramUserID != nil,
@@ -3172,9 +3203,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             if target.takeIdentityReadyTransition() {
                 hydratePrivateAppState(for: target)
                 configureNotifications(for: target)
+                // Fetch one bounded first page for each verified account as it
+                // becomes ready. Further pages remain user/scroll driven.
+                target.loadMainChats()
                 if target === runtime {
-                    target.loadMainChats()
-                    setStatus("Аккаунт авторизован.")
+                    setStatus("Аккаунт авторизован. Загружаю переписки…")
                 }
             }
             await handle(object, from: target)
@@ -4677,6 +4710,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         }
     }
 
+    private func updateSelectedChatListStatus(for target: LocalAccountRuntime) {
+        guard target === runtime else { return }
+        switch target.mainChatListLoadState {
+        case .needsLoad:
+            chatStatusLabel.stringValue = "Список переписок ещё не загружен."
+        case .loading:
+            chatStatusLabel.stringValue = "Загружаю переписки…"
+        case .loaded:
+            chatStatusLabel.stringValue = "Переписки загружены."
+            setStatus("Переписки аккаунта загружены.")
+        case .exhausted:
+            chatStatusLabel.stringValue = "Все доступные переписки загружены."
+            setStatus("Все доступные переписки аккаунта загружены.")
+        case .failed:
+            chatStatusLabel.stringValue = "Не удалось загрузить переписки. Можно повторить."
+            setStatus("TDLib не ответила на загрузку переписок. Повторите попытку.")
+        }
+    }
+
     private func addChatListState(
         _ message: String,
         detail: String? = nil,
@@ -4733,6 +4785,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             selected.loadMainChats()
         }
         refreshChatList()
+        updateSelectedChatListStatus(for: selected)
     }
 
     private func formattedChatTime(_ timestamp: Int64?) -> String {
@@ -5282,9 +5335,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             topicPicker.isHidden = true
             refreshReplyStatus(for: nil)
             setComposerText("")
+            setConversationComposerVisible(false)
             refreshComposerState()
             return
         }
+        setConversationComposerVisible(true)
         guard ChannelAccessPolicy.permitsOpening(
             isChannel: chatRowsByAccount[runtime.account]?[id]?.isChannel,
             bundleIdentifier: Bundle.main.bundleIdentifier,
@@ -7393,6 +7448,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         window.title = identifiedWindowTitle(runtime.flatMap(safeAccountName).map { "\($0) — \(ProductIdentity.displayName)" } ?? ProductIdentity.displayName)
     }
 
+    private func setConversationComposerVisible(_ isVisible: Bool) {
+        guard conversationComposer != nil, conversationEmptyState != nil else { return }
+        conversationComposer.isHidden = !isVisible
+        conversationEmptyState.isHidden = isVisible
+        messageScrollBottomToComposer.isActive = isVisible
+        messageScrollBottomToPane.isActive = !isVisible
+    }
+
     private func targetIsAuthorizedSelected() -> Bool { runtime?.telegramUserID != nil }
 
     private func safeAccountName(_ runtime: LocalAccountRuntime) -> String? {
@@ -8519,7 +8582,10 @@ private final class LocalAccountRuntime {
     private var mainChatLoadState = ChatListLoadState()
     private var mainChatRequestExtra: String?
     private var mainChatRequestID: UInt64?
+    private var mainChatRequestTimeoutTask: Task<Void, Never>?
+    private var expiredMainChatRequestExtras: [String] = []
     private var reloadMainChatsAfterPendingRequest = false
+    var onMainChatRequestTimedOut: (() -> Void)?
     private(set) var mainChatLoadRevision: UInt64 = 0
     var mainChatListLoadState: ChatListLoadState.State { mainChatLoadState.state }
     private var didSendTDLibParameters = false
@@ -8633,7 +8699,15 @@ private final class LocalAccountRuntime {
         mainChatRequestExtra = extra
         do {
             try send(["@type": "loadChats", "chat_list": NSNull(), "limit": 100, "@extra": extra])
+            mainChatRequestTimeoutTask?.cancel()
+            mainChatRequestTimeoutTask = Task { [weak self] in
+                do { try await Task.sleep(for: .seconds(20)) }
+                catch { return }
+                self?.expireMainChatRequest(requestID: requestID, extra: extra)
+            }
         } catch {
+            mainChatRequestTimeoutTask?.cancel()
+            mainChatRequestTimeoutTask = nil
             _ = mainChatLoadState.failLoad(requestID: requestID)
             mainChatRequestID = nil
             mainChatRequestExtra = nil
@@ -8649,6 +8723,8 @@ private final class LocalAccountRuntime {
         if let extra = object["@extra"] as? String,
            extra == mainChatRequestExtra,
            let requestID = mainChatRequestID {
+            mainChatRequestTimeoutTask?.cancel()
+            mainChatRequestTimeoutTask = nil
             mainChatRequestID = nil
             mainChatRequestExtra = nil
             if object["@type"] as? String == "ok" {
@@ -8772,6 +8848,8 @@ private final class LocalAccountRuntime {
     @discardableResult
     func close() -> Bool {
         guard let route else { return false }
+        mainChatRequestTimeoutTask?.cancel()
+        mainChatRequestTimeoutTask = nil
         do {
             return try commandGate.beginClosing {
                 try sendRaw(["@type": "close"], type: "close", route: route)
@@ -8785,6 +8863,31 @@ private final class LocalAccountRuntime {
     }
 
     func finishClose() {}
+
+    func consumeExpiredMainChatRequest(_ extra: String) -> Bool {
+        guard let index = expiredMainChatRequestExtras.firstIndex(of: extra) else { return false }
+        expiredMainChatRequestExtras.remove(at: index)
+        return true
+    }
+
+    private func expireMainChatRequest(requestID: UInt64, extra: String) {
+        guard mainChatRequestID == requestID, mainChatRequestExtra == extra else { return }
+        mainChatRequestID = nil
+        mainChatRequestExtra = nil
+        mainChatRequestTimeoutTask = nil
+        expiredMainChatRequestExtras.append(extra)
+        if expiredMainChatRequestExtras.count > 16 {
+            expiredMainChatRequestExtras.removeFirst(expiredMainChatRequestExtras.count - 16)
+        }
+        let stateChanged = mainChatLoadState.failLoad(requestID: requestID)
+        if stateChanged { mainChatLoadRevision &+= 1 }
+        if reloadMainChatsAfterPendingRequest {
+            reloadMainChatsAfterPendingRequest = false
+            loadMainChats(reload: true)
+            return
+        }
+        if stateChanged { onMainChatRequestTimedOut?() }
+    }
 }
 
 #if DEBUG

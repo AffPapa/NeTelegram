@@ -1953,6 +1953,25 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(state.state == .loaded)
 }
 
+@Test func timedOutChatListRequestCanRetryAndLateResponseCannotCompleteRetry() {
+    var state = ChatListLoadState()
+    let timedOutRequest = state.beginLoad()
+    #expect(timedOutRequest != nil)
+    let timeoutWasApplied = state.failLoad(requestID: timedOutRequest!)
+    #expect(timeoutWasApplied)
+    #expect(state.state == .failed)
+
+    let retry = state.beginLoad()
+    #expect(retry != nil)
+    #expect(retry != timedOutRequest)
+    let staleResponseWasRejected = state.completeLoad(requestID: timedOutRequest!)
+    #expect(!staleResponseWasRejected)
+    #expect(state.state == .loading)
+    let retryWasCompleted = state.completeLoad(requestID: retry!)
+    #expect(retryWasCompleted)
+    #expect(state.state == .loaded)
+}
+
 @Test func chatListPaginationWaitsForLoadedPageAndDoesNotLeakAcrossAccounts() {
     var policy = ChatListPaginationPolicy()
     let accountA = AccountUUID()
