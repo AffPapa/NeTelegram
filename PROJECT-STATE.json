@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "phase": "APP08-NOTIFICATION-EPOCH-22: Async notification completions now reconcile against privacy epoch and current route; focused test, exact-source macOS CI, pinned TDLib app workflow, and canonical Dev.app accountless launch passed.",
-  "verified_at": "2026-10-15",
+  "verified_at": "2026-10-15T07:31:00Z",
   "latest_api_hash_presence_check": {
     "date": "2026-10-15",
     "method": "Swift SecItemCopyMatching with the same service/account, LAContext interactionNotAllowed, and kSecReturnAttributes=true; no kSecReturnData. Also compared the legacy `security find-generic-password` lookup and canonical app data-read behavior.",
@@ -385,11 +385,11 @@
   "latest_site_source_commit": "843c894f1becf24241200b87d4b56c8e3eb4707e",
   "pending_publication": null,
   "latest_checkpoint_ci": {
-    "run_id": 38698617205,
+    "run_id": 38699366192,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698617205",
-    "workflow_commit": "ca87cf5ee550a1f5646fda1a708dcb70127a9270",
-    "scope": "Metadata validator passed for the synchronized APP08 source, Dev.app and Site checkpoint."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38699366192",
+    "workflow_commit": "768e3f8856d279155d0cd157ff30549321793921",
+    "scope": "Metadata validation passed for the APP08 source, canonical Dev.app and public Site v208 deployment checkpoint."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -677,11 +677,11 @@
     "public_site": "PASS: public Site v178 deployment appgdep_6acf1c9813788191b4e17f6f6ae951d6; anonymous Playwright confirmed devlog and no-download gate."
   },
   "latest_checkpoint_metadata": {
-    "run_id": 38698617205,
+    "run_id": 38699366192,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698617205",
-    "workflow_commit": "ca87cf5ee550a1f5646fda1a708dcb70127a9270",
-    "scope": "Metadata validator passed for the synchronized APP08 source, Dev.app and Site checkpoint."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38699366192",
+    "workflow_commit": "768e3f8856d279155d0cd157ff30549321793921",
+    "scope": "Metadata validation passed for the APP08 source, canonical Dev.app and public Site v208 deployment checkpoint."
   },
   "latest_release_preflight": {
     "date": "2026-10-15",
