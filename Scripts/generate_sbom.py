@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import plistlib
+import posixpath
 import re
 import shutil
 import subprocess
@@ -52,13 +53,59 @@ def validate_release_archive(archive: zipfile.ZipFile) -> list[zipfile.ZipInfo]:
             raise SBOMError("app ZIP contains an unsafe absolute or parent-traversal path")
         if (not name or any(part in ("", ".") for part in path_parts)
                 or (name.endswith("/") and not item.is_dir())
-                or item.flag_bits & 0x1 or (kind and kind not in (0o100000, 0o040000))):
+                or item.flag_bits & 0x1 or (kind and kind not in (0o100000, 0o040000, 0o120000))):
             raise SBOMError("app ZIP contains an unsafe, encrypted, or special entry")
+        if kind == 0o120000:
+            if item.create_system != 3:
+                raise SBOMError("app ZIP contains a non-Unix symbolic link")
+            try:
+                target = archive.read(item).decode("utf-8")
+            except (UnicodeDecodeError, RuntimeError) as error:
+                raise SBOMError("app ZIP contains an invalid symbolic link") from error
+            if not target or "\\" in target or "\x00" in target or PurePosixPath(target).is_absolute():
+                raise SBOMError("app ZIP contains an unsafe symbolic link target")
+            resolved = posixpath.normpath(posixpath.join(posixpath.dirname(name), target))
+            if not resolved.startswith("NeTelegram.app/"):
+                raise SBOMError("app ZIP contains an unsafe symbolic link that escapes the application bundle")
         total_size += item.file_size
         if total_size > 8 * 1024 * 1024 * 1024:
             raise SBOMError("app ZIP uncompressed size exceeds the 8 GiB audit limit")
         if item.file_size > 0 and item.compress_size == 0:
             raise SBOMError("app ZIP contains an invalid compressed entry")
+    normalized_names = {name.rstrip("/") for name in names}
+    for name in tuple(normalized_names):
+        parts = PurePosixPath(name).parts
+        normalized_names.update("/".join(parts[:index]) for index in range(1, len(parts)))
+    symlinks = {
+        item.filename.rstrip("/"): posixpath.normpath(posixpath.join(
+            posixpath.dirname(item.filename), archive.read(item).decode("utf-8")
+        ))
+        for item in entries if (((item.external_attr >> 16) & 0o170000) == 0o120000)
+    }
+    for name in names:
+        parts = PurePosixPath(name.rstrip("/")).parts
+        if any("/".join(parts[:index]) in symlinks for index in range(1, len(parts))):
+            raise SBOMError("app ZIP contains a member nested through a symbolic link")
+    def resolve_link_path(path: str, visited: frozenset[str] = frozenset()) -> str:
+        parts = PurePosixPath(path).parts
+        for index in range(1, len(parts) + 1):
+            prefix = "/".join(parts[:index])
+            if prefix not in symlinks:
+                continue
+            if prefix in visited:
+                raise SBOMError("app ZIP contains a symbolic link cycle")
+            replacement = symlinks[prefix]
+            suffix = "/".join(parts[index:])
+            next_path = posixpath.normpath(posixpath.join(replacement, suffix)) if suffix else replacement
+            if not next_path.startswith("NeTelegram.app/"):
+                raise SBOMError("app ZIP symbolic link chain escapes the application bundle")
+            return resolve_link_path(next_path, visited | {prefix})
+        return path
+
+    for link in symlinks:
+        resolved = resolve_link_path(link)
+        if resolved not in normalized_names:
+            raise SBOMError("app ZIP contains a broken symbolic link")
     roots = {PurePosixPath(name).parts[0] for name in names if PurePosixPath(name).parts}
     if roots != {"NeTelegram.app"}:
         raise SBOMError("app ZIP must contain exactly one NeTelegram.app root")
@@ -109,8 +156,10 @@ def audit_release_bundle(bundle: Path, version: str, source_commit: str,
         raise SBOMError("app bundle has no CFBundleExecutable")
     executable = bundle / "Contents/MacOS" / executable_name
     tdlib = bundle / "Contents/Frameworks/libtdjson.dylib"
-    if not executable.is_file() or not tdlib.is_file():
-        raise SBOMError("app bundle is missing its executable or pinned libtdjson.dylib")
+    sparkle_framework = bundle / "Contents/Frameworks/Sparkle.framework"
+    sparkle = sparkle_framework / "Sparkle"
+    if not executable.is_file() or not tdlib.is_file() or not sparkle.is_file():
+        raise SBOMError("app bundle is missing its executable, TDLib, or Sparkle framework binary")
 
     def run(*command: str) -> str:
         result = subprocess.run(command, capture_output=True, text=True, check=False)
@@ -127,10 +176,11 @@ def audit_release_bundle(bundle: Path, version: str, source_commit: str,
     if expected_team_id and team_id != expected_team_id:
         raise SBOMError("app bundle TeamIdentifier does not match --expected-team-id")
     run("/usr/bin/codesign", "--verify", "--deep", "--strict", str(bundle))
+    run("/usr/bin/codesign", "--verify", "--strict", str(sparkle_framework))
     run("/usr/bin/xcrun", "stapler", "validate", str(bundle))
     run("/usr/sbin/spctl", "--assess", "--type", "execute", "--verbose=2", str(bundle))
     architectures: dict[str, list[str]] = {}
-    for name, path in (("NeTelegram", executable), ("TDLib", tdlib)):
+    for name, path in (("NeTelegram", executable), ("TDLib", tdlib), ("Sparkle", sparkle)):
         output = run("/usr/bin/lipo", "-archs", str(path)).strip().split()
         if "arm64" not in output:
             raise SBOMError(f"{name} does not include the supported arm64 architecture")
@@ -148,6 +198,7 @@ def audit_release_bundle(bundle: Path, version: str, source_commit: str,
         "team_id": team_id,
         "executable_sha256": digest(executable),
         "tdlib_sha256": digest(tdlib),
+        "sparkle_sha256": digest(sparkle),
         "architectures": architectures,
     }
 
@@ -182,6 +233,9 @@ def audit_release_zip(app_zip: Path, version: str, source_commit: str,
                     target = root.joinpath(*relative.parts)
                     if item.is_dir():
                         target.mkdir(parents=True, exist_ok=True)
+                    elif (((item.external_attr >> 16) & 0o170000) == 0o120000):
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        os.symlink(archive.read(item).decode("utf-8"), target)
                     else:
                         target.parent.mkdir(parents=True, exist_ok=True)
                         with archive.open(item) as member, target.open("xb") as destination:
@@ -207,6 +261,7 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
 
     tdlib = json.loads((root / "TDLIB.lock.json").read_text(encoding="utf-8"))
     country = json.loads((root / "COUNTRY-DATA.lock.json").read_text(encoding="utf-8"))
+    sparkle = json.loads((root / "SPARKLE.lock.json").read_text(encoding="utf-8"))
     openssl = tdlib["build_dependencies"]["openssl"]
     gperf = tdlib["build_dependencies"]["gperf"]
 
@@ -222,6 +277,13 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
             purl="pkg:github/tdlib/td@" + tdlib["version"],
             properties={"neTelegram:source:commit": tdlib["ref"],
                         "neTelegram:distribution": "bundled-dynamic-library"},
+        ),
+        component(
+            "Sparkle", sparkle["version"], sparkle["license"]["spdx"], scope="required",
+            bom_ref=f"pkg:github/sparkle-project/Sparkle@{sparkle['version']}",
+            purl=f"pkg:github/sparkle-project/Sparkle@{sparkle['version']}",
+            properties={"neTelegram:source:commit": sparkle["revision"],
+                        "neTelegram:distribution": "bundled-framework"},
         ),
         component(
             "OpenSSL", openssl["version"], openssl["license"], scope="required",
@@ -315,6 +377,12 @@ def build_bom(root: Path, version: str, source_commit: str, timestamp: str | Non
         tdlib_component["properties"].append({
             "name": "neTelegram:binary:architectures",
             "value": ",".join(binary_audit["architectures"]["TDLib"]),
+        })
+        sparkle_component = next(item for item in components if item["name"] == "Sparkle")
+        sparkle_component["hashes"] = [{"alg": "SHA-256", "content": binary_audit["sparkle_sha256"]}]
+        sparkle_component["properties"].append({
+            "name": "neTelegram:binary:architectures",
+            "value": ",".join(binary_audit["architectures"]["Sparkle"]),
         })
         bom["metadata"]["properties"].append({
             "name": "neTelegram:sbom:release-binary-audit-evidence",

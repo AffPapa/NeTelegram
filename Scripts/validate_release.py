@@ -322,11 +322,14 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
     metadata_component = sbom.get("metadata", {}).get("component", {})
     executable_hashes = metadata_component.get("hashes", [])
     tdlib = next((item for item in sbom.get("components", []) if item.get("name") == "TDLib"), None)
+    sparkle = next((item for item in sbom.get("components", []) if item.get("name") == "Sparkle"), None)
     tdlib_hashes = tdlib.get("hashes", []) if isinstance(tdlib, dict) else []
+    sparkle_hashes = sparkle.get("hashes", []) if isinstance(sparkle, dict) else []
     executable_digest = next((item.get("content") for item in executable_hashes if item.get("alg") == "SHA-256"), None)
     tdlib_digest = next((item.get("content") for item in tdlib_hashes if item.get("alg") == "SHA-256"), None)
-    if not executable_digest or not tdlib_digest:
-        raise ValidationError("SBOM must include SHA-256 hashes for the app executable and bundled TDLib")
+    sparkle_digest = next((item.get("content") for item in sparkle_hashes if item.get("alg") == "SHA-256"), None)
+    if not executable_digest or not tdlib_digest or not sparkle_digest:
+        raise ValidationError("SBOM must include SHA-256 hashes for the app executable, TDLib, and Sparkle")
     app_zip = next(assets_dir / item["path"] for item in artifacts if item["kind"] == "app_zip")
     sbom_properties = {
         prop.get("name"): prop.get("value")
@@ -350,12 +353,15 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
                     raise ValidationError("app_zip contains an absolute or parent-traversal path")
             executable = next((name for name in names if name.endswith(".app/Contents/MacOS/NeTelegram")), None)
             tdlib_binary = next((name for name in names if name.endswith(".app/Contents/Frameworks/libtdjson.dylib")), None)
-            if not executable or not tdlib_binary:
-                raise ValidationError("app_zip must contain NeTelegram.app executable and libtdjson.dylib")
+            sparkle_binary = next((name for name in names if name.endswith(".app/Contents/Frameworks/Sparkle.framework/Sparkle")), None)
+            if not executable or not tdlib_binary or not sparkle_binary:
+                raise ValidationError("app_zip must contain NeTelegram.app executable, libtdjson.dylib, and Sparkle.framework/Sparkle")
             if hashlib.sha256(archive.read(executable)).hexdigest() != executable_digest:
                 raise ValidationError("SBOM app executable hash does not match app_zip bytes")
             if hashlib.sha256(archive.read(tdlib_binary)).hexdigest() != tdlib_digest:
                 raise ValidationError("SBOM TDLib hash does not match app_zip bytes")
+            if hashlib.sha256(archive.read(sparkle_binary)).hexdigest() != sparkle_digest:
+                raise ValidationError("SBOM Sparkle hash does not match app_zip bytes")
             if sbom_properties.get("neTelegram:sbom:audited-app-zip-sha256") != hashlib.sha256(app_zip.read_bytes()).hexdigest():
                 raise ValidationError("SBOM final app ZIP hash does not match the candidate app_zip bytes")
     except (OSError, zipfile.BadZipFile, StopIteration, RuntimeError) as error:

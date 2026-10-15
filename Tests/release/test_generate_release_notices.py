@@ -13,13 +13,13 @@ class ReleaseNoticeTests(unittest.TestCase):
         first = build_notice(ROOT)
         second = build_notice(ROOT)
         self.assertEqual(first, second)
-        for required in ("MIT License", "TDLib", "OpenSSL", "libphonenumber", "ZETETIC LLC", "gperf"):
+        for required in ("MIT License", "TDLib", "OpenSSL", "libphonenumber", "ZETETIC LLC", "gperf", "Sparkle-LICENSE.txt"):
             self.assertIn(required, first)
 
     def test_changed_pinned_license_fails_closed(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for path in ("TDLIB.lock.json", "COUNTRY-DATA.lock.json", "LICENSE", "NOTICE"):
+            for path in ("TDLIB.lock.json", "COUNTRY-DATA.lock.json", "SPARKLE.lock.json", "LICENSE", "NOTICE"):
                 (root / path).write_bytes((ROOT / path).read_bytes())
             source_licenses = ROOT / "ThirdPartyLicenses"
             (root / "ThirdPartyLicenses").mkdir()

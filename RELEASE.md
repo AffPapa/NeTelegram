@@ -14,3 +14,34 @@ Primary references: [Telegram API Terms](https://core.telegram.org/api/terms), [
 Real login, chat/read/send, multi-account lifecycle and resource measurements remain separate from synthetic tests. Do not claim twenty-account certification without twenty real authorized test accounts and the documented matrix. Never publish API hashes from local configuration, account data, signing materials, notarization credentials, updater keys, private receipts, or runtime logs.
 
 See `TDLIB.lock.json`, `DEPENDENCIES.md`, `NOTICE`, and `ACCEPTANCE.json` for source pins, licensing, evidence, and open gates.
+
+## Sparkle framework and release ZIP
+
+The development build embeds Sparkle 2.10.0 from the exact package and binary
+pins in `SPARKLE.lock.json`. Its framework contains nested helpers and XPC
+services that arrive with upstream ad-hoc signatures. A distribution build
+must replace those signatures with the product's Developer ID identity,
+working from the innermost nested executable outward, preserving any required
+per-helper entitlements. Sign the Sparkle framework after its nested code,
+then sign the app executable and outer app. Do not use `codesign --deep` to
+sign: it can apply the wrong options or entitlements to nested components.
+The existing development script is not a distribution-signing script.
+
+After inside-out signing, verify every nested signature and the outer app,
+notarize and staple the app, then create the distributable ZIP from the
+stapled app. Preserve framework symlinks and executable permissions, and keep
+the app as the archive's sole top-level item:
+
+```sh
+ditto -c -k --norsrc --keepParent \
+  "/absolute/path/NeTelegram.app" \
+  "/absolute/path/NeTelegram.zip"
+```
+
+The `--norsrc` option avoids adding a top-level `__MACOSX` AppleDouble folder,
+which would violate the release archive's single-app-root validation. This
+archive command was checked against the current development bundle for entry
+layout and Sparkle symlink preservation only; it does not establish Developer
+ID signing, notarization, Gatekeeper acceptance, or release readiness. Generate
+the release SBOM and hashes from these final ZIP bytes and never modify the
+archive after signing or notarization.

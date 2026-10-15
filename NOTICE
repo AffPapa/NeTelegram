@@ -20,5 +20,9 @@ for this project. Third-party components retain their separate terms:
   TDLib's MIME lookup tables (GPL-3.0-or-later); it is not linked into or
   distributed with the application. GNU documents that generated output is
   not automatically GPL; generated TDLib code follows its input's terms.
+* Sparkle 2.10.0 is included under the MIT License. Its upstream license file
+  also reproduces notices and license terms for external works; retain the
+  complete ThirdPartyLicenses/Sparkle-LICENSE.txt in distributions.
 
-See DEPENDENCIES.md and TDLIB.lock.json for source revisions and build details.
+See DEPENDENCIES.md, TDLIB.lock.json, and SPARKLE.lock.json for pinned source,
+binary artifact, and license details.

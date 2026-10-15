@@ -8,6 +8,69 @@ import Testing
 
 private final class RuntimeOwnershipProbe {}
 
+@Test func updaterConfigurationPinsSeparateHTTPSFeedsAndRequiresSignedManualUpdates() {
+    let publicKey = Data(repeating: 0, count: 32).base64EncodedString()
+    let common: [String: Any] = [
+        "SUPublicEDKey": publicKey,
+        "SUVerifyUpdateBeforeExtraction": true,
+        "SUEnableAutomaticChecks": false,
+        "SUAutomaticallyUpdate": false,
+    ]
+
+    for channel in ReleaseUpdateChannel.allCases {
+        var info = common
+        info["NeTelegramReleaseChannel"] = channel.rawValue
+        info["SUFeedURL"] = channel.feedURL.absoluteString
+        let configuration = ReleaseUpdateConfiguration.resolve(
+            bundleIdentifier: "org.affpapa.netelegram",
+            infoDictionary: info
+        )
+        #expect(configuration?.channel == channel)
+        #expect(configuration?.feedURL == channel.feedURL)
+        #expect(configuration?.publicEdKey == publicKey)
+    }
+
+    #expect(ReleaseUpdateChannel.stable.feedURL != ReleaseUpdateChannel.alpha.feedURL)
+}
+
+@Test func updaterConfigurationRejectsDevelopmentUnknownFeedAndIncompleteSigningPolicy() {
+    let publicKey = Data(repeating: 0, count: 32).base64EncodedString()
+    var info: [String: Any] = [
+        "NeTelegramReleaseChannel": "stable",
+        "SUFeedURL": ReleaseUpdateChannel.stable.feedURL.absoluteString,
+        "SUPublicEDKey": publicKey,
+        "SUVerifyUpdateBeforeExtraction": true,
+        "SUEnableAutomaticChecks": false,
+        "SUAutomaticallyUpdate": false,
+    ]
+
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram.dev", infoDictionary: info) == nil)
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: nil, infoDictionary: info) == nil)
+
+    info["SUFeedURL"] = "http://example.invalid/updates.xml"
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+    info["SUFeedURL"] = ReleaseUpdateChannel.stable.feedURL.absoluteString
+
+    info["NeTelegramReleaseChannel"] = "beta-typo"
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+    info["NeTelegramReleaseChannel"] = "stable"
+
+    info["SUPublicEDKey"] = "not-base64"
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+    info["SUPublicEDKey"] = publicKey
+
+    info["SUVerifyUpdateBeforeExtraction"] = false
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+    info["SUVerifyUpdateBeforeExtraction"] = true
+
+    info["SUEnableAutomaticChecks"] = true
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+    info["SUEnableAutomaticChecks"] = false
+
+    info["SUAutomaticallyUpdate"] = true
+    #expect(ReleaseUpdateConfiguration.resolve(bundleIdentifier: "org.affpapa.netelegram", infoDictionary: info) == nil)
+}
+
 @MainActor
 @Test func profileRuntimeStartupSequencePreservesRouteOwnershipAndRequestOrder() async throws {
     let account = AccountUUID(UUID(uuidString: "65000000-0000-0000-0000-000000000001")!)

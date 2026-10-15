@@ -4,6 +4,7 @@ import CoreImage.CIFilterBuiltins
 import LocalAuthentication
 import Network
 import ServiceManagement
+import Sparkle
 import UniformTypeIdentifiers
 import UserNotifications
 import NeTelegramCore
@@ -53,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var statusMenuItem: NSMenuItem!
     private var lockMenuItem: NSMenuItem?
     private var logoutAccountMenuItem: NSMenuItem?
+    private var updaterController: SPUStandardUpdaterController?
     private var statusLabel: NSTextField!
     private var inputField: NSTextField!
     private var secureInputField: NSSecureTextField!
@@ -65,7 +67,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var countryPicker: NSComboBox!
     private var countryPickerStack: NSStackView!
     private var countryFieldLabel: NSTextField!
-    private var countrySuggestionLabel: NSTextField!
+    private var countrySuggestionButton: NSButton!
     private var countryPickerRegionCodes: [String?] = []
     private var isUpdatingCountryPicker = false
     private var phoneFieldLabel: NSTextField!
@@ -482,13 +484,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPickerStack.distribution = .fill
         countryPickerStack.spacing = 8
         countryPickerStack.isHidden = true
-        countrySuggestionLabel = NSTextField(wrappingLabelWithString: "")
-        countrySuggestionLabel.font = .preferredFont(forTextStyle: .footnote)
-        countrySuggestionLabel.textColor = .secondaryLabelColor
-        countrySuggestionLabel.alignment = .left
-        countrySuggestionLabel.maximumNumberOfLines = 2
-        countrySuggestionLabel.isHidden = true
-        countrySuggestionLabel.setAccessibilityLabel("Можно выбрать страну для местного номера или ввести полный номер с плюсом")
+        countrySuggestionButton = NSButton(title: "", target: self, action: #selector(selectSuggestedCountry))
+        countrySuggestionButton.isBordered = false
+        countrySuggestionButton.contentTintColor = .systemBlue
+        countrySuggestionButton.font = .preferredFont(forTextStyle: .footnote)
+        countrySuggestionButton.alignment = .left
+        countrySuggestionButton.isHidden = true
+        countrySuggestionButton.setAccessibilityLabel("Использовать предложенный регион для местного номера")
+        countrySuggestionButton.setAccessibilityHelp("Выбор региона только подставляет телефонный код. Номер будет отправлен в Telegram после нажатия «Продолжить».")
         phoneFieldLabel = NSTextField(labelWithString: "Номер телефона:")
         phoneFieldLabel.font = .preferredFont(forTextStyle: .subheadline)
         phoneFieldLabel.textColor = .labelColor
@@ -598,7 +601,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionLabel, phoneFieldLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionButton, phoneFieldLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -673,8 +676,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
-            countrySuggestionLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
-            countrySuggestionLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
+            countrySuggestionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
+            countrySuggestionButton.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             phoneFieldLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             phoneFieldLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -980,7 +983,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // TDLib state explicitly enables the one action it supports.
             changePhoneButton.isHidden = true
             changePhoneButton.isEnabled = false
-            countrySuggestionLabel.isHidden = true
+            countrySuggestionButton.isHidden = true
             window.minSize = NSSize(width: 560, height: 520)
             window.maxSize = NSSize(width: 720, height: 640)
             let compactSize = CommandLine.arguments.contains("--ci-auth-layout-preview-compact")
@@ -1411,11 +1414,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func buildMainMenu() {
+        let updaterConfiguration = ReleaseUpdateConfiguration.resolve(
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            infoDictionary: Bundle.main.infoDictionary ?? [:]
+        )
+        if updaterConfiguration != nil {
+            // Sparkle's standard driver requests a normal AppKit termination;
+            // AppDelegate's existing close barrier drains every runtime first.
+            updaterController = SPUStandardUpdaterController(
+                startingUpdater: true,
+                updaterDelegate: nil,
+                userDriverDelegate: nil
+            )
+        }
+
         let main = NSMenu()
         let appMenuItem = NSMenuItem()
         main.addItem(appMenuItem)
         let appMenu = NSMenu()
         appMenu.addItem(withTitle: "О \(ProductIdentity.displayName)", action: nil, keyEquivalent: "")
+        if let updaterController {
+            appMenu.addItem(.separator())
+            let checkForUpdates = NSMenuItem(
+                title: "Проверить наличие обновлений…",
+                action: #selector(SPUStandardUpdaterController.checkForUpdates(_:)),
+                keyEquivalent: ""
+            )
+            checkForUpdates.target = updaterController
+            appMenu.addItem(checkForUpdates)
+        }
         appMenu.addItem(.separator())
         let loginSettings = NSMenuItem(
             title: "Запускать при входе в macOS…",
@@ -7707,21 +7734,33 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     }
 
     private func updateCountrySuggestion() {
-        guard !countryPickerStack.isHidden,
-              selectedCountryRegionCode == nil else {
-            countrySuggestionLabel.isHidden = true
-            countrySuggestionLabel.stringValue = ""
+        guard !countryPickerStack.isHidden, selectedCountryRegionCode == nil,
+              let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
+              let country = phoneCountries.first(where: { $0.code == suggestedRegion }),
+              let callingCode = country.callingCodes.first else {
+            countrySuggestionButton.isHidden = true
             return
         }
-        if let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
-           let country = phoneCountries.first(where: { $0.code == suggestedRegion }),
-           let callingCode = country.callingCodes.first {
-            countrySuggestionLabel.stringValue = "Регион Mac предлагает: \(country.name) (+\(callingCode)). Выберите страну или введите полный номер с +."
-        } else {
-            countrySuggestionLabel.stringValue = "Выберите страну для местного номера или введите полный номер с +."
-        }
-        countrySuggestionLabel.setAccessibilityLabel(countrySuggestionLabel.stringValue)
-        countrySuggestionLabel.isHidden = false
+
+        countrySuggestionButton.title = "Использовать \(country.name) (+\(callingCode))"
+        countrySuggestionButton.setAccessibilityLabel(countrySuggestionButton.title)
+        countrySuggestionButton.isHidden = false
+    }
+
+    @objc private func selectSuggestedCountry() {
+        guard pendingAuthorizationType == "authorizationStateWaitPhoneNumber",
+              let suggestedRegion = phoneCountrySelection.suggestedRegionCode,
+              phoneCountries.contains(where: { $0.code == suggestedRegion }) else { return }
+
+        // An OS locale is only a suggestion. This explicit action is the
+        // user's selection and is the only path that enables local-number
+        // normalization for that calling code.
+        countryPicker.stringValue = ""
+        populateCountryPicker(preferredRegion: suggestedRegion)
+        updateCountrySuggestion()
+        setStatus(phoneNumberEntryPrompt())
+        updatePhoneEntryActionAvailability()
+        phoneField.becomeFirstResponder()
     }
 
     private func populateCountryPicker(preferredRegion: String?, preserveSelectionWhenFiltered: Bool = false) {

@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'Package.swift'
+      - 'Package.resolved'
+      - 'SPARKLE.lock.json'
       - 'Scripts/build-tdlib.sh'
       - 'Scripts/dev-app.sh'
       - 'Scripts/window-lifecycle-smoke.sh'
@@ -14,6 +16,8 @@ on:
   pull_request:
     paths:
       - 'Package.swift'
+      - 'Package.resolved'
+      - 'SPARKLE.lock.json'
       - 'Scripts/build-tdlib.sh'
       - 'Scripts/dev-app.sh'
       - 'Scripts/window-lifecycle-smoke.sh'
@@ -73,11 +77,14 @@ jobs:
           APP=/private/tmp/NeTelegram-Dev.app
           test -x "$APP/Contents/MacOS/NeTelegram"
           test -f "$APP/Contents/Frameworks/libtdjson.dylib"
+          test -f "$APP/Contents/Frameworks/Sparkle.framework/Sparkle"
           /usr/bin/codesign --verify --deep --strict "$APP"
+          /usr/bin/codesign --verify --strict "$APP/Contents/Frameworks/Sparkle.framework"
           /usr/bin/lipo "$APP/Contents/MacOS/NeTelegram" -verify_arch arm64
           /usr/bin/lipo "$APP/Contents/Frameworks/libtdjson.dylib" -verify_arch arm64
+          /usr/bin/lipo "$APP/Contents/Frameworks/Sparkle.framework/Sparkle" -verify_arch arm64
           /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" | grep -Fx 'org.affpapa.netelegram.dev'
-          APP_SOURCE_COMMIT="$(git log -1 --format=%H -- Package.swift Sources TDLIB.lock.json)"
+          APP_SOURCE_COMMIT="$(git log -1 --format=%H -- Package.swift Package.resolved Sources TDLIB.lock.json)"
           /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentCommit' "$APP/Contents/Info.plist" | grep -Fx "$APP_SOURCE_COMMIT"
           /usr/libexec/PlistBuddy -c 'Print :NeTelegramDevelopmentDirty' "$APP/Contents/Info.plist" | grep -Fx false
           /usr/libexec/PlistBuddy -c 'Print :LSMinimumSystemVersion' "$APP/Contents/Info.plist" | grep -Fx '14.0'

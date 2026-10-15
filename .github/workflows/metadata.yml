@@ -11,6 +11,10 @@ on:
       - 'CONTRACTS.json'
       - 'TDLIB.lock.json'
       - 'COUNTRY-DATA.lock.json'
+      - 'SPARKLE.lock.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'ThirdPartyLicenses/**'
       - 'PROJECT-STATE.json'
       - 'release-manifest.template.json'
       - 'release-index.template.json'
@@ -29,6 +33,10 @@ on:
       - 'CONTRACTS.json'
       - 'TDLIB.lock.json'
       - 'COUNTRY-DATA.lock.json'
+      - 'SPARKLE.lock.json'
+      - 'Package.swift'
+      - 'Package.resolved'
+      - 'ThirdPartyLicenses/**'
       - 'PROJECT-STATE.json'
       - 'release-manifest.template.json'
       - 'release-index.template.json'
@@ -62,6 +70,8 @@ jobs:
           python3 -m json.tool CONTRACTS.json >/dev/null
           python3 -m json.tool TDLIB.lock.json >/dev/null
           python3 -m json.tool COUNTRY-DATA.lock.json >/dev/null
+          python3 -m json.tool SPARKLE.lock.json >/dev/null
+          python3 -m json.tool Package.resolved >/dev/null
           python3 -m json.tool PROJECT-STATE.json >/dev/null
           python3 -m json.tool release-manifest.template.json >/dev/null
           python3 -m json.tool release-index.template.json >/dev/null

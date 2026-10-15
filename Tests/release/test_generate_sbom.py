@@ -9,7 +9,7 @@ from unittest.mock import patch
 import subprocess
 import zipfile
 
-from Scripts.generate_sbom import SBOMError, audit_release_bundle, audit_release_zip, build_bom
+from Scripts.generate_sbom import SBOMError, audit_release_bundle, audit_release_zip, build_bom, validate_release_archive
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -22,6 +22,7 @@ class GenerateSBOMTests(unittest.TestCase):
         self.assertEqual((bom["bomFormat"], bom["specVersion"]), ("CycloneDX", "1.6"))
         names = {item["name"] for item in bom["components"]}
         self.assertIn("TDLib", names)
+        self.assertIn("Sparkle", names)
         self.assertIn("OpenSSL", names)
         self.assertIn("gperf", names)
         self.assertEqual(next(c for c in bom["components"] if c["name"] == "gperf")["scope"], "excluded")
@@ -40,10 +41,15 @@ class GenerateSBOMTests(unittest.TestCase):
             app = Path(temporary) / "NeTelegram.app"
             (app / "Contents/MacOS").mkdir(parents=True)
             (app / "Contents/Frameworks").mkdir(parents=True)
+            (app / "Contents/Frameworks/Sparkle.framework/Versions/B").mkdir(parents=True)
             executable = app / "Contents/MacOS/NeTelegram"
             tdlib = app / "Contents/Frameworks/libtdjson.dylib"
+            sparkle = app / "Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle"
             executable.write_bytes(b"release executable")
             tdlib.write_bytes(b"release tdlib")
+            sparkle.write_bytes(b"release sparkle")
+            (app / "Contents/Frameworks/Sparkle.framework/Versions/Current").symlink_to("B")
+            (app / "Contents/Frameworks/Sparkle.framework/Sparkle").symlink_to("Versions/Current/Sparkle")
             info = {
                 "CFBundleShortVersionString": "1.2.3",
                 "CFBundleIdentifier": "org.affpapa.netelegram",
@@ -58,7 +64,7 @@ class GenerateSBOMTests(unittest.TestCase):
                 if command[1:3] == ("-dv", "--verbose=4"):
                     output = "Authority=Developer ID Application: Example (TEAM)\nTeamIdentifier=TEAM\n"
                 elif command[1] == "-archs":
-                    output = "arm64\n"
+                    output = "arm64 x86_64\n"
                 return subprocess.CompletedProcess(command, 0, stdout=output, stderr="")
 
             with patch("Scripts.generate_sbom.subprocess.run", side_effect=completed):
@@ -69,6 +75,33 @@ class GenerateSBOMTests(unittest.TestCase):
             self.assertEqual(bom["metadata"]["component"]["hashes"][0]["content"], hashlib.sha256(executable.read_bytes()).hexdigest())
             tdlib_component = next(item for item in bom["components"] if item["name"] == "TDLib")
             self.assertEqual(tdlib_component["hashes"][0]["content"], hashlib.sha256(tdlib.read_bytes()).hexdigest())
+            sparkle_component = next(item for item in bom["components"] if item["name"] == "Sparkle")
+            self.assertEqual(sparkle_component["hashes"][0]["content"], hashlib.sha256(sparkle.read_bytes()).hexdigest())
+
+    def test_archive_validator_allows_contained_framework_links_and_rejects_escape(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            archive_path = Path(temporary) / "safe.zip"
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                archive.writestr("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle", b"binary")
+                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Versions/Current")
+                link.create_system = 3
+                link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                archive.writestr(link, "B")
+                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Sparkle")
+                link.create_system = 3
+                link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                archive.writestr(link, "Versions/Current/Sparkle")
+            with zipfile.ZipFile(archive_path) as archive:
+                self.assertEqual(len(validate_release_archive(archive)), 3)
+
+            with zipfile.ZipFile(archive_path, "w") as archive:
+                link = zipfile.ZipInfo("NeTelegram.app/Contents/Frameworks/escape")
+                link.create_system = 3
+                link.external_attr = (stat.S_IFLNK | 0o777) << 16
+                archive.writestr(link, "../../../../../../outside")
+            with zipfile.ZipFile(archive_path) as archive:
+                with self.assertRaisesRegex(SBOMError, "escapes"):
+                    validate_release_archive(archive)
 
     def test_bundle_audit_requires_exact_expected_team_id(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -77,6 +110,10 @@ class GenerateSBOMTests(unittest.TestCase):
             (app / "Contents/Frameworks").mkdir(parents=True)
             (app / "Contents/MacOS/NeTelegram").write_bytes(b"executable")
             (app / "Contents/Frameworks/libtdjson.dylib").write_bytes(b"tdlib")
+            (app / "Contents/Frameworks/Sparkle.framework/Versions/B").mkdir(parents=True)
+            (app / "Contents/Frameworks/Sparkle.framework/Versions/B/Sparkle").write_bytes(b"sparkle")
+            (app / "Contents/Frameworks/Sparkle.framework/Versions/Current").symlink_to("B")
+            (app / "Contents/Frameworks/Sparkle.framework/Sparkle").symlink_to("Versions/Current/Sparkle")
             (app / "Contents/Info.plist").write_bytes(plistlib.dumps({
                 "CFBundleShortVersionString": "1.2.3",
                 "CFBundleIdentifier": "org.affpapa.netelegram",

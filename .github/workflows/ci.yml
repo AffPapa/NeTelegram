@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/ci.yml'
       - 'Package.swift'
+      - 'Package.resolved'
+      - 'SPARKLE.lock.json'
       - 'TDLIB.lock.json'
       - 'Sources/**'
       - 'Tests/NeTelegramCoreTests/**'
@@ -13,6 +15,8 @@ on:
     paths:
       - '.github/workflows/ci.yml'
       - 'Package.swift'
+      - 'Package.resolved'
+      - 'SPARKLE.lock.json'
       - 'TDLIB.lock.json'
       - 'Sources/**'
       - 'Tests/NeTelegramCoreTests/**'
@@ -54,9 +58,9 @@ jobs:
         uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
         with:
           path: .build
-          key: macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-${{ github.sha }}
+          key: macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'Package.resolved', 'TDLIB.lock.json') }}-${{ github.sha }}
           restore-keys: |
-            macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'TDLIB.lock.json') }}-
+            macos-15-${{ steps.toolchain.outputs.arch }}-swift-${{ steps.toolchain.outputs.swift }}-xcode-${{ steps.toolchain.outputs.xcode }}-package-${{ hashFiles('Package.swift', 'Package.resolved', 'TDLIB.lock.json') }}-
 
       - name: Run core test suite
         # Keep the concurrency-sensitive suite serial. Verbose driver output

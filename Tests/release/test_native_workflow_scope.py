@@ -29,6 +29,8 @@ class NativeWorkflowScopeTests(unittest.TestCase):
 
         expected = [
             "Package.swift",
+            "Package.resolved",
+            "SPARKLE.lock.json",
             "Scripts/build-tdlib.sh",
             "Scripts/dev-app.sh",
             "Scripts/window-lifecycle-smoke.sh",

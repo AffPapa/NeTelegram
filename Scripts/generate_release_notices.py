@@ -21,6 +21,7 @@ def build_notice(root: Path) -> str:
     try:
         tdlib = json.loads((root / "TDLIB.lock.json").read_text(encoding="utf-8"))
         country = json.loads((root / "COUNTRY-DATA.lock.json").read_text(encoding="utf-8"))
+        sparkle = json.loads((root / "SPARKLE.lock.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise NoticeError(f"cannot read dependency lock: {error}") from error
 
@@ -28,6 +29,7 @@ def build_notice(root: Path) -> str:
         "ThirdPartyLicenses/TDLib-BSL-1.0.txt": tdlib["license"]["sha256"],
         "ThirdPartyLicenses/OpenSSL-Apache-2.0.txt": tdlib["build_dependencies"]["openssl"]["license_sha256"],
         country["license_path"]: country["license_sha256"],
+        sparkle["license"]["path"]: sparkle["license"]["sha256"],
     }
     sections: list[tuple[str, bytes]] = []
     for relative, expected_hash in sorted(pinned.items()):

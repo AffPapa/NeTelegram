@@ -9,7 +9,7 @@ SUPPORT_ROOT="${NETELEGRAM_SUPPORT_ROOT:-/private/tmp/netelegram-dev-support-cle
 BUILD_RECORD="$BUILD_ROOT/NeTelegram-Dev.build.json"
 APP_EXECUTABLE="$APP_PATH/Contents/MacOS/NeTelegram"
 FRAMEWORKS="$APP_PATH/Contents/Frameworks"
-DEV_COMMIT="$(git -C "$ROOT_DIR" log -1 --format=%H -- Package.swift Sources TDLIB.lock.json)"
+DEV_COMMIT="$(git -C "$ROOT_DIR" log -1 --format=%H -- Package.swift Package.resolved Sources TDLIB.lock.json)"
 ORIGIN_URL="$(git -C "$ROOT_DIR" remote get-url origin)"
 ORIGIN_URL_LOWER="$(printf '%s' "$ORIGIN_URL" | tr '[:upper:]' '[:lower:]')"
 case "$ORIGIN_URL_LOWER" in
@@ -24,7 +24,7 @@ if [[ "${GITHUB_ACTIONS:-false}" != "true" && "$ROOT_DIR" != "${NETELEGRAM_CANON
     echo "Set NETELEGRAM_CANONICAL_CHECKOUT only when intentionally relocating the canonical checkout." >&2
     exit 1
 fi
-if [[ -n "$(git -C "$ROOT_DIR" status --porcelain -- Package.swift Sources TDLIB.lock.json)" ]]; then
+if [[ -n "$(git -C "$ROOT_DIR" status --porcelain -- Package.swift Package.resolved Sources TDLIB.lock.json)" ]]; then
     APP_SOURCE_DIRTY=true
 else
     APP_SOURCE_DIRTY=false
@@ -59,6 +59,7 @@ elif [[ $# -gt 0 ]]; then
 fi
 
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
+SPARKLE_FRAMEWORK="$ROOT_DIR/.build/artifacts/Sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
 # Reuse only a byte-for-byte verified bundle for this exact clean source
 # commit, source fingerprint, toolchain, pinned TDLib, support root and build.
 # This check is deliberately before the process guard: an already-running
@@ -70,7 +71,7 @@ import hashlib, json, pathlib, plistlib, subprocess, sys
 root, app, build_record = map(pathlib.Path, sys.argv[1:4])
 support, expected_head = sys.argv[4:6]
 try:
-    files = [root / "Package.swift", root / "TDLIB.lock.json"]
+    files = [root / "Package.swift", root / "Package.resolved", root / "TDLIB.lock.json"]
     files += sorted((root / "Sources").rglob("*"))
     h = hashlib.sha256()
     for path in (path for path in files if path.is_file()):
@@ -87,6 +88,7 @@ try:
         info = plistlib.load(stream)
     executable_hash = hashlib.sha256((app / "Contents/MacOS/NeTelegram").read_bytes()).hexdigest()
     tdjson_hash = hashlib.sha256((app / "Contents/Frameworks/libtdjson.dylib").read_bytes()).hexdigest()
+    sparkle_hash = hashlib.sha256((app / "Contents/Frameworks/Sparkle.framework/Sparkle").read_bytes()).hexdigest()
     expected = {
         "bundle_id": "org.affpapa.netelegram.dev",
         "bundle_path": str(app),
@@ -104,6 +106,7 @@ try:
                         and all(build.get(k) == v and embedded.get(k) == v for k, v in expected.items()))
     bytes_match = (build.get("app_executable_sha256") == executable_hash
                    and build.get("tdjson_sha256") == tdjson_hash
+                   and build.get("sparkle_sha256") == sparkle_hash
                    and build.get("signature") == "ad-hoc; codesign --verify --deep --strict passed")
     plist_matches = (info.get("CFBundleIdentifier") == expected["bundle_id"]
                      and info.get("CFBundleExecutable") == "NeTelegram"
@@ -193,6 +196,10 @@ if [[ ! -f "$TDJSON" ]]; then
     echo "Pinned TDLib is missing: $TDJSON (run Scripts/build-tdlib.sh first)" >&2
     exit 1
 fi
+if [[ ! -d "$SPARKLE_FRAMEWORK" ]]; then
+    echo "Pinned Sparkle framework is missing: $SPARKLE_FRAMEWORK (run swift package resolve)" >&2
+    exit 1
+fi
 if [[ -z "$BUILT_EXECUTABLE" || ! -x "$BUILT_EXECUTABLE" ]]; then
     echo "NeTelegram executable is missing after build" >&2
     exit 1
@@ -204,8 +211,10 @@ rm -rf "$APP_PATH"
 mkdir -p "$APP_PATH/Contents/MacOS" "$FRAMEWORKS" "$APP_PATH/Contents/Resources" "$SUPPORT_ROOT"
 cp "$BUILT_EXECUTABLE" "$APP_EXECUTABLE"
 cp "$TDJSON" "$FRAMEWORKS/libtdjson.dylib"
+ditto "$SPARKLE_FRAMEWORK" "$FRAMEWORKS/Sparkle.framework"
 chmod 755 "$APP_EXECUTABLE"
 chmod 644 "$FRAMEWORKS/libtdjson.dylib"
+/usr/bin/codesign --verify --strict "$FRAMEWORKS/Sparkle.framework"
 
 cat > "$APP_PATH/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -234,7 +243,7 @@ python3 - "$ROOT_DIR" "$APP_PATH/Contents/Resources/BuildInfo.json" "$SUPPORT_RO
 import hashlib, json, pathlib, subprocess, sys
 root, output, support, app = map(pathlib.Path, sys.argv[1:5])
 working_tree_dirty = sys.argv[5] == "true"
-files = [root / "Package.swift", root / "TDLIB.lock.json"]
+files = [root / "Package.swift", root / "Package.resolved", root / "TDLIB.lock.json"]
 files += sorted((root / "Sources").rglob("*"))
 files = [p for p in files if p.is_file()]
 h = hashlib.sha256()
@@ -251,7 +260,7 @@ info = {
     "bundle_id": "org.affpapa.netelegram.dev",
     "bundle_path": str(app),
     "support_root": str(support),
-    "app_source_commit": command("git", "-C", str(root), "log", "-1", "--format=%H", "--", "Package.swift", "Sources", "TDLIB.lock.json"),
+    "app_source_commit": command("git", "-C", str(root), "log", "-1", "--format=%H", "--", "Package.swift", "Package.resolved", "Sources", "TDLIB.lock.json"),
     "working_tree_dirty": working_tree_dirty,
     "source_fingerprint_sha256": h.hexdigest(),
     "swift_version": swift_version,
@@ -273,6 +282,7 @@ app, embedded, build_record = map(pathlib.Path, sys.argv[1:])
 record = json.loads(embedded.read_text())
 record["app_executable_sha256"] = hashlib.sha256((app / "Contents/MacOS/NeTelegram").read_bytes()).hexdigest()
 record["tdjson_sha256"] = hashlib.sha256((app / "Contents/Frameworks/libtdjson.dylib").read_bytes()).hexdigest()
+record["sparkle_sha256"] = hashlib.sha256((app / "Contents/Frameworks/Sparkle.framework/Sparkle").read_bytes()).hexdigest()
 record["signature"] = "ad-hoc; codesign --verify --deep --strict passed"
 build_record.parent.mkdir(parents=True, exist_ok=True)
 build_record.write_text(json.dumps(record, indent=2) + "\n")

@@ -16,10 +16,12 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
     source_commit = "a" * 40
     executable_bytes = b"fixture:NeTelegram executable"
     tdlib_bytes = b"fixture:libtdjson"
+    sparkle_bytes = b"fixture:Sparkle"
     app_archive = assets / "NeTelegram.zip"
     with zipfile.ZipFile(app_archive, "w") as archive:
         archive.writestr("NeTelegram.app/Contents/MacOS/NeTelegram", executable_bytes)
         archive.writestr("NeTelegram.app/Contents/Frameworks/libtdjson.dylib", tdlib_bytes)
+        archive.writestr("NeTelegram.app/Contents/Frameworks/Sparkle.framework/Sparkle", sparkle_bytes)
     sbom_path = assets / "NeTelegram.cdx.json"
     sbom_path.write_text(json.dumps({
         "bomFormat": "CycloneDX",
@@ -36,7 +38,10 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
                 {"name": "neTelegram:signing:team-id", "value": "ABCDEFGHIJ"},
             ],
         }},
-        "components": [{"name": "TDLib", "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(tdlib_bytes).hexdigest()}]}],
+        "components": [
+            {"name": "TDLib", "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(tdlib_bytes).hexdigest()}]},
+            {"name": "Sparkle", "hashes": [{"alg": "SHA-256", "content": hashlib.sha256(sparkle_bytes).hexdigest()}]},
+        ],
     }), encoding="utf-8")
     notice_path = assets / "THIRD-PARTY-NOTICES.txt"
     notice_path.write_text("MIT License\nTDLib\nOpenSSL\ngperf\n", encoding="utf-8")
@@ -216,7 +221,7 @@ class CandidateValidationTests(unittest.TestCase):
             with zipfile.ZipFile(app, "w") as archive:
                 archive.writestr("other/NeTelegram.app/Contents/MacOS/NeTelegram", b"x")
                 archive.writestr("other/NeTelegram.app/Contents/Frameworks/libtdjson.dylib", b"y")
-                archive.writestr(symlink, "../../outside")
+                archive.writestr(symlink, "../../../../outside")
             artifact = next(item for item in manifest["artifacts"] if item["kind"] == "app_zip")
             artifact["bytes"] = app.stat().st_size
             artifact["sha256"] = hashlib.sha256(app.read_bytes()).hexdigest()

@@ -13,8 +13,8 @@ python3 Scripts/generate_sbom.py \
 
 The generated inventory is explicitly marked as pin-derived and incomplete
 until reconciled with the final signed application bundle. Release candidates
-must pass the binary audit and bind its executable and `libtdjson.dylib`
-SHA-256 values to the final app ZIP:
+must pass the binary audit and bind its executable, `libtdjson.dylib`, and
+Sparkle framework SHA-256 values to the final app ZIP:
 
 ```sh
 python3 Scripts/generate_sbom.py \
@@ -34,7 +34,16 @@ fail-closed ZIP structure checks, binds those values to the frozen candidate
 ZIP, and rechecks the executable and TDLib hashes. A pre-ZIP `--app-bundle` audit may
 be useful for diagnosis but cannot qualify a release SBOM. This does not replace the
 post-download install/reopen smoke or final manual NOTICE review.
-`Package.swift` currently declares no third-party Swift package dependencies.
+`Package.resolved` pins Sparkle 2.10.0 to an exact upstream revision. Its
+binary artifact URL and checksum, and the complete MIT license with embedded
+external notices, are recorded in `SPARKLE.lock.json`. SwiftPM verifies the
+downloaded archive checksum. Sparkle's XCFramework binary is universal
+arm64/x86_64 and its minimum macOS version is 12; NeTelegram retains its
+macOS 14 baseline. The upstream artifact's nested code is ad-hoc signed, so a
+release signer must replace those signatures inside-out with the product's
+Developer ID identity before signing the containing app. Release updater
+settings remain disabled unless the bundle carries the exact stable/alpha
+feed and a valid public Ed25519 key.
 
 Generate the release `THIRD-PARTY-NOTICES.txt` from the project NOTICE and the
 license texts pinned by the dependency locks:
@@ -56,6 +65,7 @@ before writing. The metadata CI runs this generator on every relevant change.
 | SQLite core | TDLib-pinned amalgamation | Public domain | Included inside TDLib |
 | zlib | macOS SDK | zlib | System dynamic library; `otool -L libtdjson.dylib` reports `/usr/lib/libz.1.dylib`, not a bundled copy |
 | gperf | Selected Xcode toolchain, version 3.0.3 | GPL-3.0-or-later tool | Build-only generator required by pinned TDLib; version checked against `TDLIB.lock.json`, not shipped or linked. GNU documents that gperf does not make generated output GPL; generated code follows its input's terms. |
+| Sparkle | `sparkle-project/Sparkle` 2.10.0, revision `eef1a539a373c1f1a320624b1130fc5de7b2e100`; binary archive checksum in `SPARKLE.lock.json` | MIT plus reproduced external notices | Bundled framework; release update checks are enabled only in a configured production bundle. Dev.app ships the framework but has no updater feed/key configuration. |
 | Apple frameworks / Swift runtime | macOS 14+ platform | Apple platform terms | Dynamically provided system frameworks/runtime; not copied as third-party source dependencies |
 
 TDLib schema and JSON header hashes are in `TDLIB.lock.json`. The build script

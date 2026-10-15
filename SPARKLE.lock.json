@@ -1,0 +1,17 @@
+{
+  "name": "Sparkle",
+  "version": "2.10.0",
+  "repository": "https://github.com/sparkle-project/Sparkle",
+  "tag": "2.10.0",
+  "revision": "eef1a539a373c1f1a320624b1130fc5de7b2e100",
+  "swift_package_binary_artifact": {
+    "url": "https://github.com/sparkle-project/Sparkle/releases/download/2.10.0/Sparkle-for-Swift-Package-Manager.zip",
+    "sha256": "17e28312b8e18ab7cdbbe09a6fb28cc55a5479ec6c371dbc07cdecd2a14fd959"
+  },
+  "license": {
+    "spdx": "MIT",
+    "path": "ThirdPartyLicenses/Sparkle-LICENSE.txt",
+    "sha256": "389a4e4e9a32f059775b13a06e25a591445ba229d2838d26dd3e7c0c45127cfe",
+    "includes_external_notices": true
+  }
+}
