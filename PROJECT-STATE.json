@@ -115,11 +115,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38741886157,
+      "run_id": 38742966742,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38741886157",
-      "workflow_commit": "d47555d6f62a0c60227a42db099961df4c57f593",
-      "scope": "Metadata validation for release manifest required_kinds contract; no app source/build or real asset signature evidence."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38742966742",
+      "workflow_commit": "d9d62cfc745709f7618483bf4b2edc2fdb35c422",
+      "scope": "Metadata validation for the checkpoint/acceptance identity and updater evidence reconciliation."
     },
     "latest_exact_source_ci": {
       "run_id": 38734713139,
@@ -704,9 +704,9 @@
     "notary_credentials": "Attributes-only Keychain query for com.apple.gke.notary.tool returned errSecItemNotFound (-25300); no APPLE_/ASC_/NOTARY_ variable names are configured. No credential value was requested or read. Notarization remains blocked.",
     "api_credentials": "The app-context Keychain access flow at app source 584500497f03af5103c97db1a413c84d6f5b0ce1 reported access confirmed, retained the value in Keychain, and did not start login; the secret was neither displayed nor modified. A separate standalone return-data query timed out, so do not repeat that probe or delete/reset the item. Do not ask for a new hash unless the app’s explicit protected access action reports it unavailable.",
     "telegram_compatibility": "The later explicit user choice is public product title NeTide; NeTelegram remains repository/internal codename. The §2.3 title-word issue is not triggered by NeTide, but this does not establish trademark clearance or overall API Terms compatibility. §1.3/1.4 basic-functionality review remains open. §3.3 sponsored-media requirements remain unresolved; channel access and stable compatibility remain deferred because the user declined a sponsored-video player.",
-    "github": "AffPapa/NeTelegram main is checkpoint commit 5324b97e859c9fadc47545ed159fbf8efa21bfc7; metadata CI 38742247670 passed. Latest app-source commit remains 75589091d7144e1d1ffe94b15bf38638df7d708d and its exact-source macOS CI 38736741715 plus pinned TDLib bundle CI 38736741714 passed. Unauthenticated public Releases API returned zero releases on 2026-10-15; no app release/tag/assets exist.",
+    "github": "Previously published checkpoint commit d9d62cfc745709f7618483bf4b2edc2fdb35c422 passed Metadata CI run 38742966742. The app source remains 75589091d7144e1d1ffe94b15bf38638df7d708d with exact-source macOS CI 38736741715 and pinned TDLib bundle CI 38736741714. The unauthenticated public Releases API returned zero releases on 2026-10-15. A new release-builder slice is being prepared after this verified checkpoint; verify current HEAD and its CI before release work.",
     "site": "Public Site v218 is active at https://netelegram.iryadom.chatgpt.site. Saved/deployed version appgprj_6acba85192e08191acdf7011928848cf~appgver_d3244e15b1e48191a36811befa334861; source d657eda9bada5ee6a530ae4b03f8ebbc04d9c068; deployment appgdep_6ad0bfa310548191a901c6a3530c00ab. Anonymous routes and XML feeds returned expected status/MIME. No application download or populated updater feed is published; Site source references app source 19485772224ab09558a6ef0764ae9b3ebcb5ea4a.",
-    "release_assets": "No signed app archive or frozen release manifest; no candidate notarization, stapling, Gatekeeper or Sparkle update smoke.",
+    "release_assets": "Separate `Scripts/build-release-candidate.sh` now assembles/signs/notarizes alpha app ZIP/DMG and Sparkle update ZIP without touching Dev.app. Contract tests and release validator passed 31/31 locally. It has not run because the current checkpoint has no notarytool Keychain profile; Sparkle private-key availability and production public-key configuration are also unverified. No candidate assets were created.",
     "recommended_next_step": "Continue independent app implementation. The stored API hash previously passed the app’s explicit Keychain-access check; owner should enter phone/code in the app when ready, and only re-enter the API hash if the protected in-app access action reports it unavailable. All-20 runtime acceptance remains separate."
   },
   "status": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01: Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes. Exact-source macOS and pinned-TDLib workflows passed; one canonical arm64 Dev.app and light/dark accountless auth previews were verified. Real authentication and accessibility speech remain partial.",

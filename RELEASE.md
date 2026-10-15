@@ -29,6 +29,40 @@ then sign the app executable and outer app. Do not use `codesign --deep` to
 sign: it can apply the wrong options or entitlements to nested components.
 The existing development script is not a distribution-signing script.
 
+## Candidate builder
+
+`Scripts/build-release-candidate.sh` is the separate distribution path. It
+requires a clean `main` checkout whose HEAD exactly matches published
+`origin/main`, an unused absolute output directory outside the checkout, an
+available Developer ID identity, the pinned TDLib/Sparkle build products, a
+working `notarytool` Keychain profile, and the public Sparkle EdDSA key. It
+supports alpha candidates only; stable remains blocked on the compatibility
+gates and real 20-account evidence. The script never replaces
+`/private/tmp/NeTelegram-Dev.app`.
+
+Set these non-secret selectors and public metadata in the invoking shell:
+
+```sh
+export NETELEGRAM_RELEASE_VERSION=0.1.0
+export NETELEGRAM_RELEASE_BUILD=1
+export NETELEGRAM_RELEASE_CHANNEL=alpha
+export NETELEGRAM_DEVELOPER_IDENTITY='Developer ID Application: <team identity>'
+export NETELEGRAM_DEVELOPER_TEAM_ID='<10-character-team-id>'
+export NETELEGRAM_NOTARY_PROFILE='<notarytool Keychain profile name>'
+export NETELEGRAM_SPARKLE_PUBLIC_ED_KEY='<base64 public key>'
+export NETELEGRAM_RELEASE_OUTPUT='/private/tmp/NeTide-0.1.0-alpha-candidate'
+```
+
+The private Sparkle key and notarization credentials stay in Keychain; never
+put their values in environment variables, shell arguments, repository files,
+logs, or checkpoints. `Scripts/build-release-candidate.sh --preflight-only`
+checks source, signing identity, toolchain inputs, output-path safety, and the
+notary profile without building. It does not prove that Sparkle's private key
+is available; the exact archive signature is verified after packaging. A
+successful script run still does not prove owner login, quarantine installation,
+the immutable release manifest, GitHub publication, or Site delivery; those
+remain separately gated and must be recorded in the release receipts.
+
 After inside-out signing, verify every nested signature and the outer app,
 notarize and staple the app, then create the distributable ZIP from the
 stapled app. Preserve framework symlinks and executable permissions, and keep
