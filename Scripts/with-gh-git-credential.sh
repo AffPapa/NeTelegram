@@ -10,7 +10,7 @@ if [[ "$#" -eq 0 ]]; then
 fi
 
 set +x
-credential_record="$(printf 'protocol=https\nhost=github.com\n\n' | GIT_TERMINAL_PROMPT=0 git credential fill)" || {
+credential_record="$(printf 'protocol=https\nhost=github.com\n\n' | GIT_TERMINAL_PROMPT=0 git -c credential.helper=osxkeychain credential fill)" || {
   printf 'Git credential helper did not provide a GitHub credential.\n' >&2
   exit 2
 }
