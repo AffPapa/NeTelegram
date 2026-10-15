@@ -25,6 +25,28 @@ private final class SystemWindowBackgroundView: NSView {
     }
 }
 
+/// Gives the short, task-focused sign-in flow a clear group inside a resizable
+/// window while keeping its colors and border tied to the current macOS
+/// appearance and accessibility contrast settings.
+private final class AuthenticationPanelView: NSView {
+    override var isOpaque: Bool { false }
+
+    override func draw(_ dirtyRect: NSRect) {
+        let bounds = bounds.insetBy(dx: 0.5, dy: 0.5)
+        let panel = NSBezierPath(roundedRect: bounds, xRadius: 14, yRadius: 14)
+        NSColor.controlBackgroundColor.setFill()
+        panel.fill()
+        NSColor.separatorColor.setStroke()
+        panel.lineWidth = 1
+        panel.stroke()
+    }
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+}
+
 private struct ChatListRowData {
     var title: String
     var lastText: String
@@ -78,6 +100,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var loginSubtitle: NSTextField!
     private var loginDisclosure: NSTextField!
     private var authCard: NSView!
+    private var authPanel: AuthenticationPanelView!
     private var authScroll: NSScrollView!
     private var authStack: NSStackView!
     private var runtime: LocalAccountRuntime?
@@ -603,36 +626,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let authScrollContent = NSView(frame: .zero)
         authScrollContent.translatesAutoresizingMaskIntoConstraints = false
         authScroll.documentView = authScrollContent
-        authScrollContent.addSubview(authStack)
+        authPanel = AuthenticationPanelView(frame: .zero)
+        authPanel.translatesAutoresizingMaskIntoConstraints = false
+        authPanel.setAccessibilityElement(false)
+        authScrollContent.addSubview(authPanel)
+        authPanel.addSubview(authStack)
         authCard.addSubview(authScroll)
         NSLayoutConstraint.activate([
-            authCard.centerXAnchor.constraint(equalTo: content.centerXAnchor),
+            authCard.leadingAnchor.constraint(equalTo: content.leadingAnchor),
+            authCard.trailingAnchor.constraint(equalTo: content.trailingAnchor),
             authCard.topAnchor.constraint(equalTo: content.topAnchor, constant: 20),
             authCard.bottomAnchor.constraint(equalTo: content.bottomAnchor, constant: -20),
-            authCard.widthAnchor.constraint(equalToConstant: 488).withPriority(.defaultHigh),
-            authCard.widthAnchor.constraint(lessThanOrEqualTo: content.widthAnchor, constant: -48),
-            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor, constant: 20),
-            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor, constant: -20),
-            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor, constant: 14),
-            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor, constant: -14),
+            authScroll.leadingAnchor.constraint(equalTo: authCard.leadingAnchor),
+            authScroll.trailingAnchor.constraint(equalTo: authCard.trailingAnchor),
+            authScroll.topAnchor.constraint(equalTo: authCard.topAnchor),
+            authScroll.bottomAnchor.constraint(equalTo: authCard.bottomAnchor),
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
-            authStack.leadingAnchor.constraint(equalTo: authScrollContent.leadingAnchor, constant: 4),
-            authStack.trailingAnchor.constraint(equalTo: authScrollContent.trailingAnchor, constant: -4),
+            authPanel.centerXAnchor.constraint(equalTo: authScrollContent.centerXAnchor),
+            authPanel.centerYAnchor.constraint(equalTo: authScrollContent.centerYAnchor),
+            authPanel.widthAnchor.constraint(equalToConstant: 488).withPriority(.defaultHigh),
+            authPanel.widthAnchor.constraint(lessThanOrEqualTo: authScrollContent.widthAnchor, constant: -32),
+            authPanel.topAnchor.constraint(greaterThanOrEqualTo: authScrollContent.topAnchor, constant: 12),
+            authPanel.bottomAnchor.constraint(lessThanOrEqualTo: authScrollContent.bottomAnchor, constant: -12),
+            authPanel.heightAnchor.constraint(greaterThanOrEqualTo: authStack.heightAnchor, constant: 40),
+            authStack.leadingAnchor.constraint(equalTo: authPanel.leadingAnchor, constant: 20),
+            authStack.trailingAnchor.constraint(equalTo: authPanel.trailingAnchor, constant: -20),
+            authStack.topAnchor.constraint(equalTo: authPanel.topAnchor, constant: 20),
+            authStack.bottomAnchor.constraint(equalTo: authPanel.bottomAnchor, constant: -20),
             // Keep the form as one compact group in tall windows. The previous
             // edge-to-edge constraints made NSStackView distribute spare
             // height through the controls, which produced large uneven gaps.
-            authStack.centerYAnchor.constraint(equalTo: authScrollContent.centerYAnchor),
-            authStack.topAnchor.constraint(greaterThanOrEqualTo: authScrollContent.topAnchor, constant: 12),
-            authStack.bottomAnchor.constraint(lessThanOrEqualTo: authScrollContent.bottomAnchor, constant: -12),
             authScrollContent.heightAnchor.constraint(greaterThanOrEqualTo: authScroll.contentView.heightAnchor),
             mark.widthAnchor.constraint(equalToConstant: 56), mark.heightAnchor.constraint(equalToConstant: 56),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
-            loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
+            loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
             loginHeading.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
-            loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
+            loginSubtitle.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
             loginSubtitle.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
-            loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
+            loginDisclosure.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
             loginDisclosure.widthAnchor.constraint(equalToConstant: 400).withPriority(.defaultHigh),
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
