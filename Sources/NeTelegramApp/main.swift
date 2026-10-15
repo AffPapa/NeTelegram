@@ -4181,7 +4181,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else { return }
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                self.privacyDispatchBarrier.withState { isLocked, _ in
+                self.privacyDispatchBarrier.withState { isLocked, privacyEpoch in
                     for (value, target) in eligible {
                         guard self.runtimesByAccount[value.account] === target,
                               self.notificationTargets[value.systemIdentifier] == value,
@@ -4201,7 +4201,34 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         // Enqueue under the same barrier used by lock(). This
                         // preserves each route while preventing a late callback
                         // from restoring sensitive text after the lock wins.
-                        UNUserNotificationCenter.current().add(request) { _ in }
+                        UNUserNotificationCenter.current().add(request) { [weak self] _ in
+                            Task { @MainActor [weak self] in
+                                guard let self else { return }
+                                let currentTarget = self.notificationTargets[value.systemIdentifier]
+                                switch NotificationAddCompletionPolicy.action(
+                                    enqueuedEpoch: privacyEpoch,
+                                    currentEpoch: self.privacyDispatchBarrier.currentEpoch(),
+                                    enqueuedTarget: value,
+                                    currentTarget: currentTarget
+                                ) {
+                                case .keep:
+                                    break
+                                case .replaceCurrent:
+                                    guard let currentTarget,
+                                          self.notificationIDsByAccount[currentTarget.account]?.contains(currentTarget.systemIdentifier) == true,
+                                          let currentRuntime = self.runtimesByAccount[currentTarget.account],
+                                          currentRuntime.telegramUserID != nil else {
+                                        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [value.systemIdentifier])
+                                        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [value.systemIdentifier])
+                                        return
+                                    }
+                                    self.deliverNotifications([(currentTarget, currentRuntime)], isReconciliation: true)
+                                case .remove:
+                                    UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [value.systemIdentifier])
+                                    UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [value.systemIdentifier])
+                                }
+                            }
+                        }
                     }
                 }
             }

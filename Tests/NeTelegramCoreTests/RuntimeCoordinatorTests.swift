@@ -175,6 +175,41 @@ private final class RuntimeOwnershipProbe {}
     #expect(targetsByIdentifier[activeNotification.systemIdentifier] == activeNotification)
 }
 
+@Test func notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges() {
+    let account = AccountUUID()
+    let enqueued = RoutedTDLibNotification(
+        account: account,
+        groupID: 3,
+        notificationID: 7,
+        conversation: ConversationKey(account: account, chatID: 42),
+        messageID: 9,
+        date: 10,
+        isSilent: false,
+        showsPreview: true,
+        preview: "private preview"
+    )
+    let redacted = enqueued.redactedForPrivacyLock()
+
+    #expect(NotificationAddCompletionPolicy.action(
+        enqueuedEpoch: 4,
+        currentEpoch: 5,
+        enqueuedTarget: enqueued,
+        currentTarget: redacted
+    ) == .replaceCurrent)
+    #expect(NotificationAddCompletionPolicy.action(
+        enqueuedEpoch: 4,
+        currentEpoch: 4,
+        enqueuedTarget: enqueued,
+        currentTarget: nil
+    ) == .remove)
+    #expect(NotificationAddCompletionPolicy.action(
+        enqueuedEpoch: 4,
+        currentEpoch: 4,
+        enqueuedTarget: enqueued,
+        currentTarget: enqueued
+    ) == .keep)
+}
+
 @Test func accountNotificationReconciliationPreservesOnlyCurrentAccountRoutes() {
     let accountA = AccountUUID()
     let accountB = AccountUUID()
