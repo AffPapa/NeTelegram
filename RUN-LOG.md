@@ -2248,3 +2248,8 @@
 - GitHub Metadata CI run [38743940093](https://github.com/AffPapa/NeTelegram/actions/runs/38743940093) failed in `Tests.release.test_release_builder_contract.test_stable_candidate_is_rejected_before_network_or_output`. Retrieved the supported GitHub job log: Ubuntu reached the macOS host guard before the stable-channel policy assertion. Exact local metadata workflow had passed on macOS, which masked the platform dependency. This is a test-contract ordering defect, not app-source or JSON corruption.
 - Moved stable-channel rejection ahead of OS/architecture guards. Focused contract tests passed 7/7 on this host; `bash -n` and `git diff --check` passed. Generated Python cache directories were removed. Fix and checkpoint are local and not yet pushed; run the exact metadata workflow once after commit.
 - No app source, Dev.app, account data, secrets, signed candidate, GitHub release, or Site deployment changed.
+
+## 2026-10-15 — RELEASE-BUILDER-CI-ORDER-01 verification
+
+- Fix/checkpoint commit `65bb8ecdcccb709073e2cc1685e2a6906883d505` was pushed to `AffPapa/NeTelegram` main. Exact GitHub Metadata CI run [38744977573](https://github.com/AffPapa/NeTelegram/actions/runs/38744977573) passed, including checkpoint validation and the full 72-test release metadata suite on Ubuntu.
+- This proves the cross-platform policy-contract fix and metadata suite only. It does not build the app, validate Telegram login, sign/notarize an artifact, or publish a release/site download.

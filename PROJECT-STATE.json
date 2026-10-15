@@ -115,11 +115,11 @@
     "pre_edit_working_tree_clean": true,
     "candidate_pending_publication": null,
     "latest_checkpoint_metadata_ci": {
-      "run_id": 38742966742,
+      "run_id": 38744977573,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38742966742",
-      "workflow_commit": "d9d62cfc745709f7618483bf4b2edc2fdb35c422",
-      "scope": "Metadata validation for the checkpoint/acceptance identity and updater evidence reconciliation."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38744977573",
+      "workflow_commit": "65bb8ecdcccb709073e2cc1685e2a6906883d505",
+      "scope": "Exact metadata workflow passed, including checkpoint validation and all 72 release tests after the cross-platform stable-channel guard-order fix."
     },
     "latest_exact_source_ci": {
       "run_id": 38734713139,
@@ -1348,6 +1348,13 @@
     "root_cause": "The contract test ran on Ubuntu, while the builder checked host OS before rejecting the stable channel. Local macOS run masked this platform-order dependency.",
     "fix_in_working_tree": "Moved channel policy validation before Darwin/arm64 host guards so the stable-only policy is deterministic across platforms.",
     "focused_local_validation": "Tests.release.test_release_builder_contract: 7/7 passed; bash -n and git diff --check passed.",
-    "publication_state": "Fix not yet committed or pushed; exact metadata CI for the fix remains pending."
+    "publication_state": "Fix committed and pushed to AffPapa/NeTelegram main; exact metadata workflow passed for the fix commit.",
+    "fix_commit": "65bb8ecdcccb709073e2cc1685e2a6906883d505",
+    "fix_commit_metadata_ci": {
+      "run_id": 38744977573,
+      "status": "success",
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38744977573",
+      "workflow_commit": "65bb8ecdcccb709073e2cc1685e2a6906883d505"
+    }
   }
 }
