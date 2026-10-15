@@ -1,43 +1,43 @@
 {
   "schema_version": 2,
-  "status": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01: Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes. Exact-source macOS and pinned-TDLib workflows passed; one canonical arm64 Dev.app and light/dark accountless auth previews were verified. Real authentication and accessibility speech remain partial.",
+  "status": "BRANDING-RELEASE-TITLE-01: Aligned app-visible and RU/EN repository copy with NeTide; retained NeTelegram as repository/internal codename; release manifest now identifies the chosen public title and rejects an unprefixed Telegram title. Exact-source Swift CI, pinned TDLib bundle workflow, local Dev.app AX smoke, and release metadata checks passed. Real account flow remains pending.",
   "current_evidence": {
-    "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "local_suite": "Focused auth launch-mode regression passed 7/7; no broader Swift suite rerun because this was a bounded AppKit window-sizing change.",
-    "focused_test": "Canonical arm64 Dev.app built from exact clean source 1948577; BuildInfo and strict ad-hoc signature verified. Accountless auth preview showed phone/code/password/QR/registration in light and dark modes at 520×460 minimum (registration 523×460); AX labels and keyboard scrolling were verified. No account credentials or network login.",
+    "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "local_suite": "Focused Swift identity/account presentation regressions passed 3/3. Release validator tests passed 20/20; full release tooling suite passed 61/61 on the matching test commit. Exact-source macOS CI and pinned TDLib bundle workflow passed for app-source 96ed316. Metadata workflow passed for test-only 2c76e23.",
+    "focused_test": "Focused Swift identity/account presentation regressions 3/3 passed; release validator tests 20/20; full release tooling suite 61/61 on test SHA 2c76e23; exact-source app CI and pinned TDLib app workflow passed on source SHA 96ed316.",
     "hosted_ci": {
-      "run_id": 38730247076,
+      "run_id": 38734713139,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247076",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Exact-source macOS CI for auth-window frame sizing and minimum light/dark layout preview."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713139",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Exact-source macOS Swift CI for NeTide identity, account-presentation strings, and related regressions."
     },
     "native_workflow_ci": {
-      "run_id": 38730247064,
+      "run_id": 38734713102,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247064",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact source."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713102",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
+      "application_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "984ef65c52dd47d98b65b67515036652ddb6c0cc9885631b9856702cafa8f362",
-      "executable_sha256": "21820642e87ee538f9d54eba1156d90d8fe7402f7a38ab60f04cc3d9af291d9d",
+      "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
+      "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app built from exact clean source 1948577; BuildInfo and strict ad-hoc signature verified. Accountless auth preview showed phone/code/password/QR/registration in light and dark modes at 520×460 minimum (registration 523×460); AX labels and keyboard scrolling were verified. No account credentials or network login."
+      "smoke": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request."
     },
     "latest_site_deployment": {
       "date": "2026-10-15",
@@ -626,26 +626,26 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "summary": "AUTH03 minimum-size light/dark accountless preview; exact-source CI and pinned Dev.app workflow passed; Sites v218 deployed and anonymous routes returned expected MIME/status. Real login remains deferred."
+    "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "summary": "BRANDING-RELEASE-TITLE-01: exact-source app CI and pinned TDLib bundle workflow passed; canonical clean Dev.app visually/accessibly shows NeTide. Full metadata suite and repaired exact-commit metadata CI passed. Real authentication remains owner-operated and unverified."
   },
   "current_local_slice": {
-    "id": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01",
+    "id": "BRANDING-RELEASE-TITLE-01",
     "date": "2026-10-15",
-    "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "test_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "finding": "Auth state changes compared content-view dimensions with outer-window bounds, expanding a minimum-size 520×460 phone window to 560×528.",
-    "change": "Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes.",
-    "focused_tests": "7/7 Scripts.release.test_dev_app_launch_mode; python unittest passed; bash -n and git diff --check passed. Native AX/visual smoke covered phone, code, password, QR, and registration states in light/dark mode. Registration content expanded to 523×460; Tab navigation scrolls consent into view.",
+    "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "test_commit": "2c76e238e666d8fae4fa575d01f0247c894ca89c",
+    "finding": "App display identity had changed to NeTide, while account-facing copy, README/NOTICE/RELEASE, and the release fixture still used NeTelegram as the public title.",
+    "change": "Aligned app-visible and RU/EN repository copy with NeTide; retained NeTelegram as repository/internal codename; release manifest now identifies the chosen public title and rejects an unprefixed Telegram title.",
+    "focused_tests": "Swift identity/account presentation 3/3; release validator tests 20/20; full release tooling suite 61/61; git diff --check passed. One metadata CI failure exposed a stale bundle-name expectation; corrected on test-only commit 2c76e23 and the metadata workflow passed.",
     "hosted_ci": {
-      "run_id": 38730247076,
+      "run_id": 38734713139,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247076",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Exact-source macOS CI for auth-window frame sizing and minimum light/dark layout preview."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713139",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Exact-source macOS Swift CI for NeTide identity, account-presentation strings, and related regressions."
     },
-    "remaining": "AUTH03 partial: no real auth; VoiceOver speech and system Increased Contrast remain unverified. Layout preview does not establish login, real-account behavior, 20-runtime coverage, or distribution readiness."
+    "remaining": "Public Site copy is intentionally deferred for the single alpha deployment batch. Real sign-in/read/send remains owner-operated; 20-runtime coverage, Developer ID distribution/notarization, Gatekeeper, channel Terms gates, and downloadable assets remain open."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -687,7 +687,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Continue one highest-priority unresolved native acceptance slice from this checkpoint. Reuse the canonical checkout and Dev.app; run only the focused regression and exact-source CI required by the changed code. Do not use browser for GitHub: the existing Git credential helper is the publishing route. Update Sites only after a factual milestone, using its official helper and Sites API. Real login remains owner-operated and deferred; 20 live runtimes, Developer ID/notarization, Telegram compatibility gates, signed release assets, and updater remain open.",
+  "next_action": "Owner completes one standard in-app sign-in and verifies read/send/restart/logout on the canonical clean NeTide build; then fix only P0 defects found. Keep 20-account and stable performance certification separate from alpha. Batch Site brand/download/changelog changes with the verified GitHub alpha artifact.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -720,40 +720,40 @@
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
+      "application_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "984ef65c52dd47d98b65b67515036652ddb6c0cc9885631b9856702cafa8f362",
-      "executable_sha256": "21820642e87ee538f9d54eba1156d90d8fe7402f7a38ab60f04cc3d9af291d9d",
+      "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
+      "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app built from exact clean source 1948577; BuildInfo and strict ad-hoc signature verified. Accountless auth preview showed phone/code/password/QR/registration in light and dark modes at 520×460 minimum (registration 523×460); AX labels and keyboard scrolling were verified. No account credentials or network login."
+      "smoke": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request."
     },
     "pending_native_candidate": null
   },
   "latest_acceptance_slice": {
-    "id": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01",
+    "id": "BRANDING-RELEASE-TITLE-01",
     "date": "2026-10-15",
-    "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "test_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "finding": "Auth state changes compared content-view dimensions with outer-window bounds, expanding a minimum-size 520×460 phone window to 560×528.",
-    "change": "Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes.",
-    "focused_tests": "7/7 Scripts.release.test_dev_app_launch_mode; python unittest passed; bash -n and git diff --check passed. Native AX/visual smoke covered phone, code, password, QR, and registration states in light/dark mode. Registration content expanded to 523×460; Tab navigation scrolls consent into view.",
+    "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "test_commit": "2c76e238e666d8fae4fa575d01f0247c894ca89c",
+    "finding": "App display identity had changed to NeTide, while account-facing copy, README/NOTICE/RELEASE, and the release fixture still used NeTelegram as the public title.",
+    "change": "Aligned app-visible and RU/EN repository copy with NeTide; retained NeTelegram as repository/internal codename; release manifest now identifies the chosen public title and rejects an unprefixed Telegram title.",
+    "focused_tests": "Swift identity/account presentation 3/3; release validator tests 20/20; full release tooling suite 61/61; git diff --check passed. One metadata CI failure exposed a stale bundle-name expectation; corrected on test-only commit 2c76e23 and the metadata workflow passed.",
     "hosted_ci": {
-      "run_id": 38730247076,
+      "run_id": 38734713139,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247076",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Exact-source macOS CI for auth-window frame sizing and minimum light/dark layout preview."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713139",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Exact-source macOS Swift CI for NeTide identity, account-presentation strings, and related regressions."
     },
-    "remaining": "AUTH03 partial: no real auth; VoiceOver speech and system Increased Contrast remain unverified. Layout preview does not establish login, real-account behavior, 20-runtime coverage, or distribution readiness."
+    "remaining": "Public Site copy is intentionally deferred for the single alpha deployment batch. Real sign-in/read/send remains owner-operated; 20-runtime coverage, Developer ID distribution/notarization, Gatekeeper, channel Terms gates, and downloadable assets remain open."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -846,41 +846,41 @@
   "phase": "AUTH03-MINIMUM-WINDOW-APPEARANCE-01: Compare NSWindow.frame to the configured limits; add process-scoped light/dark accountless preview modes. Exact-source macOS and pinned-TDLib workflows passed; one canonical arm64 Dev.app and light/dark accountless auth previews were verified. Real authentication and accessibility speech remain partial.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-    "command": "CLANG_MODULE_CACHE_PATH=/private/tmp/netelegram-dev-swift-modules Scripts/dev-app.sh --launch",
-    "result": "PASS: canonical arm64 Dev.app BuildInfo matched exact source; strict ad-hoc signature passed. Reused existing candidate; no rebuild for Site-only publication.",
-    "source_fingerprint_sha256": "984ef65c52dd47d98b65b67515036652ddb6c0cc9885631b9856702cafa8f362",
-    "executable_sha256": "21820642e87ee538f9d54eba1156d90d8fe7402f7a38ab60f04cc3d9af291d9d",
+    "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "command": "Scripts/dev-app.sh --launch",
+    "result": "PASS: canonical arm64 Dev.app built from exact clean source; BuildInfo and strict ad-hoc signature verified.",
+    "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
+    "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
-    "swift_version": "Apple Swift 6.4",
+    "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700"
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
+    "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "984ef65c52dd47d98b65b67515036652ddb6c0cc9885631b9856702cafa8f362",
-    "executable_sha256": "21820642e87ee538f9d54eba1156d90d8fe7402f7a38ab60f04cc3d9af291d9d",
+    "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
+    "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical arm64 Dev.app built from exact clean source 1948577; BuildInfo and strict ad-hoc signature verified. Accountless auth preview showed phone/code/password/QR/registration in light and dark modes at 520×460 minimum (registration 523×460); AX labels and keyboard scrolling were verified. No account credentials or network login.",
-    "scope": "One canonical Dev.app only; accountless light/dark auth preview states. No credentials, Telegram request, real auth, VoiceOver speech, or Increased Contrast.",
+    "result": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request.",
+    "scope": "Fresh accountless first-run AX verification of visible product name/disclosure on the exact clean canonical app. No account data, credential entry, or network login.",
     "exact_source_ci": {
-      "run_id": 38730247076,
+      "run_id": 38734713139,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247076",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Exact-source macOS CI for auth-window frame sizing and minimum light/dark layout preview."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713139",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Exact-source macOS Swift CI for NeTide identity, account-presentation strings, and related regressions."
     },
     "native_workflow_ci": {
-      "run_id": 38730247064,
+      "run_id": 38734713102,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38730247064",
-      "workflow_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "app_source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact source."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713102",
+      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
     }
   },
   "current_ui_design_slice": {
@@ -920,12 +920,12 @@
   },
   "verified_at": "2026-10-15",
   "latest_native_workflow_ci": {
-    "run_id": 38725117928,
+    "run_id": 38734713102,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38725117928",
-    "workflow_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "app_source_commit": "63d7968bec3479ccc6a0e56acae1ca77c6e0cd81",
-    "scope": "Pinned TDLib Apple Silicon Dev.app assembly and strict verification for the exact app source."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713102",
+    "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
   },
   "latest_workflow_safety_check": {
     "date": "2026-10-15",
