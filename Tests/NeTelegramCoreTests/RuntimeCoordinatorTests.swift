@@ -2088,9 +2088,9 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     try await coordinator.registerBeforeFirstRequest(oldRoute)
 
     let consumeGate = AsyncTestGate()
-    let coordinatorCheckGate = AsyncTestGate()
     let callbackStarted = LockedTestValue(false)
-    let coordinatorCheckStarted = LockedTestValue(false)
+    let consumeReturned = LockedTestValue(false)
+    let routeCheckObservedCompletedConsume = LockedTestValue(false)
     let localRoute = LockedTestValue(oldRoute)
     let sideEffectsApplied = LockedTestValue(false)
     let callback = Task { @MainActor in
@@ -2099,12 +2099,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         callbackStarted.set(true)
         let stillOwnsRoute = await RuntimeUpdateOwnership.consumeThenCheck(
             oldRoute,
-            consume: { await consumeGate.wait() },
+            consume: {
+                await consumeGate.wait()
+                consumeReturned.set(true)
+            },
             coordinatorRouteIsCurrent: {
-                let wasCurrentBeforeSuspension = await coordinator.isCurrent(oldRoute)
-                coordinatorCheckStarted.set(true)
-                await coordinatorCheckGate.wait()
-                return wasCurrentBeforeSuspension
+                routeCheckObservedCompletedConsume.set(consumeReturned.get())
+                return await coordinator.isCurrent(oldRoute)
             },
             localOwnerIsCurrent: { localRoute.get() == oldRoute }
         )
@@ -2112,16 +2113,22 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
         return stillOwnsRoute
     }
     #expect(await waitForTrue(callbackStarted, timeout: .seconds(1)))
-    await consumeGate.open()
-    #expect(await waitForTrue(coordinatorCheckStarted, timeout: .seconds(1)))
+    #expect(!consumeReturned.get())
+    #expect(!routeCheckObservedCompletedConsume.get())
 
+    // Replace the route while the reducer's identity-persistence stand-in is
+    // still suspended. The ownership closure below must query the coordinator
+    // only after consume resumes, so it observes the replacement generation.
     #expect(await coordinator.applyAuthorizationState("authorizationStateClosed", telegramUserID: nil, from: oldRoute))
     let replacement = RuntimeRoute(account: account, generation: RuntimeGeneration(2), client: ClientID(196))
     try await coordinator.registerBeforeFirstRequest(replacement)
     localRoute.set(replacement)
-    await coordinatorCheckGate.open()
+
+    await consumeGate.open()
 
     #expect(!(await callback.value))
+    #expect(consumeReturned.get())
+    #expect(routeCheckObservedCompletedConsume.get())
     #expect(!sideEffectsApplied.get())
     #expect(await coordinator.isCurrent(replacement))
 }
