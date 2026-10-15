@@ -142,6 +142,9 @@ with open(plist_path, "wb") as f:
         "LSMinimumSystemVersion":"14.0", "NSHighResolutionCapable":True,
         "NeTelegramDevelopmentCommit":commit, "NeTelegramDevelopmentDirty":False,
         "NeTelegramReleaseChannel":channel, "SUFeedURL":feed, "SUPublicEDKey":public_key,
+        # Sponsored video support is intentionally deferred in the first alpha.
+        # A channel-capable release must opt in only after compatibility review.
+        "NeTideChannelAccessEnabled":False,
         "SUVerifyUpdateBeforeExtraction":True, "SUEnableAutomaticChecks":False,
         "SUAutomaticallyUpdate":False,
     }, f, sort_keys=True)
@@ -153,6 +156,7 @@ record = {
     "source_fingerprint_sha256":h.hexdigest(), "swift_version":swift,
     "tdlib_commit":tdlib, "architecture":"arm64", "minimum_macos":"14.0",
     "release_version":version, "release_build":int(build), "release_channel":channel,
+    "channel_access_enabled":False,
 }
 pathlib.Path(build_info_path).write_text(json.dumps(record, indent=2)+"\n")
 PY
@@ -223,7 +227,7 @@ assets=[]
 for kind,name in (("app_zip",f"{stem}.zip"),("dmg",f"{stem}.dmg"),("sparkle_update_zip",f"{stem}-update.zip"),("sbom",f"{stem}-sbom.json"),("notice","NOTICE.txt")):
  p=out/name; h=hashlib.sha256(p.read_bytes()).hexdigest()
  assets.append({"kind":kind,"filename":name,"bytes":p.stat().st_size,"sha256":h})
-(out/"candidate-assets.json").write_text(json.dumps({"source_commit":commit,"version":version,"build":int(build),"channel":channel,"minimum_macos":"14.0","sparkle_ed_signature":signature,"assets":assets},indent=2)+"\n")
+(out/"candidate-assets.json").write_text(json.dumps({"source_commit":commit,"version":version,"build":int(build),"channel":channel,"minimum_macos":"14.0","channel_access_enabled":False,"sparkle_ed_signature":signature,"assets":assets},indent=2)+"\n")
 with (out/"SHA256SUMS").open("w") as f:
  for item in assets: f.write(f"{item['sha256']}  {item['filename']}\n")
 PY

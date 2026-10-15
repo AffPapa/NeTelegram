@@ -238,6 +238,46 @@ private final class RuntimeOwnershipProbe {}
     #expect(targetsByIdentifier[activeNotification.systemIdentifier] == activeNotification)
 }
 
+@Test func accountNotificationCleanupRemovesOnlyOneChatRoutes() {
+    let accountA = AccountUUID()
+    let accountB = AccountUUID()
+    func notification(account: AccountUUID, chatID: Int64, notificationID: Int32) -> RoutedTDLibNotification {
+        RoutedTDLibNotification(
+            account: account,
+            groupID: 1,
+            notificationID: notificationID,
+            conversation: ConversationKey(account: account, chatID: chatID),
+            messageID: Int64(notificationID),
+            date: 1,
+            isSilent: true,
+            showsPreview: true,
+            preview: "preview"
+        )
+    }
+    let remove1 = notification(account: accountA, chatID: 10, notificationID: 1)
+    let remove2 = notification(account: accountA, chatID: 10, notificationID: 2)
+    let keepOtherChat = notification(account: accountA, chatID: 11, notificationID: 3)
+    let keepOtherAccount = notification(account: accountB, chatID: 10, notificationID: 4)
+    var identifiers = [
+        accountA: Set([remove1.systemIdentifier, remove2.systemIdentifier, keepOtherChat.systemIdentifier]),
+        accountB: Set([keepOtherAccount.systemIdentifier]),
+    ]
+    var targets = Dictionary(uniqueKeysWithValues: [remove1, remove2, keepOtherChat, keepOtherAccount].map { ($0.systemIdentifier, $0) })
+
+    let removed = AccountNotificationCleanup.removeChat(
+        account: accountA,
+        chatID: 10,
+        identifiersByAccount: &identifiers,
+        targetsByIdentifier: &targets
+    )
+
+    #expect(removed == [remove1.systemIdentifier, remove2.systemIdentifier])
+    #expect(identifiers[accountA] == [keepOtherChat.systemIdentifier])
+    #expect(identifiers[accountB] == [keepOtherAccount.systemIdentifier])
+    #expect(targets[keepOtherChat.systemIdentifier] == keepOtherChat)
+    #expect(targets[keepOtherAccount.systemIdentifier] == keepOtherAccount)
+}
+
 @Test func notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges() {
     let account = AccountUUID()
     let enqueued = RoutedTDLibNotification(

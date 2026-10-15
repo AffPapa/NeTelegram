@@ -2253,3 +2253,10 @@
 
 - Fix/checkpoint commit `65bb8ecdcccb709073e2cc1685e2a6906883d505` was pushed to `AffPapa/NeTelegram` main. Exact GitHub Metadata CI run [38744977573](https://github.com/AffPapa/NeTelegram/actions/runs/38744977573) passed, including checkpoint validation and the full 72-test release metadata suite on Ubuntu.
 - This proves the cross-platform policy-contract fix and metadata suite only. It does not build the app, validate Telegram login, sign/notarize an artifact, or publish a release/site download.
+
+## 2026-10-15 — ALPHA-CHANNEL-ACCESS-GATE-01 (local candidate)
+
+- Audit found a release-contract gap: docs deferred channel access because sponsored video support is incomplete, but the production code did not enforce that decision on chat opening/history and notification routes. Added an explicit policy: Dev bundle retains access; distribution defaults closed; the alpha release builder embeds `NeTideChannelAccessEnabled=false` and records `channel_access_enabled:false` in candidate metadata.
+- Production mode hides known channels from chat/search results, blocks unknown/channel opens until `getChat` metadata is known, blocks history/render paths, suppresses sponsored-channel fetches, and removes channel notification previews/routes. Account runtimes continue operating. `README.md` now consistently calls the public app NeTide and NeTelegram the repository codename.
+- Focused macOS tests passed 4/4 (three policy cases and one account/chat-scoped notification cleanup case). AppKit executable target compiled. `bash -n Scripts/build-release-candidate.sh` and `git diff --check` passed. Initial sandboxed test invocation failed before compilation; the approved direct Xcode route completed successfully using a temporary module cache.
+- Local source candidate is not yet committed/pushed and has no exact-source CI receipt. The canonical `/private/tmp/NeTelegram-Dev.app` was not rebuilt: process check could not prove NeTelegram absence, so guarded replacement remains blocked. No real account, release asset, Site or account data was touched.

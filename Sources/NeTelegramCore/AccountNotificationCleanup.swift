@@ -127,4 +127,27 @@ public enum AccountNotificationCleanup {
         identifiersByAccount[account]?.subtract(removed)
         return removed
     }
+
+    /// Removes every cached route for a conversation that the current product
+    /// build must not expose, without disturbing another chat or account.
+    @discardableResult
+    public static func removeChat(
+        account: AccountUUID,
+        chatID: Int64,
+        identifiersByAccount: inout [AccountUUID: Set<String>],
+        targetsByIdentifier: inout [String: RoutedTDLibNotification]
+    ) -> Set<String> {
+        let removed = Set(targetsByIdentifier.compactMap { identifier, target in
+            target.account == account && target.conversation.chatID == chatID ? identifier : nil
+        })
+        let indexed = identifiersByAccount[account] ?? []
+        let allRemoved = removed.union(indexed.filter { identifier in
+            targetsByIdentifier[identifier]?.account == account
+                && targetsByIdentifier[identifier]?.conversation.chatID == chatID
+        })
+        guard !allRemoved.isEmpty else { return [] }
+        targetsByIdentifier = targetsByIdentifier.filter { !allRemoved.contains($0.key) }
+        identifiersByAccount[account]?.subtract(allRemoved)
+        return allRemoved
+    }
 }

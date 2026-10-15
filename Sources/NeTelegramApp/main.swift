@@ -38,6 +38,7 @@ private struct ChatListRowData {
     var lastMessageDate: Int64?
     var unreadCount: Int
     var isMuted: Bool
+    var isChannel: Bool?
 }
 
 private extension NSLayoutConstraint {
@@ -115,6 +116,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var pendingInitialAuthorizationAction: InitialAuthorizationAction?
     private var initialAccountCreationInProgress = false
     private var lockState = false
+    private var allowsChannelReading: Bool {
+        ChannelAccessPolicy.isReadingEnabled(
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            infoDictionary: Bundle.main.infoDictionary ?? [:]
+        )
+    }
     private var shutdownCoordinator = RuntimeShutdownCoordinator()
     private var terminationReply: ((Bool) -> Void)?
     private var pendingClosures: Set<Int32> = []
@@ -260,6 +267,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private var historyRequestCounter: UInt64 = 0
     private var notificationIDsByAccount: [AccountUUID: Set<String>] = [:]
     private var notificationTargets: [String: RoutedTDLibNotification] = [:]
+    private var pendingChatMetadataLookupsByAccount: [AccountUUID: Set<Int64>] = [:]
     private var notificationUnlockHandoff = NotificationUnlockHandoff()
     private var notificationAuthorizationRequestGate = NotificationAuthorizationRequestGate()
     private let telegramAPIHashReadiness = TelegramAPIHashReadiness()
@@ -2318,6 +2326,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func purgeInMemoryAccountState(_ account: AccountUUID) {
         notificationUnlockHandoff.clear(account: account)
+        pendingChatMetadataLookupsByAccount.removeValue(forKey: account)
         draftsByConversation = draftsByConversation.filter { $0.key.account != account }
         draftStoresByAccount.removeValue(forKey: account)
         dirtyDraftAccounts.remove(account)
@@ -3192,6 +3201,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func clearRevokedIdentityPresentation(for target: LocalAccountRuntime) {
         let account = target.account
+        pendingChatMetadataLookupsByAccount.removeValue(forKey: account)
         persistDrafts(for: account)
         target.invalidateMainChatSnapshot()
         photoPipeline.cancelPreviews(for: account)
@@ -4295,6 +4305,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                         guard self.runtimesByAccount[value.account] === target,
                               self.notificationTargets[value.systemIdentifier] == value,
                               self.notificationIDsByAccount[value.account]?.contains(value.systemIdentifier) == true else { continue }
+                        let channel = self.chatRowsByAccount[value.account]?[value.conversation.chatID]?.isChannel
+                        guard ChannelAccessPolicy.permitsNotification(
+                            isChannel: channel,
+                            bundleIdentifier: Bundle.main.bundleIdentifier,
+                            infoDictionary: Bundle.main.infoDictionary ?? [:]
+                        ) else {
+                            let removed = AccountNotificationCleanup.removeChat(
+                                account: value.account,
+                                chatID: value.conversation.chatID,
+                                identifiersByAccount: &self.notificationIDsByAccount,
+                                targetsByIdentifier: &self.notificationTargets
+                            )
+                            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
+                            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
+                            // Chat metadata may still be loading. Resolve it without opening
+                            // the conversation; upsertChat will reconcile eligible routes.
+                            if channel == nil {
+                                self.requestChatMetadata(value.conversation.chatID, from: target)
+                            }
+                            continue
+                        }
                         let presentation = TDLibNotificationRouter.presentation(
                             for: value,
                             isPrivacyLocked: isLocked,
@@ -4404,12 +4435,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let last = chat["last_message"] as? [String: Any]
         let notificationSettings = chat["notification_settings"] as? [String: Any]
         let inheritsMute = (notificationSettings?["use_default_mute_for"] as? Bool) ?? false
+        let chatType = chat["type"] as? [String: Any]
+        let isChannel = chatType?["@type"] as? String == "chatTypeSupergroup"
+            && (chatType?["is_channel"] as? Bool ?? false)
+        pendingChatMetadataLookupsByAccount[target.account]?.remove(id)
         chatRowsByAccount[target.account, default: [:]][id] = ChatListRowData(
             title: ChatDisplayTitlePolicy.resolve(title),
             lastText: last.map(messagePreview) ?? "",
             lastMessageDate: (last?["date"] as? NSNumber)?.int64Value,
             unreadCount: max(0, (chat["unread_count"] as? NSNumber)?.intValue ?? 0),
-            isMuted: !inheritsMute && ((notificationSettings?["mute_for"] as? NSNumber)?.intValue ?? 0) > 0
+            isMuted: !inheritsMute && ((notificationSettings?["mute_for"] as? NSNumber)?.intValue ?? 0) > 0,
+            isChannel: isChannel
         )
         let positions = chat["positions"] as? [[String: Any]] ?? []
         let mainPosition = positions.first {
@@ -4418,7 +4454,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let mainOrder = mainPosition.flatMap { ($0["order"] as? NSNumber)?.uint64Value }
         mainChatListPositionsByAccount[target.account, default: MainChatListPositionIndex()]
             .replaceSnapshot(chatID: id, mainListOrder: mainOrder)
-        let chatType = chat["type"] as? [String: Any]
         let isForum = chatType? ["@type"] as? String == "chatTypeSupergroup"
             && (chatType? ["is_forum"] as? Bool ?? false)
         if isForum {
@@ -4426,8 +4461,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         } else {
             forumChatsByAccount[target.account]?.remove(id)
         }
-        let isChannel = chatType? ["@type"] as? String == "chatTypeSupergroup"
-            && (chatType? ["is_channel"] as? Bool ?? false)
+        if isChannel && !allowsChannelReading {
+            let removed = AccountNotificationCleanup.removeChat(
+                account: target.account,
+                chatID: id,
+                identifiersByAccount: &notificationIDsByAccount,
+                targetsByIdentifier: &notificationTargets
+            )
+            UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: Array(removed))
+            UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: Array(removed))
+        }
         let sponsoredKey = SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: id)
         if isChannel {
             sponsoredEligibleChatKeys.insert(sponsoredKey)
@@ -4469,10 +4512,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             refreshChatList(changedChatIDs: [id])
             if selectedChatByAccount[target.account] == id { refreshComposerState() }
         }
+        let routes = notificationTargets.values.compactMap { value -> (RoutedTDLibNotification, LocalAccountRuntime)? in
+            guard value.account == target.account, value.conversation.chatID == id else { return nil }
+            return (value, target)
+        }
+        deliverNotifications(routes, isReconciliation: true)
+    }
+
+    private func requestChatMetadata(_ chatID: Int64, from target: LocalAccountRuntime) {
+        guard pendingChatMetadataLookupsByAccount[target.account, default: []].insert(chatID).inserted else { return }
+        do {
+            try target.send(["@type": "getChat", "chat_id": chatID])
+        } catch {
+            pendingChatMetadataLookupsByAccount[target.account]?.remove(chatID)
+        }
     }
 
     private func loadSponsoredMessages(in target: LocalAccountRuntime, chatID: Int64) {
         let key = SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: chatID)
+        guard allowsChannelReading || !sponsoredChannelKeys.contains(key) else { return }
         guard sponsoredEligibleChatKeys.contains(key),
               SponsoredMessagesPolicy.shouldRequest(lastFetchedAt: sponsoredMessagesFetchedAt[key], now: Date()),
               !pendingSponsoredMessagesByExtra.values.contains(key) else { return }
@@ -4494,7 +4552,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
                 let state = pendingSearchRequests.isEmpty ? "Совпадений пока нет" : "Ищу в подключённых аккаунтах…"
                 chatList.addArrangedSubview(NSTextField(wrappingLabelWithString: state))
             }
-            for result in searchResults.values.prefix(420) {
+            for result in searchResults.values.filter({ result in
+                guard let chatID = result.conversation?.chatID else { return allowsChannelReading }
+                guard let isChannel = chatRowsByAccount[result.account]?[chatID]?.isChannel else {
+                    return allowsChannelReading
+                }
+                return allowsChannelReading || !isChannel
+            }).prefix(420) {
                 let controlID = "search-result-\(UUID().uuidString)"
                 let accountName = runtimesByAccount[result.account].flatMap(safeAccountName) ?? "Аккаунт"
                 let button = NSButton(title: "\(result.title)\n\(accountName) · \(result.excerpt)", target: self, action: #selector(openSearchResult(_:)))
@@ -4514,6 +4578,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let positions = account.flatMap { mainChatListPositionsByAccount[$0] } ?? MainChatListPositionIndex()
         let rows = (runtime.flatMap { chatRowsByAccount[$0.account] } ?? [:])
             .compactMap { chatID, row -> (key: Int64, value: ChatListRowData, order: UInt64)? in
+                guard allowsChannelReading || row.isChannel == false else { return nil }
                 guard let order = positions.order(for: chatID) else { return nil }
                 return (chatID, row, order)
             }
@@ -4524,18 +4589,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let loadState = runtime?.mainChatListLoadState ?? .needsLoad
         guard !rows.isEmpty else {
             clearStack(chatList)
+            let hasHiddenChannels = account.flatMap { chatRowsByAccount[$0]?.values.contains(where: { $0.isChannel == true }) } ?? false
             switch loadState {
             case .needsLoad, .loading:
                 addChatListState("Загружаю переписки…")
             case .loaded:
                 addChatListState(
                     "Нет загруженных переписок",
-                    detail: "TDLib пока не сообщила ни одной переписки. Можно запросить ещё одну страницу.",
+                    detail: hasHiddenChannels
+                        ? "Каналы пока скрыты в alpha. Личные и групповые чаты появятся после загрузки списка."
+                        : "TDLib пока не сообщила ни одной переписки. Можно запросить ещё одну страницу.",
                     allowsRetry: true,
                     retryTitle: "Загрузить ещё"
                 )
             case .exhausted:
-                addChatListState("Переписок пока нет")
+                addChatListState(
+                    hasHiddenChannels ? "Каналы отключены в alpha" : "Переписок пока нет",
+                    detail: hasHiddenChannels ? "Каналы временно недоступны. Личные и групповые чаты продолжают работать." : nil
+                )
             case .failed:
                 addChatListState("Не удалось загрузить переписки", detail: "Проверьте соединение и повторите попытку.", allowsRetry: true)
             }
@@ -4822,6 +4893,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         in runtime: LocalAccountRuntime,
         presentationSnapshot: AccountConversationSnapshot? = nil
     ) {
+        let knownChannel = chatRowsByAccount[runtime.account]?[id]?.isChannel
+        guard ChannelAccessPolicy.permitsOpening(
+            isChannel: knownChannel,
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            infoDictionary: Bundle.main.infoDictionary ?? [:]
+        ) else {
+            if knownChannel == nil {
+                requestChatMetadata(id, from: runtime)
+                setStatus("Проверяю тип переписки. После загрузки данных выберите её ещё раз.")
+            } else {
+                setStatus("Каналы пока недоступны в этой alpha-версии.")
+            }
+            return
+        }
         closePhotoViewer()
         if let previous = selectedChatByAccount[runtime.account], previous != id {
             stopTypingAction()
@@ -5158,6 +5243,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
     private func loadSelectedConversationHistory(in runtime: LocalAccountRuntime, chatID: Int64) {
         guard runtime === self.runtime, selectedChatByAccount[runtime.account] == chatID else { return }
+        guard ChannelAccessPolicy.permitsOpening(
+            isChannel: chatRowsByAccount[runtime.account]?[chatID]?.isChannel,
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            infoDictionary: Bundle.main.infoDictionary ?? [:]
+        ) else { return }
         let conversation = currentConversationKey(for: runtime.account, chatID: chatID)
         let anchorMessageID = historyAnchorByConversation.removeValue(forKey: conversation) ?? 0
         historyRequestCounter &+= 1
@@ -5195,6 +5285,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             refreshComposerState()
             return
         }
+        guard ChannelAccessPolicy.permitsOpening(
+            isChannel: chatRowsByAccount[runtime.account]?[id]?.isChannel,
+            bundleIdentifier: Bundle.main.bundleIdentifier,
+            infoDictionary: Bundle.main.infoDictionary ?? [:]
+        ) else { return }
         if let title = chatRowsByAccount[runtime.account]?[id]?.title,
            let label = chatPane.subviews.first(where: { $0.identifier?.rawValue == "conversationTitle" }) as? NSTextField {
             label.stringValue = title
@@ -5793,6 +5888,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let ordered = Array(messages)
         let selected = runtime
         let chatID = selected.flatMap { selectedChatByAccount[$0.account] }
+        if let selected, let chatID,
+           !ChannelAccessPolicy.permitsOpening(
+               isChannel: chatRowsByAccount[selected.account]?[chatID]?.isChannel,
+               bundleIdentifier: Bundle.main.bundleIdentifier,
+               infoDictionary: Bundle.main.infoDictionary ?? [:]
+           ) {
+            return
+        }
         let key = selected.flatMap { target in chatID.map { SponsoredMessagesKey(account: target.account, generation: target.generation, chatID: $0) } }
         sponsoredActionByControlID.removeAll()
         sponsoredReportActionByControlID.removeAll()
