@@ -149,7 +149,7 @@
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "PASS: canonical Dev.app built/launched from exact clean source e8bd672. CUA screenshot and AX show the primary Continue button aligned to the 400 pt phone field; empty-input disabled state and other controls remain. No account, credential, Keychain value or Telegram request."
+    "smoke": "PASS: canonical Dev.app source e8bd672 confirmed by window title. Light system appearance AX/screenshot and dark system appearance screenshot both show the same centered, aligned phone form, native controls, QR action and disclaimer; empty phone keeps Continue disabled. Dark review used the same running binary; no app rebuild, account, credential, Keychain value or Telegram request."
   },
   "verification": {
     "current_head_targeted_tests": "Swift 6.4 countryPickerSearchFiltersNamesCodesAndKeepsSharedCallingCodeRegionsDistinct passed 1/1; full exact-source CI passed 195 tests for app source c78cc2d. No direct geometry assertion; visual AX/screenshot review covers layout.",
@@ -858,8 +858,8 @@
     "executable_sha256": "8a5b0bfab0b63ffaffd942bb750cb37e10a1061b9441b5ebae75a0637d018e07",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: canonical Dev.app built/launched from exact clean source e8bd672. CUA screenshot and AX show the primary Continue button aligned to the 400 pt phone field; empty-input disabled state and other controls remain. No account, credential, Keychain value or Telegram request.",
-    "scope": "Accountless native sign-in visual/AX smoke in current light appearance; no login or network request."
+    "result": "PASS: canonical Dev.app source e8bd672 confirmed by window title. Light system appearance AX/screenshot and dark system appearance screenshot both show the same centered, aligned phone form, native controls, QR action and disclaimer; empty phone keeps Continue disabled. Dark review used the same running binary; no app rebuild, account, credential, Keychain value or Telegram request.",
+    "scope": "Accountless exact-source native sign-in visual smoke in light and dark macOS appearance; minimum-size drag attempt was not completed, so minimum-window, VoiceOver speech, IME/RTL and contrast measurements remain unverified."
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
@@ -1073,7 +1073,13 @@
       "scope": "Pinned TDLib and Apple Silicon Dev.app build/verification passed for the exact AppKit source."
     },
     "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app rebuilt once from exact clean source e8bd672. CUA screenshot visually confirms the Continue button and phone field have matching widths; AX confirms the same accountless form, empty phone, disabled Continue, QR action, and affiliation note. Strict ad-hoc signature passed. No login, Keychain read, account, or Telegram request.",
-    "coverage_limit": "Accountless UI smoke in the current light appearance only. The attached dark screenshot is from an older build. No VoiceOver speech, IME/RTL, real login/chat, live-account or 20-runtime validation. Development signing only; not a release."
+    "coverage_limit": "Accountless UI smoke in the current light appearance only. The attached dark screenshot is from an older build. No VoiceOver speech, IME/RTL, real login/chat, live-account or 20-runtime validation. Development signing only; not a release.",
+    "native_dark_review": {
+      "source_commit": "e8bd672a8888b654f615cdc17d8c78523a9368c6",
+      "result": "Same canonical running Dev.app visually reviewed in dark appearance; system controls, labels, country picker, disabled Continue, QR action and disclaimer remained legible. System appearance restored to Automatic.",
+      "minimum_window": "Not verified; attempted pointer resize did not reach the app window, and no window geometry change was observed."
+    },
+    "limitations": "Light and dark accountless first-run states reviewed on exact e8bd672a. Minimum supported size, formal contrast, VoiceOver speech, IME/RTL, later authorization states, login and account-backed behavior remain unverified."
   },
   "working_tree_candidate": {
     "base_commit": "380c98c8258ef5be9fd09e043ee2dcfa85cf85d9",
@@ -1120,7 +1126,12 @@
       "scope": "Pinned TDLib and Apple Silicon Dev.app build/verification passed for the exact AppKit source."
     },
     "native_smoke": "PASS: canonical /private/tmp/NeTelegram-Dev.app rebuilt once from exact clean source e8bd672. CUA screenshot visually confirms the Continue button and phone field have matching widths; AX confirms the same accountless form, empty phone, disabled Continue, QR action, and affiliation note. Strict ad-hoc signature passed. No login, Keychain read, account, or Telegram request.",
-    "coverage_limit": "Accountless UI smoke in the current light appearance only. The attached dark screenshot is from an older build. No VoiceOver speech, IME/RTL, real login/chat, live-account or 20-runtime validation. Development signing only; not a release."
+    "coverage_limit": "Accountless UI smoke in the current light appearance only. The attached dark screenshot is from an older build. No VoiceOver speech, IME/RTL, real login/chat, live-account or 20-runtime validation. Development signing only; not a release.",
+    "native_dark_review": {
+      "source_commit": "e8bd672a8888b654f615cdc17d8c78523a9368c6",
+      "result": "Same canonical running Dev.app visually reviewed in dark appearance; system controls, labels, country picker, disabled Continue, QR action and disclaimer remained legible. System appearance restored to Automatic.",
+      "minimum_window": "Not verified; attempted pointer resize did not reach the app window, and no window geometry change was observed."
+    }
   },
   "latest_auth_form_improvement": {
     "id": "APP04-AUTH-SEARCHABLE-COUNTRY-COMBO-01",
@@ -1192,22 +1203,20 @@
   },
   "latest_visual_hig_audit": {
     "date": "2026-10-15",
-    "app_source_commit": "b6851921778867fc5d0233236e59bd6c40b61af8",
+    "app_source_commit": "e8bd672a8888b654f615cdc17d8c78523a9368c6",
     "attached_window_source": "5f414650 (stale screenshot)",
-    "current_window_source": "b685192",
-    "decision": "Current native AppKit login screen conforms to reviewed macOS HIG; no redundant redesign or rebuild.",
+    "current_window_source": "e8bd672a8888b654f615cdc17d8c78523a9368c6",
+    "decision": "The aligned native AppKit sign-in form renders in both light and dark system appearances; no hard-coded appearance colors were found in the inspected auth controls.",
     "research": [
+      "https://developer.apple.com/design/human-interface-guidelines/designing-for-macos/",
       "https://developer.apple.com/design/human-interface-guidelines/windows",
       "https://developer.apple.com/design/human-interface-guidelines/layout",
       "https://developer.apple.com/design/human-interface-guidelines/text-fields",
-      "https://developer.apple.com/design/human-interface-guidelines/dark-mode",
-      "https://developer.apple.com/design/human-interface-guidelines/accessibility",
-      "https://github.com/TelegramMessenger/Telegram-iOS",
-      "https://github.com/TelegramOrg/Telegram-desktop"
+      "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "https://developer.apple.com/design/human-interface-guidelines/accessibility"
     ],
-    "scope": "Official guidance and repository/source review only; no Telegram styles/assets copied.",
-    "current_screenshot": "/var/folders/tq/cxqnzks0nd8_c0y80rf3j300000gp/T/codex-shot-2026-10-15_06-07-38.png",
-    "limitations": "Visual review was in current light system appearance only. No fresh dark/high-contrast, spoken VoiceOver, IME/RTL, real login, chat, or 20-account run. Ad-hoc development signing only; no distribution release."
+    "scope": "Exact canonical Dev.app `e8bd672a`; read-only native screenshots and AX review in light and dark. System Appearance was restored to the previously selected Automatic setting. No Telegram code/styles/assets copied.",
+    "limitations": "Minimum-window visual interaction did not complete because the CUA pointer did not resolve to the app window; source minSize is 560x520 points. No formal contrast measurement, high-contrast mode, spoken VoiceOver, IME/RTL, auth-step flow, real login/chat, or 20-account run. Ad-hoc development signing only."
   },
   "latest_public_site_verification": {
     "date": "2026-10-15",
