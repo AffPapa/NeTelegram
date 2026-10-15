@@ -139,6 +139,12 @@ controls whose actions are not implemented.
 
 ## Current implementation evidence and limits
 
+### 2026-10-15 — Apple HIG pass on the sign-in window
+
+Reviewed Apple's current guidance for [macOS windows](https://developer.apple.com/design/human-interface-guidelines/windows), [layout](https://developer.apple.com/design/human-interface-guidelines/layout), [text fields](https://developer.apple.com/design/human-interface-guidelines/text-fields), [color](https://developer.apple.com/design/human-interface-guidelines/color), and [accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility). Apple guidance supports semantic system colors across appearance/contrast settings, consistent field sizing and spacing, clear field labels, native window behavior, and grouping related controls without decorating each control. The exact visual treatment is a NeTelegram design choice, not an Apple-mandated login template.
+
+At app source `45c761c4094a8c9e33a90c8167b8093eaf70b3f4`, the live canonical Dev.app window title and accessibility tree matched the source. Its phone-entry state is accountless; the attached screenshot title `dev 5f414650` is from an earlier build and was not used as current-binary evidence. The inspected `45c761c` screen showed a custom rounded card around otherwise native controls. This HIG pass removes that extra custom fill and border while retaining the centered form, native controls, semantic window surface, single-width inputs, privacy disclosure and disabled Continue state. A post-change native visual check is required before calling the resulting screen verified. This says nothing about real login, authenticated chat UI, VoiceOver speech, increased-contrast behavior or all authorization steps.
+
 At app source `15002caccc16953cd3fd093ab9fb7ddca205ca1e`, ordinary text
 messages changed from generic sender-prefixed transcript lines to aligned,
 rounded incoming/outgoing surfaces. The focused unsafe-link and UTF-16 entity

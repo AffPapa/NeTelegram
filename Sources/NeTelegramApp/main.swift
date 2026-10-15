@@ -25,26 +25,10 @@ private final class SystemWindowBackgroundView: NSView {
     }
 }
 
-/// Gives the short, task-focused sign-in flow a clear group inside a resizable
-/// window while keeping its colors and border tied to the current macOS
-/// appearance and accessibility contrast settings.
+/// Structural container for the sign-in stack. The surrounding window remains
+/// the visual surface; standard AppKit controls provide their own grouping and
+/// focus treatment without a second decorative card.
 private final class AuthenticationPanelView: NSView {
-    override var isOpaque: Bool { false }
-
-    override func draw(_ dirtyRect: NSRect) {
-        let bounds = bounds.insetBy(dx: 0.5, dy: 0.5)
-        let panel = NSBezierPath(roundedRect: bounds, xRadius: 14, yRadius: 14)
-        NSColor.controlBackgroundColor.setFill()
-        panel.fill()
-        NSColor.separatorColor.setStroke()
-        panel.lineWidth = 1
-        panel.stroke()
-    }
-
-    override func viewDidChangeEffectiveAppearance() {
-        super.viewDidChangeEffectiveAppearance()
-        needsDisplay = true
-    }
 }
 
 private struct ChatListRowData {
@@ -644,7 +628,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             authScrollContent.widthAnchor.constraint(equalTo: authScroll.contentView.widthAnchor),
             authPanel.centerXAnchor.constraint(equalTo: authScrollContent.centerXAnchor),
             authPanel.centerYAnchor.constraint(equalTo: authScrollContent.centerYAnchor),
-            authPanel.widthAnchor.constraint(equalToConstant: 488).withPriority(.defaultHigh),
+            authPanel.widthAnchor.constraint(equalToConstant: 448).withPriority(.defaultHigh),
             authPanel.widthAnchor.constraint(lessThanOrEqualTo: authScrollContent.widthAnchor, constant: -32),
             authPanel.topAnchor.constraint(greaterThanOrEqualTo: authScrollContent.topAnchor, constant: 12),
             authPanel.bottomAnchor.constraint(lessThanOrEqualTo: authScrollContent.bottomAnchor, constant: -12),
@@ -952,8 +936,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         window.center()
         // Longer authorization steps remain reachable through the enclosing
         // scroll view while the first-run window stays compact. The login
-        // form has a fixed readable measure; an unbounded Zoom made the
-        // resizable window mostly empty while leaving the form unchanged.
+        // form uses one readable measure; a decorative card is avoided so the
+        // standard window and native controls define the visual hierarchy.
         window.minSize = NSSize(width: 560, height: 520)
         window.maxSize = NSSize(width: 720, height: 640)
         window.isReleasedWhenClosed = false
