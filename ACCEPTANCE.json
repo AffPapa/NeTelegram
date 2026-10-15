@@ -1137,5 +1137,12 @@
     "login_started": false,
     "scope": "Proves app-context read permission for the stored API hash only; does not prove successful Telegram login or later Keychain behavior on the restored support root."
   },
-  "latest_site_source_commit": "c2119bcb72523b31748965626131a30bb032acd3"
+  "latest_site_source_commit": "c2119bcb72523b31748965626131a30bb032acd3",
+  "latest_github_ci_api_check": {
+    "date": "2026-10-15",
+    "method": "Public GitHub Actions REST API via Scripts/github-ci-status.sh; unauthenticated read-only request keyed by full commit SHA. Git pushes continue through the configured system credential helper. gh auth status is invalid, so no gh login or replacement token was attempted.",
+    "test_commit": "6a6d57bb9986b46b5470f1073e2b351d60c475f1",
+    "workflow_run_id": 38727854037,
+    "result": "PASS; exact head SHA returned macOS CI completed/success. Script syntax and exact-SHA API query verified. No browser, OAuth flow, token creation, or token output was used."
+  }
 }
