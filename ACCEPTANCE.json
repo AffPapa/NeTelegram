@@ -1,42 +1,59 @@
 {
   "schema_version": 2,
-  "status": "APP08-NOTIFICATION-EPOCH-22: Async notification completions now reconcile against privacy epoch and current route; focused test, exact-source macOS CI, pinned TDLib app workflow, and canonical Dev.app accountless launch passed.",
+  "status": "AUTH-COUNTRY-SUGGESTION-01: AppKit sign-in now shows the macOS locale suggestion without silently choosing a country; focused phone policy test, exact-source CI, pinned TDLib workflow, and canonical Dev.app smoke passed.",
   "current_evidence": {
-    "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-    "local_suite": "Swift 6.4 focused regression notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges passed 1/1; Swift test build compiled NeTelegramApp and NeTelegramCoreTests. git diff --check passed before commit. This test verifies epoch/route policy; it does not simulate the OS notification daemon or prove real notification delivery.",
-    "focused_test": "Swift 6.4 focused regression notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges passed 1/1; Swift test build compiled NeTelegramApp and NeTelegramCoreTests. git diff --check passed before commit. This test verifies epoch/route policy; it does not simulate the OS notification daemon or prove real notification delivery.",
+    "app_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "local_suite": "Swift 6.4 local focused regression `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1. `git diff --check` passed. Exact-source macOS CI 38700024333 and pinned TDLib app workflow 38700024448 passed.",
+    "focused_test": "Swift 6.4 local focused regression `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1. `git diff --check` passed. Exact-source macOS CI 38700024333 and pinned TDLib app workflow 38700024448 passed.",
     "hosted_ci": {
-      "run_id": 38698123661,
+      "run_id": 38700024333,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123661",
-      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "scope": "Exact-source macOS CI completed successfully for notification privacy add-completion race fix."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38700024333",
+      "workflow_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "app_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "scope": "Exact-source macOS Swift CI passed for the country suggestion copy/accessibility refinement."
     },
     "native_workflow_ci": {
-      "run_id": 38698123625,
+      "run_id": 38700024448,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123625",
-      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "scope": "Pinned TDLib app bundle workflow completed successfully for exact source commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38700024448",
+      "workflow_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "app_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "scope": "Pinned TDLib Apple Silicon Dev.app workflow passed for the country suggestion refinement."
     },
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "application_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "046ce95e4db45f1e8fac56a801b993ea6f97fa22ed86d6e8d874db94fe6ff8d2",
-      "executable_sha256": "d25b01a4de9a35a1bc8cc5116d0c8fc59080e7420c1fed33f0fbb0be52ed02aa",
+      "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+      "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical Dev.app launched from exact clean source; AX title NeTelegram · dev 63556b10; screenshot confirms accountless phone sign-in, QR action and independent-client disclosure. No credentials entered."
+      "smoke": "PASS: canonical Dev.app rebuilt from exact clean source; AX title NeTelegram · dev 39649bc9; screenshot and AX tree show the locale-based country suggestion, explicit selection guidance, QR action, disabled empty-input Continue, and independent-client disclosure. No credentials entered.",
+      "native_app": {
+        "bundle_id": "org.affpapa.netelegram.dev",
+        "version": "0.0.0-dev",
+        "application_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+        "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+        "dirty_source": false,
+        "distribution_ready": false,
+        "path": "/private/tmp/NeTelegram-Dev.app",
+        "support_root": "/private/tmp/netelegram-dev-support-clean",
+        "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+        "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
+        "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
+        "architecture": "arm64",
+        "minimum_macos": "14.0",
+        "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
+        "smoke": "PASS: canonical Dev.app rebuilt from exact clean source; AX title NeTelegram · dev 39649bc9; screenshot and AX tree show the locale-based country suggestion, explicit selection guidance, QR action, disabled empty-input Continue, and independent-client disclosure. No credentials entered."
+      }
     },
     "latest_site_deployment": {
       "date": "2026-10-15",
@@ -585,8 +602,8 @@
   ],
   "last_verification": {
     "date": "2026-10-15",
-    "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-    "summary": "Exact-source macOS CI 38698123661 and pinned TDLib app workflow 38698123625 passed. Focused local Swift regression passed 1/1. Canonical Dev.app rebuilt once and launched from exact clean source; BuildInfo, fingerprint and strict ad-hoc signature verified. AX title and screenshot confirm accountless sign-in; no login performed. Public Site v208 deployed and anonymously checked; downloads still show no app build. No application release was produced."
+    "app_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "summary": "AUTH-COUNTRY-SUGGESTION-01: AppKit sign-in now shows the macOS locale suggestion without silently choosing a country; focused phone policy test, exact-source CI, pinned TDLib workflow, and canonical Dev.app smoke passed. The canonical Dev.app BuildInfo, source fingerprint, and strict ad-hoc signature matched; no account login occurred. Site v208 remains public and has no application download."
   },
   "current_local_slice": {
     "id": "APP08-NOTIFICATION-EPOCH-22",
@@ -655,7 +672,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Continue the next bounded app acceptance slice from this exact canonical source and bundle. Reconcile APP30 chat-list pagination adapter or another highest-value unresolved core path; preserve one Dev.app. Real account login, all-20 coverage, developer signing/notarization, and Telegram compatibility gates remain open.",
+  "next_action": "Continue the next bounded native-app acceptance slice from this checkpoint; do not repeat the phone-form layout pass unless source or appearance inputs change.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -687,63 +704,48 @@
   "current_local_candidate": {
     "bundle_id": "org.affpapa.netelegram.dev",
     "version": "0.0.0-dev",
-    "application_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-    "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "application_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
     "dirty_source": false,
     "distribution_ready": false,
     "path": "/private/tmp/NeTelegram-Dev.app",
     "support_root": "/private/tmp/netelegram-dev-support-clean",
-    "source_fingerprint_sha256": "046ce95e4db45f1e8fac56a801b993ea6f97fa22ed86d6e8d874db94fe6ff8d2",
-    "executable_sha256": "d25b01a4de9a35a1bc8cc5116d0c8fc59080e7420c1fed33f0fbb0be52ed02aa",
+    "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+    "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
     "minimum_macos": "14.0",
     "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-    "smoke": "PASS: canonical Dev.app launched from exact clean source; AX title NeTelegram · dev 63556b10; screenshot confirms accountless phone sign-in, QR action and independent-client disclosure. No credentials entered.",
+    "smoke": "PASS: canonical Dev.app rebuilt from exact clean source; AX title NeTelegram · dev 39649bc9; screenshot and AX tree show the locale-based country suggestion, explicit selection guidance, QR action, disabled empty-input Continue, and independent-client disclosure. No credentials entered.",
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "application_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+      "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "046ce95e4db45f1e8fac56a801b993ea6f97fa22ed86d6e8d874db94fe6ff8d2",
-      "executable_sha256": "d25b01a4de9a35a1bc8cc5116d0c8fc59080e7420c1fed33f0fbb0be52ed02aa",
+      "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+      "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "PASS: canonical Dev.app launched from exact clean source; AX title NeTelegram · dev 63556b10; screenshot confirms accountless phone sign-in, QR action and independent-client disclosure. No credentials entered."
+      "smoke": "PASS: canonical Dev.app rebuilt from exact clean source; AX title NeTelegram · dev 39649bc9; screenshot and AX tree show the locale-based country suggestion, explicit selection guidance, QR action, disabled empty-input Continue, and independent-client disclosure. No credentials entered."
     }
   },
   "latest_acceptance_slice": {
-    "id": "APP08-NOTIFICATION-EPOCH-22",
+    "id": "AUTH-COUNTRY-SUGGESTION-01",
     "date": "2026-10-15",
-    "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-    "test_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-    "finding": "UNUserNotificationCenter.add completion was ignored; an older detailed notification could finish after privacy lock cleanup and race the redacted reconciliation.",
-    "change": "Capture the enqueue privacy epoch. On add completion, compare the current epoch and route; re-deliver the current redacted/latest route or remove a route that no longer exists.",
-    "focused_test": "Swift 6.4 notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges passed 1/1. Swift test build compiled NeTelegramApp. Policy test covers locked/redacted route, removed route, and unchanged route; no OS notification daemon simulation.",
-    "hosted_ci": {
-      "run_id": 38698123661,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123661",
-      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "scope": "Exact-source macOS CI completed successfully for notification privacy add-completion race fix."
-    },
-    "native_workflow_ci": {
-      "run_id": 38698123625,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123625",
-      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
-      "scope": "Pinned TDLib app bundle workflow completed successfully for exact source commit."
-    },
-    "native_smoke": "Canonical arm64 Dev.app rebuilt once from exact clean source with Scripts/dev-app.sh --launch. BuildInfo source/fingerprint matched; strict ad-hoc codesign verification passed. AX title NeTelegram · dev 63556b10 and screenshot confirmed normal accountless sign-in; no phone/code entered.",
-    "scope": "Source and accountless app smoke only. Actual UNUserNotificationCenter timing, privacy-lock UI interaction, real Telegram notifications, account routing and 20-account coverage remain unverified."
+    "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "test_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "finding": "The sign-in control correctly kept the macOS region as a suggestion rather than silently selecting a calling code, but the visible helper text did not show which region macOS suggested.",
+    "change": "Show the localized macOS region and calling code as a suggestion, explain that the user must select a country for a national number, and expose the same dynamic text to VoiceOver. Keep international numbers with + available; no auth state or phone normalization behavior changed.",
+    "research": "Apple HIG Layout, Windows, Color, Labels, Accessibility, and Dark Mode; official Telegram Desktop GitHub repository inspected for high-level login-flow reference only. NeTelegram remains native AppKit and uses semantic system colors and system fonts. No Telegram source, GPL code, or styling was copied.",
+    "focused_test": "Swift 6.4 local focused regression `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1. `git diff --check` passed. Exact-source macOS CI 38700024333 and pinned TDLib app workflow 38700024448 passed.",
+    "native_smoke": "Canonical arm64 Dev.app rebuilt once from clean source via Scripts/dev-app.sh --launch. BuildInfo source/fingerprint matched; strict ad-hoc code-signature verification passed. CUA/AX and live screenshot confirm visible suggestion “Регион Mac предлагает: Таиланд (+66). Выберите страну или введите полный номер с +.” and matching VoiceOver value. Accountless screen only; no phone, code, or Telegram request.",
+    "limits": "One light-appearance phone step on this Mac. No dark/increased-contrast or minimum-window pass in this slice; real login, later auth steps, spoken VoiceOver, IME/RTL, 20-runtime behavior, Developer ID and notarization remain open."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -807,10 +809,10 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP08",
-    "receipt_id": "APP08-NOTIFICATION-EPOCH-22",
-    "test": "PASS 1/1 notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges; policy test covers redacted epoch transition, retired route removal, and unchanged route. It does not exercise OS notification daemon delivery.",
-    "result": "Exact-source macOS CI and pinned TDLib app workflow both passed; canonical local app was rebuilt from same source and accountless AX/screenshot checked."
+    "case": "AUTH-COUNTRY-SUGGESTION-01",
+    "receipt_id": "AUTH-COUNTRY-SUGGESTION-01",
+    "test": "Swift 6.4 local focused regression `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1. `git diff --check` passed. Exact-source macOS CI 38700024333 and pinned TDLib app workflow 38700024448 passed.",
+    "result": "Exact-source CI, pinned TDLib workflow, and native accountless screenshot/AX smoke passed."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -827,70 +829,37 @@
   "phase": "AUTH-KEYBOARD-FOCUS-20: Fixed the native sign-in Tab cycle so the QR action is reachable and country/phone traversal remains bidirectional. Exact-source CI and pinned TDLib app workflow passed; native accountless keyboard smoke passed.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
     "command": "Scripts/dev-app.sh --launch",
     "result": "PASS: canonical arm64 Dev.app rebuilt from exact clean source and launched; BuildInfo/fingerprint matched and codesign --verify --deep --strict passed.",
-    "source_fingerprint_sha256": "046ce95e4db45f1e8fac56a801b993ea6f97fa22ed86d6e8d874db94fe6ff8d2",
-    "executable_sha256": "d25b01a4de9a35a1bc8cc5116d0c8fc59080e7420c1fed33f0fbb0be52ed02aa",
+    "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+    "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
     "tdlib_commit": "c15d3f5a5de6e3ba5839822c451152e5e18bb700"
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "app_source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "046ce95e4db45f1e8fac56a801b993ea6f97fa22ed86d6e8d874db94fe6ff8d2",
-    "executable_sha256": "d25b01a4de9a35a1bc8cc5116d0c8fc59080e7420c1fed33f0fbb0be52ed02aa",
+    "source_fingerprint_sha256": "3053db00dba09dca2a65a3520897e913feb48382c36a78ec6266108f623a1c78",
+    "executable_sha256": "45f3031a7e9b7196ec2aac0be2259c49f956b184d69a5113c06ad51f7a5cfec3",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "PASS: canonical Dev.app launched from exact clean source; AX title NeTelegram · dev 63556b10; screenshot confirms accountless phone sign-in, QR action and independent-client disclosure. No credentials entered.",
-    "scope": "Normal accountless native launch and AX/screenshot identity verification; no authentication or live Telegram API action."
+    "result": "PASS: canonical Dev.app rebuilt from exact clean source; AX title NeTelegram · dev 39649bc9; screenshot and AX tree show the locale-based country suggestion, explicit selection guidance, QR action, disabled empty-input Continue, and independent-client disclosure. No credentials entered.",
+    "scope": "Normal accountless native launch, appearance screenshot, and AX confirmation of the visible country suggestion; no authentication or live Telegram API action."
   },
   "current_ui_design_slice": {
-    "id": "AUTH-PANEL-HIG-21",
+    "id": "AUTH-COUNTRY-SUGGESTION-01",
     "date": "2026-10-15",
-    "source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "test_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "finding": "The phone sign-in fields and actions were spread directly across the window background, so the step lacked a clear visual grouping and looked unfinished in the supplied screenshot.",
-    "change": "Added a rounded AppKit panel around the existing authentication stack, using semantic controlBackgroundColor and separatorColor so the grouping follows the current macOS light/dark appearance. No auth state, fields, validation, QR behavior, or requests changed.",
-    "research": "Reviewed Apple HIG for macOS layout, text fields and accessibility/contrast; reviewed TelegramSwift phone auth only for step sequencing. Retained AppKit system controls and no third-party code or visual styling was copied.",
-    "focused_test": "Swift 6.4 `swift build --disable-sandbox --scratch-path /private/tmp/netelegram-ui-hig-panel-build --target NeTelegramApp` passed; `git diff --check` passed before commit. Built the single canonical arm64 Dev.app from clean source and verified strict ad-hoc signature. Native CUA/AX and screenshot checked default-size light and minimum-size compact dark authentication previews; all auth fields/actions remained visible. Final normal non-preview app launched from the same exact source and AX confirms the empty phone step; no credentials entered.",
-    "hosted_ci": {
-      "run_id": 38694629718,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629718",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Exact-source macOS CI passed for the AppKit authentication panel grouping change."
-    },
-    "exact_source_ci": {
-      "run_id": 38694629718,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629718",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Exact-source macOS CI passed for the AppKit authentication panel grouping change."
-    },
-    "native_workflow_ci": {
-      "run_id": 38694629709,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629709",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification passed for the exact source commit."
-    },
-    "native_workflow": {
-      "run_id": 38694629709,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629709",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification passed for the exact source commit."
-    },
-    "source_commit_pushed": true,
-    "native_smoke": "PASS: canonical normal launch window NeTelegram · dev 42a4e634, arm64, exact source fingerprint and executable recorded; AX exposes country selection, phone, disabled Continue, QR and disclosure. Light screenshot shows the centered grouped panel. Previous targeted previews checked light and dark compact geometry; no account data or Telegram network action occurred.",
-    "coverage_limit": "Authentication phone-step UI only. No real Telegram login, later auth screens, registration, actual VoiceOver speech, IME/RTL, formal contrast measurement, 20-runtime coverage, Developer ID signing or notarization. Development ad-hoc build only; no public download."
+    "source_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "test_commit": "39649bc97e51d958bbc2bfda214c72acc3b3ff46",
+    "finding": "The sign-in control correctly kept the macOS region as a suggestion rather than silently selecting a calling code, but the visible helper text did not show which region macOS suggested.",
+    "change": "Show the localized macOS region and calling code as a suggestion, explain that the user must select a country for a national number, and expose the same dynamic text to VoiceOver. Keep international numbers with + available; no auth state or phone normalization behavior changed.",
+    "research": "Apple HIG Layout, Windows, Color, Labels, Accessibility, and Dark Mode; official Telegram Desktop GitHub repository inspected for high-level login-flow reference only. NeTelegram remains native AppKit and uses semantic system colors and system fonts. No Telegram source, GPL code, or styling was copied.",
+    "focused_test": "Swift 6.4 local focused regression `macOSCountrySuggestionDoesNotSelectCallingCodeForPhoneLogin` passed 1/1. `git diff --check` passed. Exact-source macOS CI 38700024333 and pinned TDLib app workflow 38700024448 passed.",
+    "native_smoke": "Canonical arm64 Dev.app rebuilt once from clean source via Scripts/dev-app.sh --launch. BuildInfo source/fingerprint matched; strict ad-hoc code-signature verification passed. CUA/AX and live screenshot confirm visible suggestion “Регион Mac предлагает: Таиланд (+66). Выберите страну или введите полный номер с +.” and matching VoiceOver value. Accountless screen only; no phone, code, or Telegram request.",
+    "limits": "One light-appearance phone step on this Mac. No dark/increased-contrast or minimum-window pass in this slice; real login, later auth steps, spoken VoiceOver, IME/RTL, 20-runtime behavior, Developer ID and notarization remain open."
   },
   "verified_at": "2026-10-15",
   "latest_native_workflow_ci": {
