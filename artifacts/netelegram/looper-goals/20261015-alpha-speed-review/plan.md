@@ -2,7 +2,7 @@
 
 ## Pinned state at review
 
-- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, origin `AffPapa/NeTelegram`; latest release-tooling commit `HEAD=origin/main=d47555d6f62a0c60227a42db099961df4c57f593`; the release-contract slice is pushed and the working tree is clean before this checkpoint metadata refresh. This does not freeze or change the separate app-source SHA.
+- Checkout: `/private/tmp/netelegram-cli-work`, branch `main`, origin `AffPapa/NeTelegram`; release-tooling commit `d47555d6f62a0c60227a42db099961df4c57f593`; checkpoint commit before this reconciliation was `5324b97e859c9fadc47545ed159fbf8efa21bfc7`. The app source is separately pinned at `75589091d7144e1d1ffe94b15bf38638df7d708d`; verify the new checkpoint SHA at resume.
 - App source: `75589091d7144e1d1ffe94b15bf38638df7d708d`; canonical Dev.app: `/private/tmp/NeTelegram-Dev.app`, `0.0.0-dev`, arm64, macOS 14, ad-hoc only. Not a distribution artifact.
 - Current Site: public v218, no app download, empty alpha/stable feeds.
 - Acceptance: 56 cases: 3 passed, 46 partial, 7 not run. Synthetic 20-profile tests are not real multi-account validation. All available authorized accounts remaining active is a required product behavior at every release, not a stable-only feature.

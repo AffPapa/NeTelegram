@@ -2229,3 +2229,9 @@
 
 - Source/tooling commit `d47555d6f62a0c60227a42db099961df4c57f593` was pushed once to `AffPapa/NeTelegram` main using the existing Git credential helper. Exact GitHub Metadata validation run `38741886157` completed successfully for that SHA.
 - Public unauthenticated GitHub Releases API returned zero existing releases at verification time; no tag or binary assets were created. This change does not alter the app-source SHA, Dev.app, Site, account data, or release signing state.
+
+## 2026-10-15 — Checkpoint identity and branding projection reconciliation
+
+- Reconciled stale public-name evidence in `ACCEPTANCE.json`: the current user choice is public app `NeTide`, repository codename `NeTelegram`; prior evidence stating the user selected public `NeTelegram` was obsolete. §1.3/1.4 remains open, sponsored-video requirements remain unresolved, and channel access/stable compatibility remain deferred.
+- Updated REL06 evidence to separate implemented/unit-tested updater configuration policy from missing production plist key, signed EdDSA archive, public appcast, and real update smoke. Integration remains `not_run`.
+- Refreshed duplicated release-preflight GitHub pointers to checkpoint `5324b97` and metadata CI `38742247670`; current app-source SHA remains `7558909`. Public Releases API returned zero releases. No app, credentials, Site, or release assets were changed.
