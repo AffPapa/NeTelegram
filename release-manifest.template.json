@@ -3,7 +3,7 @@
   "record_status": "template_not_a_release",
   "release_id": null,
   "product": "NeTelegram",
-  "public_title": null,
+  "public_title": "NeTide",
   "version": null,
   "build_number": null,
   "channel": null,
@@ -26,7 +26,7 @@
     "performance_matrix": []
   },
   "telegram_compatibility": {
-    "terms_2_3_title": "open",
+    "terms_2_3_title": "passed",
     "sponsored_media_3_3": "deferred",
     "basic_functionality_1_3_1_4": "open"
   },

@@ -1,16 +1,16 @@
-# NeTelegram for macOS
+# NeTide for macOS
 
 [English](README.md) · [Русский](README.ru.md)
 
-**NeTelegram** is a separate native macOS application in development, built with Swift and AppKit and designed for Telegram cloud chats through a pinned TDLib version. If you are looking for an unofficial Telegram client for macOS, a Telegram client for Mac, or an open-source macOS Telegram client, this repository publishes the source, current evidence, and product limitations.
+**NeTide** (repository codename **NeTelegram**) is a separate native macOS application in development, built with Swift and AppKit for Telegram cloud chats through a pinned TDLib version. If you are looking for an unofficial Telegram client for macOS, a Telegram client for Mac, or an open-source macOS Telegram client, this repository publishes the source, current evidence, and product limitations.
 
-> **Independent project.** NeTelegram is not an official Telegram app, is not developed by Telegram, and has no direct relationship or affiliation with, endorsement by, or connection to Telegram Messenger LLP. Telegram and TDLib names describe compatibility and belong to their respective owners. NeTelegram uses the Telegram API/TDLib; it is a separate client in the Telegram ecosystem, not a separate messaging network.
+> **Independent project.** NeTide is not an official Telegram app, is not developed by Telegram, and has no direct relationship or affiliation with, endorsement by, or connection to Telegram Messenger LLP. Telegram and TDLib names describe compatibility and belong to their respective owners. NeTide uses the Telegram API/TDLib; it is a separate client in the Telegram ecosystem, not a separate messaging network.
 
 > **Status:** development continues. There is no signed installer to download. Real account login, account-based message sending, and twenty simultaneously authorized accounts have not been verified. See the [development site](https://netelegram.iryadom.chatgpt.site/) for downloads, changelog, development log, roadmap, privacy, and source links.
 
 ### Looking for an alternative Telegram client for Mac or a Telegram for Mac download?
 
-NeTelegram is an independent native client project for macOS. It is not the official Telegram for Mac and it is not a separate messaging service. The repository documents source, current verification status, and planned scope. There is no ready-to-download app yet because no signed, verified installer has been released. Current search-result wording includes “unofficial Telegram client for macOS”, “Telegram client for Mac”, “alternative Telegram client for Mac/macOS”, “native macOS Telegram client”, and “open-source Telegram client for Mac”. These phrases describe the project topic; they do not imply Telegram endorsement or measured search demand.
+NeTide is an independent native client project for macOS. It is not the official Telegram for Mac and it is not a separate messaging service; NeTelegram is the repository codename. The repository documents source, current verification status, and planned scope. There is no ready-to-download app yet because no signed, verified installer has been released. Current search-result wording includes “unofficial Telegram client for macOS”, “Telegram client for Mac”, “alternative Telegram client for Mac/macOS”, “native macOS Telegram client”, and “open-source Telegram client for Mac”. These phrases describe the project topic; they do not imply Telegram endorsement or measured search demand.
 
 ## Intended scope
 
@@ -26,7 +26,7 @@ Version 1 excludes calls, voice chats, audio recording or playback, a general vi
 
 Observed search wording includes “unofficial Telegram client for macOS”, “Telegram alternative client for Mac”, “Telegram client for Mac”, “app for Telegram on Mac”, «неофициальный клиент Telegram для macOS», «клиент Telegram для Mac», «альтернативный клиент Telegram для Mac/macOS» and «приложение для Telegram на Mac». These are descriptive phrases, not claims of official status, rankings, or measured search demand. Search volumes and site rankings have not been measured.
 
-Current [Telegram API Terms](https://core.telegram.org/api/terms) restrict the app title: §2.3 allows “Telegram” in the title only when it is preceded by “Unofficial”. The requested public product name is NeTelegram. Its compatibility with §2.3 is unresolved, so this name is not a compatibility clearance and stable release remains gated. Section 2.2 also requires a prominent disclosure that the app uses the Telegram API and is part of the Telegram ecosystem. Channel access and stable release remain deferred because sponsored-message/video and basic-functionality requirements are unresolved. The name is not trademark clearance, and no API compatibility claim is made.
+Current [Telegram API Terms](https://core.telegram.org/api/terms) restrict the app title: §2.3 allows “Telegram” in the title only when it is preceded by “Unofficial”. The selected public title is NeTide; NeTelegram remains the repository codename. This does not resolve the separate §1.3/1.4 basic-functionality or §3.3 sponsored-media requirements. Section 2.2 also requires prominent disclosure that the app uses the Telegram API and is part of the Telegram ecosystem. Channel access remains deferred. The name is not trademark clearance, and no API compatibility claim is made.
 
 ## Verification and downloads
 

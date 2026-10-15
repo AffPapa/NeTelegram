@@ -106,6 +106,9 @@ def validate_candidate(manifest_path: Path, assets_dir: Path) -> str:
         raise ValidationError("published_at belongs in the separate append-only verification receipt")
     if manifest.get("product") != "NeTelegram" or manifest.get("repository") != "AffPapa/NeTelegram":
         raise ValidationError("product and repository must identify the NeTelegram project")
+    public_title = require_text(manifest, "public_title")
+    if "telegram" in public_title.casefold() and not public_title.casefold().startswith("unofficial telegram"):
+        raise ValidationError("public_title may use Telegram only with the required Unofficial prefix")
     if manifest.get("schema_version") != 1:
         raise ValidationError("unsupported manifest schema_version")
     contract = manifest.get("artifact_contract")

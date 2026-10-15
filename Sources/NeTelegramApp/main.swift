@@ -446,7 +446,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         loginSubtitle.font = .preferredFont(forTextStyle: .body)
         loginSubtitle.textColor = .secondaryLabelColor
         loginSubtitle.alignment = .center
-        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTelegram — независимый клиент; не связан с Telegram Messenger LLP.")
+        loginDisclosure = NSTextField(wrappingLabelWithString: "NeTide — независимый клиент; не связан с Telegram Messenger LLP.")
         loginDisclosure.font = .preferredFont(forTextStyle: .footnote)
         loginDisclosure.textColor = .secondaryLabelColor
         loginDisclosure.maximumNumberOfLines = 2
@@ -457,14 +457,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountPicker.isHidden = true
         accountPicker.target = self
         accountPicker.action = #selector(selectAccount)
-        accountPicker.setAccessibilityLabel("Аккаунты NeTelegram и статус входа")
-        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в NeTelegram на этом Mac. Сессии других приложений не импортируются.")
+        accountPicker.setAccessibilityLabel("Аккаунты NeTide и статус входа")
+        accountPicker.setAccessibilityHelp("Здесь показаны только входы, добавленные в NeTide на этом Mac. Сессии других приложений не импортируются.")
 
-        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в NeTelegram отдельно. Сессии других приложений не используются.")
+        accountProfileHint = NSTextField(wrappingLabelWithString: "Каждый аккаунт входит в NeTide отдельно. Сессии других приложений не используются.")
         accountProfileHint.font = .systemFont(ofSize: 11)
         accountProfileHint.textColor = .secondaryLabelColor
         accountProfileHint.maximumNumberOfLines = 2
-        accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
+        accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTide")
 
         countryPicker = NSComboBox(frame: .zero)
         countryPicker.controlSize = .regular
@@ -2229,7 +2229,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         firstNameField.stringValue = ""
         lastNameField.stringValue = ""
         let accountNumber = profileOrder.firstIndex(of: account).map { $0 + 1 } ?? 1
-        loginHeading.stringValue = "Вход NeTelegram \(accountNumber)"
+        loginHeading.stringValue = "Вход NeTide \(accountNumber)"
         loginSubtitle.stringValue = "Подготавливаю сохранённый вход. Данные другого аккаунта скрыты."
         statusLabel.stringValue = "Открываю вход \(accountNumber)…"
         window.title = identifiedWindowTitle(ProductIdentity.displayName)
@@ -2437,7 +2437,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Удалить «\(title)»?"
-        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные NeTelegram. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
+        alert.informativeText = "Это удалит только незавершённый локальный вход и его данные NeTide. Сначала TDLib должен подтвердить закрытие; подтверждённый Telegram-аккаунт этим действием удалить нельзя."
         alert.addButton(withTitle: "Удалить незавершённый вход")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }
@@ -2509,7 +2509,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let alert = NSAlert()
         alert.alertStyle = .critical
         alert.messageText = "Выйти из аккаунта «\(title)»?"
-        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; NeTelegram также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
+        alert.informativeText = "Telegram требует сетевое соединение для выхода. После подтверждения Telegram удалит локальные данные этого профиля; NeTide также удалит сохранённые черновики. Остальные аккаунты продолжат работу."
         alert.addButton(withTitle: "Выйти и удалить локальные данные")
         alert.addButton(withTitle: "Отмена")
         guard alert.runModal() == .alertFirstButtonReturn else { return }

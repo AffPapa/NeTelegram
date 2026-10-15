@@ -1,7 +1,8 @@
-NeTelegram is the name selected for this project and is currently a project
-codename. Copyright and trademark rights in Telegram belong to their owners.
+NeTide is the public application name. NeTelegram is the repository codename
+and internal technical identifier. Copyright and trademark rights in Telegram
+belong to their owners.
 
-The MIT License in LICENSE applies only to original NeTelegram code authored
+The MIT License in LICENSE applies only to original NeTide/NeTelegram project code authored
 for this project. Third-party components retain their separate terms:
 
 * TDLib 1.8.68, pinned to c15d3f5a5de6e3ba5839822c451152e5e18bb700, is licensed

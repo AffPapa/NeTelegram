@@ -78,7 +78,7 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
         "record_status": "release_candidate",
         "release_id": "netelegram-1.2.3-100",
         "product": "NeTelegram",
-        "public_title": "NeTelegram",
+        "public_title": "NeTide",
         "version": "1.2.3",
         "build_number": 100,
         "channel": channel,
@@ -121,6 +121,14 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
 
 
 class CandidateValidationTests(unittest.TestCase):
+    def test_public_title_uses_selected_name_without_telegram(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            manifest["public_title"] = "NeTelegram"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "public_title may use Telegram only with the required Unofficial prefix"):
+                validate_candidate(manifest_path, assets)
+
     def test_duplicate_artifact_kinds_are_rejected_even_with_distinct_filenames(self):
         with tempfile.TemporaryDirectory() as temporary:
             manifest_path, assets, manifest = valid_candidate(Path(temporary))
