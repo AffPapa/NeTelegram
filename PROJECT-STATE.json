@@ -151,7 +151,7 @@
     "real_twenty_runtime_coverage": "not tested",
     "developer_id_and_notarization": "Fresh direct security find-identity -v -p codesigning on 2026-10-14 returned 0 valid identities. An earlier checkpoint reported 4, but the fresh result supersedes it. Notary credentials remain unverified. No signing or notarization was performed.",
     "gatekeeper_and_sparkle_update": "not verified",
-    "keychain_main_thread": "Security reads use a dedicated serial DispatchQueue and non-interactive LAContext. Fresh clean default support root avoids restore before explicit login and reaches phone entry. The earlier preserved root /private/tmp/netelegram-dev-support still has an unresolved SecItemCopyMatching wait >20s; cause is unverified. No profile/key content was inspected, deleted or overwritten.",
+    "keychain_main_thread": "SecItemCopyMatching runs through a bounded OperationQueue (maximum 2 concurrent operations) and non-interactive reads set LAContext.interactionNotAllowed. The prior standalone/automatic read diagnostic timed out for the existing stored API-hash item; on 2026-10-15 the explicit in-app “allow saved API hash” interactive read returned success without exposing the value or starting Telegram login. The preserved support root still has a separate unresolved read delay; no profile/key content was inspected, deleted or overwritten.",
     "current_head_voiceover": "Static authorization-step mapping and context dedup are unit tested. Native VoiceOver, keyboard-only, RTL/IME and real login remain unverified.",
     "historical_native_smoke": "Pinned TDLib workflow 38384029582 succeeded for exact app-source SHA 1b3d910aadb1cd6ffc3a11501cc2d2b9c808f462; pinned TDLib built, isolated arm64 Dev.app assembled and first-run screenshot captured. Screenshot SHA-256 cd73b7b9e8b263888d91fa12c0d0e370d224ee10d47b2a379ed7e868431b9a45; no account data or credentials entered. CI smoke is accountless. This is historical evidence for 1b3d910, not the current app-source SHA.",
     "historical_native_smoke_4dcddcc": "Exact app source 4dcddcc: canonical arm64 Dev.app built once in 5.29s; ad-hoc codesign verification passed. CUA confirmed exact source title and accountless login UI. No credentials or profiles.",
@@ -311,7 +311,7 @@
     "APP25: read-only CUA check on 2026-10-15 showed SMAppService.mainApp unavailable for the temporary ad-hoc Dev.app (macOS says open an installed package); no Login Items preference was changed. Real registration persistence/removal requires an installed app bundle and remains unverified.",
     "All-active APP01, native recovery/notifications and resource measurements still require real authorized accounts and same-Mac observation; synthetic coverage remains separate."
   ],
-  "next_action": "Continue the existing app-first gate: investigate the existing Keychain read stall without reading/printing secret values; once owner can enter a current API hash in app, complete one user-operated login/read/send/logout. Keep 20-real-account certification, distribution signing/notarization, Telegram Terms gates, and app release open.",
+  "next_action": "Keychain access is now confirmed in the app without exposing its value. The owner previously chose to defer login; keep the app accountless and continue independent runtime/source audit work. One owner-operated login/read/send/logout remains pending, followed by the separate real-20-runtime measurement gate.",
   "secrets": "No credentials, tokens, account data, or profile paths are stored here.",
   "workspace": {
     "canonical_checkout": "/private/tmp/netelegram-cli-work",
@@ -1228,5 +1228,16 @@
     },
     "source_commit_pushed": true,
     "scope": "Accountless sign-in keyboard traversal in the phone step only. Does not prove all later auth steps, VoiceOver speech, IME/RTL, real account login, or 20-account behavior."
+  },
+  "latest_interactive_keychain_access_check": {
+    "date": "2026-10-15",
+    "app_source_commit": "584500497f03af5103c97db1a413c84d6f5b0ce1",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "method": "In the visible NeTelegram Dev app, invoked menu item “Разрешить доступ к сохранённому API hash…”. The app used its protected interactive Keychain path; checked only the status text in its window.",
+    "result": "The app reported “Доступ к сохранённому API hash подтверждён. Значение осталось в Связке ключей; нажмите «Продолжить», чтобы отдельно начать вход.” No secret value was displayed or copied. Phone field stayed empty and Continue stayed disabled; no Telegram authorization request started.",
+    "item_modified": false,
+    "secret_observed_or_printed": false,
+    "login_started": false,
+    "scope": "Proves app-context read permission for the stored API hash only; does not prove successful Telegram login or later Keychain behavior on the restored support root."
   }
 }

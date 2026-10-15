@@ -63,6 +63,10 @@
       "archive_local_status": "Site source commit pushed; exact source saved as version 206 and public deployment succeeded. Anonymous /devlog/ confirms the bilingual UI milestone; /downloads/ has no binary release.",
       "archive_local_sha256": "ced0bb759587ac4030df1930ae0222210e6eff8108eb5384ea05c12b2eeb6677",
       "archive_local_size_bytes": 208141
+    },
+    "keychain_access": {
+      "result": "The explicit protected in-app Keychain permission action succeeded on source 584500497f03af5103c97db1a413c84d6f5b0ce1; value was not displayed/copied and no login started.",
+      "scope": "Permission/read success only; real Telegram auth remains pending."
     }
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
@@ -661,7 +665,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "Continue the existing app-first gate: investigate the existing Keychain read stall without reading/printing secret values; once owner can enter a current API hash in app, complete one user-operated login/read/send/logout. Keep 20-real-account certification, distribution signing/notarization, Telegram Terms gates, and app release open.",
+  "next_action": "Keychain access is now confirmed in the app without exposing its value. The owner previously chose to defer login; keep the app accountless and continue independent runtime/source audit work. One owner-operated login/read/send/logout remains pending, followed by the separate real-20-runtime measurement gate.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -1087,5 +1091,16 @@
     },
     "source_commit_pushed": true,
     "scope": "Accountless sign-in keyboard traversal in the phone step only. Does not prove all later auth steps, VoiceOver speech, IME/RTL, real account login, or 20-account behavior."
+  },
+  "latest_interactive_keychain_access_check": {
+    "date": "2026-10-15",
+    "app_source_commit": "584500497f03af5103c97db1a413c84d6f5b0ce1",
+    "bundle_path": "/private/tmp/NeTelegram-Dev.app",
+    "method": "In the visible NeTelegram Dev app, invoked menu item “Разрешить доступ к сохранённому API hash…”. The app used its protected interactive Keychain path; checked only the status text in its window.",
+    "result": "The app reported “Доступ к сохранённому API hash подтверждён. Значение осталось в Связке ключей; нажмите «Продолжить», чтобы отдельно начать вход.” No secret value was displayed or copied. Phone field stayed empty and Continue stayed disabled; no Telegram authorization request started.",
+    "item_modified": false,
+    "secret_observed_or_printed": false,
+    "login_started": false,
+    "scope": "Proves app-context read permission for the stored API hash only; does not prove successful Telegram login or later Keychain behavior on the restored support root."
   }
 }
