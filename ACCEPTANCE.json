@@ -589,49 +589,31 @@
     "summary": "Exact-source macOS CI 38698123661 and pinned TDLib app workflow 38698123625 passed. Focused local Swift regression passed 1/1. Canonical Dev.app rebuilt once and launched from exact clean source; BuildInfo, fingerprint and strict ad-hoc signature verified. AX title and screenshot confirm accountless sign-in; no login performed. Site remains at the prior recorded public version; no release/download was produced."
   },
   "current_local_slice": {
-    "id": "AUTH-PANEL-HIG-21",
+    "id": "APP08-NOTIFICATION-EPOCH-22",
     "date": "2026-10-15",
-    "source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "test_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "finding": "The phone sign-in fields and actions were spread directly across the window background, so the step lacked a clear visual grouping and looked unfinished in the supplied screenshot.",
-    "change": "Added a rounded AppKit panel around the existing authentication stack, using semantic controlBackgroundColor and separatorColor so the grouping follows the current macOS light/dark appearance. No auth state, fields, validation, QR behavior, or requests changed.",
-    "research": "Reviewed Apple HIG for macOS layout, text fields and accessibility/contrast; reviewed TelegramSwift phone auth only for step sequencing. Retained AppKit system controls and no third-party code or visual styling was copied.",
-    "focused_test": "Swift 6.4 `swift build --disable-sandbox --scratch-path /private/tmp/netelegram-ui-hig-panel-build --target NeTelegramApp` passed; `git diff --check` passed before commit. Built the single canonical arm64 Dev.app from clean source and verified strict ad-hoc signature. Native CUA/AX and screenshot checked default-size light and minimum-size compact dark authentication previews; all auth fields/actions remained visible. Final normal non-preview app launched from the same exact source and AX confirms the empty phone step; no credentials entered.",
+    "source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "test_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "finding": "UNUserNotificationCenter.add completion was ignored; an older detailed notification could finish after privacy lock cleanup and race the redacted reconciliation.",
+    "change": "Capture the enqueue privacy epoch. On add completion, compare the current epoch and route; re-deliver the current redacted/latest route or remove a route that no longer exists.",
+    "focused_test": "Swift 6.4 notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges passed 1/1. Swift test build compiled NeTelegramApp. Policy test covers locked/redacted route, removed route, and unchanged route; no OS notification daemon simulation.",
     "hosted_ci": {
-      "run_id": 38694629718,
+      "run_id": 38698123661,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629718",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Exact-source macOS CI passed for the AppKit authentication panel grouping change."
-    },
-    "exact_source_ci": {
-      "run_id": 38694629718,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629718",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Exact-source macOS CI passed for the AppKit authentication panel grouping change."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123661",
+      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "scope": "Exact-source macOS CI completed successfully for notification privacy add-completion race fix."
     },
     "native_workflow_ci": {
-      "run_id": 38694629709,
+      "run_id": 38698123625,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629709",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification passed for the exact source commit."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123625",
+      "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+      "scope": "Pinned TDLib app bundle workflow completed successfully for exact source commit."
     },
-    "native_workflow": {
-      "run_id": 38694629709,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629709",
-      "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification passed for the exact source commit."
-    },
-    "source_commit_pushed": true,
-    "native_smoke": "PASS: canonical normal launch window NeTelegram · dev 42a4e634, arm64, exact source fingerprint and executable recorded; AX exposes country selection, phone, disabled Continue, QR and disclosure. Light screenshot shows the centered grouped panel. Previous targeted previews checked light and dark compact geometry; no account data or Telegram network action occurred.",
-    "coverage_limit": "Authentication phone-step UI only. No real Telegram login, later auth screens, registration, actual VoiceOver speech, IME/RTL, formal contrast measurement, 20-runtime coverage, Developer ID signing or notarization. Development ad-hoc build only; no public download."
+    "native_smoke": "Canonical arm64 Dev.app rebuilt once from exact clean source with Scripts/dev-app.sh --launch. BuildInfo source/fingerprint matched; strict ad-hoc codesign verification passed. AX title NeTelegram · dev 63556b10 and screenshot confirmed normal accountless sign-in; no phone/code entered.",
+    "scope": "Source and accountless app smoke only. Actual UNUserNotificationCenter timing, privacy-lock UI interaction, real Telegram notifications, account routing and 20-account coverage remain unverified."
   },
   "latest_site_deployment": {
     "date": "2026-10-15",
@@ -825,21 +807,10 @@
   },
   "latest_targeted_acceptance_check": {
     "date": "2026-10-15",
-    "case": "APP02",
-    "receipt_id": "APP02-RESTORE-STALL-DEDUP-01",
-    "test": "PASS 1/1 `restorePlannerAndStartupRegistryDeduplicateWhileOneKeychainPreparationStalls`; composes profile restore planning, startup registry, parallelism=2 and injected Keychain preparation across 20 synthetic profiles. One profile stalls, one fails with errSecInteractionNotAllowed, the other 18 finish; a repeated restore adds no duplicate work; existing DB/draft marker bytes remain unchanged; after releasing the stall, 19 succeed and all slots drain.",
-    "result": "Focused local Swift 6.4 test passed 1/1; exact test-only GitHub macOS serial CI passed (195 tests). APP02 remains partial: synthetic coordination only; no real Keychain, TDLib sessions, Telegram accounts, AppDelegate restore, or resource measurements.",
-    "command": "swift test --disable-sandbox --scratch-path /private/tmp/netelegram-app02-restore-scratch --no-parallel --filter restorePlannerAndStartupRegistryDeduplicateWhileOneKeychainPreparationStalls",
-    "scope": "Synthetic regression covers the restore planner/registry/scheduler/preparer composition. It does not prove macOS Keychain behavior, production AppDelegate wiring, 20 live LocalAccountRuntime instances, TDLib connections, real authorized identities, or same-Mac RSS/CPU/wakeups/network.",
-    "test_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
-    "hosted_test_ci": {
-      "run_id": 38638917609,
-      "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38638917609",
-      "workflow_commit": "72fbbf70eafc90f4e87f6c7a1103b07e84e27fc0",
-      "app_source_commit": "47247149939e825c23b5816573e42ff5101c7b94",
-      "scope": "Full serial macOS core suite: 195 tests passed on test-only commit; native app source remained unchanged."
-    }
+    "case": "APP08",
+    "receipt_id": "APP08-NOTIFICATION-EPOCH-22",
+    "test": "PASS 1/1 notificationAddCompletionReconcilesPrivacyEpochAndRouteChanges; policy test covers redacted epoch transition, retired route removal, and unchanged route. It does not exercise OS notification daemon delivery.",
+    "result": "Exact-source macOS CI and pinned TDLib app workflow both passed; canonical local app was rebuilt from same source and accountless AX/screenshot checked."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -923,12 +894,12 @@
   },
   "verified_at": "2026-10-15",
   "latest_native_workflow_ci": {
-    "run_id": 38694629709,
+    "run_id": 38698123625,
     "status": "success",
-    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38694629709",
-    "workflow_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "app_source_commit": "42a4e63450ff6c381f6d27119ef5facea2729276",
-    "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification passed for the exact source commit."
+    "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38698123625",
+    "workflow_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "app_source_commit": "63556b10cd82d97e2252c348a367df49132f794e",
+    "scope": "Pinned TDLib and Apple Silicon Dev.app workflow passed for APP08 exact source."
   },
   "latest_workflow_safety_check": {
     "date": "2026-10-15",
