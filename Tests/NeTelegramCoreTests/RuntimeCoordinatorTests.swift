@@ -497,6 +497,66 @@ private final class RuntimeOwnershipProbe {}
     #expect(dirtyAccounts.isEmpty)
 }
 
+@Test func draftQuitPersistenceBarrierPreservesDurableCopiesAcrossPartialDiskFailure() throws {
+    enum InjectedFailure: Error { case diskFull }
+
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let first = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000021")!)
+    let failing = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000022")!)
+    let unattempted = AccountUUID(UUID(uuidString: "00000000-0000-0000-0000-000000000023")!)
+    let firstConversation = ConversationKey(account: first, chatID: 121)
+    let failingConversation = ConversationKey(account: failing, chatID: 122)
+    let unattemptedConversation = ConversationKey(account: unattempted, chatID: 123)
+
+    func makeStore(_ account: AccountUUID, keyByte: UInt8) throws -> EncryptedDraftStore {
+        try EncryptedDraftStore(
+            account: account,
+            stateDirectory: root.appendingPathComponent(account.id.uuidString, isDirectory: true),
+            key: Data(repeating: keyByte, count: 32)
+        )
+    }
+
+    let firstStore = try makeStore(first, keyByte: 0x51)
+    let durableFailingStore = try makeStore(failing, keyByte: 0x52)
+    let durableUnattemptedStore = try makeStore(unattempted, keyByte: 0x53)
+    try firstStore.save([firstConversation: "first old copy"])
+    try durableFailingStore.save([failingConversation: "failing old copy"])
+    try durableUnattemptedStore.save([unattemptedConversation: "unattempted old copy"])
+
+    let failingStore = try EncryptedDraftStore(
+        account: failing,
+        stateDirectory: root.appendingPathComponent(failing.id.uuidString, isDirectory: true),
+        key: Data(repeating: 0x52, count: 32),
+        replaceFile: { _, _ in throw InjectedFailure.diskFull }
+    )
+    let newSnapshots: [AccountUUID: [ConversationKey: String]] = [
+        first: [firstConversation: "first new copy"],
+        failing: [failingConversation: "failing new copy"],
+        unattempted: [unattemptedConversation: "unattempted new copy"],
+    ]
+    var dirtyAccounts: Set<AccountUUID> = [first, failing, unattempted]
+    var attempted: [AccountUUID] = []
+    let stores: [AccountUUID: EncryptedDraftStore] = [
+        first: firstStore,
+        failing: failingStore,
+        unattempted: durableUnattemptedStore,
+    ]
+
+    let outcome = DraftQuitPersistenceBarrier.flush(dirtyAccounts: &dirtyAccounts) { account in
+        attempted.append(account)
+        try stores[account]!.save(newSnapshots[account]!)
+    }
+
+    #expect(outcome == .blocked(account: failing))
+    #expect(attempted == [first, failing])
+    #expect(dirtyAccounts == [failing, unattempted])
+    #expect(try firstStore.load() == [firstConversation: "first new copy"])
+    #expect(try durableFailingStore.load() == [failingConversation: "failing old copy"])
+    #expect(try durableUnattemptedStore.load() == [unattemptedConversation: "unattempted old copy"])
+}
+
 @Test func acceptedSendRemovesOnlyMatchingDraftFromLockedDirtyRecovery() {
     let account = AccountUUID()
     let sentConversation = ConversationKey(account: account, chatID: 30)
