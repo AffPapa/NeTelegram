@@ -2054,3 +2054,22 @@
 - Exact-source CI and metadata passed for `35abba9cb4924829bb02d20489b4c5f5c2854def`; native workflow `38714135145` failed after SwiftPM successfully built the app. Job log showed the script expected `.build/artifacts/Sparkle/...`, while SwiftPM's package identity path is case-folded as `sparkle` on the case-sensitive hosted runner.
 - Corrected `Scripts/dev-app.sh` to take `Sparkle.framework` from the exact `swift build --show-bin-path` product directory, the same build output containing the linked executable. Added a release regression assertion against reintroducing the guessed artifact path.
 - Local verification after the correction: `bash -n Scripts/dev-app.sh`, native workflow scope tests 4/4, release metadata suite 58/58, checkpoint validation, and `git diff --check` passed. Hosted native workflow has not yet run on the corrective commit.
+
+## 2026-10-15 — APPLE-HIG-SIGNIN-REVIEW-22
+
+- Research: rechecked current Apple HIG guidance for macOS conventions, windows, layout, text fields, writing, accessibility, keyboard navigation, and appearance. Reviewed public GitHub AppKit layout/control examples as implementation references only; no third-party code, styling, assets, or dependencies were copied. Telegram Desktop remained an interaction reference only.
+- Evidence: the attached screenshot/build identity was stale. The one canonical `/private/tmp/NeTelegram-Dev.app` was launched from clean app source `35abba9cb4924829bb02d20489b4c5f5c2854def` after the guarded process check confirmed absence. Its actual AX tree shows one native searchable country/code combo, explicit region suggestion, labeled phone field, disabled Continue, QR action, and truthful non-affiliation disclosure. AppKit build completed in 0.41 s; BuildInfo/build receipt match, binary hashes match, and strict ad-hoc signature verification passed.
+- Decision: no further UI source change is justified by current evidence. The form already uses native AppKit controls, semantic system colors, shared 400 pt column geometry, keyboard ordering and accessible labels. Dark appearance follows the user's macOS setting. No account data or credentials were entered; no Telegram request occurred.
+- Limits: this was current AX/window inspection, not a new pixel screenshot or quantitative contrast measurement. Spoken VoiceOver, increased contrast, IME/RTL, authenticated UI, real login, 20-account runtime coverage, Developer ID/notarization, and public app download remain unverified.
+
+## 2026-10-15 — CURRENT-RELEASE-AND-SLEEP-PREFLIGHT-01
+
+- Fresh read-only `security find-identity -v -p codesigning` reported four valid identities, including two Developer ID Application identities for Team ID `H6VGU2M6JD`. This confirms that Developer ID signing material is now available to the macOS account, not that a NeTelegram distribution bundle has been signed.
+- A Keychain query requested only attributes for the standard `com.apple.gke.notary.tool` service and returned `errSecItemNotFound` (-25300); the query did not request credential data. Environment inspection found zero variable names prefixed `APPLE_`, `ASC_`, or `NOTARY_`. No notarization submission was attempted.
+- Current canonical app process PID 63703, AX window `NeTelegram · dev 35abba9c`, owns no listed power assertion in `pmset -g assertions`. Other processes have assertions; no physical sleep/wake or Telegram recovery was tested. APP13 remains partial.
+
+## 2026-10-15 — APP04-LIFECYCLE-CURRENT-23
+
+- Reconciled the current app source `35abba9cb4924829bb02d20489b4c5f5c2854def` with GitHub run [38714652288](https://github.com/AffPapa/NeTelegram/actions/runs/38714652288) on workflow commit `708ebbbee0c95e3ff68490c8239a12bac55be590`. GitHub API reports the pinned TDLib native workflow completed successfully; its AppKit assembly step runs `Scripts/window-lifecycle-smoke.sh` unconditionally.
+- The smoke script asserts one launched process/window, last-window close with process still alive, LaunchServices reopen in the same PID with one visible window, then normal quit and process exit. The workflow uploaded its review bundle artifact. The local canonical Dev.app remains a separate exact-source AX/build/signature observation.
+- APP04 remains partial: workflow evidence is accountless and ran on a GitHub macOS host. It does not prove owner-Mac behavior with active TDLib accounts, drafts, multi-runtime close barriers, or twenty-account quit. No additional GUI rerun or source change was made.
