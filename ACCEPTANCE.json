@@ -535,8 +535,8 @@
       "method": "source-matched native visual review at default and minimum window sizes; dark/light and accessibility contrast checks",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "App source 63d7968 preserves the 560x500-point first-run content size and user resizes inside the auth range. Exact-source CI 38725117924 and pinned native workflow 38725117928 passed; canonical Dev.app screenshot/AX checked the default size and no overlap. CUA drag did not resize the window; minimum-size, dark/light matrix, increased contrast and VoiceOver remain unverified.",
-      "source_commit": "887b81664e203da26b4366666b313501ee1d6099"
+      "evidence": "App source 19485772224ab09558a6ef0764ae9b3ebcb5ea4a fixes auth-window frame-bound comparisons; five accountless auth states were visually/AX checked in light and dark preview at 520×460 minimum, with registration at 523×460 and keyboard Tab scrolling the consent row into view. Focused launch-mode tests passed 7/7; exact-source macOS CI 38730247076 and pinned TDLib/Dev.app workflow 38730247064 passed. This verifies layout only. Real auth, spoken VoiceOver, and system Increased Contrast remain unverified; status remains partial.",
+      "source_commit": "19485772224ab09558a6ef0764ae9b3ebcb5ea4a"
     },
     {
       "id": "AUTH04",
