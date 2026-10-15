@@ -1,10 +1,10 @@
 {
   "schema_version": 2,
-  "status": "RUNTIME-READ-RECEIPT-IDENTITY-01: Bind the privacy dispatch check to the selected runtime account and its already-verified Telegram user ID, matching the immutable command target. Exact-source Swift CI and pinned TDLib bundle workflow passed; canonical app remains at prior source while running.",
+  "status": "RUNTIME-READ-RECEIPT-IDENTITY-01: Visible read-receipt privacy dispatch now binds to the captured runtime identity. Exact-source CI, pinned TDLib assembly, canonical app rebuild, and accountless native smoke passed. Real account behavior remains pending.",
   "current_evidence": {
     "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
-    "local_suite": "Exact-source macOS CI passed for 3d65165; no local SwiftPM build because the sandbox could not access the host Clang module cache. Native pinned TDLib workflow produced an exact-source CI Dev.app artifact; canonical local Dev.app remains 96ed316.",
-    "focused_test": "No new focused test was added for this AppDelegate-only identity binding; exact-source CI and pinned TDLib bundle workflow both passed on 3d65165.",
+    "local_suite": "Exact-source macOS Swift CI passed for 3d65165; the guarded canonical Dev.app build and accountless first-run AX smoke also passed locally. No owner credentials or login were used.",
+    "focused_test": "No new focused test was added for this AppDelegate-only identity binding. Exact-source CI suite and pinned TDLib bundle workflow passed on 3d65165.",
     "hosted_ci": {
       "run_id": 38735807175,
       "status": "success",
@@ -24,21 +24,20 @@
     "local_dev_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "application_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
-      "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
+      "source_fingerprint_sha256": "dc1db4fb20a4aba995a585efab83c1a15cc4075b728a54d13e2637de9fa5a1ce",
+      "executable_sha256": "7ca18026b70d3dbe431e5df0de5ea4c4b413ccfbd0b695003c87ebf8859a5da7",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request.",
-      "pending_source_commit": "3d65165ddc11143b3b972247de594a03463d1809"
+      "smoke": "Guarded canonical Dev.app build and launch from exact clean source 3d65165. BuildInfo: arm64, macOS 14 baseline, Swift 6.4, pinned TDLib c15d3f5. Strict ad-hoc signature passed. AX showed NeTide · dev 3d65165d and first-run phone auth, no account/profile data. No credentials or login request."
     },
     "latest_site_deployment": {
       "date": "2026-10-15",
@@ -104,12 +103,7 @@
       "limits": "Synthetic persistence/failure-injection and CI only. Physical disk-full, actual app quit with a real draft, real Telegram login/accounts, and 20 active runtimes were not tested. The running canonical Dev.app was not rebuilt because this slice changed persistence code only; it remains built from 6490b8d."
     },
     "current_dev_app_note": "Apple HIG research and Telegram source review informed one focused AppKit fix: neighboring country/phone controls and later auth fields now use regular system sizing without forced heights. Swift 6.4 build passed; the single canonical arm64 Dev.app was rebuilt once from clean exact source f54f5d3, code signature verified, and current screenshot/AX confirmed aligned regular-height country and phone controls, labels, keyboard focus, empty field, disabled Continue, and no login request. Exact-source macOS CI 38726643265 and pinned TDLib Dev.app workflow 38726643187 passed. Minimum-size resize, VoiceOver speech, increased contrast, RTL/IME, and real auth remain unverified.",
-    "pending_native_candidate": {
-      "source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
-      "running_bundle_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "status": "blocked_running_canonical_app",
-      "reason": "Canonical Dev.app at 96ed316 was positively observed running as NeTelegram PID 43295. Exact-source CI/native bundle passed for 3d65165, but replacing the live app would disrupt the current session; rebuild/smoke after the app is normally closed."
-    }
+    "pending_native_candidate": null
   },
   "case_evidence_policy": "Case-level evidence strings below are historical snapshots tied to their named source commits and harnesses. They do not prove the latest source unless the commit matches current_evidence.app_source_commit; statuses remain partial/not_run until the exact acceptance method is repeated.",
   "cases": [
@@ -205,7 +199,7 @@
       "method": "protocol fixtures+native",
       "required_for": "all releases",
       "status": "partial",
-      "evidence": "Local candidate adds a debounced AppKit viewport check and pinned-TDLib viewMessages requests only for incoming, fully visible message cards in the active unlocked window; force_read is false. The same bounded account/generation/conversation registry now includes fully visible text and photo sponsored cards; animation/video cards are excluded pending their required playback path. The exact local suite passes 125/125 on 2026-10-13. Native viewport behavior, real-account receipt semantics, lock/sleep/reopen and a remote CI run for this candidate remain unverified; no acceptance pass is claimed. Current source 3d65165 binds the visible read-receipt privacy check to the selected runtime account and verified Telegram user ID used for dispatch. Exact-source macOS CI 38735807175 and pinned TDLib/Dev.app workflow 38735807010 passed. This is compilation/synthetic CI evidence only; the canonical local app remains at 96ed316 and real-account receipt behavior is unverified; APP10 remains partial."
+      "evidence": "Local candidate adds a debounced AppKit viewport check and pinned-TDLib viewMessages requests only for incoming, fully visible message cards in the active unlocked window; force_read is false. The same bounded account/generation/conversation registry now includes fully visible text and photo sponsored cards; animation/video cards are excluded pending their required playback path. The exact local suite passes 125/125 on 2026-10-13. Native viewport behavior, real-account receipt semantics, lock/sleep/reopen and a remote CI run for this candidate remain unverified; no acceptance pass is claimed. Current source 3d65165 binds the visible read-receipt privacy check to the selected runtime account and verified Telegram user ID used for dispatch. Exact-source macOS CI 38735807175 and pinned TDLib/Dev.app workflow 38735807010 passed. This is compilation/synthetic CI evidence only; the canonical app was subsequently rebuilt and accountless AX-smoked at 3d65165; real-account receipt behavior is unverified; APP10 remains partial."
     },
     {
       "id": "APP11",
@@ -633,7 +627,7 @@
   "last_verification": {
     "date": "2026-10-15",
     "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
-    "summary": "RUNTIME-READ-RECEIPT-IDENTITY-01: exact-source Swift CI and pinned TDLib Dev.app assembly passed for 3d65165. Canonical local app is still 96ed316 and was confirmed running as PID 43295; exact-source local rebuild/smoke awaits normal app closure. No account smoke was performed."
+    "summary": "RUNTIME-READ-RECEIPT-IDENTITY-01: exact-source Swift CI and pinned TDLib bundle passed; canonical arm64 Dev.app was rebuilt and launched from exact clean source 3d65165, BuildInfo/fingerprint/strict ad-hoc signature verified, and accountless AX smoke passed. Real Telegram account behavior remains unverified."
   },
   "current_local_slice": {
     "id": "BRANDING-RELEASE-TITLE-01",
@@ -693,7 +687,7 @@
     "process_id": 13616,
     "result": "The canonical app is still running source 44c999d. Process enumeration via NSWorkspace was incomplete; the release-safe build guard detected PID 13616 and refused replacement. No force quit or data/session access occurred."
   },
-  "next_action": "After the current canonical Dev.app is normally closed, rebuild and smoke exact source 3d65165 once; then the owner completes standard sign-in and read/send/restart/logout. Fix only reproduced P0 defects. Keep 20-runtime and stable performance certification separate from alpha; batch Site brand/download/changelog changes with the verified GitHub alpha artifact.",
+  "next_action": "Owner completes standard in-app sign-in and verifies read/send/restart/logout on canonical clean source 3d65165. Fix only reproduced P0 defects. Keep 20-runtime and stable performance certification separate from alpha; batch Site brand/download/changelog changes with the verified GitHub alpha artifact.",
   "latest_release_candidate_validation": {
     "date": "2026-10-14",
     "base_commit": "abdf2268fbbfdf052980d97cfd53e62ba285c45d",
@@ -726,28 +720,22 @@
     "native_app": {
       "bundle_id": "org.affpapa.netelegram.dev",
       "version": "0.0.0-dev",
-      "application_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+      "application_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
       "dirty_source": false,
       "distribution_ready": false,
       "path": "/private/tmp/NeTelegram-Dev.app",
       "support_root": "/private/tmp/netelegram-dev-support-clean",
-      "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
-      "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
+      "source_fingerprint_sha256": "dc1db4fb20a4aba995a585efab83c1a15cc4075b728a54d13e2637de9fa5a1ce",
+      "executable_sha256": "7ca18026b70d3dbe431e5df0de5ea4c4b413ccfbd0b695003c87ebf8859a5da7",
       "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
       "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
       "architecture": "arm64",
       "minimum_macos": "14.0",
       "signing": "ad-hoc development only; codesign --verify --deep --strict passed",
-      "smoke": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request."
+      "smoke": "Guarded canonical Dev.app build and launch from exact clean source 3d65165. BuildInfo: arm64, macOS 14 baseline, Swift 6.4, pinned TDLib c15d3f5. Strict ad-hoc signature passed. AX showed NeTide · dev 3d65165d and first-run phone auth, no account/profile data. No credentials or login request."
     },
-    "pending_native_candidate": {
-      "source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
-      "running_bundle_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "status": "blocked_running_canonical_app",
-      "reason": "Canonical Dev.app at 96ed316 was positively observed running as NeTelegram PID 43295. Exact-source CI/native bundle passed for 3d65165, but replacing the live app would disrupt the current session; rebuild/smoke after the app is normally closed."
-    },
-    "pending_source_commit": "3d65165ddc11143b3b972247de594a03463d1809"
+    "pending_native_candidate": null
   },
   "latest_acceptance_slice": {
     "id": "RUNTIME-READ-RECEIPT-IDENTITY-01",
@@ -773,7 +761,7 @@
       "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly for exact app source; artifact is a CI development bundle, not a signed distribution release."
     },
-    "remaining": "Canonical Dev.app remains at 96ed316 and is running (NeTelegram PID 43295); do not replace it mid-session. Exact-source accountless CI artifact is not a signed release. Real Telegram read receipt behavior, owner account smoke, and all-account lifecycle remain unverified."
+    "remaining": "Owner-operated real sign-in/read/send/restart/logout remains unverified; 20-runtime and performance certification, Developer ID distribution/notarization, Gatekeeper, channel Terms gates, and downloadable assets remain open. Canonical Dev.app is now exact clean 3d65165 and accountless-smoked."
   },
   "latest_hosted_ci_efficiency_change": {
     "date": "2026-10-14",
@@ -857,7 +845,7 @@
       "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
       "scope": "Pinned TDLib Apple Silicon Dev.app assembly for exact app source; artifact is a CI development bundle, not a signed distribution release."
     },
-    "limitation": "CI compilation/assembly is not a real-account receipt test. Canonical local Dev.app is still running on 96ed316; real authenticated behavior remains unverified. APP10 remains partial."
+    "limitation": "Canonical exact-source app was subsequently rebuilt and accountless AX-smoked on 3d65165. This is not an authenticated read-receipt test; APP10 remains partial."
   },
   "latest_read_only_audit": {
     "date": "2026-10-14",
@@ -871,14 +859,14 @@
     "tests_run": false,
     "scope": "Read-only; exact async notification publish and click paths traced through final stale-route checks."
   },
-  "phase": "RUNTIME-READ-RECEIPT-IDENTITY-01: Bind the privacy dispatch check to the selected runtime account and its already-verified Telegram user ID, matching the immutable command target. Exact-source Swift CI and pinned TDLib bundle workflow passed; canonical app remains at prior source while running.",
+  "phase": "RUNTIME-READ-RECEIPT-IDENTITY-01: Visible read-receipt privacy dispatch now binds to the captured runtime identity. Exact-source CI, pinned TDLib assembly, canonical app rebuild, and accountless native smoke passed. Real account behavior remains pending.",
   "latest_local_build": {
     "date": "2026-10-15",
-    "source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-    "command": "Scripts/dev-app.sh --launch",
-    "result": "PASS: canonical arm64 Dev.app built from exact clean source; BuildInfo and strict ad-hoc signature verified.",
-    "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
-    "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
+    "source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+    "command": "Scripts/dev-app.sh (guarded rebuild), then Scripts/dev-app.sh --launch",
+    "result": "PASS: one canonical arm64 Dev.app built from exact clean source; BuildInfo, source fingerprint, executable hash, and strict ad-hoc signature verified. App launched and displayed clean first-run phone auth.",
+    "source_fingerprint_sha256": "dc1db4fb20a4aba995a585efab83c1a15cc4075b728a54d13e2637de9fa5a1ce",
+    "executable_sha256": "7ca18026b70d3dbe431e5df0de5ea4c4b413ccfbd0b695003c87ebf8859a5da7",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "sparkle_sha256": "b57162032b569fce26c8ba162a54c55740da362822f80eac72dbad41d6edc374",
     "swift_version": "Apple Swift version 6.4 (swiftlang-6.4.0.27.1 clang-2100.3.27.1)",
@@ -886,29 +874,29 @@
   },
   "latest_native_smoke": {
     "date": "2026-10-15",
-    "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
+    "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
     "bundle_path": "/private/tmp/NeTelegram-Dev.app",
-    "source_fingerprint_sha256": "b408ad6434035da4cc2d1e98e35580a57588cf1b7ebb5df1a1f1f0d6358fb909",
-    "executable_sha256": "1a1d79fc16c6bd4a6eaaf9092d79aa8226bda3cf748105b616f5b3cc8b89a7dc",
+    "source_fingerprint_sha256": "dc1db4fb20a4aba995a585efab83c1a15cc4075b728a54d13e2637de9fa5a1ce",
+    "executable_sha256": "7ca18026b70d3dbe431e5df0de5ea4c4b413ccfbd0b695003c87ebf8859a5da7",
     "tdjson_sha256": "9b1ba46d15f410d687aeb355bcd6bbe4e5e172bfc55ab38abc3e68d7842efdc1",
     "architecture": "arm64",
-    "result": "Canonical arm64 Dev.app built from exact clean source 96ed316. BuildInfo and strict ad-hoc signature verified. AX showed NeTide · dev 96ed3164, NeTide independent-project disclosure, first-run phone authorization, and no account/profile data. No credentials or login request.",
-    "scope": "Fresh accountless first-run AX verification of visible product name/disclosure on the exact clean canonical app. No account data, credential entry, or network login.",
+    "result": "Exact clean source 3d65165 canonical Dev.app launched. AX showed NeTide · dev 3d65165d, country/phone first-run auth, disabled Continue before phone entry, and independent-project disclosure. No account/profile data or credentials were entered. Strict ad-hoc signature passed.",
+    "scope": "Accountless native first-run launch smoke for the exact app source; does not test Telegram login, read receipts, account lifecycle, or distribution signature.",
     "exact_source_ci": {
-      "run_id": 38734713139,
+      "run_id": 38735807175,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713139",
-      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "scope": "Exact-source macOS Swift CI for NeTide identity, account-presentation strings, and related regressions."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38735807175",
+      "workflow_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "scope": "Exact-source macOS Swift test workflow for the visible-read identity binding fix."
     },
     "native_workflow_ci": {
-      "run_id": 38734713102,
+      "run_id": 38735807010,
       "status": "success",
-      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38734713102",
-      "workflow_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "app_source_commit": "96ed31647d7860701a9947373e5f46a714d183d4",
-      "scope": "Pinned TDLib Apple Silicon Dev.app assembly and verification for exact app source."
+      "url": "https://github.com/AffPapa/NeTelegram/actions/runs/38735807010",
+      "workflow_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "app_source_commit": "3d65165ddc11143b3b972247de594a03463d1809",
+      "scope": "Pinned TDLib Apple Silicon Dev.app assembly for exact app source; development bundle only, not a signed distribution release."
     }
   },
   "current_ui_design_slice": {
