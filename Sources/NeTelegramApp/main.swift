@@ -413,9 +413,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
     private func buildWindow() {
         // Keep the first-run phone step compact. Longer authorization states
         // use the same scroll container, while the window remains resizable.
-        let contentWidth: CGFloat = 600
-        let contentHeight: CGFloat = 560
-        let authFormColumnWidth: CGFloat = 400
+        let contentWidth: CGFloat = 560
+        let contentHeight: CGFloat = 500
+        let authFormColumnWidth: CGFloat = 380
         let authPanelHorizontalInset: CGFloat = 16
         let authStackHorizontalInset: CGFloat = 16
         let content = SystemWindowBackgroundView(frame: NSRect(x: 0, y: 0, width: contentWidth, height: contentHeight))
@@ -425,18 +425,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         let mark = NSView(frame: .zero)
         mark.wantsLayer = true
         mark.layer?.backgroundColor = NSColor.systemBlue.cgColor
-        mark.layer?.cornerRadius = 28
+        mark.layer?.cornerRadius = 14
         let markLabel = NSTextField(labelWithString: "N")
-        markLabel.font = .systemFont(ofSize: 30, weight: .bold)
+        markLabel.font = .systemFont(ofSize: 26, weight: .bold)
         markLabel.textColor = .white
         markLabel.alignment = .center
-        markLabel.frame = NSRect(x: 0, y: 8, width: 56, height: 40)
+        markLabel.frame = NSRect(x: 0, y: 4, width: 48, height: 40)
         markLabel.setAccessibilityElement(false)
         mark.addSubview(markLabel)
 
         loginHeading = NSTextField(labelWithString: "Добро пожаловать")
         loginHeading.font = .systemFont(
-            ofSize: NSFont.preferredFont(forTextStyle: .title1).pointSize,
+            ofSize: NSFont.preferredFont(forTextStyle: .title2).pointSize,
             weight: .semibold
         )
         loginHeading.alignment = .center
@@ -465,7 +465,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         accountProfileHint.setAccessibilityLabel("О входе в аккаунты NeTelegram")
 
         countryPicker = NSComboBox(frame: .zero)
-        countryPicker.placeholderString = "Выберите страну или введите код"
+        countryPicker.placeholderString = "Выберите страну"
         countryPicker.completes = false
         countryPicker.hasVerticalScroller = true
         countryPicker.numberOfVisibleItems = 8
@@ -475,7 +475,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         countryPicker.setAccessibilityHelp("Введите часть названия или телефонного кода, затем выберите страну из списка. Для местного номера выбор обязателен; полный номер можно ввести с плюсом.")
         countryPicker.delegate = self
         countryFieldLabel = NSTextField(labelWithString: "Страна:")
-        countryFieldLabel.font = .systemFont(ofSize: 13, weight: .medium)
+        countryFieldLabel.font = .preferredFont(forTextStyle: .subheadline)
         countryFieldLabel.textColor = .labelColor
         countryFieldLabel.setAccessibilityLabel("Страна")
         countryPickerStack = NSStackView(views: [countryFieldLabel, countryPicker])
@@ -500,16 +500,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         phoneFieldLabel.isHidden = true
         phoneField = NSTextField(string: "")
         phoneField.placeholderString = "+код страны и номер"
-        phoneField.font = .systemFont(ofSize: 17)
+        phoneField.font = .preferredFont(forTextStyle: .body)
         phoneField.frame = .zero
         phoneField.alignment = .left
         phoneField.setAccessibilityLabel("Номер телефона")
         phoneField.isHidden = false
         phoneField.delegate = self
+        let phoneEntryStack = NSStackView(views: [phoneFieldLabel, phoneField])
+        phoneEntryStack.orientation = .vertical
+        phoneEntryStack.alignment = .leading
+        phoneEntryStack.distribution = .fill
+        phoneEntryStack.spacing = 8
+        let numberEntryRow = NSStackView(views: [countryPickerStack, phoneEntryStack])
+        numberEntryRow.orientation = .horizontal
+        numberEntryRow.alignment = .top
+        numberEntryRow.distribution = .fillEqually
+        numberEntryRow.spacing = 12
 
         emailField = NSTextField(string: "")
         emailField.placeholderString = "Электронная почта"
-        emailField.font = .systemFont(ofSize: 17)
+        emailField.font = .preferredFont(forTextStyle: .body)
         emailField.alignment = .left
         emailField.setAccessibilityLabel("Электронная почта для входа")
         emailField.isHidden = true
@@ -517,13 +527,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
 
         firstNameField = NSTextField(string: "")
         firstNameField.placeholderString = "Имя"
-        firstNameField.font = .systemFont(ofSize: 17)
+        firstNameField.font = .preferredFont(forTextStyle: .body)
         firstNameField.setAccessibilityLabel("Имя для регистрации")
         firstNameField.isHidden = true
         firstNameField.delegate = self
         lastNameField = NSTextField(string: "")
         lastNameField.placeholderString = "Фамилия (необязательно)"
-        lastNameField.font = .systemFont(ofSize: 17)
+        lastNameField.font = .preferredFont(forTextStyle: .body)
         lastNameField.setAccessibilityLabel("Фамилия для регистрации, необязательно")
         lastNameField.isHidden = true
         lastNameField.delegate = self
@@ -601,7 +611,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         addAccountButton.frame = .zero
         addAccountButton.isHidden = true
         addAccountButton.setAccessibilityLabel("Добавить ещё один Telegram аккаунт")
-        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, countryPickerStack, countrySuggestionButton, phoneFieldLabel, phoneField, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
+        authStack = NSStackView(views: [mark, loginHeading, loginSubtitle, registrationTermsScroll, numberEntryRow, countrySuggestionButton, emailField, inputField, secureInputField, firstNameField, lastNameField, registrationConsent, qrImageView, statusLabel, actionButton, qrButton, changePhoneButton, loginDisclosure])
         authStack.orientation = .vertical
         authStack.alignment = .centerX
         authStack.distribution = .fill
@@ -659,7 +669,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             // edge-to-edge constraints made NSStackView distribute spare
             // height through the controls, which produced large uneven gaps.
             authScrollContent.heightAnchor.constraint(greaterThanOrEqualTo: authScroll.contentView.heightAnchor),
-            mark.widthAnchor.constraint(equalToConstant: 56), mark.heightAnchor.constraint(equalToConstant: 56),
+            mark.widthAnchor.constraint(equalToConstant: 48), mark.heightAnchor.constraint(equalToConstant: 48),
             // Keep the form centered while allowing its explanatory text and
             // registration terms to shrink with a narrow window.
             loginHeading.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -16),
@@ -671,17 +681,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             registrationTermsScroll.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             registrationTermsScroll.widthAnchor.constraint(equalToConstant: 440).withPriority(.defaultHigh),
             registrationTermsScroll.heightAnchor.constraint(equalToConstant: 144),
-            countryPickerStack.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            countryPickerStack.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
+            numberEntryRow.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
+            numberEntryRow.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
             countryFieldLabel.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.widthAnchor.constraint(equalTo: countryPickerStack.widthAnchor),
             countryPicker.heightAnchor.constraint(equalToConstant: 34),
             countrySuggestionButton.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -24),
             countrySuggestionButton.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
-            phoneFieldLabel.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneFieldLabel.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh),
-            phoneField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
-            phoneField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), phoneField.heightAnchor.constraint(equalToConstant: 40),
+            phoneFieldLabel.widthAnchor.constraint(equalTo: phoneEntryStack.widthAnchor),
+            phoneField.widthAnchor.constraint(equalTo: phoneEntryStack.widthAnchor), phoneField.heightAnchor.constraint(equalToConstant: 36),
             emailField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
             emailField.widthAnchor.constraint(equalToConstant: authFormColumnWidth).withPriority(.defaultHigh), emailField.heightAnchor.constraint(equalToConstant: 40),
             inputField.widthAnchor.constraint(lessThanOrEqualTo: authStack.widthAnchor, constant: -32),
@@ -956,8 +964,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
         // scroll view while the first-run window stays compact. The login
         // form uses one readable measure; a decorative card is avoided so the
         // standard window and native controls define the visual hierarchy.
-        window.minSize = NSSize(width: 560, height: 520)
-        window.maxSize = NSSize(width: 720, height: 640)
+        window.minSize = NSSize(width: 520, height: 460)
+        window.maxSize = NSSize(width: 720, height: 620)
         window.isReleasedWhenClosed = false
         window.delegate = self
         self.window = window
