@@ -77,6 +77,7 @@ def valid_candidate(root: Path, *, channel: str = "alpha", accounts: int = 1) ->
         "gatekeeper_status": "passed",
         "verification_evidence": ["sparkle-signature-verified", "gatekeeper-smoke:456"],
         "sparkle_ed_signature": "fixture-signature",
+        "sparkle_key_account": "netide-updates",
         "sparkle_version": "2.10.0",
         "sparkle_short_version": "1.2.3",
         "update_channel": channel,
@@ -148,9 +149,11 @@ def validate_fixture_candidate(root: Path, manifest: Path, assets: Path) -> str:
     verifier = root / "fixture-sign_update"
     verifier.write_text(
         "#!/bin/sh\n"
-        "[ \"$1\" = \"--verify\" ] || exit 20\n"
-        "[ -f \"$2\" ] || exit 21\n"
-        "[ \"$3\" = \"fixture-signature\" ] || exit 22\n"
+        "[ \"$1\" = \"--account\" ] || exit 19\n"
+        "[ \"$2\" = \"netide-updates\" ] || exit 20\n"
+        "[ \"$3\" = \"--verify\" ] || exit 21\n"
+        "[ -f \"$4\" ] || exit 22\n"
+        "[ \"$5\" = \"fixture-signature\" ] || exit 23\n"
         "exit 0\n",
         encoding="utf-8",
     )
@@ -384,6 +387,15 @@ class CandidateValidationTests(unittest.TestCase):
             del update["sparkle_ed_signature"]
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(ValidationError, "sparkle_ed_signature"):
+                validate_fixture_candidate(Path(temporary), manifest_path, assets)
+
+    def test_sparkle_key_account_is_required_and_restricted(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            manifest_path, assets, manifest = valid_candidate(Path(temporary))
+            update = next(item for item in manifest["artifacts"] if item["kind"] == "sparkle_update_zip")
+            update["sparkle_key_account"] = "../other-key"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaisesRegex(ValidationError, "sparkle_key_account contains unsupported characters"):
                 validate_fixture_candidate(Path(temporary), manifest_path, assets)
 
     def test_synthetic_tests_do_not_substitute_for_real_account_coverage(self):

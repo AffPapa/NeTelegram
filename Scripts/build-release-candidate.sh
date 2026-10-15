@@ -17,7 +17,6 @@ Required environment:
   NETELEGRAM_DEVELOPER_IDENTITY    exact Developer ID Application identity
   NETELEGRAM_DEVELOPER_TEAM_ID     expected Apple Team ID
   NETELEGRAM_NOTARY_PROFILE        notarytool Keychain profile name
-  NETELEGRAM_SPARKLE_PUBLIC_ED_KEY public EdDSA key (base64; not secret)
   NETELEGRAM_RELEASE_OUTPUT        new absolute directory outside the checkout
 
 Sparkle's private EdDSA key is read by its tool from the login Keychain. The
@@ -39,7 +38,21 @@ require_env() {
 }
 for name in NETELEGRAM_RELEASE_VERSION NETELEGRAM_RELEASE_BUILD NETELEGRAM_RELEASE_CHANNEL \
   NETELEGRAM_DEVELOPER_IDENTITY NETELEGRAM_DEVELOPER_TEAM_ID NETELEGRAM_NOTARY_PROFILE \
-  NETELEGRAM_SPARKLE_PUBLIC_ED_KEY NETELEGRAM_RELEASE_OUTPUT; do require_env "$name"; done
+  NETELEGRAM_RELEASE_OUTPUT; do require_env "$name"; done
+
+NETELEGRAM_SPARKLE_KEY_ACCOUNT="$(python3 - "$ROOT_DIR/UPDATER-CONFIG.json" <<'PY'
+import json, pathlib, sys
+value = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+print(value["sparkle_key_account"])
+PY
+)" || fail "cannot read updater key account from UPDATER-CONFIG.json"
+NETELEGRAM_SPARKLE_PUBLIC_ED_KEY="$(python3 - "$ROOT_DIR/UPDATER-CONFIG.json" <<'PY'
+import json, pathlib, sys
+value = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+print(value["sparkle_public_ed_key"])
+PY
+)" || fail "cannot read updater public key from UPDATER-CONFIG.json"
+[[ "$NETELEGRAM_SPARKLE_KEY_ACCOUNT" =~ ^[A-Za-z0-9._-]{1,64}$ ]] || fail "Sparkle key account contains unsupported characters"
 
 [[ "$NETELEGRAM_RELEASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || fail "version must be released SemVer without a prerelease suffix"
 [[ "$NETELEGRAM_RELEASE_BUILD" =~ ^[1-9][0-9]*$ ]] || fail "build must be a positive integer"
@@ -73,7 +86,7 @@ case "$ORIGIN" in
   https://github.com/affpapa/netelegram|https://github.com/affpapa/netelegram.git|git@github.com:affpapa/netelegram|git@github.com:affpapa/netelegram.git|ssh://git@github.com/affpapa/netelegram|ssh://git@github.com/affpapa/netelegram.git) ;;
   *) fail "unexpected source remote" ;;
 esac
-REMOTE_HEAD="$(git -C "$ROOT_DIR" ls-remote origin refs/heads/main | awk 'NR==1 {print $1}')" || fail "cannot verify the published main commit"
+REMOTE_HEAD="$(git -c credential.helper=osxkeychain -C "$ROOT_DIR" ls-remote origin refs/heads/main | awk 'NR==1 {print $1}')" || fail "cannot verify the published main commit"
 [[ "$REMOTE_HEAD" == "$HEAD" ]] || fail "release source must equal the published origin/main commit"
 
 IDENTITIES="$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null)" || fail "cannot inspect code-signing identities"
@@ -85,6 +98,12 @@ command -v swift >/dev/null || fail "Swift is unavailable"
 command -v ditto >/dev/null || fail "ditto is unavailable"
 SPARKLE_SIGN_UPDATE="$ROOT_DIR/.build/artifacts/sparkle/Sparkle/bin/sign_update"
 [[ -x "$SPARKLE_SIGN_UPDATE" ]] || fail "pinned Sparkle sign_update is unavailable; resolve the exact SwiftPM artifact first"
+SPARKLE_GENERATE_KEYS="$ROOT_DIR/.build/artifacts/sparkle/Sparkle/bin/generate_keys"
+[[ -x "$SPARKLE_GENERATE_KEYS" ]] || fail "pinned Sparkle generate_keys is unavailable; resolve the exact SwiftPM artifact first"
+SPARKLE_KEYCHAIN_PUBLIC_KEY="$("$SPARKLE_GENERATE_KEYS" --account "$NETELEGRAM_SPARKLE_KEY_ACCOUNT" -p 2>/dev/null)" \
+  || fail "Sparkle signing key is unavailable in the login Keychain"
+[[ "$SPARKLE_KEYCHAIN_PUBLIC_KEY" == "$NETELEGRAM_SPARKLE_PUBLIC_ED_KEY" ]] \
+  || fail "Sparkle Keychain signing key does not match UPDATER-CONFIG.json"
 TDJSON="$ROOT_DIR/.build/tdlib-build/libtdjson.dylib"
 [[ -f "$TDJSON" ]] || fail "pinned TDLib library is missing; build it with Scripts/build-tdlib.sh first"
 
@@ -95,7 +114,7 @@ xcrun notarytool history --keychain-profile "$NETELEGRAM_NOTARY_PROFILE" --outpu
 
 if [[ "$PREFLIGHT_ONLY" == "true" ]]; then
   echo "Release preflight passed for source $HEAD, version $NETELEGRAM_RELEASE_VERSION build $NETELEGRAM_RELEASE_BUILD ($NETELEGRAM_RELEASE_CHANNEL)."
-  echo "Preflight did not verify the Sparkle private key, build, sign, notarize, or create files."
+  echo "Preflight did not build, sign, notarize, or create candidate files."
   exit 0
 fi
 
@@ -210,24 +229,28 @@ hdiutil verify "$DMG" >/dev/null
 
 UPDATE_ZIP="$OUTPUT_REAL/$VERSIONED-update.zip"
 cp "$APP_ZIP" "$UPDATE_ZIP"
-SIGNATURE_OUTPUT="$("$SPARKLE_SIGN_UPDATE" "$UPDATE_ZIP")"
+SIGNATURE_OUTPUT="$("$SPARKLE_SIGN_UPDATE" --account "$NETELEGRAM_SPARKLE_KEY_ACCOUNT" "$UPDATE_ZIP")"
 printf '%s\n' "$SIGNATURE_OUTPUT" > "$OUTPUT_REAL/sparkle-signature.xml"
 SIGNATURE="$(python3 -c 'import re,sys; m=re.search(r"sparkle:edSignature=\"([^\"]+)\"",sys.stdin.read()); print(m.group(1) if m else "")' <<<"$SIGNATURE_OUTPUT")"
 [[ -n "$SIGNATURE" ]] || fail "Sparkle did not return an EdDSA update signature"
-"$SPARKLE_SIGN_UPDATE" --verify "$UPDATE_ZIP" "$SIGNATURE" >/dev/null
+"$SPARKLE_SIGN_UPDATE" --account "$NETELEGRAM_SPARKLE_KEY_ACCOUNT" --verify "$UPDATE_ZIP" "$SIGNATURE" >/dev/null
 
 python3 "$ROOT_DIR/Scripts/generate_sbom.py" --version "$NETELEGRAM_RELEASE_VERSION" \
   --source-commit "$HEAD" --app-zip "$APP_ZIP" --expected-team-id "$NETELEGRAM_DEVELOPER_TEAM_ID" \
   --output "$OUTPUT_REAL/$VERSIONED-sbom.json"
 python3 "$ROOT_DIR/Scripts/generate_release_notices.py" --output "$OUTPUT_REAL/NOTICE.txt"
-python3 - "$OUTPUT_REAL" "$VERSIONED" "$NETELEGRAM_RELEASE_VERSION" "$NETELEGRAM_RELEASE_BUILD" "$NETELEGRAM_RELEASE_CHANNEL" "$HEAD" "$SIGNATURE" <<'PY'
+python3 - "$OUTPUT_REAL" "$VERSIONED" "$NETELEGRAM_RELEASE_VERSION" "$NETELEGRAM_RELEASE_BUILD" "$NETELEGRAM_RELEASE_CHANNEL" "$HEAD" "$SIGNATURE" "$NETELEGRAM_SPARKLE_KEY_ACCOUNT" "$ROOT_DIR/SPARKLE.lock.json" <<'PY'
 import hashlib, json, pathlib, sys
-out=pathlib.Path(sys.argv[1]); stem,version,build,channel,commit,signature=sys.argv[2:]
+out=pathlib.Path(sys.argv[1]); stem,version,build,channel,commit,signature,key_account,lock_path=sys.argv[2:]
+sparkle_version=json.loads(pathlib.Path(lock_path).read_text(encoding="utf-8"))["version"]
 assets=[]
 for kind,name in (("app_zip",f"{stem}.zip"),("dmg",f"{stem}.dmg"),("sparkle_update_zip",f"{stem}-update.zip"),("sbom",f"{stem}-sbom.json"),("notice","NOTICE.txt")):
  p=out/name; h=hashlib.sha256(p.read_bytes()).hexdigest()
- assets.append({"kind":kind,"filename":name,"bytes":p.stat().st_size,"sha256":h})
-(out/"candidate-assets.json").write_text(json.dumps({"source_commit":commit,"version":version,"build":int(build),"channel":channel,"minimum_macos":"14.0","channel_access_enabled":False,"sparkle_ed_signature":signature,"assets":assets},indent=2)+"\n")
+ item={"kind":kind,"filename":name,"bytes":p.stat().st_size,"sha256":h}
+ if kind == "sparkle_update_zip":
+  item.update({"sparkle_ed_signature":signature,"sparkle_key_account":key_account,"sparkle_version":sparkle_version,"sparkle_short_version":version,"update_channel":channel,"minimum_system_version":"14.0"})
+ assets.append(item)
+(out/"candidate-assets.json").write_text(json.dumps({"source_commit":commit,"version":version,"build":int(build),"channel":channel,"minimum_macos":"14.0","channel_access_enabled":False,"assets":assets},indent=2)+"\n")
 with (out/"SHA256SUMS").open("w") as f:
  for item in assets: f.write(f"{item['sha256']}  {item['filename']}\n")
 PY

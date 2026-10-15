@@ -29,6 +29,7 @@ Use one canonical development bundle across checkouts: `/private/tmp/NeTelegram-
 
 ## Fast feedback and release boundary
 
+- The updater's public EdDSA key and dedicated Keychain account are in `UPDATER-CONFIG.json`; the private key is stored only in the macOS login Keychain under account `netide-updates`. Candidate preflight compares the Keychain public key with the checked-in value, and candidate validation verifies the archive signature using the recorded account. Never export the private seed with `generate_keys -x` or place key material in logs, environment dumps, release metadata, or the repository.
 - One canonical checkout, one source SHA, and one Dev.app path are used for a milestone. Do not switch among stale bundles or rebuild the same candidate after a Site-only failure.
 - Docs and static website edits use their relevant validators; metadata edits use `metadata.yml`; Swift changes use the full serial suite once. Native bundle smoke is a separate candidate gate, not another way to rerun unit tests.
 - Select checks from the changed paths before editing: Swift source -> one full serial suite; AppKit visible/lifecycle change -> also one scenario in the canonical Dev.app; workflow/toolchain/pin change -> the matching hosted integration gate; state/acceptance/README-only change -> JSON/metadata validators; Site source -> Site build/route checks. Do not rerun an unchanged gate to gain confidence. After a failure, inspect its job/log and change the next action based on the observed failure stage.

@@ -12,6 +12,7 @@ on:
       - 'TDLIB.lock.json'
       - 'COUNTRY-DATA.lock.json'
       - 'SPARKLE.lock.json'
+      - 'UPDATER-CONFIG.json'
       - 'Package.swift'
       - 'Package.resolved'
       - 'ThirdPartyLicenses/**'
@@ -34,6 +35,7 @@ on:
       - 'TDLIB.lock.json'
       - 'COUNTRY-DATA.lock.json'
       - 'SPARKLE.lock.json'
+      - 'UPDATER-CONFIG.json'
       - 'Package.swift'
       - 'Package.resolved'
       - 'ThirdPartyLicenses/**'
@@ -71,6 +73,7 @@ jobs:
           python3 -m json.tool TDLIB.lock.json >/dev/null
           python3 -m json.tool COUNTRY-DATA.lock.json >/dev/null
           python3 -m json.tool SPARKLE.lock.json >/dev/null
+          python3 -m json.tool UPDATER-CONFIG.json >/dev/null
           python3 -m json.tool Package.resolved >/dev/null
           python3 -m json.tool PROJECT-STATE.json >/dev/null
           python3 -m json.tool release-manifest.template.json >/dev/null

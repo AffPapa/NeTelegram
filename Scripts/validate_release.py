@@ -24,6 +24,7 @@ else:
 
 HEX_40 = re.compile(r"^[0-9a-f]{40}$")
 HEX_64 = re.compile(r"^[0-9a-f]{64}$")
+SPARKLE_KEY_ACCOUNT = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 VERSION = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 PLACEHOLDER = re.compile(r"(?:^|[<>])(?:TODO|TBD|CHANGEME|PLACEHOLDER|EXAMPLE)(?:$|[<>])", re.I)
 REQUIRED_MANIFEST_FIELDS = (
@@ -318,11 +319,13 @@ def validate_candidate(
                 raise ValidationError(f"{field} omits required project or third-party license notices")
         if artifact["kind"] == "sparkle_update_zip":
             sparkle_fields = (
-                "sparkle_ed_signature", "sparkle_version", "sparkle_short_version",
+                "sparkle_ed_signature", "sparkle_key_account", "sparkle_version", "sparkle_short_version",
                 "update_channel", "minimum_system_version",
             )
             for name in sparkle_fields:
                 require_text(artifact, name)
+            if not SPARKLE_KEY_ACCOUNT.fullmatch(artifact["sparkle_key_account"]):
+                raise ValidationError(f"{field}.sparkle_key_account contains unsupported characters")
             if artifact["sparkle_short_version"] != manifest["version"]:
                 raise ValidationError(f"{field}.sparkle_short_version must match manifest version")
             if artifact["update_channel"] != manifest["channel"]:
@@ -339,7 +342,10 @@ def validate_candidate(
                 )
             try:
                 signature_check = subprocess.run(
-                    [str(verifier), "--verify", str(candidate_path), artifact["sparkle_ed_signature"]],
+                    [
+                        str(verifier), "--account", artifact["sparkle_key_account"],
+                        "--verify", str(candidate_path), artifact["sparkle_ed_signature"],
+                    ],
                     capture_output=True,
                     text=True,
                     check=False,

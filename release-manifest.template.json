@@ -59,6 +59,7 @@
     ],
     "update_zip_extra": [
       "sparkle_ed_signature",
+      "sparkle_key_account",
       "sparkle_version",
       "sparkle_short_version",
       "update_channel",
