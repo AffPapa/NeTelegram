@@ -2110,3 +2110,10 @@
 - Compared the supplied screenshot title (`NeTelegram · dev 5f414650`) against the already-running canonical `/private/tmp/NeTelegram-Dev.app`. Fresh CUA showed window/build marker `NeTelegram · dev 6490b8d5`, source `6490b8d566c6648fcd6ec7d528d472d370475c39`.
 - Current AX and screenshot show one native searchable country/code combo box, one phone field, a shared aligned form column, primary/QR actions, and the independent-client disclosure. The two country controls in the attachment belong to the older build.
 - No source change or app rebuild was warranted. Before future UI edits, reconcile supplied window title/build marker, exact source SHA, and a fresh canonical screenshot; stale screenshot evidence must not trigger repeat implementation.
+
+
+## 2026-10-15 — APP09-DRAFT-QUIT-FLUSH-BARRIER-01
+
+- Source commit `59957441b2ca23db8edeb0123bd644183da53a4b` adds the deterministic account-ordered dirty-draft flush barrier and includes lock-recovery drafts in the quit snapshot. A failed write keeps the failed and later accounts dirty.
+- Focused local tests: barrier 2/2, lock recovery snapshot 1/1, encrypted-store disk-write failure 1/1; AppKit target compile passed. Exact-SHA GitHub CI runs [38722213980](https://github.com/AffPapa/NeTelegram/actions/runs/38722213980) and [38722214005](https://github.com/AffPapa/NeTelegram/actions/runs/38722214005) succeeded. Physical disk-full and a real quit with user data were not tested. No Dev.app rebuild was done; the current running canonical app remains source `6490b8d`.
+- Existing public Site v214 deployed successfully from exact Site source commit `3b980dafbd9ede673b91b71bca70a126ca7f36bc`; deployment `appgdep_6ad0af6c52b4819191306c7b89f8e72e`. Anonymous `/devlog/` and `/downloads/` both returned 200 `text/html`; devlog shows APP09, and downloads still has no binary. Site local archive SHA-256 `c75540638c11a00780dfc4c25a9a9541160240548b6858f68d87d51a8af04c78`; provider stored archive hash `sha256:0dc5b66d3131ce4685d96f4f0b0e1d766683972c62e33c11e96fe1d674105c9c`.
