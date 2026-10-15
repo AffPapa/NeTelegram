@@ -1789,11 +1789,13 @@ private func waitForCount(_ value: LockedTestValue<Int>, atLeast target: Int, ti
     #expect(index.chatIDs == [10, 20])
 
     // An archived-list event must not mutate main-list membership.
-    index.applyMainListUpdate(chatID: 10, order: 700)
+    index.applyUpdate(chatID: 10, scope: .other, order: 700)
+    #expect(index.order(for: 10) == 900)
+    index.applyUpdate(chatID: 10, scope: .main, order: 700)
     #expect(index.order(for: 10) == 700)
 
     // TDLib order zero means removal from this list.
-    index.applyMainListUpdate(chatID: 10, order: 0)
+    index.applyUpdate(chatID: 10, scope: .main, order: 0)
     #expect(index.order(for: 10) == nil)
     #expect(index.chatIDs == [20])
 }

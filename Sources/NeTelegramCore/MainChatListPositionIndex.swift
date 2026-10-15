@@ -1,5 +1,10 @@
 /// Tracks membership and ordering for TDLib's main chat list only.
 /// A position with order zero means TDLib removed the chat from that list.
+public enum ChatListPositionScope: Sendable, Equatable {
+    case main
+    case other
+}
+
 public struct MainChatListPositionIndex: Sendable, Equatable {
     private var orderByChatID: [Int64: UInt64] = [:]
 
@@ -21,7 +26,8 @@ public struct MainChatListPositionIndex: Sendable, Equatable {
     }
 
     /// Applies an incremental position update. Non-main lists are deliberately ignored.
-    public mutating func applyMainListUpdate(chatID: Int64, order: UInt64) {
+    public mutating func applyUpdate(chatID: Int64, scope: ChatListPositionScope, order: UInt64) {
+        guard scope == .main else { return }
         replaceSnapshot(chatID: chatID, mainListOrder: order)
     }
 }

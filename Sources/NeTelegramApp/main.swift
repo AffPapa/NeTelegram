@@ -3699,7 +3699,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate, NSSp
             if (position["list"] as? [String: Any])?["@type"] as? String == "chatListMain",
                let order = (position["order"] as? NSNumber)?.uint64Value {
                 mainChatListPositionsByAccount[target.account, default: MainChatListPositionIndex()]
-                    .applyMainListUpdate(chatID: chatID, order: order)
+                    .applyUpdate(chatID: chatID, scope: .main, order: order)
             }
             if target === runtime { refreshChatList(changedChatIDs: [chatID]) }
         } else if let type = object["@type"] as? String, type == "updateNewMessage",
